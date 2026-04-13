@@ -3,248 +3,368 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#161b22">
 <title>TC Plants — Lab Notes</title>
+<link rel="manifest" href="manifest.json">
 <script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3/dist/jszip.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0d1117;--surface:#161b22;--surface2:#21262d;
-  --border:#30363d;--text:#e6edf3;--muted:#8b949e;
-  --accent:#58a6ff;--green:#3fb950;--red:#f85149;--yellow:#d29922;
+  --bg:#0d1117;--sf:#161b22;--sf2:#21262d;--sf3:#2d333b;
+  --bd:#30363d;--tx:#e6edf3;--mu:#8b949e;
+  --ac:#58a6ff;--gn:#3fb950;--rd:#f85149;--yw:#d29922;--pu:#bc8cff;
   --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
   --mono:ui-monospace,SFMono-Regular,"SF Mono",Consolas,monospace;
 }
-body{background:var(--bg);color:var(--text);font-family:var(--font);height:100vh;overflow:hidden}
+body{background:var(--bg);color:var(--tx);font-family:var(--font);height:100vh;overflow:hidden}
 
 /* ── LOGIN ── */
-#login{display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:20px}
-.login-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:32px;width:380px}
-.login-logo{text-align:center;margin-bottom:24px}
-.login-logo .icon{font-size:40px;display:block;margin-bottom:8px}
-.login-logo h1{font-size:20px;font-weight:700}
-.login-logo p{font-size:13px;color:var(--muted);margin-top:4px;line-height:1.5}
-label{display:block;font-size:13px;font-weight:600;margin-bottom:5px;color:var(--text)}
+#login{display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column}
+.lbox{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:32px;width:390px}
+.llogo{text-align:center;margin-bottom:24px}
+.llogo .ic{font-size:42px;display:block;margin-bottom:8px}
+.llogo h1{font-size:20px;font-weight:700}
+.llogo p{font-size:13px;color:var(--mu);margin-top:6px;line-height:1.6}
+label{display:block;font-size:13px;font-weight:600;margin-bottom:5px}
 input,select,textarea{
-  width:100%;background:var(--bg);border:1px solid var(--border);
-  border-radius:6px;color:var(--text);font-family:var(--font);
-  font-size:14px;padding:8px 11px;outline:none;transition:border-color .15s
+  width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:6px;
+  color:var(--tx);font-family:var(--font);font-size:14px;padding:8px 11px;
+  outline:none;transition:border-color .15s
 }
-input:focus,select:focus,textarea:focus{border-color:var(--accent)}
-select option{background:var(--surface2)}
+input:focus,select:focus,textarea:focus{border-color:var(--ac)}
+select option{background:var(--sf2)}
 .field{margin-bottom:14px}
-.hint{font-size:12px;color:var(--muted);margin-top:4px}
-.hint a{color:var(--accent);text-decoration:none}
-.btn{
-  background:var(--accent);border:none;border-radius:6px;
-  color:#0d1117;cursor:pointer;font-family:var(--font);
-  font-size:14px;font-weight:600;padding:8px 16px;transition:opacity .15s
-}
+.hint{font-size:12px;color:var(--mu);margin-top:4px}
+.hint a{color:var(--ac);text-decoration:none}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+
+/* ── BUTTONS ── */
+.btn{background:var(--ac);border:none;border-radius:6px;color:#0d1117;cursor:pointer;
+  font-family:var(--font);font-size:14px;font-weight:600;padding:8px 16px;transition:opacity .15s}
 .btn:hover{opacity:.88}
-.btn.ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
-.btn.danger{background:var(--red);color:#fff}
+.btn.ghost{background:transparent;border:1px solid var(--bd);color:var(--tx)}
+.btn.ghost:hover{background:var(--sf2)}
+.btn.danger{background:var(--rd);color:#fff}
+.btn.green{background:var(--gn);color:#0d1117}
 .btn.sm{font-size:13px;padding:5px 12px}
-.btn:disabled{opacity:.45;cursor:default}
-#login-btn{width:100%;padding:10px;margin-top:4px}
-#err{color:var(--red);font-size:13px;margin-top:8px;display:none;line-height:1.4}
+.btn.xs{font-size:12px;padding:3px 9px}
+.btn:disabled{opacity:.4;cursor:default}
+#lbtn{width:100%;padding:10px;margin-top:4px}
+#lerr{color:var(--rd);font-size:13px;margin-top:8px;display:none;line-height:1.4}
 
 /* ── APP SHELL ── */
 #app{display:none;height:100vh;flex-direction:column}
 #app.on{display:flex}
+
+/* ── NAV ── */
 nav{
-  background:var(--surface);border-bottom:1px solid var(--border);
-  padding:0 20px;height:52px;display:flex;align-items:center;gap:10px;flex-shrink:0
+  background:var(--sf);border-bottom:1px solid var(--bd);
+  padding:0 16px;height:50px;display:flex;align-items:center;gap:8px;flex-shrink:0
 }
-.brand{font-size:15px;font-weight:600;flex:1;display:flex;align-items:center;gap:8px}
-.brand span{color:var(--muted);font-weight:400}
-nav .btn{font-size:13px;padding:5px 12px}
+.brand{font-size:14px;font-weight:700;margin-right:8px;white-space:nowrap}
+.brand span{color:var(--mu);font-weight:400}
+.nav-tabs{display:flex;gap:2px;flex:1;overflow-x:auto}
+.ntab{
+  background:transparent;border:none;border-radius:6px;color:var(--mu);
+  cursor:pointer;font-family:var(--font);font-size:13px;font-weight:500;
+  padding:5px 12px;white-space:nowrap;transition:all .15s;position:relative
+}
+.ntab:hover{background:var(--sf2);color:var(--tx)}
+.ntab.active{background:var(--sf2);color:var(--tx)}
+.rbadge{
+  background:var(--rd);border-radius:8px;color:#fff;font-size:10px;font-weight:700;
+  padding:1px 5px;margin-left:4px;vertical-align:middle;display:none
+}
+.rbadge.on{display:inline}
+.nav-right{display:flex;gap:6px;align-items:center;flex-shrink:0}
+#offline-pill{
+  background:rgba(248,81,73,.15);border:1px solid var(--rd);border-radius:12px;
+  color:var(--rd);font-size:11px;padding:2px 9px;display:none
+}
+#offline-pill.on{display:block}
 
 /* ── LAYOUT ── */
-.layout{display:flex;flex:1;overflow:hidden}
+.section{display:none;flex:1;overflow:hidden}
+.section.on{display:flex}
+.section.fullpage{display:none;flex:1;overflow-y:auto;padding:32px 40px}
+.section.fullpage.on{display:block}
+
 aside{
-  width:270px;background:var(--surface);border-right:1px solid var(--border);
+  width:268px;background:var(--sf);border-right:1px solid var(--bd);
   display:flex;flex-direction:column;flex-shrink:0;overflow:hidden
 }
-.sidebar-top{padding:10px;border-bottom:1px solid var(--border);flex-shrink:0}
-.sidebar-top .btn{width:100%;padding:8px;font-size:13px}
-#note-list{flex:1;overflow-y:auto}
-.n-item{
-  padding:11px 14px;border-bottom:1px solid var(--border);
-  cursor:pointer;transition:background .1s
+.aside-top{padding:10px;border-bottom:1px solid var(--bd);flex-shrink:0;display:flex;flex-direction:column;gap:8px}
+.aside-top .btn{width:100%;padding:8px;font-size:13px}
+.aside-stats{font-size:11px;color:var(--mu);text-align:center;padding:4px 0}
+
+/* Search bar */
+.search-wrap{position:relative}
+.search-wrap input{padding-left:30px;font-size:13px}
+.search-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--mu);font-size:13px;pointer-events:none}
+
+/* Filters */
+.filter-row{display:flex;gap:5px;flex-wrap:wrap}
+.fpill{
+  background:var(--sf2);border:1px solid var(--bd);border-radius:12px;
+  color:var(--mu);cursor:pointer;font-family:var(--font);font-size:11px;
+  padding:2px 9px;transition:all .15s
 }
+.fpill:hover,.fpill.active{background:rgba(88,166,255,.15);border-color:var(--ac);color:var(--ac)}
+.fpill.red.active{background:rgba(248,81,73,.15);border-color:var(--rd);color:var(--rd)}
+.fpill.yellow.active{background:rgba(210,153,34,.15);border-color:var(--yw);color:var(--yw)}
+
+/* Note list */
+#note-list,#acc-list,#rec-list{flex:1;overflow-y:auto}
+.n-item{padding:11px 14px;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .1s;position:relative}
 .n-item:hover{background:rgba(255,255,255,.04)}
-.n-item.active{background:rgba(88,166,255,.1);border-left:2px solid var(--accent);padding-left:12px}
-.n-title{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.n-meta{font-size:11px;color:var(--muted);margin-top:3px;display:flex;gap:8px;align-items:center}
-.n-type{background:var(--surface2);border-radius:4px;padding:1px 6px;font-size:10px;text-transform:uppercase;letter-spacing:.4px}
-.n-tags{margin-top:5px;display:flex;gap:4px;flex-wrap:wrap}
-.tag{background:rgba(88,166,255,.15);color:var(--accent);border-radius:10px;font-size:11px;padding:1px 7px}
-.tag.green{background:rgba(63,185,80,.15);color:var(--green)}
+.n-item.active{background:rgba(88,166,255,.1);border-left:2px solid var(--ac);padding-left:12px}
+.n-title{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:16px}
+.n-meta{font-size:11px;color:var(--mu);margin-top:3px;display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.ntype{background:var(--sf2);border-radius:4px;padding:1px 6px;font-size:10px;text-transform:uppercase;letter-spacing:.3px;flex-shrink:0}
+.nspecies{font-size:11px;color:var(--gn);font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.n-tags-row{margin-top:4px;display:flex;gap:4px;flex-wrap:wrap}
+.tag{background:rgba(88,166,255,.12);color:var(--ac);border-radius:10px;font-size:11px;padding:1px 7px}
+.review-dot{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  width:7px;height:7px;border-radius:50%
+}
+.review-dot.overdue{background:var(--rd)}
+.review-dot.soon{background:var(--yw)}
 
-main{flex:1;overflow-y:auto;padding:32px 40px}
+/* Status badges */
+.sbadge{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:3px 10px;border-radius:12px;font-weight:500}
+.sbadge.type{background:var(--sf2);border:1px solid var(--bd);color:var(--tx)}
+.sbadge.stage{background:rgba(210,153,34,.12);color:var(--yw);border:1px solid rgba(210,153,34,.3)}
+.sbadge.species{background:rgba(63,185,80,.1);color:var(--gn);border:1px solid rgba(63,185,80,.3);font-style:italic}
+.sbadge.status-active{background:rgba(63,185,80,.1);color:var(--gn);border:1px solid rgba(63,185,80,.3)}
+.sbadge.status-lost{background:rgba(248,81,73,.1);color:var(--rd);border:1px solid rgba(248,81,73,.3)}
+.sbadge.status-other{background:var(--sf2);border:1px solid var(--bd);color:var(--mu)}
+.sbadge.review-overdue{background:rgba(248,81,73,.12);color:var(--rd);border:1px solid rgba(248,81,73,.3)}
+.sbadge.review-soon{background:rgba(210,153,34,.12);color:var(--yw);border:1px solid rgba(210,153,34,.3)}
 
-/* ── EMPTY STATE ── */
-#empty{text-align:center;padding:80px 20px;color:var(--muted)}
-#empty h2{font-size:20px;margin-bottom:8px;color:var(--text)}
-#empty p{font-size:14px;line-height:1.7}
+/* ── MAIN CONTENT ── */
+main{flex:1;overflow-y:auto;padding:28px 36px}
 
-/* ── NOTE VIEW ── */
-#view{display:none;max-width:800px}
-#view.on{display:block}
-.view-head{margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)}
-.view-title{font-size:28px;font-weight:700;line-height:1.3;margin-bottom:10px}
-.view-badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;align-items:center}
-.badge{font-size:12px;padding:3px 10px;border-radius:12px;font-weight:500}
-.badge.type{background:var(--surface2);border:1px solid var(--border);color:var(--text)}
-.badge.stage{background:rgba(210,153,34,.15);color:var(--yellow);border:1px solid rgba(210,153,34,.3)}
-.badge.species{background:rgba(63,185,80,.1);color:var(--green);border:1px solid rgba(63,185,80,.3);font-style:italic}
-.view-date{font-size:13px;color:var(--muted)}
-.view-actions{margin-top:12px;display:flex;gap:8px}
+/* Empty state */
+.empty-state{text-align:center;padding:70px 20px;color:var(--mu)}
+.empty-state h2{font-size:18px;margin-bottom:8px;color:var(--tx)}
+.empty-state p{font-size:14px;line-height:1.7}
+
+/* Detail view */
+.dview{display:none;max-width:820px}
+.dview.on{display:block}
+.dhead{margin-bottom:22px;padding-bottom:16px;border-bottom:1px solid var(--bd)}
+.dtitle{font-size:26px;font-weight:700;line-height:1.3;margin-bottom:10px}
+.dbadges{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:8px;align-items:center}
+.ddate{font-size:13px;color:var(--mu);margin-bottom:10px}
+.dactions{display:flex;gap:7px;flex-wrap:wrap}
+
+/* Editor */
+.editor{display:none;max-width:820px}
+.editor.on{display:block}
+.ehead{font-size:17px;font-weight:700;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--bd)}
+.editor-toolbar{display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap}
+#e-body,#ra-notes,#rr-notes{height:340px;font-family:var(--mono);font-size:13px;resize:vertical;line-height:1.7}
+.eactions{display:flex;gap:7px;margin-top:14px;flex-wrap:wrap}
+.tmpl-hint{font-size:12px;color:var(--mu);margin-top:4px}
 
 /* ── MARKDOWN ── */
 .md{font-size:15px;line-height:1.75}
-.md h1,.md h2,.md h3,.md h4{margin:24px 0 10px;line-height:1.3}
-.md h1{font-size:24px;padding-bottom:8px;border-bottom:1px solid var(--border)}
-.md h2{font-size:20px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.md h1,.md h2,.md h3,.md h4{margin:22px 0 10px;line-height:1.3}
+.md h1{font-size:24px;padding-bottom:8px;border-bottom:1px solid var(--bd)}
+.md h2{font-size:20px;padding-bottom:6px;border-bottom:1px solid var(--bd)}
 .md h3{font-size:17px}
-.md h4{font-size:15px;color:var(--muted)}
+.md h4{font-size:15px;color:var(--mu)}
 .md p{margin:10px 0}
 .md code{background:rgba(255,255,255,.08);border-radius:4px;font-family:var(--mono);font-size:13px;padding:2px 6px}
-.md pre{background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow-x:auto;padding:16px;margin:14px 0}
+.md pre{background:var(--sf);border:1px solid var(--bd);border-radius:6px;overflow-x:auto;padding:16px;margin:14px 0}
 .md pre code{background:none;padding:0;font-size:13px}
-.md blockquote{border-left:3px solid var(--border);color:var(--muted);margin:14px 0;padding:4px 16px}
+.md blockquote{border-left:3px solid var(--bd);color:var(--mu);margin:14px 0;padding:4px 16px}
 .md ul,.md ol{margin:10px 0;padding-left:22px}
 .md li{margin:4px 0}
 .md table{border-collapse:collapse;width:100%;margin:14px 0;font-size:14px}
-.md th,.md td{border:1px solid var(--border);padding:7px 12px;text-align:left}
-.md th{background:var(--surface2);font-weight:600}
-.md a{color:var(--accent)}
+.md th,.md td{border:1px solid var(--bd);padding:7px 12px;text-align:left}
+.md th{background:var(--sf2);font-weight:600}
+.md a{color:var(--ac)}
 .md img{max-width:100%;border-radius:6px;margin:8px 0}
-.md hr{border:none;border-top:1px solid var(--border);margin:20px 0}
+.md hr{border:none;border-top:1px solid var(--bd);margin:20px 0}
 .md strong{font-weight:700}
 
-/* ── EDITOR ── */
-#editor{display:none;max-width:800px}
-#editor.on{display:block}
-.editor-head{font-size:17px;font-weight:700;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border)}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-#edit-body{
-  height:380px;font-family:var(--mono);font-size:13px;
-  resize:vertical;line-height:1.7;tab-size:2
-}
-.editor-actions{display:flex;gap:8px;margin-top:14px}
-.template-hint{font-size:12px;color:var(--muted);margin-top:4px}
+/* ── RECIPE SPEC TABLE ── */
+.spec-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px}
+.spec-table td{padding:7px 12px;border:1px solid var(--bd)}
+.spec-table td:first-child{color:var(--mu);font-weight:500;width:38%;background:var(--sf2)}
 
-/* ── LOADING ── */
-#overlay{
-  position:fixed;inset:0;background:rgba(13,17,23,.82);
-  display:none;align-items:center;justify-content:center;z-index:100;flex-direction:column;gap:12px
+/* ── REMINDERS PAGE ── */
+.rem-section{margin-bottom:28px}
+.rem-section h3{font-size:14px;font-weight:700;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--bd)}
+.rem-section h3.overdue{color:var(--rd)}
+.rem-section h3.soon{color:var(--yw)}
+.rem-card{
+  background:var(--sf);border:1px solid var(--bd);border-radius:8px;
+  padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:border-color .15s;display:flex;gap:14px;align-items:center
 }
+.rem-card:hover{border-color:var(--ac)}
+.rem-card.overdue{border-left:3px solid var(--rd)}
+.rem-card.soon{border-left:3px solid var(--yw)}
+.rem-info{flex:1;min-width:0}
+.rem-title{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rem-sub{font-size:12px;color:var(--mu);margin-top:3px}
+.rem-date{font-size:13px;font-weight:600;flex-shrink:0;text-align:right}
+.rem-date.overdue{color:var(--rd)}
+.rem-date.soon{color:var(--yw)}
+
+/* ── CONTAMINATION DASHBOARD ── */
+.contam-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.cstat{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:16px;text-align:center}
+.cstat-num{font-size:28px;font-weight:700;color:var(--rd)}
+.cstat-label{font-size:12px;color:var(--mu);margin-top:4px}
+
+/* ── SEARCH RESULTS ── */
+.search-results{padding:16px;max-width:820px}
+.search-results h3{font-size:14px;color:var(--mu);margin-bottom:12px}
+.sr-item{
+  background:var(--sf);border:1px solid var(--bd);border-radius:7px;
+  padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:border-color .15s
+}
+.sr-item:hover{border-color:var(--ac)}
+.sr-title{font-size:14px;font-weight:600;margin-bottom:4px}
+.sr-excerpt{font-size:12px;color:var(--mu);line-height:1.5}
+.sr-excerpt mark{background:rgba(88,166,255,.25);color:var(--tx);border-radius:2px;padding:0 2px}
+
+/* ── LOADING / TOAST ── */
+#overlay{position:fixed;inset:0;background:rgba(13,17,23,.82);display:none;align-items:center;justify-content:center;z-index:100;flex-direction:column;gap:12px}
 #overlay.on{display:flex}
-.spin{
-  border:2px solid var(--border);border-top-color:var(--accent);
-  border-radius:50%;width:28px;height:28px;animation:spin .6s linear infinite
-}
+.spin{border:2px solid var(--bd);border-top-color:var(--ac);border-radius:50%;width:28px;height:28px;animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-#overlay p{font-size:14px;color:var(--muted)}
-
-/* ── TOAST ── */
-#toast{
-  position:fixed;bottom:24px;right:24px;background:var(--surface2);
-  border:1px solid var(--border);border-radius:8px;padding:11px 16px;
-  font-size:13px;transform:translateY(70px);transition:transform .25s;z-index:200;max-width:320px
-}
+#overlay p{font-size:14px;color:var(--mu)}
+#toast{position:fixed;bottom:22px;right:22px;background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:10px 15px;font-size:13px;transform:translateY(70px);transition:transform .25s;z-index:200;max-width:320px}
 #toast.on{transform:translateY(0)}
-#toast.ok{border-color:var(--green)}
-#toast.fail{border-color:var(--red)}
+#toast.ok{border-color:var(--gn)}
+#toast.fail{border-color:var(--rd)}
+
+/* ── PRINT ── */
+@media print{
+  body{background:#fff;color:#000;overflow:auto;height:auto}
+  #overlay,#toast,nav,aside,.dactions,#app > nav{display:none!important}
+  .section.on{display:block!important;overflow:visible}
+  main{padding:0;overflow:visible}
+  .dview.on{display:block!important;max-width:100%}
+  .dhead{border-bottom:1px solid #ccc}
+  .dtitle{color:#000;font-size:22px}
+  .ddate,.mu{color:#666}
+  .md{color:#000}
+  .md code,.md pre{background:#f5f5f5;color:#000;border-color:#ddd}
+  .md a{color:#1a73e8}
+  .sbadge{border-color:#ccc;color:#333;background:#f5f5f5}
+  @page{margin:2cm}
+}
 
 ::-webkit-scrollbar{width:5px}
 ::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
 </style>
 </head>
 <body>
 
-<div id="overlay" aria-live="polite"><div class="spin"></div><p id="overlay-msg">Working…</p></div>
+<div id="overlay" aria-live="polite"><div class="spin"></div><p id="ovmsg">Working…</p></div>
 <div id="toast"></div>
 
-<!-- ═══════════════════════════ LOGIN ═══════════════════════════ -->
+<!-- ═══════════ LOGIN ═══════════ -->
 <div id="login">
-  <div class="login-wrap">
-    <div class="login-logo">
-      <span class="icon">🌿</span>
+  <div class="lbox">
+    <div class="llogo">
+      <span class="ic">🌿</span>
       <h1>TC Plants Lab Notes</h1>
-      <p>End-to-end encrypted. Your notes are unreadable without your password — including in the GitHub repo.</p>
+      <p>End-to-end encrypted. Notes are unreadable without your password — including in the GitHub repo.</p>
     </div>
-
     <div class="field">
       <label>Encryption Password</label>
-      <input type="password" id="inp-pw" placeholder="Your secret passphrase" autocomplete="off">
+      <input type="password" id="lpw" placeholder="Your secret passphrase" autocomplete="off">
     </div>
     <div class="field">
       <label>GitHub Personal Access Token</label>
-      <input type="password" id="inp-tok" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
-      <div class="hint">
-        Needs <strong>Contents: Read &amp; Write</strong> permission on the repo.<br>
-        <a href="https://github.com/settings/tokens/new?scopes=repo&description=TC+Plants+Lab+Notes" target="_blank" rel="noopener">Create a fine-grained token →</a>
-        &nbsp;Cleared on tab close.
-      </div>
+      <input type="password" id="ltok" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+      <div class="hint">Needs <strong>repo</strong> scope. Cleared on tab close. <a href="https://github.com/settings/tokens/new?scopes=repo&description=TC+Plants+Lab+Notes" target="_blank" rel="noopener">Create token →</a></div>
     </div>
-    <div id="err"></div>
-    <button class="btn" id="login-btn">Unlock Lab →</button>
+    <div id="lerr"></div>
+    <button class="btn" id="lbtn">Unlock Lab →</button>
   </div>
 </div>
 
-<!-- ═══════════════════════════ APP ═══════════════════════════ -->
+<!-- ═══════════ APP ═══════════ -->
 <div id="app">
   <nav>
-    <div class="brand">🌿 TC Plants <span>/ Lab Notes</span></div>
-    <button class="btn ghost sm" id="lock-btn">🔒 Lock</button>
+    <div class="brand">🌿 TC Plants <span>/ Lab</span></div>
+    <div class="nav-tabs">
+      <button class="ntab active" data-sec="notes">📋 Notes</button>
+      <button class="ntab" data-sec="registry">🌿 Registry</button>
+      <button class="ntab" data-sec="recipes">🧪 Recipes</button>
+      <button class="ntab" data-sec="reminders">⏰ Reminders<span class="rbadge" id="rbadge">0</span></button>
+      <button class="ntab" data-sec="contam">☣️ Contamination</button>
+    </div>
+    <div class="nav-right">
+      <span id="offline-pill">● Offline</span>
+      <button class="btn ghost sm" id="export-all-btn" title="Export all notes as ZIP">⬇ Export</button>
+      <button class="btn ghost sm" id="lock-btn">🔒 Lock</button>
+    </div>
   </nav>
-  <div class="layout">
+
+  <!-- ── NOTES ── -->
+  <div class="section on" id="sec-notes">
     <aside>
-      <div class="sidebar-top">
-        <button class="btn" id="new-btn">＋ New Entry</button>
+      <div class="aside-top">
+        <button class="btn" id="new-note-btn">＋ New Entry</button>
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="note-search" placeholder="Search titles, tags, species…">
+        </div>
+        <div class="filter-row" id="type-filters">
+          <button class="fpill active" data-filter="type" data-val="">All</button>
+          <button class="fpill red" data-filter="type" data-val="Contamination Log">☣️ Contam</button>
+          <button class="fpill yellow" data-filter="type" data-val="__overdue">⏰ Overdue</button>
+        </div>
+        <div class="filter-row" id="stage-filters">
+          <button class="fpill active" data-filter="stage" data-val="">Any stage</button>
+          <button class="fpill" data-filter="stage" data-val="Stage I — Initiation">I</button>
+          <button class="fpill" data-filter="stage" data-val="Stage II — Multiplication">II</button>
+          <button class="fpill" data-filter="stage" data-val="Stage III — Rooting">III</button>
+          <button class="fpill" data-filter="stage" data-val="Stage IV — Acclimatization">IV</button>
+        </div>
+        <div class="aside-stats" id="note-stats"></div>
       </div>
-      <div id="note-list">
-        <div style="padding:20px;font-size:13px;color:var(--muted);text-align:center">Loading…</div>
-      </div>
+      <div id="note-list"></div>
     </aside>
-    <main>
-
-      <!-- Empty -->
-      <div id="empty">
+    <main id="notes-main">
+      <div class="empty-state" id="notes-empty">
         <h2>Lab Notes</h2>
-        <p>Encrypted lab journal for TC Plants.<br>Every entry is AES-256 encrypted before it reaches GitHub.<br><br>
-        Press <strong>＋ New Entry</strong> to start.</p>
+        <p>Encrypted lab journal.<br>Every save is an AES-256 encrypted commit in GitHub.<br><br>Press <strong>＋ New Entry</strong> to begin.</p>
       </div>
-
-      <!-- View -->
-      <div id="view">
-        <div class="view-head">
-          <div class="view-title" id="v-title"></div>
-          <div class="view-badges" id="v-badges"></div>
-          <div class="view-date" id="v-date"></div>
-          <div class="view-actions">
-            <button class="btn sm" id="edit-btn">✏️ Edit</button>
-            <button class="btn sm danger" id="del-btn">🗑 Delete</button>
+      <div class="dview" id="note-view">
+        <div class="dhead">
+          <div class="dtitle" id="nv-title"></div>
+          <div class="dbadges" id="nv-badges"></div>
+          <div class="ddate" id="nv-date"></div>
+          <div class="dactions">
+            <button class="btn sm" id="edit-note-btn">✏️ Edit</button>
+            <button class="btn sm ghost" id="print-btn">🖨 Print / PDF</button>
+            <button class="btn sm danger" id="del-note-btn">🗑 Delete</button>
           </div>
         </div>
-        <div class="md" id="v-body"></div>
+        <div class="md" id="nv-body"></div>
       </div>
-
-      <!-- Editor -->
-      <div id="editor">
-        <div class="editor-head" id="ed-head">New Lab Entry</div>
-
+      <div class="editor" id="note-editor">
+        <div class="ehead" id="ne-head">New Lab Entry</div>
         <div class="field">
           <label>Title</label>
-          <input type="text" id="e-title" placeholder="e.g. Stage II subculture — Nepenthes rajah batch 4">
+          <input type="text" id="ne-title" placeholder="e.g. Stage II subculture — Nepenthes rajah batch 4">
         </div>
-
         <div class="row2">
           <div class="field">
             <label>Experiment Type</label>
-            <select id="e-type">
+            <select id="ne-type">
               <option value="">— select —</option>
               <option>Initiation (Stage I)</option>
               <option>Multiplication (Stage II)</option>
@@ -261,7 +381,7 @@ main{flex:1;overflow-y:auto;padding:32px 40px}
           </div>
           <div class="field">
             <label>TC Stage</label>
-            <select id="e-stage">
+            <select id="ne-stage">
               <option value="">— select —</option>
               <option>Stage 0 — Collection</option>
               <option>Stage I — Initiation</option>
@@ -272,372 +392,1209 @@ main{flex:1;overflow-y:auto;padding:32px 40px}
             </select>
           </div>
         </div>
-
         <div class="row2">
           <div class="field">
             <label>Species / Accession</label>
-            <input type="text" id="e-species" placeholder="e.g. Nepenthes rajah — ACC-2024-07">
+            <input type="text" id="ne-species" placeholder="e.g. Nepenthes rajah — ACC-2024-07">
           </div>
           <div class="field">
-            <label>Tags <span style="font-weight:400;color:var(--muted)">(comma separated)</span></label>
-            <input type="text" id="e-tags" placeholder="orchid, MS media, contamination…">
+            <label>Tags <span style="font-weight:400;color:var(--mu)">(comma separated)</span></label>
+            <input type="text" id="ne-tags" placeholder="MS media, contamination…">
           </div>
         </div>
-
         <div class="field">
-          <label>Notes <span style="font-weight:400;color:var(--muted)">(Markdown)</span></label>
-          <textarea id="e-body" placeholder="Write lab notes here…"></textarea>
-          <div class="template-hint" id="tmpl-hint"></div>
+          <label>Next Review Date <span style="font-weight:400;color:var(--mu)">(optional — sets reminder)</span></label>
+          <input type="date" id="ne-review" style="width:200px">
         </div>
-
-        <div class="editor-actions">
-          <button class="btn" id="save-btn">💾 Save to GitHub</button>
-          <button class="btn ghost" id="cancel-btn">Cancel</button>
+        <div class="field">
+          <label>Notes <span style="font-weight:400;color:var(--mu)">(Markdown)</span></label>
+          <div class="editor-toolbar">
+            <button class="btn ghost xs" id="img-btn" type="button">🖼 Image</button>
+            <button class="btn ghost xs" id="tbl-btn" type="button">📊 Table</button>
+            <span style="font-size:11px;color:var(--mu);align-self:center">Markdown supported</span>
+          </div>
+          <textarea id="ne-body" placeholder="Write lab notes here…"></textarea>
+          <div class="tmpl-hint" id="ne-tmpl-hint"></div>
+        </div>
+        <div class="eactions">
+          <button class="btn" id="save-note-btn">💾 Save to GitHub</button>
+          <button class="btn ghost" id="cancel-note-btn">Cancel</button>
         </div>
       </div>
-
+      <!-- Deep search results -->
+      <div id="deep-search-results" style="display:none">
+        <div class="search-results">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+            <h3 style="font-size:16px;font-weight:700;flex:1">Search Results</h3>
+            <button class="btn ghost sm" id="close-search-btn">✕ Close</button>
+          </div>
+          <p id="search-status" style="font-size:13px;color:var(--mu);margin-bottom:12px"></p>
+          <div id="search-result-list"></div>
+        </div>
+      </div>
     </main>
   </div>
-</div>
+
+  <!-- ── REGISTRY ── -->
+  <div class="section" id="sec-registry">
+    <aside>
+      <div class="aside-top">
+        <button class="btn green" id="new-acc-btn">＋ New Accession</button>
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="acc-search" placeholder="Search accessions…">
+        </div>
+        <div class="aside-stats" id="acc-stats"></div>
+      </div>
+      <div id="acc-list"></div>
+    </aside>
+    <main id="registry-main">
+      <div class="empty-state" id="reg-empty">
+        <h2>Accession Registry</h2>
+        <p>Track every plant accession — origin, status,<br>acquisition date and linked lab entries.<br><br>Press <strong>＋ New Accession</strong> to begin.</p>
+      </div>
+      <div class="dview" id="acc-view">
+        <div class="dhead">
+          <div class="dtitle" id="av-title"></div>
+          <div class="dbadges" id="av-badges"></div>
+          <div class="ddate" id="av-date"></div>
+          <div class="dactions">
+            <button class="btn sm" id="edit-acc-btn">✏️ Edit</button>
+            <button class="btn sm danger" id="del-acc-btn">🗑 Delete</button>
+          </div>
+        </div>
+        <div class="md" id="av-body"></div>
+        <div id="av-linked" style="margin-top:28px"></div>
+      </div>
+      <div class="editor" id="acc-editor">
+        <div class="ehead" id="ae-head">New Accession</div>
+        <div class="row2">
+          <div class="field">
+            <label>Accession Number</label>
+            <input type="text" id="ae-num" placeholder="ACC-2024-07">
+          </div>
+          <div class="field">
+            <label>Status</label>
+            <select id="ae-status">
+              <option>Active in culture</option>
+              <option>In acclimatization</option>
+              <option>Dormant</option>
+              <option>Transferred out</option>
+              <option>Lost</option>
+            </select>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>Species</label>
+            <input type="text" id="ae-species" placeholder="Nepenthes rajah">
+          </div>
+          <div class="field">
+            <label>Common Name</label>
+            <input type="text" id="ae-common" placeholder="Rajah Pitcher Plant">
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>Source</label>
+            <select id="ae-source">
+              <option value="">— select —</option>
+              <option>Wild collection</option>
+              <option>Donated</option>
+              <option>Purchased</option>
+              <option>Lab-propagated</option>
+              <option>Botanical garden</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Date Acquired</label>
+            <input type="date" id="ae-date">
+          </div>
+        </div>
+        <div class="field">
+          <label>Origin / Collection Location</label>
+          <input type="text" id="ae-location" placeholder="e.g. Mt Kinabalu, Sabah, Malaysia">
+        </div>
+        <div class="field">
+          <label>Notes <span style="font-weight:400;color:var(--mu)">(Markdown)</span></label>
+          <textarea id="ra-notes" placeholder="Background, morphology, special requirements…"></textarea>
+        </div>
+        <div class="eactions">
+          <button class="btn green" id="save-acc-btn">💾 Save Accession</button>
+          <button class="btn ghost" id="cancel-acc-btn">Cancel</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ── RECIPES ── -->
+  <div class="section" id="sec-recipes">
+    <aside>
+      <div class="aside-top">
+        <button class="btn" style="background:var(--pu);color:#0d1117" id="new-rec-btn">＋ New Recipe</button>
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="rec-search" placeholder="Search recipes…">
+        </div>
+        <div class="aside-stats" id="rec-stats"></div>
+      </div>
+      <div id="rec-list"></div>
+    </aside>
+    <main id="recipes-main">
+      <div class="empty-state" id="rec-empty">
+        <h2>Media Recipe Book</h2>
+        <p>Store all your media formulations — MS, WPM, B5,<br>custom blends, hormone regimes.<br><br>Press <strong>＋ New Recipe</strong> to begin.</p>
+      </div>
+      <div class="dview" id="rec-view">
+        <div class="dhead">
+          <div class="dtitle" id="rv-title"></div>
+          <div class="dbadges" id="rv-badges"></div>
+          <div class="ddate" id="rv-date"></div>
+          <div class="dactions">
+            <button class="btn sm" id="edit-rec-btn">✏️ Edit</button>
+            <button class="btn sm ghost" id="print-rec-btn">🖨 Print</button>
+            <button class="btn sm danger" id="del-rec-btn">🗑 Delete</button>
+          </div>
+        </div>
+        <table class="spec-table" id="rv-spec"></table>
+        <div class="md" id="rv-body" style="margin-top:20px"></div>
+      </div>
+      <div class="editor" id="rec-editor">
+        <div class="ehead" id="re-head">New Media Recipe</div>
+        <div class="row2">
+          <div class="field">
+            <label>Recipe Name</label>
+            <input type="text" id="re-name" placeholder="e.g. MS + BAP 0.5 for Nepenthes">
+          </div>
+          <div class="field">
+            <label>Base Medium</label>
+            <select id="re-base">
+              <option value="">— select —</option>
+              <option>Murashige-Skoog (MS) Full</option>
+              <option>½ MS</option>
+              <option>¼ MS</option>
+              <option>WPM (Lloyd & McCown)</option>
+              <option>B5 (Gamborg)</option>
+              <option>Knudson C</option>
+              <option>Anderson's</option>
+              <option>Custom / Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="row3">
+          <div class="field">
+            <label>Sucrose (g/L)</label>
+            <input type="number" id="re-sucrose" placeholder="30" step="0.1" min="0">
+          </div>
+          <div class="field">
+            <label>Agar/Gelrite (g/L)</label>
+            <input type="number" id="re-agar" placeholder="7" step="0.1" min="0">
+          </div>
+          <div class="field">
+            <label>pH (before autoclave)</label>
+            <input type="number" id="re-ph" placeholder="5.8" step="0.1" min="0" max="14">
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>Growth Regulators</label>
+            <input type="text" id="re-pgr" placeholder="e.g. BAP 0.5mg/L + NAA 0.1mg/L">
+          </div>
+          <div class="field">
+            <label>Autoclave</label>
+            <select id="re-autoclave">
+              <option>121°C / 15 min</option>
+              <option>121°C / 20 min</option>
+              <option>115°C / 20 min</option>
+              <option>Filter sterilized</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Target Organism / Use</label>
+          <input type="text" id="re-target" placeholder="e.g. Nepenthes spp. multiplication">
+        </div>
+        <div class="field">
+          <label>Preparation Notes <span style="font-weight:400;color:var(--mu)">(Markdown)</span></label>
+          <textarea id="rr-notes" placeholder="Preparation steps, special additions, observations…"></textarea>
+        </div>
+        <div class="eactions">
+          <button class="btn" style="background:var(--pu);color:#0d1117" id="save-rec-btn">💾 Save Recipe</button>
+          <button class="btn ghost" id="cancel-rec-btn">Cancel</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ── REMINDERS ── -->
+  <div class="section fullpage" id="sec-reminders">
+    <h2 style="font-size:20px;font-weight:700;margin-bottom:6px">⏰ Subculture Reminders</h2>
+    <p style="font-size:13px;color:var(--mu);margin-bottom:24px">Entries with a Next Review Date set. Click any card to open the note.</p>
+    <div id="reminders-body"></div>
+  </div>
+
+  <!-- ── CONTAMINATION ── -->
+  <div class="section fullpage" id="sec-contam">
+    <h2 style="font-size:20px;font-weight:700;margin-bottom:6px">☣️ Contamination Dashboard</h2>
+    <p style="font-size:13px;color:var(--mu);margin-bottom:20px">All contamination log entries across the lab.</p>
+    <div class="contam-summary" id="contam-summary"></div>
+    <div id="contam-list"></div>
+  </div>
+
+</div><!-- /app -->
 
 <script>
 'use strict';
+// ════════════════════════════════════════════════════════════
+// CONFIG
+// ════════════════════════════════════════════════════════════
+const REPO   = 'Phyto-Evolution/tcplants';
+const BRANCH = 'main';
+const DIR    = 'notes';
+const IDX    = `${DIR}/index.enc`;
+const ACC_F  = 'accessions/data.enc';
+const REC_F  = 'recipes/data.enc';
+const API    = 'https://api.github.com';
 
-// ── CONFIG ──────────────────────────────────────────────────────────
-const REPO    = 'Phyto-Evolution/tcplants';
-const BRANCH  = 'main';
-const DIR     = 'notes';
-const IDX     = `${DIR}/index.enc`;
-const API     = 'https://api.github.com';
+// ════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════
+const S = {
+  pw:null, tok:null,
+  // notes
+  notes:[], cur:null, editing:null, notesSha:null,
+  typeFilter:'', stageFilter:'', searchQ:'',
+  // accessions
+  accs:[], curAcc:null, editingAcc:null, accSha:null,
+  // recipes
+  recs:[], curRec:null, editingRec:null, recSha:null,
+  // section
+  section:'notes',
+};
 
-// ── STATE ───────────────────────────────────────────────────────────
-const S = { pw: null, tok: null, notes: [], cur: null, editing: null };
-
-// ── CRYPTO ──────────────────────────────────────────────────────────
-async function deriveKey(pw, salt) {
-  const raw = await crypto.subtle.importKey(
-    'raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveKey']
-  );
+// ════════════════════════════════════════════════════════════
+// CRYPTO
+// ════════════════════════════════════════════════════════════
+async function deriveKey(pw, salt){
+  const raw = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveKey']);
   return crypto.subtle.deriveKey(
-    { name:'PBKDF2', salt, iterations:600000, hash:'SHA-256' },
-    raw, { name:'AES-GCM', length:256 }, false, ['encrypt','decrypt']
+    {name:'PBKDF2', salt, iterations:600000, hash:'SHA-256'},
+    raw, {name:'AES-GCM', length:256}, false, ['encrypt','decrypt']
   );
 }
-
 const b64e = b => btoa(String.fromCharCode(...new Uint8Array(b)));
 const b64d = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
 
-async function enc(text) {
-  const salt = crypto.getRandomValues(new Uint8Array(16));
-  const iv   = crypto.getRandomValues(new Uint8Array(12));
-  const key  = await deriveKey(S.pw, salt);
-  const ct   = await crypto.subtle.encrypt({ name:'AES-GCM', iv }, key, new TextEncoder().encode(text));
-  return JSON.stringify({ v:1, s:b64e(salt), i:b64e(iv), d:b64e(ct) });
+async function enc(text){
+  const salt=crypto.getRandomValues(new Uint8Array(16));
+  const iv=crypto.getRandomValues(new Uint8Array(12));
+  const key=await deriveKey(S.pw,salt);
+  const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,new TextEncoder().encode(text));
+  return JSON.stringify({v:1,s:b64e(salt),i:b64e(iv),d:b64e(ct)});
 }
-
-async function dec(raw) {
-  const { s, i, d } = JSON.parse(raw);
-  const key = await deriveKey(S.pw, b64d(s));
-  const pt  = await crypto.subtle.decrypt({ name:'AES-GCM', iv:b64d(i) }, key, b64d(d));
+async function dec(raw){
+  const {s,i,d}=JSON.parse(raw);
+  const key=await deriveKey(S.pw,b64d(s));
+  const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64d(i)},key,b64d(d));
   return new TextDecoder().decode(pt);
 }
 
-// ── GITHUB API ───────────────────────────────────────────────────────
-const ghHdr = () => ({ Authorization:`token ${S.tok}`, Accept:'application/vnd.github.v3+json', 'Content-Type':'application/json' });
+// ════════════════════════════════════════════════════════════
+// GITHUB API
+// ════════════════════════════════════════════════════════════
+const ghH = () => ({Authorization:`token ${S.tok}`, Accept:'application/vnd.github.v3+json', 'Content-Type':'application/json'});
 
-async function ghGet(path) {
-  const r = await fetch(`${API}/repos/${REPO}/contents/${path}?ref=${BRANCH}`, { headers: ghHdr() });
-  if (r.status === 404) return null;
-  if (!r.ok) throw new Error(`GitHub ${r.status}`);
+async function ghGet(path){
+  const r=await fetch(`${API}/repos/${REPO}/contents/${path}?ref=${BRANCH}`,{headers:ghH()});
+  if(r.status===404) return null;
+  if(!r.ok) throw new Error(`GitHub ${r.status}`);
   return r.json();
 }
-
-async function ghPut(path, content, sha, msg) {
-  const r = await fetch(`${API}/repos/${REPO}/contents/${path}`, {
-    method:'PUT', headers: ghHdr(),
-    body: JSON.stringify({
-      message: msg || `lab: update ${path}`,
-      content: btoa(unescape(encodeURIComponent(content))),
-      branch: BRANCH,
-      ...(sha ? { sha } : {})
-    })
+async function ghPut(path,content,sha,msg){
+  const r=await fetch(`${API}/repos/${REPO}/contents/${path}`,{
+    method:'PUT', headers:ghH(),
+    body:JSON.stringify({message:msg||`lab: update ${path}`, content:btoa(unescape(encodeURIComponent(content))), branch:BRANCH, ...(sha?{sha}:{})})
   });
-  if (!r.ok) throw new Error(`GitHub ${r.status}: ${await r.text()}`);
+  if(!r.ok) throw new Error(`GitHub ${r.status}: ${await r.text()}`);
   return r.json();
 }
-
-async function ghDel(path, sha, msg) {
-  const r = await fetch(`${API}/repos/${REPO}/contents/${path}`, {
-    method:'DELETE', headers: ghHdr(),
-    body: JSON.stringify({ message: msg || `lab: delete ${path}`, sha, branch: BRANCH })
+async function ghDel(path,sha,msg){
+  const r=await fetch(`${API}/repos/${REPO}/contents/${path}`,{
+    method:'DELETE', headers:ghH(),
+    body:JSON.stringify({message:msg||`lab: delete ${path}`, sha, branch:BRANCH})
   });
-  if (!r.ok) throw new Error(`GitHub ${r.status}`);
+  if(!r.ok) throw new Error(`GitHub ${r.status}`);
 }
+const ghDec = c => decodeURIComponent(escape(atob(c.replace(/\n/g,''))));
 
-const ghDecode = c => decodeURIComponent(escape(atob(c.replace(/\n/g,''))));
-
-// ── INDEX ────────────────────────────────────────────────────────────
-async function loadIndex() {
-  const f = await ghGet(IDX);
-  if (!f) return { notes:[], sha:null };
-  const notes = JSON.parse(await dec(ghDecode(f.content)));
-  return { notes, sha: f.sha };
+// ════════════════════════════════════════════════════════════
+// DATA LAYER
+// ════════════════════════════════════════════════════════════
+async function loadNotesIndex(){
+  const f=await ghGet(IDX);
+  if(!f) return {notes:[],sha:null};
+  const notes=JSON.parse(await dec(ghDec(f.content)));
+  return {notes, sha:f.sha};
 }
-
-async function saveIndex(notes, sha) {
-  const res = await ghPut(IDX, await enc(JSON.stringify(notes)), sha,
-    `lab: index update — ${notes.length} entries`);
+async function saveNotesIndex(notes,sha){
+  const res=await ghPut(IDX, await enc(JSON.stringify(notes)), sha, `lab: index — ${notes.length} entries`);
+  return res.content.sha;
+}
+async function loadNote(id){
+  const f=await ghGet(`${DIR}/${id}.enc`);
+  if(!f) throw new Error('Not found');
+  return {body:await dec(ghDec(f.content)), sha:f.sha};
+}
+async function writeNote(id,body,sha,msg){
+  const res=await ghPut(`${DIR}/${id}.enc`, await enc(body), sha, msg);
   return res.content.sha;
 }
 
-// ── NOTES ────────────────────────────────────────────────────────────
-async function loadNote(id) {
-  const f = await ghGet(`${DIR}/${id}.enc`);
-  if (!f) throw new Error('Not found');
-  return { body: await dec(ghDecode(f.content)), sha: f.sha };
+async function loadAccessions(){
+  const f=await ghGet(ACC_F);
+  if(!f) return {accs:[],sha:null};
+  const accs=JSON.parse(await dec(ghDec(f.content)));
+  return {accs, sha:f.sha};
 }
-
-async function writeNote(id, body, sha, msg) {
-  const res = await ghPut(`${DIR}/${id}.enc`, await enc(body), sha, msg);
+async function saveAccessions(accs,sha){
+  const res=await ghPut(ACC_F, await enc(JSON.stringify(accs)), sha, `lab: registry — ${accs.length} accessions`);
   return res.content.sha;
 }
 
-function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
-function fmtDate(iso) {
-  return new Date(iso).toLocaleDateString('en-IN',{ day:'numeric', month:'short', year:'numeric', weekday:'short' });
+async function loadRecipes(){
+  const f=await ghGet(REC_F);
+  if(!f) return {recs:[],sha:null};
+  const recs=JSON.parse(await dec(ghDec(f.content)));
+  return {recs, sha:f.sha};
+}
+async function saveRecipes(recs,sha){
+  const res=await ghPut(REC_F, await enc(JSON.stringify(recs)), sha, `lab: recipes — ${recs.length} recipes`);
+  return res.content.sha;
 }
 
-// ── UI UTILS ────────────────────────────────────────────────────────
-function load(msg='Working…') { document.getElementById('overlay').classList.add('on'); document.getElementById('overlay-msg').textContent=msg; }
-function unload() { document.getElementById('overlay').classList.remove('on'); }
-let _tt;
-function toast(msg, type='ok') {
-  const t=document.getElementById('toast'); t.textContent=msg; t.className=`on ${type}`;
-  clearTimeout(_tt); _tt=setTimeout(()=>t.className='',3200);
-}
+// ════════════════════════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════════════════════════
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmtDate(iso){
+  if(!iso) return '';
+  return new Date(iso).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric',weekday:'short'});
+}
+function fmtDateShort(iso){
+  if(!iso) return '';
+  return new Date(iso).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+}
+function daysFrom(iso){
+  if(!iso) return null;
+  return Math.ceil((new Date(iso) - new Date().setHours(0,0,0,0)) / 86400000);
+}
+function slugify(s){ return String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); }
 
-function pane(name) {
-  document.getElementById('empty').style.display  = name==='empty'  ? 'block':'none';
-  document.getElementById('view').className        = name==='view'   ? 'on':'';
-  document.getElementById('editor').className      = name==='editor' ? 'on':'';
+let _ov;
+function load(msg='Working…'){document.getElementById('ovmsg').textContent=msg;document.getElementById('overlay').classList.add('on');}
+function unload(){document.getElementById('overlay').classList.remove('on');}
+let _tt;
+function toast(msg,type='ok'){const t=document.getElementById('toast');t.textContent=msg;t.className=`on ${type}`;clearTimeout(_tt);_tt=setTimeout(()=>t.className='',3200);}
+
+function showNote(name){
+  document.getElementById('notes-empty').style.display      = name==='empty'  ?'block':'none';
+  document.getElementById('note-view').className            = name==='view'   ?'dview on':'dview';
+  document.getElementById('note-editor').className         = name==='editor' ?'editor on':'editor';
+  document.getElementById('deep-search-results').style.display = name==='search'?'block':'none';
+}
+function showReg(name){
+  document.getElementById('reg-empty').style.display  = name==='empty'  ?'block':'none';
+  document.getElementById('acc-view').className       = name==='view'   ?'dview on':'dview';
+  document.getElementById('acc-editor').className    = name==='editor' ?'editor on':'editor';
+}
+function showRec(name){
+  document.getElementById('rec-empty').style.display  = name==='empty'  ?'block':'none';
+  document.getElementById('rec-view').className       = name==='view'   ?'dview on':'dview';
+  document.getElementById('rec-editor').className    = name==='editor' ?'editor on':'editor';
 }
 
-// ── SIDEBAR ─────────────────────────────────────────────────────────
-function renderList() {
-  const el = document.getElementById('note-list');
-  if (!S.notes.length) {
-    el.innerHTML='<div style="padding:20px;font-size:13px;color:var(--muted);text-align:center">No entries yet</div>';
+// ════════════════════════════════════════════════════════════
+// REMINDER BADGE
+// ════════════════════════════════════════════════════════════
+function updateReminderBadge(){
+  const count = S.notes.filter(n=>{
+    if(!n.next_review) return false;
+    const d = daysFrom(n.next_review);
+    return d !== null && d <= 7;
+  }).length;
+  const b=document.getElementById('rbadge');
+  b.textContent=count; b.className=count>0?'rbadge on':'rbadge';
+}
+
+// ════════════════════════════════════════════════════════════
+// NOTES — SIDEBAR
+// ════════════════════════════════════════════════════════════
+function filteredNotes(){
+  let list = S.notes;
+  const q = S.searchQ.toLowerCase().trim();
+  if(q) list=list.filter(n=>
+    (n.title||'').toLowerCase().includes(q) ||
+    (n.species||'').toLowerCase().includes(q) ||
+    (n.tags||[]).some(t=>t.toLowerCase().includes(q))
+  );
+  if(S.typeFilter==='__overdue'){
+    list=list.filter(n=>n.next_review && daysFrom(n.next_review)!==null && daysFrom(n.next_review)<=0);
+  } else if(S.typeFilter){
+    list=list.filter(n=>n.type===S.typeFilter);
+  }
+  if(S.stageFilter) list=list.filter(n=>n.stage===S.stageFilter);
+  return list.sort((a,b)=>new Date(b.date)-new Date(a.date));
+}
+
+function renderNoteList(){
+  const el=document.getElementById('note-list');
+  const list=filteredNotes();
+  // stats
+  const all=S.notes;
+  const last=all.length?fmtDateShort(all.sort((a,b)=>new Date(b.date)-new Date(a.date))[0].date):'—';
+  document.getElementById('note-stats').textContent=`${all.length} entries · last: ${last}`;
+
+  if(!list.length){
+    el.innerHTML=`<div style="padding:18px;font-size:13px;color:var(--mu);text-align:center">${S.searchQ||S.typeFilter||S.stageFilter?'No matching entries':'No entries yet'}</div>`;
     return;
   }
-  const sorted = [...S.notes].sort((a,b)=>new Date(b.date)-new Date(a.date));
-  el.innerHTML = sorted.map(n=>{
-    const typeColor = n.type?.includes('Contam') ? 'color:var(--red)' : '';
+  el.innerHTML=list.map(n=>{
+    const d=n.next_review?daysFrom(n.next_review):null;
+    const dotClass=d!==null&&d<=0?'overdue':d!==null&&d<=7?'soon':'';
     return `<div class="n-item${S.cur===n.id?' active':''}" data-id="${n.id}">
       <div class="n-title">${esc(n.title)}</div>
+      ${dotClass?`<div class="review-dot ${dotClass}"></div>`:''}
       <div class="n-meta">
-        <span>${fmtDate(n.date)}</span>
-        ${n.type ? `<span class="n-type" style="${typeColor}">${esc(n.type.split(' ')[0])}</span>`:''}
+        <span>${fmtDateShort(n.date)}</span>
+        ${n.type?`<span class="ntype">${esc(n.type.split('(')[0].trim().slice(0,12))}</span>`:''}
       </div>
-      ${n.species ? `<div style="font-size:11px;color:var(--green);margin-top:3px;font-style:italic">${esc(n.species)}</div>`:''}
-      ${n.tags?.length ? `<div class="n-tags">${n.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>`:''}
+      ${n.species?`<div class="nspecies">${esc(n.species)}</div>`:''}
+      ${n.tags?.length?`<div class="n-tags-row">${n.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>`:''}
     </div>`;
   }).join('');
   el.querySelectorAll('.n-item').forEach(el=>el.addEventListener('click',()=>openNote(el.dataset.id)));
 }
 
-// ── OPEN NOTE ───────────────────────────────────────────────────────
-async function openNote(id) {
-  S.cur = id; renderList(); load('Decrypting…');
-  try {
-    const { body } = await loadNote(id);
-    const m = S.notes.find(n=>n.id===id);
-    document.getElementById('v-title').textContent = m.title;
-    document.getElementById('v-date').textContent  = fmtDate(m.date);
-
-    const badges = [];
-    if (m.type)    badges.push(`<span class="badge type">${esc(m.type)}</span>`);
-    if (m.stage)   badges.push(`<span class="badge stage">${esc(m.stage)}</span>`);
-    if (m.species) badges.push(`<span class="badge species">${esc(m.species)}</span>`);
-    if (m.tags?.length) m.tags.forEach(t=>badges.push(`<span class="tag">${esc(t)}</span>`));
-    document.getElementById('v-badges').innerHTML = badges.join('');
-    document.getElementById('v-body').innerHTML = marked.parse(body);
-    pane('view');
-  } catch(e) { toast('Decrypt failed: '+e.message,'fail'); }
+// ════════════════════════════════════════════════════════════
+// NOTES — OPEN / VIEW
+// ════════════════════════════════════════════════════════════
+async function openNote(id){
+  S.cur=id; renderNoteList(); load('Decrypting…');
+  try{
+    const {body}=await loadNote(id);
+    const m=S.notes.find(n=>n.id===id);
+    document.getElementById('nv-title').textContent=m.title;
+    document.getElementById('nv-date').textContent=fmtDate(m.date);
+    const badges=[];
+    if(m.type)    badges.push(`<span class="sbadge type">${esc(m.type)}</span>`);
+    if(m.stage)   badges.push(`<span class="sbadge stage">${esc(m.stage)}</span>`);
+    if(m.species) badges.push(`<span class="sbadge species">${esc(m.species)}</span>`);
+    if(m.next_review){
+      const d=daysFrom(m.next_review);
+      const cls=d<=0?'review-overdue':'review-soon';
+      const label=d<=0?`Overdue by ${Math.abs(d)}d`:d===0?'Due today':`Review in ${d}d`;
+      badges.push(`<span class="sbadge ${cls}">⏰ ${label} (${fmtDateShort(m.next_review)})</span>`);
+    }
+    if(m.tags?.length) m.tags.forEach(t=>badges.push(`<span class="tag">${esc(t)}</span>`));
+    document.getElementById('nv-badges').innerHTML=badges.join('');
+    document.getElementById('nv-body').innerHTML=marked.parse(body);
+    switchSection('notes'); showNote('view');
+  }catch(e){toast('Decrypt failed: '+e.message,'fail');}
   unload();
 }
 
-// ── TEMPLATES ───────────────────────────────────────────────────────
-const TEMPLATES = {
-  'Initiation (Stage I)': `## Explant Source\n\n## Surface Sterilisation Protocol\n\n## Media Used\n\n## Initial Response\n\n## Notes\n`,
-  'Multiplication (Stage II)': `## Cultures Subcultured\n\n## Media / Hormone Regime\n\n## Number of Shoots / Propagules\n\n## Observations\n\n## Next Subculture Date\n`,
-  'Rooting (Stage III)': `## Cultures Transferred to Rooting\n\n## Rooting Media\n\n## Root Induction Observed\n\n## Success Rate\n\n## Notes\n`,
-  'Acclimatization (Stage IV)': `## Plantlets Transferred\n\n## Substrate Used\n\n## Humidity / Hardening Protocol\n\n## Survival Rate\n\n## Observations\n`,
-  'Media Preparation': `## Media Name / Recipe\n\n## Batch Size\n\n## pH (before autoclave)\n\n## Autoclave Parameters\n\n## Notes\n`,
-  'Contamination Log': `## Affected Cultures\n\n## Contamination Type (fungal / bacterial / other)\n\n## Visual Description\n\n## Likely Source\n\n## Action Taken\n\n## Lessons / Prevention\n`,
-  'Subculture': `## Source Cultures\n\n## Number of Transfers\n\n## Media Used\n\n## Observations\n\n## Next Review\n`,
-  'Observation': `## Cultures Observed\n\n## Visual Observations\n\n## Measurements / Data\n\n## Photographs (link or description)\n\n## Follow-up\n`,
-  'Protocol Update': `## Protocol Changed\n\n## Previous Method\n\n## New Method\n\n## Reason for Change\n\n## Reference / Source\n`,
-  'Harvest / Transfer': `## Cultures Harvested\n\n## Quantity\n\n## Destination / Purpose\n\n## Condition at Transfer\n\n## Notes\n`,
+// ════════════════════════════════════════════════════════════
+// NOTES — NEW / EDIT
+// ════════════════════════════════════════════════════════════
+const NOTE_TEMPLATES={
+  'Initiation (Stage I)':`## Explant Source\n\n## Surface Sterilisation Protocol\n\n## Media Used\n\n## Initial Response\n\n## Notes\n`,
+  'Multiplication (Stage II)':`## Cultures Subcultured\n\n## Media / Hormone Regime\n\n## Number of Shoots / Propagules\n\n## Observations\n\n## Next Subculture Date\n`,
+  'Rooting (Stage III)':`## Cultures Transferred to Rooting\n\n## Rooting Media\n\n## Root Induction Observed\n\n## Success Rate\n\n## Notes\n`,
+  'Acclimatization (Stage IV)':`## Plantlets Transferred\n\n## Substrate Used\n\n## Humidity / Hardening Protocol\n\n## Survival Rate\n\n## Observations\n`,
+  'Media Preparation':`## Media Name / Recipe\n\n## Batch Size (L)\n\n## pH before autoclave\n\n## Autoclave Parameters\n\n## Notes\n`,
+  'Contamination Log':`## Affected Cultures\n\n## Contamination Type\n_(fungal / bacterial / other)_\n\n## Visual Description\n\n## Likely Source\n\n## Action Taken\n\n## Lessons / Prevention\n`,
+  'Subculture':`## Source Cultures\n\n## Number of Transfers\n\n## Media Used\n\n## Observations\n\n## Next Review\n`,
+  'Observation':`## Cultures Observed\n\n## Visual Observations\n\n## Measurements / Data\n\n## Follow-up\n`,
+  'Protocol Update':`## Protocol Changed\n\n## Previous Method\n\n## New Method\n\n## Reason for Change\n\n## Reference / Source\n`,
+  'Harvest / Transfer':`## Cultures Harvested\n\n## Quantity\n\n## Destination / Purpose\n\n## Condition at Transfer\n\n## Notes\n`,
 };
 
-document.getElementById('e-type').addEventListener('change', function(){
-  const tmpl = TEMPLATES[this.value];
-  if (tmpl && !document.getElementById('e-body').value.trim()) {
-    document.getElementById('e-body').value = tmpl;
-    document.getElementById('tmpl-hint').textContent = 'Template loaded — customise as needed.';
+function startNewNote(){
+  S.editing=null; S.cur=null; renderNoteList();
+  document.getElementById('ne-head').textContent='New Lab Entry';
+  ['ne-title','ne-species','ne-tags','ne-body'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('ne-type').value='';
+  document.getElementById('ne-stage').value='';
+  document.getElementById('ne-review').value='';
+  document.getElementById('ne-tmpl-hint').textContent='';
+  showNote('editor');
+}
+
+async function startEditNote(){
+  const id=S.cur; if(!id) return;
+  load('Loading…');
+  try{
+    const {body}=await loadNote(id);
+    const m=S.notes.find(n=>n.id===id);
+    S.editing=id;
+    document.getElementById('ne-head').textContent='Edit Entry';
+    document.getElementById('ne-title').value=m.title||'';
+    document.getElementById('ne-type').value=m.type||'';
+    document.getElementById('ne-stage').value=m.stage||'';
+    document.getElementById('ne-species').value=m.species||'';
+    document.getElementById('ne-tags').value=(m.tags||[]).join(', ');
+    document.getElementById('ne-review').value=m.next_review||'';
+    document.getElementById('ne-body').value=body;
+    document.getElementById('ne-tmpl-hint').textContent='';
+    showNote('editor');
+  }catch(e){toast('Load failed: '+e.message,'fail');}
+  unload();
+}
+
+async function saveNoteAction(){
+  const title  =document.getElementById('ne-title').value.trim();
+  const type   =document.getElementById('ne-type').value;
+  const stage  =document.getElementById('ne-stage').value;
+  const species=document.getElementById('ne-species').value.trim();
+  const tags   =document.getElementById('ne-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  const review =document.getElementById('ne-review').value||null;
+  const body   =document.getElementById('ne-body').value;
+  if(!title){toast('Title is required','fail');return;}
+  document.getElementById('save-note-btn').disabled=true;
+  load('Encrypting & saving…');
+  try{
+    const {notes,sha:iSha}=await loadNotesIndex();
+    if(S.editing){
+      const ef=await ghGet(`${DIR}/${S.editing}.enc`);
+      await writeNote(S.editing,body,ef.sha,`lab: update "${title}"`);
+      const idx=notes.findIndex(n=>n.id===S.editing);
+      if(idx!==-1) notes[idx]={...notes[idx],title,type,stage,species,tags,next_review:review};
+      S.notes=notes; S.cur=S.editing;
+    }else{
+      const id=uid(), date=new Date().toISOString();
+      await writeNote(id,body,null,`lab: add "${title}"`);
+      notes.push({id,title,date,type,stage,species,tags,next_review:review});
+      S.notes=notes; S.cur=id;
+    }
+    S.notesSha=await saveNotesIndex(S.notes,iSha);
+    updateReminderBadge();
+    toast('Saved ✓ — committed to GitHub');
+    renderNoteList(); await openNote(S.cur);
+  }catch(e){toast('Save failed: '+e.message,'fail');}
+  document.getElementById('save-note-btn').disabled=false;
+  unload();
+}
+
+async function deleteNote(){
+  const id=S.cur; if(!id) return;
+  const m=S.notes.find(n=>n.id===id);
+  if(!confirm(`Permanently delete "${m?.title}"?\nThis removes the encrypted file from GitHub.`)) return;
+  load('Deleting…');
+  try{
+    const f=await ghGet(`${DIR}/${id}.enc`);
+    if(f) await ghDel(`${DIR}/${id}.enc`,f.sha,`lab: delete "${m?.title}"`);
+    const {notes,sha}=await loadNotesIndex();
+    S.notes=notes.filter(n=>n.id!==id);
+    S.notesSha=await saveNotesIndex(S.notes,sha);
+    S.cur=null; updateReminderBadge(); renderNoteList(); showNote('empty');
+    toast('Entry deleted');
+  }catch(e){toast('Delete failed: '+e.message,'fail');}
+  unload();
+}
+
+// ════════════════════════════════════════════════════════════
+// NOTES — PRINT
+// ════════════════════════════════════════════════════════════
+function printNote(){
+  const title=document.getElementById('nv-title').textContent;
+  const body=document.getElementById('nv-body').innerHTML;
+  const badges=document.getElementById('nv-badges').innerHTML;
+  const date=document.getElementById('nv-date').textContent;
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${esc(title)}</title>
+  <style>
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+      max-width:820px;margin:40px auto;color:#000;padding:0 20px}
+    h1{font-size:24px;margin-bottom:8px}
+    .meta{color:#666;font-size:13px;margin-bottom:16px}
+    .badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+    .badge{border:1px solid #ccc;border-radius:12px;font-size:12px;padding:2px 10px;background:#f5f5f5}
+    hr{border:none;border-top:1px solid #ccc;margin:16px 0}
+    code{background:#f5f5f5;border-radius:3px;padding:2px 5px;font-size:13px}
+    pre{background:#f5f5f5;border:1px solid #ddd;border-radius:6px;padding:12px;overflow-x:auto}
+    table{border-collapse:collapse;width:100%} th,td{border:1px solid #ccc;padding:7px 12px}
+    th{background:#f5f5f5}
+    img{max-width:100%}
+    @page{margin:2cm}
+  </style></head><body>
+  <h1>${esc(title)}</h1>
+  <div class="meta">${date}</div>
+  <div class="badges">${badges.replace(/class="[^"]*"/g,'class="badge"')}</div>
+  <hr>
+  ${body}
+  </body></html>`);
+  w.document.close();
+  w.focus(); w.print();
+}
+
+// ════════════════════════════════════════════════════════════
+// NOTES — DEEP SEARCH
+// ════════════════════════════════════════════════════════════
+async function deepSearch(query){
+  if(!query.trim()) return;
+  showNote('search');
+  const q=query.toLowerCase().trim();
+  document.getElementById('search-status').textContent=`Decrypting ${S.notes.length} entries — please wait…`;
+  document.getElementById('search-result-list').innerHTML='';
+  const results=[];
+  for(const n of S.notes){
+    try{
+      const {body}=await loadNote(n.id);
+      const idx=body.toLowerCase().indexOf(q);
+      if(idx!==-1){
+        const start=Math.max(0,idx-80), end=Math.min(body.length,idx+q.length+80);
+        let excerpt=body.slice(start,end).replace(/\n/g,' ');
+        excerpt=esc(excerpt).replace(new RegExp(esc(q),'gi'),m=>`<mark>${m}</mark>`);
+        results.push({n,excerpt});
+      }
+    }catch(_){}
+  }
+  document.getElementById('search-status').textContent=`${results.length} result${results.length!==1?'s':''} for "${query}"`;
+  document.getElementById('search-result-list').innerHTML=results.map(({n,excerpt})=>`
+    <div class="sr-item" data-id="${n.id}">
+      <div class="sr-title">${esc(n.title)} <span style="font-size:11px;color:var(--mu)">${fmtDateShort(n.date)}</span></div>
+      ${n.species?`<div style="font-size:12px;color:var(--gn);font-style:italic">${esc(n.species)}</div>`:''}
+      <div class="sr-excerpt">…${excerpt}…</div>
+    </div>
+  `).join('');
+  document.querySelectorAll('.sr-item').forEach(el=>el.addEventListener('click',()=>openNote(el.dataset.id)));
+}
+
+// Search input: instant metadata search on typing, Enter = deep search
+document.getElementById('note-search').addEventListener('input',function(){
+  S.searchQ=this.value;
+  renderNoteList();
+});
+document.getElementById('note-search').addEventListener('keydown',function(e){
+  if(e.key==='Enter') deepSearch(this.value);
+});
+document.getElementById('close-search-btn').addEventListener('click',()=>showNote(S.cur?'view':'empty'));
+
+// ════════════════════════════════════════════════════════════
+// NOTES — IMAGE INSERT
+// ════════════════════════════════════════════════════════════
+function insertImage(){
+  const input=document.createElement('input');
+  input.type='file'; input.accept='image/*';
+  input.onchange=e=>{
+    const file=e.target.files[0]; if(!file) return;
+    if(file.size>1048576 && !confirm(`Image is ${(file.size/1048576).toFixed(1)}MB. Large images inflate note size. Continue?`)) return;
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const ta=document.getElementById('ne-body');
+      const pos=ta.selectionStart;
+      const ins=`\n![${file.name}](${e.target.result})\n`;
+      ta.value=ta.value.slice(0,pos)+ins+ta.value.slice(pos);
+      ta.selectionStart=ta.selectionEnd=pos+ins.length;
+      toast('Image inserted — it will be encrypted with the note');
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+}
+
+function insertTable(){
+  const ta=document.getElementById('ne-body');
+  const pos=ta.selectionStart;
+  const ins=`\n| Header 1 | Header 2 | Header 3 |\n|----------|----------|----------|\n| Cell     | Cell     | Cell     |\n`;
+  ta.value=ta.value.slice(0,pos)+ins+ta.value.slice(pos);
+  ta.selectionStart=ta.selectionEnd=pos+ins.length;
+}
+
+// ════════════════════════════════════════════════════════════
+// ACCESSION REGISTRY
+// ════════════════════════════════════════════════════════════
+function renderAccList(){
+  const el=document.getElementById('acc-list');
+  const q=document.getElementById('acc-search').value.toLowerCase();
+  let list=S.accs;
+  if(q) list=list.filter(a=>(a.number||'').toLowerCase().includes(q)||(a.species||'').toLowerCase().includes(q)||(a.common||'').toLowerCase().includes(q));
+  list=[...list].sort((a,b)=>(a.species||'').localeCompare(b.species||''));
+  document.getElementById('acc-stats').textContent=`${S.accs.length} accessions`;
+  if(!list.length){el.innerHTML=`<div style="padding:18px;font-size:13px;color:var(--mu);text-align:center">${q?'No matches':'No accessions yet'}</div>`;return;}
+  el.innerHTML=list.map(a=>{
+    const statusCls=a.status==='Active in culture'?'color:var(--gn)':a.status==='Lost'?'color:var(--rd)':'color:var(--mu)';
+    return `<div class="n-item${S.curAcc===a.id?' active':''}" data-id="${a.id}">
+      <div class="n-title" style="font-style:italic">${esc(a.species)}</div>
+      <div class="n-meta">
+        <span style="font-family:var(--mono);font-size:10px">${esc(a.number)}</span>
+        <span style="${statusCls};font-size:10px">${esc(a.status||'')}</span>
+      </div>
+      ${a.common?`<div style="font-size:11px;color:var(--mu)">${esc(a.common)}</div>`:''}
+    </div>`;
+  }).join('');
+  el.querySelectorAll('.n-item').forEach(el=>el.addEventListener('click',()=>openAccession(el.dataset.id)));
+}
+
+function openAccession(id){
+  S.curAcc=id; renderAccList();
+  const a=S.accs.find(x=>x.id===id); if(!a) return;
+  document.getElementById('av-title').textContent=a.species+(a.common?` (${a.common})`:'');
+  document.getElementById('av-date').textContent=a.date_acquired?`Acquired: ${fmtDateShort(a.date_acquired)}`:'';
+  const badges=[];
+  if(a.number) badges.push(`<span class="sbadge type" style="font-family:var(--mono)">${esc(a.number)}</span>`);
+  const sCls=a.status==='Active in culture'?'status-active':a.status==='Lost'?'status-lost':'status-other';
+  if(a.status) badges.push(`<span class="sbadge ${sCls}">${esc(a.status)}</span>`);
+  if(a.source) badges.push(`<span class="sbadge type">${esc(a.source)}</span>`);
+  if(a.location) badges.push(`<span class="sbadge type">📍 ${esc(a.location)}</span>`);
+  document.getElementById('av-badges').innerHTML=badges.join('');
+  document.getElementById('av-body').innerHTML=a.notes_md?marked.parse(a.notes_md):'';
+  // linked notes
+  const linked=S.notes.filter(n=>(n.species||'').toLowerCase().includes((a.species||'').toLowerCase())||(n.species||'').toLowerCase().includes((a.number||'').toLowerCase()));
+  const lEl=document.getElementById('av-linked');
+  if(linked.length){
+    lEl.innerHTML=`<h3 style="font-size:14px;font-weight:700;margin-bottom:10px;padding-top:16px;border-top:1px solid var(--bd)">🔗 Linked Lab Entries (${linked.length})</h3>`+
+    linked.sort((a,b)=>new Date(b.date)-new Date(a.date)).map(n=>`
+      <div class="sr-item" data-id="${n.id}">
+        <div class="sr-title">${esc(n.title)}</div>
+        <div style="font-size:12px;color:var(--mu)">${fmtDateShort(n.date)} ${n.type?'· '+esc(n.type):''}</div>
+      </div>`).join('');
+    lEl.querySelectorAll('.sr-item').forEach(el=>el.addEventListener('click',()=>openNote(el.dataset.id)));
+  } else { lEl.innerHTML=''; }
+  showReg('view');
+}
+
+function startNewAccession(){
+  S.editingAcc=null; S.curAcc=null; renderAccList();
+  document.getElementById('ae-head').textContent='New Accession';
+  ['ae-num','ae-species','ae-common','ae-location','ra-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('ae-source').value='';
+  document.getElementById('ae-status').value='Active in culture';
+  document.getElementById('ae-date').value='';
+  showReg('editor');
+}
+
+function startEditAccession(){
+  const a=S.accs.find(x=>x.id===S.curAcc); if(!a) return;
+  S.editingAcc=a.id;
+  document.getElementById('ae-head').textContent='Edit Accession';
+  document.getElementById('ae-num').value=a.number||'';
+  document.getElementById('ae-species').value=a.species||'';
+  document.getElementById('ae-common').value=a.common||'';
+  document.getElementById('ae-source').value=a.source||'';
+  document.getElementById('ae-date').value=a.date_acquired||'';
+  document.getElementById('ae-location').value=a.location||'';
+  document.getElementById('ae-status').value=a.status||'Active in culture';
+  document.getElementById('ra-notes').value=a.notes_md||'';
+  showReg('editor');
+}
+
+async function saveAccession(){
+  const species=document.getElementById('ae-species').value.trim();
+  if(!species){toast('Species is required','fail');return;}
+  const data={
+    id:S.editingAcc||uid(),
+    number:document.getElementById('ae-num').value.trim(),
+    species, common:document.getElementById('ae-common').value.trim(),
+    source:document.getElementById('ae-source').value,
+    date_acquired:document.getElementById('ae-date').value||null,
+    location:document.getElementById('ae-location').value.trim(),
+    status:document.getElementById('ae-status').value,
+    notes_md:document.getElementById('ra-notes').value,
+  };
+  document.getElementById('save-acc-btn').disabled=true;
+  load('Saving accession…');
+  try{
+    const {accs,sha}=await loadAccessions();
+    if(S.editingAcc){
+      const idx=accs.findIndex(a=>a.id===S.editingAcc);
+      if(idx!==-1) accs[idx]=data; else accs.push(data);
+    } else { accs.push(data); }
+    S.accs=accs; S.accSha=await saveAccessions(accs,sha);
+    S.curAcc=data.id;
+    toast('Accession saved ✓');
+    renderAccList(); openAccession(data.id);
+  }catch(e){toast('Save failed: '+e.message,'fail');}
+  document.getElementById('save-acc-btn').disabled=false;
+  unload();
+}
+
+async function deleteAccession(){
+  const a=S.accs.find(x=>x.id===S.curAcc); if(!a) return;
+  if(!confirm(`Delete accession "${a.species}" (${a.number})?`)) return;
+  load('Deleting…');
+  try{
+    const {accs,sha}=await loadAccessions();
+    S.accs=accs.filter(x=>x.id!==a.id);
+    S.accSha=await saveAccessions(S.accs,sha);
+    S.curAcc=null; renderAccList(); showReg('empty');
+    toast('Accession deleted');
+  }catch(e){toast('Delete failed: '+e.message,'fail');}
+  unload();
+}
+
+document.getElementById('acc-search').addEventListener('input',renderAccList);
+
+// ════════════════════════════════════════════════════════════
+// RECIPES
+// ════════════════════════════════════════════════════════════
+function renderRecList(){
+  const el=document.getElementById('rec-list');
+  const q=document.getElementById('rec-search').value.toLowerCase();
+  let list=S.recs;
+  if(q) list=list.filter(r=>(r.name||'').toLowerCase().includes(q)||(r.base||'').toLowerCase().includes(q)||(r.target||'').toLowerCase().includes(q));
+  list=[...list].sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+  document.getElementById('rec-stats').textContent=`${S.recs.length} recipes`;
+  if(!list.length){el.innerHTML=`<div style="padding:18px;font-size:13px;color:var(--mu);text-align:center">${q?'No matches':'No recipes yet'}</div>`;return;}
+  el.innerHTML=list.map(r=>`<div class="n-item${S.curRec===r.id?' active':''}" data-id="${r.id}">
+    <div class="n-title">${esc(r.name)}</div>
+    <div class="n-meta"><span>${esc(r.base||'')}</span>${r.pgr?`<span class="ntype">PGR</span>`:''}</div>
+    ${r.target?`<div style="font-size:11px;color:var(--mu)">${esc(r.target)}</div>`:''}
+  </div>`).join('');
+  el.querySelectorAll('.n-item').forEach(el=>el.addEventListener('click',()=>openRecipe(el.dataset.id)));
+}
+
+function openRecipe(id){
+  S.curRec=id; renderRecList();
+  const r=S.recs.find(x=>x.id===id); if(!r) return;
+  document.getElementById('rv-title').textContent=r.name;
+  document.getElementById('rv-date').textContent=r.date_created?`Created: ${fmtDateShort(r.date_created)}`:'';
+  const badges=[];
+  if(r.base) badges.push(`<span class="sbadge type">${esc(r.base)}</span>`);
+  if(r.target) badges.push(`<span class="sbadge species">${esc(r.target)}</span>`);
+  document.getElementById('rv-badges').innerHTML=badges.join('');
+  // Spec table
+  const rows=[
+    ['Base Medium', r.base],['Sucrose', r.sucrose?(r.sucrose+' g/L'):''],
+    ['Agar / Gelrite', r.agar?(r.agar+' g/L'):''],['pH (before autoclave)', r.ph],
+    ['Growth Regulators', r.pgr],['Autoclave', r.autoclave],['Target', r.target],
+  ].filter(([,v])=>v);
+  document.getElementById('rv-spec').innerHTML=rows.map(([k,v])=>`<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join('');
+  document.getElementById('rv-body').innerHTML=r.notes_md?marked.parse(r.notes_md):'';
+  showRec('view');
+}
+
+function startNewRecipe(){
+  S.editingRec=null; S.curRec=null; renderRecList();
+  document.getElementById('re-head').textContent='New Media Recipe';
+  ['re-name','re-sucrose','re-agar','re-ph','re-pgr','re-target','rr-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('re-base').value='';
+  document.getElementById('re-autoclave').value='121°C / 15 min';
+  showRec('editor');
+}
+
+function startEditRecipe(){
+  const r=S.recs.find(x=>x.id===S.curRec); if(!r) return;
+  S.editingRec=r.id;
+  document.getElementById('re-head').textContent='Edit Recipe';
+  document.getElementById('re-name').value=r.name||'';
+  document.getElementById('re-base').value=r.base||'';
+  document.getElementById('re-sucrose').value=r.sucrose||'';
+  document.getElementById('re-agar').value=r.agar||'';
+  document.getElementById('re-ph').value=r.ph||'';
+  document.getElementById('re-pgr').value=r.pgr||'';
+  document.getElementById('re-autoclave').value=r.autoclave||'121°C / 15 min';
+  document.getElementById('re-target').value=r.target||'';
+  document.getElementById('rr-notes').value=r.notes_md||'';
+  showRec('editor');
+}
+
+async function saveRecipe(){
+  const name=document.getElementById('re-name').value.trim();
+  if(!name){toast('Name is required','fail');return;}
+  const data={
+    id:S.editingRec||uid(),
+    name, base:document.getElementById('re-base').value,
+    sucrose:document.getElementById('re-sucrose').value,
+    agar:document.getElementById('re-agar').value,
+    ph:document.getElementById('re-ph').value,
+    pgr:document.getElementById('re-pgr').value.trim(),
+    autoclave:document.getElementById('re-autoclave').value,
+    target:document.getElementById('re-target').value.trim(),
+    notes_md:document.getElementById('rr-notes').value,
+    date_created:S.editingRec?(S.recs.find(r=>r.id===S.editingRec)?.date_created||new Date().toISOString()):new Date().toISOString(),
+  };
+  document.getElementById('save-rec-btn').disabled=true;
+  load('Saving recipe…');
+  try{
+    const {recs,sha}=await loadRecipes();
+    if(S.editingRec){
+      const idx=recs.findIndex(r=>r.id===S.editingRec);
+      if(idx!==-1) recs[idx]=data; else recs.push(data);
+    } else { recs.push(data); }
+    S.recs=recs; S.recSha=await saveRecipes(recs,sha);
+    S.curRec=data.id;
+    toast('Recipe saved ✓');
+    renderRecList(); openRecipe(data.id);
+  }catch(e){toast('Save failed: '+e.message,'fail');}
+  document.getElementById('save-rec-btn').disabled=false;
+  unload();
+}
+
+async function deleteRecipe(){
+  const r=S.recs.find(x=>x.id===S.curRec); if(!r) return;
+  if(!confirm(`Delete recipe "${r.name}"?`)) return;
+  load('Deleting…');
+  try{
+    const {recs,sha}=await loadRecipes();
+    S.recs=recs.filter(x=>x.id!==r.id);
+    S.recSha=await saveRecipes(S.recs,sha);
+    S.curRec=null; renderRecList(); showRec('empty');
+    toast('Recipe deleted');
+  }catch(e){toast('Delete failed: '+e.message,'fail');}
+  unload();
+}
+
+function printRecipe(){
+  const r=S.recs.find(x=>x.id===S.curRec); if(!r) return;
+  const spec=document.getElementById('rv-spec').outerHTML;
+  const body=document.getElementById('rv-body').innerHTML;
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${esc(r.name)}</title>
+  <style>body{font-family:sans-serif;max-width:700px;margin:40px auto;color:#000;padding:0 20px}
+  h1{font-size:22px}table{border-collapse:collapse;width:100%;margin:16px 0}
+  td{border:1px solid #ccc;padding:7px 12px}td:first-child{background:#f5f5f5;font-weight:500;width:40%}
+  @page{margin:2cm}</style></head><body>
+  <h1>🧪 ${esc(r.name)}</h1>${spec}${body}</body></html>`);
+  w.document.close(); w.focus(); w.print();
+}
+
+document.getElementById('rec-search').addEventListener('input',renderRecList);
+
+// ════════════════════════════════════════════════════════════
+// REMINDERS
+// ════════════════════════════════════════════════════════════
+function renderReminders(){
+  const notes=S.notes.filter(n=>n.next_review).map(n=>({...n, days:daysFrom(n.next_review)}));
+  const overdue=notes.filter(n=>n.days<=0).sort((a,b)=>a.days-b.days);
+  const week=notes.filter(n=>n.days>0&&n.days<=7).sort((a,b)=>a.days-b.days);
+  const month=notes.filter(n=>n.days>7&&n.days<=30).sort((a,b)=>a.days-b.days);
+  const later=notes.filter(n=>n.days>30).sort((a,b)=>a.days-b.days);
+
+  const card=(n)=>{
+    const cls=n.days<=0?'overdue':'soon';
+    const dlabel=n.days<0?`${Math.abs(n.days)}d overdue`:n.days===0?'Due today':`In ${n.days}d`;
+    return `<div class="rem-card ${cls}" data-id="${n.id}">
+      <div class="rem-info">
+        <div class="rem-title">${esc(n.title)}</div>
+        <div class="rem-sub">${n.species?`<em>${esc(n.species)}</em> · `:''}${n.type?esc(n.type):''}</div>
+      </div>
+      <div class="rem-date ${cls}">${dlabel}<br><span style="font-size:11px;font-weight:400">${fmtDateShort(n.next_review)}</span></div>
+    </div>`;
+  };
+
+  const section=(title,list,cls='')=>list.length?`<div class="rem-section">
+    <h3 class="${cls}">${title} (${list.length})</h3>${list.map(card).join('')}
+  </div>`:'';
+
+  const body=document.getElementById('reminders-body');
+  body.innerHTML= !notes.length
+    ? '<div class="empty-state"><h2>No reminders set</h2><p>Add a "Next Review Date" to any lab entry to see reminders here.</p></div>'
+    : section('🔴 Overdue',overdue,'overdue')+section('🟡 This week',week,'soon')+section('📅 This month',month)+section('🗓 Later',later);
+
+  body.querySelectorAll('.rem-card').forEach(el=>el.addEventListener('click',()=>openNote(el.dataset.id)));
+}
+
+// ════════════════════════════════════════════════════════════
+// CONTAMINATION DASHBOARD
+// ════════════════════════════════════════════════════════════
+function renderContamDashboard(){
+  const items=S.notes.filter(n=>n.type==='Contamination Log').sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const species={};
+  items.forEach(n=>{if(n.species) species[n.species]=(species[n.species]||0)+1;});
+  const topSpecies=Object.entries(species).sort((a,b)=>b[1]-a[1]).slice(0,1)[0];
+  document.getElementById('contam-summary').innerHTML=`
+    <div class="cstat"><div class="cstat-num">${items.length}</div><div class="cstat-label">Total Events</div></div>
+    <div class="cstat"><div class="cstat-num" style="color:var(--yw)">${items.filter(n=>{const d=daysFrom(n.date); return d!==null&&d>=-30&&d<=0;}).length}</div><div class="cstat-label">Last 30 Days</div></div>
+    <div class="cstat"><div class="cstat-num" style="color:var(--mu);font-size:16px">${topSpecies?esc(topSpecies[0]).split(' ').slice(0,2).join(' '):'—'}</div><div class="cstat-label">Most Affected</div></div>
+  `;
+  if(!items.length){
+    document.getElementById('contam-list').innerHTML='<div class="empty-state"><h2>No contamination events logged</h2><p>Create a note with type "Contamination Log" to track events here.</p></div>';
+    return;
+  }
+  document.getElementById('contam-list').innerHTML=items.map(n=>`
+    <div class="sr-item" data-id="${n.id}">
+      <div style="display:flex;gap:10px;align-items:center">
+        <div style="flex:1">
+          <div class="sr-title" style="color:var(--rd)">☣️ ${esc(n.title)}</div>
+          ${n.species?`<div style="font-size:12px;color:var(--gn);font-style:italic">${esc(n.species)}</div>`:''}
+        </div>
+        <div style="font-size:12px;color:var(--mu);text-align:right;flex-shrink:0">${fmtDateShort(n.date)}</div>
+      </div>
+    </div>`).join('');
+  document.getElementById('contam-list').querySelectorAll('.sr-item').forEach(el=>el.addEventListener('click',()=>openNote(el.dataset.id)));
+}
+
+// ════════════════════════════════════════════════════════════
+// BULK EXPORT
+// ════════════════════════════════════════════════════════════
+async function bulkExport(){
+  if(!S.notes.length){toast('No notes to export','fail');return;}
+  if(!confirm(`Export all ${S.notes.length} notes as decrypted Markdown files?\nThis creates a ZIP on your device.`)) return;
+  load('Decrypting & building ZIP…');
+  try{
+    const zip=new JSZip();
+    const folder=zip.folder('tc-plants-lab-notes');
+    let ok=0;
+    for(const n of S.notes){
+      try{
+        const {body}=await loadNote(n.id);
+        const fm=`---\ntitle: "${(n.title||'').replace(/"/g,"'")}"\ndate: ${n.date}\ntype: ${n.type||''}\nstage: ${n.stage||''}\nspecies: ${n.species||''}\ntags: [${(n.tags||[]).join(', ')}]\n${n.next_review?`next_review: ${n.next_review}\n`:''}`+'---\n\n';
+        const fname=`${n.date.slice(0,10)}-${slugify(n.title)||n.id}.md`;
+        folder.file(fname, fm+body); ok++;
+      }catch(_){}
+    }
+    // Also export accessions and recipes as JSON
+    if(S.accs.length) zip.file('accessions.json', JSON.stringify(S.accs, null, 2));
+    if(S.recs.length) zip.file('recipes.json', JSON.stringify(S.recs, null, 2));
+
+    const blob=await zip.generateAsync({type:'blob'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download=`tc-plants-lab-notes-${new Date().toISOString().slice(0,10)}.zip`;
+    a.click(); URL.revokeObjectURL(url);
+    toast(`Exported ${ok} notes + accessions + recipes ✓`);
+  }catch(e){toast('Export failed: '+e.message,'fail');}
+  unload();
+}
+
+// ════════════════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════════════════
+function switchSection(name){
+  S.section=name;
+  document.querySelectorAll('.section').forEach(el=>el.classList.remove('on'));
+  document.querySelectorAll('.ntab').forEach(el=>el.classList.remove('active'));
+  const sec=document.getElementById(`sec-${name}`);
+  if(sec) sec.classList.add('on');
+  document.querySelector(`[data-sec="${name}"]`)?.classList.add('active');
+  if(name==='reminders') renderReminders();
+  if(name==='contam') renderContamDashboard();
+}
+document.querySelectorAll('.ntab').forEach(t=>t.addEventListener('click',()=>switchSection(t.dataset.sec)));
+
+// Filters
+document.querySelectorAll('[data-filter="type"]').forEach(p=>{
+  p.addEventListener('click',function(){
+    document.querySelectorAll('[data-filter="type"]').forEach(x=>x.classList.remove('active'));
+    this.classList.add('active');
+    S.typeFilter=this.dataset.val; S.cur=null; renderNoteList(); showNote('empty');
+  });
+});
+document.querySelectorAll('[data-filter="stage"]').forEach(p=>{
+  p.addEventListener('click',function(){
+    document.querySelectorAll('[data-filter="stage"]').forEach(x=>x.classList.remove('active'));
+    this.classList.add('active');
+    S.stageFilter=this.dataset.val; S.cur=null; renderNoteList(); showNote('empty');
+  });
+});
+
+// Template auto-fill
+document.getElementById('ne-type').addEventListener('change',function(){
+  const tmpl=NOTE_TEMPLATES[this.value];
+  if(tmpl&&!document.getElementById('ne-body').value.trim()){
+    document.getElementById('ne-body').value=tmpl;
+    document.getElementById('ne-tmpl-hint').textContent='Template loaded — customise freely.';
   }
 });
 
-// ── NEW NOTE ────────────────────────────────────────────────────────
-function startNew() {
-  S.editing = null; S.cur = null; renderList();
-  document.getElementById('ed-head').textContent = 'New Lab Entry';
-  ['e-title','e-species','e-tags','e-body'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('e-type').value='';
-  document.getElementById('e-stage').value='';
-  document.getElementById('tmpl-hint').textContent='';
-  pane('editor');
-}
-
-// ── EDIT NOTE ───────────────────────────────────────────────────────
-async function startEdit() {
-  const id = S.cur; if (!id) return;
-  load('Loading…');
-  try {
-    const { body } = await loadNote(id);
-    const m = S.notes.find(n=>n.id===id);
-    S.editing = id;
-    document.getElementById('ed-head').textContent = 'Edit Entry';
-    document.getElementById('e-title').value   = m.title   || '';
-    document.getElementById('e-type').value    = m.type    || '';
-    document.getElementById('e-stage').value   = m.stage   || '';
-    document.getElementById('e-species').value = m.species || '';
-    document.getElementById('e-tags').value    = (m.tags||[]).join(', ');
-    document.getElementById('e-body').value    = body;
-    document.getElementById('tmpl-hint').textContent = '';
-    pane('editor');
-  } catch(e) { toast('Load failed: '+e.message,'fail'); }
-  unload();
-}
-
-// ── SAVE ─────────────────────────────────────────────────────────────
-async function save() {
-  const title   = document.getElementById('e-title').value.trim();
-  const type    = document.getElementById('e-type').value;
-  const stage   = document.getElementById('e-stage').value;
-  const species = document.getElementById('e-species').value.trim();
-  const tags    = document.getElementById('e-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
-  const body    = document.getElementById('e-body').value;
-
-  if (!title) { toast('Title is required','fail'); return; }
-
-  document.getElementById('save-btn').disabled = true;
-  load('Encrypting & saving to GitHub…');
-
-  try {
-    const { notes, sha: iSha } = await loadIndex();
-
-    if (S.editing) {
-      const ef = await ghGet(`${DIR}/${S.editing}.enc`);
-      await writeNote(S.editing, body, ef.sha, `lab: update "${title}"`);
-      const idx = notes.findIndex(n=>n.id===S.editing);
-      if (idx!==-1) notes[idx] = { ...notes[idx], title, type, stage, species, tags };
-      S.notes = notes; S.cur = S.editing;
-    } else {
-      const id   = uid();
-      const date = new Date().toISOString();
-      await writeNote(id, body, null, `lab: add "${title}"`);
-      notes.push({ id, title, date, type, stage, species, tags });
-      S.notes = notes; S.cur = id;
-    }
-
-    await saveIndex(S.notes, iSha);
-    toast('Saved ✓  — committed to GitHub');
-    renderList();
-    await openNote(S.cur);
-  } catch(e) { toast('Save failed: '+e.message,'fail'); }
-
-  document.getElementById('save-btn').disabled = false;
-  unload();
-}
-
-// ── DELETE ───────────────────────────────────────────────────────────
-async function del() {
-  const id = S.cur; if (!id) return;
-  const m = S.notes.find(n=>n.id===id);
-  if (!confirm(`Permanently delete "${m?.title}"?\n\nThis removes the encrypted file from GitHub.`)) return;
-  load('Deleting…');
-  try {
-    const f = await ghGet(`${DIR}/${id}.enc`);
-    if (f) await ghDel(`${DIR}/${id}.enc`, f.sha, `lab: delete "${m?.title}"`);
-    const { notes, sha } = await loadIndex();
-    S.notes = notes.filter(n=>n.id!==id);
-    await saveIndex(S.notes, sha);
-    S.cur = null; renderList(); pane('empty');
-    toast('Entry deleted');
-  } catch(e) { toast('Delete failed: '+e.message,'fail'); }
-  unload();
-}
-
-// ── LOGIN ─────────────────────────────────────────────────────────────
-async function login() {
-  const pw  = document.getElementById('inp-pw').value;
-  const tok = document.getElementById('inp-tok').value.trim();
-  const err = document.getElementById('err');
+// ════════════════════════════════════════════════════════════
+// LOGIN / LOCK
+// ════════════════════════════════════════════════════════════
+async function login(){
+  const pw=document.getElementById('lpw').value;
+  const tok=document.getElementById('ltok').value.trim();
+  const err=document.getElementById('lerr');
   err.style.display='none';
-  if (!pw || !tok) { err.textContent='Both fields are required.'; err.style.display='block'; return; }
-
-  document.getElementById('login-btn').disabled=true;
-  document.getElementById('login-btn').textContent='Unlocking…';
-
-  try {
-    const r = await fetch(`${API}/repos/${REPO}`,{ headers:{ Authorization:`token ${tok}` } });
-    if (!r.ok) throw new Error('GitHub token invalid or lacks repo access.');
+  if(!pw||!tok){err.textContent='Both fields required.';err.style.display='block';return;}
+  document.getElementById('lbtn').disabled=true;
+  document.getElementById('lbtn').textContent='Unlocking…';
+  try{
+    const r=await fetch(`${API}/repos/${REPO}`,{headers:{Authorization:`token ${tok}`}});
+    if(!r.ok) throw new Error('GitHub token invalid or lacks repo access.');
     S.pw=pw; S.tok=tok;
-    sessionStorage.setItem('_lt', tok);
-
-    load('Loading notes…');
-    const { notes } = await loadIndex();
-    S.notes = notes;
-
+    sessionStorage.setItem('_lt',tok);
+    load('Loading all data…');
+    const [{notes,sha:nSha},{accs,sha:aSha},{recs,sha:rSha}]=await Promise.all([loadNotesIndex(),loadAccessions(),loadRecipes()]);
+    S.notes=notes; S.notesSha=nSha;
+    S.accs=accs; S.accSha=aSha;
+    S.recs=recs; S.recSha=rSha;
     document.getElementById('login').style.display='none';
     document.getElementById('app').classList.add('on');
-    renderList(); pane('empty');
-  } catch(e) {
-    err.textContent = e.message; err.style.display='block';
+    renderNoteList(); renderAccList(); renderRecList();
+    updateReminderBadge();
+    switchSection('notes'); showNote('empty');
+  }catch(e){
+    err.textContent=e.message; err.style.display='block';
     S.pw=null; S.tok=null;
   }
-
-  document.getElementById('login-btn').disabled=false;
-  document.getElementById('login-btn').textContent='Unlock Lab →';
+  document.getElementById('lbtn').disabled=false;
+  document.getElementById('lbtn').textContent='Unlock Lab →';
   unload();
 }
 
-function lock() {
-  Object.assign(S,{pw:null,tok:null,notes:[],cur:null,editing:null});
+function lock(){
+  Object.assign(S,{pw:null,tok:null,notes:[],cur:null,editing:null,notesSha:null,accs:[],curAcc:null,editingAcc:null,accSha:null,recs:[],curRec:null,editingRec:null,recSha:null});
   sessionStorage.clear();
   document.getElementById('app').classList.remove('on');
   document.getElementById('login').style.display='flex';
-  document.getElementById('inp-pw').value='';
-  document.getElementById('inp-tok').value='';
+  document.getElementById('lpw').value='';
+  document.getElementById('ltok').value='';
 }
 
-// ── WIRE UP ──────────────────────────────────────────────────────────
-document.getElementById('login-btn').onclick  = login;
-document.getElementById('lock-btn').onclick   = lock;
-document.getElementById('new-btn').onclick    = startNew;
-document.getElementById('edit-btn').onclick   = startEdit;
-document.getElementById('del-btn').onclick    = del;
-document.getElementById('save-btn').onclick   = save;
-document.getElementById('cancel-btn').onclick = () => S.cur ? openNote(S.cur) : pane('empty');
+// ════════════════════════════════════════════════════════════
+// EVENT WIRING
+// ════════════════════════════════════════════════════════════
+document.getElementById('lbtn').onclick=login;
+document.getElementById('lpw').onkeydown=e=>{if(e.key==='Enter')document.getElementById('ltok').focus();};
+document.getElementById('ltok').onkeydown=e=>{if(e.key==='Enter')login();};
+document.getElementById('lock-btn').onclick=lock;
+document.getElementById('export-all-btn').onclick=bulkExport;
 
-document.getElementById('inp-pw').onkeydown   = e => { if(e.key==='Enter') document.getElementById('inp-tok').focus(); };
-document.getElementById('inp-tok').onkeydown  = e => { if(e.key==='Enter') login(); };
+// Notes
+document.getElementById('new-note-btn').onclick=startNewNote;
+document.getElementById('edit-note-btn').onclick=startEditNote;
+document.getElementById('del-note-btn').onclick=deleteNote;
+document.getElementById('save-note-btn').onclick=saveNoteAction;
+document.getElementById('cancel-note-btn').onclick=()=>S.cur?openNote(S.cur):showNote('empty');
+document.getElementById('print-btn').onclick=printNote;
+document.getElementById('img-btn').onclick=insertImage;
+document.getElementById('tbl-btn').onclick=insertTable;
 
-// Restore token from session (password always required fresh)
-const st = sessionStorage.getItem('_lt');
-if (st) document.getElementById('inp-tok').value = st;
+// Registry
+document.getElementById('new-acc-btn').onclick=startNewAccession;
+document.getElementById('edit-acc-btn').onclick=startEditAccession;
+document.getElementById('del-acc-btn').onclick=deleteAccession;
+document.getElementById('save-acc-btn').onclick=saveAccession;
+document.getElementById('cancel-acc-btn').onclick=()=>S.curAcc?openAccession(S.curAcc):showReg('empty');
+
+// Recipes
+document.getElementById('new-rec-btn').onclick=startNewRecipe;
+document.getElementById('edit-rec-btn').onclick=startEditRecipe;
+document.getElementById('del-rec-btn').onclick=deleteRecipe;
+document.getElementById('save-rec-btn').onclick=saveRecipe;
+document.getElementById('cancel-rec-btn').onclick=()=>S.curRec?openRecipe(S.curRec):showRec('empty');
+document.getElementById('print-rec-btn').onclick=printRecipe;
+
+// ════════════════════════════════════════════════════════════
+// OFFLINE DETECTION
+// ════════════════════════════════════════════════════════════
+window.addEventListener('online',()=>document.getElementById('offline-pill').classList.remove('on'));
+window.addEventListener('offline',()=>document.getElementById('offline-pill').classList.add('on'));
+if(!navigator.onLine) document.getElementById('offline-pill').classList.add('on');
+
+// ════════════════════════════════════════════════════════════
+// PWA SERVICE WORKER
+// ════════════════════════════════════════════════════════════
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js').catch(()=>{});
+}
+
+// Restore token from session
+const _st=sessionStorage.getItem('_lt');
+if(_st) document.getElementById('ltok').value=_st;
 </script>
 </body>
 </html>
