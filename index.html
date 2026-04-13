@@ -1838,12 +1838,43 @@ function openRecipe(id){
   showRec('view');
 }
 
+function _acStr(){
+  const t=document.getElementById('re-ac-temp').value.trim();
+  const m=document.getElementById('re-ac-time').value.trim();
+  if(!t&&!m) return 'Filter sterilized';
+  if(t&&m) return `${t}°C / ${m} min`;
+  return t?`${t}°C`:(`${m} min`);
+}
+function _acParse(stored){
+  const tM=( stored||'').match(/(\d+)°C/);
+  const mM=(stored||'').match(/(\d+)\s*min/);
+  document.getElementById('re-ac-temp').value=tM?tM[1]:'';
+  document.getElementById('re-ac-time').value=mM?mM[1]:'';
+}
+function _baseVal(){
+  const sel=document.getElementById('re-base');
+  if(sel.value==='__custom') return document.getElementById('re-base-custom').value.trim()||'Custom';
+  return sel.value;
+}
+function _baseSet(val){
+  const knownOpts=Array.from(document.getElementById('re-base').options).map(o=>o.value);
+  if(val&&!knownOpts.includes(val)){
+    document.getElementById('re-base').value='__custom';
+    document.getElementById('re-base-custom').value=val;
+    document.getElementById('re-base-custom-wrap').style.display='block';
+  } else {
+    document.getElementById('re-base').value=val||'';
+    document.getElementById('re-base-custom-wrap').style.display='none';
+  }
+}
+
 function startNewRecipe(){
   S.editingRec=null; S.curRec=null; renderRecList();
   document.getElementById('re-head').textContent='New Media Recipe';
   ['re-name','re-sucrose','re-agar','re-ph','re-pgr','re-target','rr-notes'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('re-base').value='';
-  document.getElementById('re-autoclave').value='121°C / 15 min';
+  _baseSet('');
+  document.getElementById('re-ac-temp').value='121';
+  document.getElementById('re-ac-time').value='15';
   showRec('editor');
 }
 
@@ -1852,12 +1883,12 @@ function startEditRecipe(){
   S.editingRec=r.id;
   document.getElementById('re-head').textContent='Edit Recipe';
   document.getElementById('re-name').value=r.name||'';
-  document.getElementById('re-base').value=r.base||'';
+  _baseSet(r.base||'');
   document.getElementById('re-sucrose').value=r.sucrose||'';
   document.getElementById('re-agar').value=r.agar||'';
   document.getElementById('re-ph').value=r.ph||'';
   document.getElementById('re-pgr').value=r.pgr||'';
-  document.getElementById('re-autoclave').value=r.autoclave||'121°C / 15 min';
+  _acParse(r.autoclave);
   document.getElementById('re-target').value=r.target||'';
   document.getElementById('rr-notes').value=r.notes_md||'';
   showRec('editor');
@@ -1868,12 +1899,12 @@ async function saveRecipe(){
   if(!name){toast('Name is required','fail');return;}
   const data={
     id:S.editingRec||uid(),
-    name, base:document.getElementById('re-base').value,
+    name, base:_baseVal(),
     sucrose:document.getElementById('re-sucrose').value,
     agar:document.getElementById('re-agar').value,
     ph:document.getElementById('re-ph').value,
     pgr:document.getElementById('re-pgr').value.trim(),
-    autoclave:document.getElementById('re-autoclave').value,
+    autoclave:_acStr(),
     target:document.getElementById('re-target').value.trim(),
     notes_md:document.getElementById('rr-notes').value,
     date_created:S.editingRec?(S.recs.find(r=>r.id===S.editingRec)?.date_created||new Date().toISOString()):new Date().toISOString(),
@@ -2226,13 +2257,11 @@ function closeSidebarMobile(){
     document.getElementById('sidebar-backdrop').classList.remove('on');
   }
 }
-// Patch openNote/openAccession/openRecipe to close sidebar on mobile
-const _origOpenNote=openNote;
-openNote=async function(id){ await _origOpenNote(id); closeSidebarMobile(); };
-const _origOpenAcc=openAccession;
-openAccession=function(id){ _origOpenAcc(id); closeSidebarMobile(); };
-const _origOpenRec=openRecipe;
-openRecipe=function(id){ _origOpenRec(id); closeSidebarMobile(); };
+// Close sidebar after opening any item on mobile
+// (note list uses arrow fn closures so openNote is looked up at call time — patching works)
+const _onNote=openNote; openNote=async function(id){await _onNote(id);closeSidebarMobile();};
+const _onAcc=openAccession; openAccession=function(id){_onAcc(id);closeSidebarMobile();};
+const _onRec=openRecipe; openRecipe=function(id){_onRec(id);closeSidebarMobile();};
 
 // ════════════════════════════════════════════════════════════
 // RECIPE FORM — CUSTOM MEDIA + AUTOCLAVE PRESETS
@@ -2257,98 +2286,34 @@ document.querySelectorAll('.ac-preset').forEach(btn=>{
   });
 });
 
-// Patch saveRecipe to use new autoclave fields + custom media
-const _origSaveRecipe=saveRecipe;
-saveRecipe=async function(){
-  // Read autoclave
-  const t=document.getElementById('re-ac-temp').value;
-  const m=document.getElementById('re-ac-time').value;
-  const acStr=(!t&&!m)?'Filter sterilized':(t&&m)?`${t}°C / ${m} min`:(t?`${t}°C`:`${m} min`);
-  // Temporarily set the old field value so existing saveRecipe reads it
-  // Instead, we override the whole thing here:
-  const name=document.getElementById('re-name').value.trim();
-  if(!name){toast('Name is required','fail');return;}
-  let base=document.getElementById('re-base').value;
-  if(base==='__custom') base=document.getElementById('re-base-custom').value.trim()||'Custom';
-  const data={
-    id:S.editingRec||uid(),
-    name, base,
-    sucrose:document.getElementById('re-sucrose').value,
-    agar:document.getElementById('re-agar').value,
-    ph:document.getElementById('re-ph').value,
-    pgr:document.getElementById('re-pgr').value.trim(),
-    autoclave:acStr,
-    target:document.getElementById('re-target').value.trim(),
-    notes_md:document.getElementById('rr-notes').value,
-    date_created:S.editingRec?(S.recs.find(r=>r.id===S.editingRec)?.date_created||new Date().toISOString()):new Date().toISOString(),
-  };
-  document.getElementById('save-rec-btn').disabled=true;
-  load('Saving recipe…');
-  try{
-    const {recs,sha}=await loadRecipes();
-    if(S.editingRec){const idx=recs.findIndex(r=>r.id===S.editingRec);if(idx!==-1)recs[idx]=data;else recs.push(data);}
-    else recs.push(data);
-    S.recs=recs; S.recSha=await saveRecipes(recs,sha);
-    S.curRec=data.id;
-    toast('Recipe saved ✓');
-    renderRecList(); openRecipe(data.id);
-  }catch(e){toast('Save failed: '+e.message,'fail');}
-  document.getElementById('save-rec-btn').disabled=false;
-  unload();
-};
-
-// Patch startEditRecipe to populate autoclave fields
-const _origStartEditRecipe=startEditRecipe;
-startEditRecipe=function(){
-  _origStartEditRecipe();
-  const r=S.recs.find(x=>x.id===S.curRec); if(!r) return;
-  // Parse stored autoclave string back to temp + time
-  const ac=r.autoclave||'';
-  const tMatch=ac.match(/(\d+)°C/);
-  const mMatch=ac.match(/(\d+)\s*min/);
-  document.getElementById('re-ac-temp').value=tMatch?tMatch[1]:'';
-  document.getElementById('re-ac-time').value=mMatch?mMatch[1]:'';
-  // Custom base
-  const knownBases=['Murashige & Skoog (MS) Full','½ MS','¼ MS','MS + vitamins (modified)',
-    'Linsmaier & Skoog (LS)','Knudson C (KC)','Vacin & Went (VW)','Pierik\'s medium',
-    'New Dogashima (ND)','Hyponex-based','Gamborg B5','N6 (Chu) — Monocots / Cereals',
-    'MS Modified for Musa','WPM (Lloyd & McCown)','DKW (Driver & Kuniyuki)',
-    'Anderson\'s Rhododendron','Nitsch & Nitsch (NN) — Anther','Schenk & Hildebrandt (SH)',
-    'White\'s — Roots','Gamborg B5 Modified',''];
-  if(r.base&&!knownBases.includes(r.base)){
-    document.getElementById('re-base').value='__custom';
-    document.getElementById('re-base-custom').value=r.base;
-    document.getElementById('re-base-custom-wrap').style.display='block';
-  }
-};
-
-const _origStartNewRecipe=startNewRecipe;
-startNewRecipe=function(){
-  _origStartNewRecipe();
-  document.getElementById('re-ac-temp').value='121';
-  document.getElementById('re-ac-time').value='15';
-  document.getElementById('re-base-custom-wrap').style.display='none';
-};
+// (recipe functions now self-contained — patches removed)
 
 // ════════════════════════════════════════════════════════════
 // TOOLS — TIMERS
 // ════════════════════════════════════════════════════════════
 let timerList=[], swList=[];
 
-function playBeep(n=3){
+let _audioCtx=null;
+function _getAudioCtx(){
+  if(!_audioCtx||_audioCtx.state==='closed'){
+    _audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  }
+  return _audioCtx;
+}
+async function playBeep(n=3){
   try{
-    const ctx=new(window.AudioContext||window.webkitAudioContext)();
-    let t=ctx.currentTime;
+    const ctx=_getAudioCtx();
+    await ctx.resume(); // must await — context may be suspended
+    let t=ctx.currentTime+0.05; // small delay to ensure context is live
     for(let i=0;i<n;i++){
       const o=ctx.createOscillator(), g=ctx.createGain();
       o.connect(g); g.connect(ctx.destination);
       o.frequency.value=880; o.type='sine';
-      g.gain.setValueAtTime(0.4,t);
-      g.gain.exponentialRampToValueAtTime(0.001,t+0.35);
-      o.start(t); o.stop(t+0.35); t+=0.45;
+      g.gain.setValueAtTime(0.5,t);
+      g.gain.exponentialRampToValueAtTime(0.001,t+0.3);
+      o.start(t); o.stop(t+0.3); t+=0.4;
     }
-    ctx.resume();
-  }catch(_){}
+  }catch(e){ console.warn('Beep error:',e); }
 }
 
 function fmtHMS(s){
