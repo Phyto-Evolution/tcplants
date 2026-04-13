@@ -421,9 +421,17 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
             <input type="text" id="ne-tags" placeholder="MS media, contamination…">
           </div>
         </div>
-        <div class="field">
-          <label>Next Review Date <span style="font-weight:400;color:var(--mu)">(optional — sets reminder)</span></label>
-          <input type="date" id="ne-review" style="width:200px">
+        <div class="row2">
+          <div class="field">
+            <label>Recipe Used <span style="font-weight:400;color:var(--mu)">(optional)</span></label>
+            <select id="ne-recipe">
+              <option value="">— none —</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Next Review Date <span style="font-weight:400;color:var(--mu)">(sets reminder)</span></label>
+            <input type="date" id="ne-review">
+          </div>
         </div>
         <div class="field">
           <label>Notes <span style="font-weight:400;color:var(--mu)">(Markdown)</span></label>
@@ -652,6 +660,26 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
         </div>
         <div class="field">
           <label>Preparation Notes <span style="font-weight:400;color:var(--mu)">(Markdown)</span></label>
+          <div class="editor-toolbar">
+            <button class="tb-btn" id="rb-h2"     title="Heading 2">H2</button>
+            <button class="tb-btn" id="rb-h3"     title="Heading 3">H3</button>
+            <div class="tb-div"></div>
+            <button class="tb-btn" id="rb-bold"   title="Bold (Ctrl+B)"><b>B</b></button>
+            <button class="tb-btn" id="rb-italic" title="Italic (Ctrl+I)"><i>I</i></button>
+            <button class="tb-btn" id="rb-strike" title="Strikethrough"><s>S</s></button>
+            <div class="tb-div"></div>
+            <button class="tb-btn" id="rb-code"   title="Inline code">`c`</button>
+            <button class="tb-btn" id="rb-codebl" title="Code block">```</button>
+            <button class="tb-btn" id="rb-quote"  title="Blockquote">"</button>
+            <button class="tb-btn" id="rb-hr"     title="Horizontal rule">—</button>
+            <div class="tb-div"></div>
+            <button class="tb-btn" id="rb-ul"     title="Bullet list">• List</button>
+            <button class="tb-btn" id="rb-ol"     title="Numbered list">1. List</button>
+            <button class="tb-btn" id="rb-task"   title="Task list">☑ Task</button>
+            <div class="tb-div"></div>
+            <button class="tb-btn" id="rb-link"   title="Link (Ctrl+K)">🔗</button>
+            <button class="tb-btn" id="rb-tbl"    title="Insert table">⊞</button>
+          </div>
           <textarea id="rr-notes" placeholder="Preparation steps, special additions, observations…"></textarea>
         </div>
         <div class="eactions">
@@ -932,8 +960,16 @@ async function openNote(id){
       const label=d<=0?`Overdue by ${Math.abs(d)}d`:d===0?'Due today':`Review in ${d}d`;
       badges.push(`<span class="sbadge ${cls}">⏰ ${label} (${fmtDateShort(m.next_review)})</span>`);
     }
+    if(m.recipe_id){
+      const rec=S.recs.find(r=>r.id===m.recipe_id);
+      if(rec) badges.push(`<span class="sbadge type" style="cursor:pointer;border-color:var(--pu);color:var(--pu)" data-recipe-id="${esc(m.recipe_id)}">🧪 ${esc(rec.name)}</span>`);
+    }
     if(m.tags?.length) m.tags.forEach(t=>badges.push(`<span class="tag">${esc(t)}</span>`));
     document.getElementById('nv-badges').innerHTML=badges.join('');
+    // clicking the recipe badge opens that recipe
+    document.getElementById('nv-badges').querySelectorAll('[data-recipe-id]').forEach(el=>{
+      el.addEventListener('click',()=>{ switchSection('recipes'); openRecipe(el.dataset.recipeId); });
+    });
     document.getElementById('nv-body').innerHTML=marked.parse(body);
     switchSection('notes'); showNote('view');
   }catch(e){toast('Decrypt failed: '+e.message,'fail');}
@@ -956,6 +992,17 @@ const NOTE_TEMPLATES={
   'Harvest / Transfer':`## Cultures Harvested\n\n## Quantity\n\n## Destination / Purpose\n\n## Condition at Transfer\n\n## Notes\n`,
 };
 
+function populateRecipeSelect(selectedId=''){
+  const sel=document.getElementById('ne-recipe');
+  sel.innerHTML='<option value="">— none —</option>';
+  S.recs.forEach(r=>{
+    const opt=document.createElement('option');
+    opt.value=r.id; opt.textContent=r.name+(r.base?` (${r.base})`:''+(r.target?` · ${r.target}`:''));
+    if(r.id===selectedId) opt.selected=true;
+    sel.appendChild(opt);
+  });
+}
+
 function startNewNote(){
   S.editing=null; S.cur=null; renderNoteList();
   document.getElementById('ne-head').textContent='New Lab Entry';
@@ -964,6 +1011,7 @@ function startNewNote(){
   document.getElementById('ne-stage').value='';
   document.getElementById('ne-review').value='';
   document.getElementById('ne-tmpl-hint').textContent='';
+  populateRecipeSelect();
   showNote('editor');
 }
 
@@ -983,6 +1031,7 @@ async function startEditNote(){
     document.getElementById('ne-review').value=m.next_review||'';
     document.getElementById('ne-body').value=body;
     document.getElementById('ne-tmpl-hint').textContent='';
+    populateRecipeSelect(m.recipe_id||'');
     showNote('editor');
   }catch(e){toast('Load failed: '+e.message,'fail');}
   unload();
@@ -994,7 +1043,8 @@ async function saveNoteAction(){
   const stage  =document.getElementById('ne-stage').value;
   const species=document.getElementById('ne-species').value.trim();
   const tags   =document.getElementById('ne-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
-  const review =document.getElementById('ne-review').value||null;
+  const review   =document.getElementById('ne-review').value||null;
+  const recipe_id=document.getElementById('ne-recipe').value||null;
   const body   =document.getElementById('ne-body').value;
   if(!title){toast('Title is required','fail');return;}
   document.getElementById('save-note-btn').disabled=true;
@@ -1005,12 +1055,12 @@ async function saveNoteAction(){
       const ef=await ghGet(`${DIR}/${S.editing}.enc`);
       await writeNote(S.editing,body,ef.sha,`lab: update "${title}"`);
       const idx=notes.findIndex(n=>n.id===S.editing);
-      if(idx!==-1) notes[idx]={...notes[idx],title,type,stage,species,tags,next_review:review};
+      if(idx!==-1) notes[idx]={...notes[idx],title,type,stage,species,tags,next_review:review,recipe_id};
       S.notes=notes; S.cur=S.editing;
     }else{
       const id=uid(), date=new Date().toISOString();
       await writeNote(id,body,null,`lab: add "${title}"`);
-      notes.push({id,title,date,type,stage,species,tags,next_review:review});
+      notes.push({id,title,date,type,stage,species,tags,next_review:review,recipe_id});
       S.notes=notes; S.cur=id;
     }
     S.notesSha=await saveNotesIndex(S.notes,iSha);
@@ -1121,8 +1171,8 @@ document.getElementById('close-search-btn').addEventListener('click',()=>showNot
 // NOTES — IMAGE INSERT
 // ════════════════════════════════════════════════════════════
 // ── MARKDOWN TOOLBAR ────────────────────────────────────────
-function mdWrap(before, after, placeholder){
-  const ta=document.getElementById('ne-body');
+function mdWrap(taId, before, after, placeholder){
+  const ta=document.getElementById(taId);
   const s=ta.selectionStart, e=ta.selectionEnd;
   const sel=ta.value.slice(s,e)||placeholder||'';
   const ins=before+sel+after;
@@ -1132,8 +1182,8 @@ function mdWrap(before, after, placeholder){
   else { ta.selectionStart=s+before.length; ta.selectionEnd=s+before.length+sel.length; }
 }
 
-function mdLinePrefix(prefix){
-  const ta=document.getElementById('ne-body');
+function mdLinePrefix(taId, prefix){
+  const ta=document.getElementById(taId);
   const s=ta.selectionStart;
   const lineStart=ta.value.lastIndexOf('\n',s-1)+1;
   const ins='\n'+prefix;
@@ -1163,48 +1213,72 @@ function insertImage(){
   input.click();
 }
 
-function insertTable(){
-  mdWrap('\n| Header 1 | Header 2 | Header 3 |\n|----------|----------|----------|\n| Cell     | Cell     | Cell     |\n','','');
+function insertTable(taId){
+  mdWrap(taId,'\n| Header 1 | Header 2 | Header 3 |\n|----------|----------|----------|\n| Cell     | Cell     | Cell     |\n','','');
 }
 
-// Toolbar button actions
-const TB={
-  'tb-h2':     ()=>mdLinePrefix('## '),
-  'tb-h3':     ()=>mdLinePrefix('### '),
-  'tb-bold':   ()=>mdWrap('**','**','bold text'),
-  'tb-italic': ()=>mdWrap('*','*','italic text'),
-  'tb-strike': ()=>mdWrap('~~','~~','strikethrough'),
-  'tb-code':   ()=>mdWrap('`','`','code'),
-  'tb-codebl': ()=>mdWrap('\n```\n','\n```\n','code here'),
-  'tb-quote':  ()=>mdLinePrefix('> '),
-  'tb-hr':     ()=>mdWrap('\n\n---\n\n','',''),
-  'tb-ul':     ()=>mdLinePrefix('- '),
-  'tb-ol':     ()=>mdLinePrefix('1. '),
-  'tb-task':   ()=>mdLinePrefix('- [ ] '),
-  'tb-link':   ()=>mdWrap('[','](https://)','link text'),
-  'img-btn':   insertImage,
-  'tbl-btn':   insertTable,
-};
-Object.entries(TB).forEach(([id,fn])=>{
-  const el=document.getElementById(id);
-  if(el) el.addEventListener('click',fn);
-});
+// Generic toolbar factory — builds action map for any textarea ID
+function makeTB(taId){
+  return {
+    h2:     ()=>mdLinePrefix(taId,'## '),
+    h3:     ()=>mdLinePrefix(taId,'### '),
+    bold:   ()=>mdWrap(taId,'**','**','bold text'),
+    italic: ()=>mdWrap(taId,'*','*','italic text'),
+    strike: ()=>mdWrap(taId,'~~','~~','strikethrough'),
+    code:   ()=>mdWrap(taId,'`','`','code'),
+    codebl: ()=>mdWrap(taId,'\n```\n','\n```\n','code here'),
+    quote:  ()=>mdLinePrefix(taId,'> '),
+    hr:     ()=>mdWrap(taId,'\n\n---\n\n','',''),
+    ul:     ()=>mdLinePrefix(taId,'- '),
+    ol:     ()=>mdLinePrefix(taId,'1. '),
+    task:   ()=>mdLinePrefix(taId,'- [ ] '),
+    link:   ()=>mdWrap(taId,'[','](https://)','link text'),
+    tbl:    ()=>insertTable(taId),
+  };
+}
 
-// Keyboard shortcuts in the textarea
+// Wire up toolbar prefix (e.g. 'tb-' for notes, 'rb-' for recipes)
+function wireToolbar(prefix, taId, extraBtns={}){
+  const tb=makeTB(taId);
+  const map={
+    [`${prefix}h2`]:tb.h2, [`${prefix}h3`]:tb.h3,
+    [`${prefix}bold`]:tb.bold, [`${prefix}italic`]:tb.italic, [`${prefix}strike`]:tb.strike,
+    [`${prefix}code`]:tb.code, [`${prefix}codebl`]:tb.codebl,
+    [`${prefix}quote`]:tb.quote, [`${prefix}hr`]:tb.hr,
+    [`${prefix}ul`]:tb.ul, [`${prefix}ol`]:tb.ol, [`${prefix}task`]:tb.task,
+    [`${prefix}link`]:tb.link, [`${prefix}tbl`]:tb.tbl,
+    ...extraBtns,
+  };
+  Object.entries(map).forEach(([id,fn])=>{ const el=document.getElementById(id); if(el) el.onclick=fn; });
+}
+
+// Notes toolbar
+wireToolbar('tb-','ne-body',{'img-btn':insertImage});
+
+// Recipes toolbar
+wireToolbar('rb-','rr-notes');
+
+// Keyboard shortcuts — notes textarea
 document.getElementById('ne-body').addEventListener('keydown',e=>{
+  const tb=makeTB('ne-body');
   if(e.ctrlKey||e.metaKey){
-    if(e.key==='b'){e.preventDefault();TB['tb-bold']();}
-    else if(e.key==='i'){e.preventDefault();TB['tb-italic']();}
-    else if(e.key==='k'){e.preventDefault();TB['tb-link']();}
+    if(e.key==='b'){e.preventDefault();tb.bold();}
+    else if(e.key==='i'){e.preventDefault();tb.italic();}
+    else if(e.key==='k'){e.preventDefault();tb.link();}
     else if(e.key==='s'){e.preventDefault();saveNoteAction();}
   }
-  // Tab key inserts 2 spaces instead of focusing next element
-  if(e.key==='Tab'){
-    e.preventDefault();
-    const ta=e.target, s=ta.selectionStart;
-    ta.value=ta.value.slice(0,s)+'  '+ta.value.slice(ta.selectionEnd);
-    ta.selectionStart=ta.selectionEnd=s+2;
+  if(e.key==='Tab'){e.preventDefault();const ta=e.target,s=ta.selectionStart;ta.value=ta.value.slice(0,s)+'  '+ta.value.slice(ta.selectionEnd);ta.selectionStart=ta.selectionEnd=s+2;}
+});
+
+// Keyboard shortcuts — recipe textarea
+document.getElementById('rr-notes').addEventListener('keydown',e=>{
+  const tb=makeTB('rr-notes');
+  if(e.ctrlKey||e.metaKey){
+    if(e.key==='b'){e.preventDefault();tb.bold();}
+    else if(e.key==='i'){e.preventDefault();tb.italic();}
+    else if(e.key==='k'){e.preventDefault();tb.link();}
   }
+  if(e.key==='Tab'){e.preventDefault();const ta=e.target,s=ta.selectionStart;ta.value=ta.value.slice(0,s)+'  '+ta.value.slice(ta.selectionEnd);ta.selectionStart=ta.selectionEnd=s+2;}
 });
 
 // ════════════════════════════════════════════════════════════
