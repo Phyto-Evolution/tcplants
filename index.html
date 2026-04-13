@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TC Plants — Lab Notes</title>
+<script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d1117;--surface:#161b22;--surface2:#21262d;
+  --border:#30363d;--text:#e6edf3;--muted:#8b949e;
+  --accent:#58a6ff;--green:#3fb950;--red:#f85149;--yellow:#d29922;
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Consolas,monospace;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font);height:100vh;overflow:hidden}
+
+/* ── LOGIN ── */
+#login{display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:20px}
+.login-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:32px;width:380px}
+.login-logo{text-align:center;margin-bottom:24px}
+.login-logo .icon{font-size:40px;display:block;margin-bottom:8px}
+.login-logo h1{font-size:20px;font-weight:700}
+.login-logo p{font-size:13px;color:var(--muted);margin-top:4px;line-height:1.5}
+label{display:block;font-size:13px;font-weight:600;margin-bottom:5px;color:var(--text)}
+input,select,textarea{
+  width:100%;background:var(--bg);border:1px solid var(--border);
+  border-radius:6px;color:var(--text);font-family:var(--font);
+  font-size:14px;padding:8px 11px;outline:none;transition:border-color .15s
+}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+select option{background:var(--surface2)}
+.field{margin-bottom:14px}
+.hint{font-size:12px;color:var(--muted);margin-top:4px}
+.hint a{color:var(--accent);text-decoration:none}
+.btn{
+  background:var(--accent);border:none;border-radius:6px;
+  color:#0d1117;cursor:pointer;font-family:var(--font);
+  font-size:14px;font-weight:600;padding:8px 16px;transition:opacity .15s
+}
+.btn:hover{opacity:.88}
+.btn.ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn.danger{background:var(--red);color:#fff}
+.btn.sm{font-size:13px;padding:5px 12px}
+.btn:disabled{opacity:.45;cursor:default}
+#login-btn{width:100%;padding:10px;margin-top:4px}
+#err{color:var(--red);font-size:13px;margin-top:8px;display:none;line-height:1.4}
+
+/* ── APP SHELL ── */
+#app{display:none;height:100vh;flex-direction:column}
+#app.on{display:flex}
+nav{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:0 20px;height:52px;display:flex;align-items:center;gap:10px;flex-shrink:0
+}
+.brand{font-size:15px;font-weight:600;flex:1;display:flex;align-items:center;gap:8px}
+.brand span{color:var(--muted);font-weight:400}
+nav .btn{font-size:13px;padding:5px 12px}
+
+/* ── LAYOUT ── */
+.layout{display:flex;flex:1;overflow:hidden}
+aside{
+  width:270px;background:var(--surface);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;flex-shrink:0;overflow:hidden
+}
+.sidebar-top{padding:10px;border-bottom:1px solid var(--border);flex-shrink:0}
+.sidebar-top .btn{width:100%;padding:8px;font-size:13px}
+#note-list{flex:1;overflow-y:auto}
+.n-item{
+  padding:11px 14px;border-bottom:1px solid var(--border);
+  cursor:pointer;transition:background .1s
+}
+.n-item:hover{background:rgba(255,255,255,.04)}
+.n-item.active{background:rgba(88,166,255,.1);border-left:2px solid var(--accent);padding-left:12px}
+.n-title{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.n-meta{font-size:11px;color:var(--muted);margin-top:3px;display:flex;gap:8px;align-items:center}
+.n-type{background:var(--surface2);border-radius:4px;padding:1px 6px;font-size:10px;text-transform:uppercase;letter-spacing:.4px}
+.n-tags{margin-top:5px;display:flex;gap:4px;flex-wrap:wrap}
+.tag{background:rgba(88,166,255,.15);color:var(--accent);border-radius:10px;font-size:11px;padding:1px 7px}
+.tag.green{background:rgba(63,185,80,.15);color:var(--green)}
+
+main{flex:1;overflow-y:auto;padding:32px 40px}
+
+/* ── EMPTY STATE ── */
+#empty{text-align:center;padding:80px 20px;color:var(--muted)}
+#empty h2{font-size:20px;margin-bottom:8px;color:var(--text)}
+#empty p{font-size:14px;line-height:1.7}
+
+/* ── NOTE VIEW ── */
+#view{display:none;max-width:800px}
+#view.on{display:block}
+.view-head{margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.view-title{font-size:28px;font-weight:700;line-height:1.3;margin-bottom:10px}
+.view-badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;align-items:center}
+.badge{font-size:12px;padding:3px 10px;border-radius:12px;font-weight:500}
+.badge.type{background:var(--surface2);border:1px solid var(--border);color:var(--text)}
+.badge.stage{background:rgba(210,153,34,.15);color:var(--yellow);border:1px solid rgba(210,153,34,.3)}
+.badge.species{background:rgba(63,185,80,.1);color:var(--green);border:1px solid rgba(63,185,80,.3);font-style:italic}
+.view-date{font-size:13px;color:var(--muted)}
+.view-actions{margin-top:12px;display:flex;gap:8px}
+
+/* ── MARKDOWN ── */
+.md{font-size:15px;line-height:1.75}
+.md h1,.md h2,.md h3,.md h4{margin:24px 0 10px;line-height:1.3}
+.md h1{font-size:24px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.md h2{font-size:20px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.md h3{font-size:17px}
+.md h4{font-size:15px;color:var(--muted)}
+.md p{margin:10px 0}
+.md code{background:rgba(255,255,255,.08);border-radius:4px;font-family:var(--mono);font-size:13px;padding:2px 6px}
+.md pre{background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow-x:auto;padding:16px;margin:14px 0}
+.md pre code{background:none;padding:0;font-size:13px}
+.md blockquote{border-left:3px solid var(--border);color:var(--muted);margin:14px 0;padding:4px 16px}
+.md ul,.md ol{margin:10px 0;padding-left:22px}
+.md li{margin:4px 0}
+.md table{border-collapse:collapse;width:100%;margin:14px 0;font-size:14px}
+.md th,.md td{border:1px solid var(--border);padding:7px 12px;text-align:left}
+.md th{background:var(--surface2);font-weight:600}
+.md a{color:var(--accent)}
+.md img{max-width:100%;border-radius:6px;margin:8px 0}
+.md hr{border:none;border-top:1px solid var(--border);margin:20px 0}
+.md strong{font-weight:700}
+
+/* ── EDITOR ── */
+#editor{display:none;max-width:800px}
+#editor.on{display:block}
+.editor-head{font-size:17px;font-weight:700;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+#edit-body{
+  height:380px;font-family:var(--mono);font-size:13px;
+  resize:vertical;line-height:1.7;tab-size:2
+}
+.editor-actions{display:flex;gap:8px;margin-top:14px}
+.template-hint{font-size:12px;color:var(--muted);margin-top:4px}
+
+/* ── LOADING ── */
+#overlay{
+  position:fixed;inset:0;background:rgba(13,17,23,.82);
+  display:none;align-items:center;justify-content:center;z-index:100;flex-direction:column;gap:12px
+}
+#overlay.on{display:flex}
+.spin{
+  border:2px solid var(--border);border-top-color:var(--accent);
+  border-radius:50%;width:28px;height:28px;animation:spin .6s linear infinite
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+#overlay p{font-size:14px;color:var(--muted)}
+
+/* ── TOAST ── */
+#toast{
+  position:fixed;bottom:24px;right:24px;background:var(--surface2);
+  border:1px solid var(--border);border-radius:8px;padding:11px 16px;
+  font-size:13px;transform:translateY(70px);transition:transform .25s;z-index:200;max-width:320px
+}
+#toast.on{transform:translateY(0)}
+#toast.ok{border-color:var(--green)}
+#toast.fail{border-color:var(--red)}
+
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+
+<div id="overlay" aria-live="polite"><div class="spin"></div><p id="overlay-msg">Working…</p></div>
+<div id="toast"></div>
+
+<!-- ═══════════════════════════ LOGIN ═══════════════════════════ -->
+<div id="login">
+  <div class="login-wrap">
+    <div class="login-logo">
+      <span class="icon">🌿</span>
+      <h1>TC Plants Lab Notes</h1>
+      <p>End-to-end encrypted. Your notes are unreadable without your password — including in the GitHub repo.</p>
+    </div>
+
+    <div class="field">
+      <label>Encryption Password</label>
+      <input type="password" id="inp-pw" placeholder="Your secret passphrase" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>GitHub Personal Access Token</label>
+      <input type="password" id="inp-tok" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+      <div class="hint">
+        Needs <strong>Contents: Read &amp; Write</strong> permission on the repo.<br>
+        <a href="https://github.com/settings/tokens/new?scopes=repo&description=TC+Plants+Lab+Notes" target="_blank" rel="noopener">Create a fine-grained token →</a>
+        &nbsp;Cleared on tab close.
+      </div>
+    </div>
+    <div id="err"></div>
+    <button class="btn" id="login-btn">Unlock Lab →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ APP ═══════════════════════════ -->
+<div id="app">
+  <nav>
+    <div class="brand">🌿 TC Plants <span>/ Lab Notes</span></div>
+    <button class="btn ghost sm" id="lock-btn">🔒 Lock</button>
+  </nav>
+  <div class="layout">
+    <aside>
+      <div class="sidebar-top">
+        <button class="btn" id="new-btn">＋ New Entry</button>
+      </div>
+      <div id="note-list">
+        <div style="padding:20px;font-size:13px;color:var(--muted);text-align:center">Loading…</div>
+      </div>
+    </aside>
+    <main>
+
+      <!-- Empty -->
+      <div id="empty">
+        <h2>Lab Notes</h2>
+        <p>Encrypted lab journal for TC Plants.<br>Every entry is AES-256 encrypted before it reaches GitHub.<br><br>
+        Press <strong>＋ New Entry</strong> to start.</p>
+      </div>
+
+      <!-- View -->
+      <div id="view">
+        <div class="view-head">
+          <div class="view-title" id="v-title"></div>
+          <div class="view-badges" id="v-badges"></div>
+          <div class="view-date" id="v-date"></div>
+          <div class="view-actions">
+            <button class="btn sm" id="edit-btn">✏️ Edit</button>
+            <button class="btn sm danger" id="del-btn">🗑 Delete</button>
+          </div>
+        </div>
+        <div class="md" id="v-body"></div>
+      </div>
+
+      <!-- Editor -->
+      <div id="editor">
+        <div class="editor-head" id="ed-head">New Lab Entry</div>
+
+        <div class="field">
+          <label>Title</label>
+          <input type="text" id="e-title" placeholder="e.g. Stage II subculture — Nepenthes rajah batch 4">
+        </div>
+
+        <div class="row2">
+          <div class="field">
+            <label>Experiment Type</label>
+            <select id="e-type">
+              <option value="">— select —</option>
+              <option>Initiation (Stage I)</option>
+              <option>Multiplication (Stage II)</option>
+              <option>Rooting (Stage III)</option>
+              <option>Acclimatization (Stage IV)</option>
+              <option>Media Preparation</option>
+              <option>Contamination Log</option>
+              <option>Subculture</option>
+              <option>Observation</option>
+              <option>Protocol Update</option>
+              <option>Harvest / Transfer</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>TC Stage</label>
+            <select id="e-stage">
+              <option value="">— select —</option>
+              <option>Stage 0 — Collection</option>
+              <option>Stage I — Initiation</option>
+              <option>Stage II — Multiplication</option>
+              <option>Stage III — Rooting</option>
+              <option>Stage IV — Acclimatization</option>
+              <option>N/A</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row2">
+          <div class="field">
+            <label>Species / Accession</label>
+            <input type="text" id="e-species" placeholder="e.g. Nepenthes rajah — ACC-2024-07">
+          </div>
+          <div class="field">
+            <label>Tags <span style="font-weight:400;color:var(--muted)">(comma separated)</span></label>
+            <input type="text" id="e-tags" placeholder="orchid, MS media, contamination…">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Notes <span style="font-weight:400;color:var(--muted)">(Markdown)</span></label>
+          <textarea id="e-body" placeholder="Write lab notes here…"></textarea>
+          <div class="template-hint" id="tmpl-hint"></div>
+        </div>
+
+        <div class="editor-actions">
+          <button class="btn" id="save-btn">💾 Save to GitHub</button>
+          <button class="btn ghost" id="cancel-btn">Cancel</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ── CONFIG ──────────────────────────────────────────────────────────
+const REPO    = 'Phyto-Evolution/tcplants';
+const BRANCH  = 'main';
+const DIR     = 'notes';
+const IDX     = `${DIR}/index.enc`;
+const API     = 'https://api.github.com';
+
+// ── STATE ───────────────────────────────────────────────────────────
+const S = { pw: null, tok: null, notes: [], cur: null, editing: null };
+
+// ── CRYPTO ──────────────────────────────────────────────────────────
+async function deriveKey(pw, salt) {
+  const raw = await crypto.subtle.importKey(
+    'raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveKey']
+  );
+  return crypto.subtle.deriveKey(
+    { name:'PBKDF2', salt, iterations:600000, hash:'SHA-256' },
+    raw, { name:'AES-GCM', length:256 }, false, ['encrypt','decrypt']
+  );
+}
+
+const b64e = b => btoa(String.fromCharCode(...new Uint8Array(b)));
+const b64d = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+
+async function enc(text) {
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const iv   = crypto.getRandomValues(new Uint8Array(12));
+  const key  = await deriveKey(S.pw, salt);
+  const ct   = await crypto.subtle.encrypt({ name:'AES-GCM', iv }, key, new TextEncoder().encode(text));
+  return JSON.stringify({ v:1, s:b64e(salt), i:b64e(iv), d:b64e(ct) });
+}
+
+async function dec(raw) {
+  const { s, i, d } = JSON.parse(raw);
+  const key = await deriveKey(S.pw, b64d(s));
+  const pt  = await crypto.subtle.decrypt({ name:'AES-GCM', iv:b64d(i) }, key, b64d(d));
+  return new TextDecoder().decode(pt);
+}
+
+// ── GITHUB API ───────────────────────────────────────────────────────
+const ghHdr = () => ({ Authorization:`token ${S.tok}`, Accept:'application/vnd.github.v3+json', 'Content-Type':'application/json' });
+
+async function ghGet(path) {
+  const r = await fetch(`${API}/repos/${REPO}/contents/${path}?ref=${BRANCH}`, { headers: ghHdr() });
+  if (r.status === 404) return null;
+  if (!r.ok) throw new Error(`GitHub ${r.status}`);
+  return r.json();
+}
+
+async function ghPut(path, content, sha, msg) {
+  const r = await fetch(`${API}/repos/${REPO}/contents/${path}`, {
+    method:'PUT', headers: ghHdr(),
+    body: JSON.stringify({
+      message: msg || `lab: update ${path}`,
+      content: btoa(unescape(encodeURIComponent(content))),
+      branch: BRANCH,
+      ...(sha ? { sha } : {})
+    })
+  });
+  if (!r.ok) throw new Error(`GitHub ${r.status}: ${await r.text()}`);
+  return r.json();
+}
+
+async function ghDel(path, sha, msg) {
+  const r = await fetch(`${API}/repos/${REPO}/contents/${path}`, {
+    method:'DELETE', headers: ghHdr(),
+    body: JSON.stringify({ message: msg || `lab: delete ${path}`, sha, branch: BRANCH })
+  });
+  if (!r.ok) throw new Error(`GitHub ${r.status}`);
+}
+
+const ghDecode = c => decodeURIComponent(escape(atob(c.replace(/\n/g,''))));
+
+// ── INDEX ────────────────────────────────────────────────────────────
+async function loadIndex() {
+  const f = await ghGet(IDX);
+  if (!f) return { notes:[], sha:null };
+  const notes = JSON.parse(await dec(ghDecode(f.content)));
+  return { notes, sha: f.sha };
+}
+
+async function saveIndex(notes, sha) {
+  const res = await ghPut(IDX, await enc(JSON.stringify(notes)), sha,
+    `lab: index update — ${notes.length} entries`);
+  return res.content.sha;
+}
+
+// ── NOTES ────────────────────────────────────────────────────────────
+async function loadNote(id) {
+  const f = await ghGet(`${DIR}/${id}.enc`);
+  if (!f) throw new Error('Not found');
+  return { body: await dec(ghDecode(f.content)), sha: f.sha };
+}
+
+async function writeNote(id, body, sha, msg) {
+  const res = await ghPut(`${DIR}/${id}.enc`, await enc(body), sha, msg);
+  return res.content.sha;
+}
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function fmtDate(iso) {
+  return new Date(iso).toLocaleDateString('en-IN',{ day:'numeric', month:'short', year:'numeric', weekday:'short' });
+}
+
+// ── UI UTILS ────────────────────────────────────────────────────────
+function load(msg='Working…') { document.getElementById('overlay').classList.add('on'); document.getElementById('overlay-msg').textContent=msg; }
+function unload() { document.getElementById('overlay').classList.remove('on'); }
+let _tt;
+function toast(msg, type='ok') {
+  const t=document.getElementById('toast'); t.textContent=msg; t.className=`on ${type}`;
+  clearTimeout(_tt); _tt=setTimeout(()=>t.className='',3200);
+}
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function pane(name) {
+  document.getElementById('empty').style.display  = name==='empty'  ? 'block':'none';
+  document.getElementById('view').className        = name==='view'   ? 'on':'';
+  document.getElementById('editor').className      = name==='editor' ? 'on':'';
+}
+
+// ── SIDEBAR ─────────────────────────────────────────────────────────
+function renderList() {
+  const el = document.getElementById('note-list');
+  if (!S.notes.length) {
+    el.innerHTML='<div style="padding:20px;font-size:13px;color:var(--muted);text-align:center">No entries yet</div>';
+    return;
+  }
+  const sorted = [...S.notes].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  el.innerHTML = sorted.map(n=>{
+    const typeColor = n.type?.includes('Contam') ? 'color:var(--red)' : '';
+    return `<div class="n-item${S.cur===n.id?' active':''}" data-id="${n.id}">
+      <div class="n-title">${esc(n.title)}</div>
+      <div class="n-meta">
+        <span>${fmtDate(n.date)}</span>
+        ${n.type ? `<span class="n-type" style="${typeColor}">${esc(n.type.split(' ')[0])}</span>`:''}
+      </div>
+      ${n.species ? `<div style="font-size:11px;color:var(--green);margin-top:3px;font-style:italic">${esc(n.species)}</div>`:''}
+      ${n.tags?.length ? `<div class="n-tags">${n.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>`:''}
+    </div>`;
+  }).join('');
+  el.querySelectorAll('.n-item').forEach(el=>el.addEventListener('click',()=>openNote(el.dataset.id)));
+}
+
+// ── OPEN NOTE ───────────────────────────────────────────────────────
+async function openNote(id) {
+  S.cur = id; renderList(); load('Decrypting…');
+  try {
+    const { body } = await loadNote(id);
+    const m = S.notes.find(n=>n.id===id);
+    document.getElementById('v-title').textContent = m.title;
+    document.getElementById('v-date').textContent  = fmtDate(m.date);
+
+    const badges = [];
+    if (m.type)    badges.push(`<span class="badge type">${esc(m.type)}</span>`);
+    if (m.stage)   badges.push(`<span class="badge stage">${esc(m.stage)}</span>`);
+    if (m.species) badges.push(`<span class="badge species">${esc(m.species)}</span>`);
+    if (m.tags?.length) m.tags.forEach(t=>badges.push(`<span class="tag">${esc(t)}</span>`));
+    document.getElementById('v-badges').innerHTML = badges.join('');
+    document.getElementById('v-body').innerHTML = marked.parse(body);
+    pane('view');
+  } catch(e) { toast('Decrypt failed: '+e.message,'fail'); }
+  unload();
+}
+
+// ── TEMPLATES ───────────────────────────────────────────────────────
+const TEMPLATES = {
+  'Initiation (Stage I)': `## Explant Source\n\n## Surface Sterilisation Protocol\n\n## Media Used\n\n## Initial Response\n\n## Notes\n`,
+  'Multiplication (Stage II)': `## Cultures Subcultured\n\n## Media / Hormone Regime\n\n## Number of Shoots / Propagules\n\n## Observations\n\n## Next Subculture Date\n`,
+  'Rooting (Stage III)': `## Cultures Transferred to Rooting\n\n## Rooting Media\n\n## Root Induction Observed\n\n## Success Rate\n\n## Notes\n`,
+  'Acclimatization (Stage IV)': `## Plantlets Transferred\n\n## Substrate Used\n\n## Humidity / Hardening Protocol\n\n## Survival Rate\n\n## Observations\n`,
+  'Media Preparation': `## Media Name / Recipe\n\n## Batch Size\n\n## pH (before autoclave)\n\n## Autoclave Parameters\n\n## Notes\n`,
+  'Contamination Log': `## Affected Cultures\n\n## Contamination Type (fungal / bacterial / other)\n\n## Visual Description\n\n## Likely Source\n\n## Action Taken\n\n## Lessons / Prevention\n`,
+  'Subculture': `## Source Cultures\n\n## Number of Transfers\n\n## Media Used\n\n## Observations\n\n## Next Review\n`,
+  'Observation': `## Cultures Observed\n\n## Visual Observations\n\n## Measurements / Data\n\n## Photographs (link or description)\n\n## Follow-up\n`,
+  'Protocol Update': `## Protocol Changed\n\n## Previous Method\n\n## New Method\n\n## Reason for Change\n\n## Reference / Source\n`,
+  'Harvest / Transfer': `## Cultures Harvested\n\n## Quantity\n\n## Destination / Purpose\n\n## Condition at Transfer\n\n## Notes\n`,
+};
+
+document.getElementById('e-type').addEventListener('change', function(){
+  const tmpl = TEMPLATES[this.value];
+  if (tmpl && !document.getElementById('e-body').value.trim()) {
+    document.getElementById('e-body').value = tmpl;
+    document.getElementById('tmpl-hint').textContent = 'Template loaded — customise as needed.';
+  }
+});
+
+// ── NEW NOTE ────────────────────────────────────────────────────────
+function startNew() {
+  S.editing = null; S.cur = null; renderList();
+  document.getElementById('ed-head').textContent = 'New Lab Entry';
+  ['e-title','e-species','e-tags','e-body'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('e-type').value='';
+  document.getElementById('e-stage').value='';
+  document.getElementById('tmpl-hint').textContent='';
+  pane('editor');
+}
+
+// ── EDIT NOTE ───────────────────────────────────────────────────────
+async function startEdit() {
+  const id = S.cur; if (!id) return;
+  load('Loading…');
+  try {
+    const { body } = await loadNote(id);
+    const m = S.notes.find(n=>n.id===id);
+    S.editing = id;
+    document.getElementById('ed-head').textContent = 'Edit Entry';
+    document.getElementById('e-title').value   = m.title   || '';
+    document.getElementById('e-type').value    = m.type    || '';
+    document.getElementById('e-stage').value   = m.stage   || '';
+    document.getElementById('e-species').value = m.species || '';
+    document.getElementById('e-tags').value    = (m.tags||[]).join(', ');
+    document.getElementById('e-body').value    = body;
+    document.getElementById('tmpl-hint').textContent = '';
+    pane('editor');
+  } catch(e) { toast('Load failed: '+e.message,'fail'); }
+  unload();
+}
+
+// ── SAVE ─────────────────────────────────────────────────────────────
+async function save() {
+  const title   = document.getElementById('e-title').value.trim();
+  const type    = document.getElementById('e-type').value;
+  const stage   = document.getElementById('e-stage').value;
+  const species = document.getElementById('e-species').value.trim();
+  const tags    = document.getElementById('e-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  const body    = document.getElementById('e-body').value;
+
+  if (!title) { toast('Title is required','fail'); return; }
+
+  document.getElementById('save-btn').disabled = true;
+  load('Encrypting & saving to GitHub…');
+
+  try {
+    const { notes, sha: iSha } = await loadIndex();
+
+    if (S.editing) {
+      const ef = await ghGet(`${DIR}/${S.editing}.enc`);
+      await writeNote(S.editing, body, ef.sha, `lab: update "${title}"`);
+      const idx = notes.findIndex(n=>n.id===S.editing);
+      if (idx!==-1) notes[idx] = { ...notes[idx], title, type, stage, species, tags };
+      S.notes = notes; S.cur = S.editing;
+    } else {
+      const id   = uid();
+      const date = new Date().toISOString();
+      await writeNote(id, body, null, `lab: add "${title}"`);
+      notes.push({ id, title, date, type, stage, species, tags });
+      S.notes = notes; S.cur = id;
+    }
+
+    await saveIndex(S.notes, iSha);
+    toast('Saved ✓  — committed to GitHub');
+    renderList();
+    await openNote(S.cur);
+  } catch(e) { toast('Save failed: '+e.message,'fail'); }
+
+  document.getElementById('save-btn').disabled = false;
+  unload();
+}
+
+// ── DELETE ───────────────────────────────────────────────────────────
+async function del() {
+  const id = S.cur; if (!id) return;
+  const m = S.notes.find(n=>n.id===id);
+  if (!confirm(`Permanently delete "${m?.title}"?\n\nThis removes the encrypted file from GitHub.`)) return;
+  load('Deleting…');
+  try {
+    const f = await ghGet(`${DIR}/${id}.enc`);
+    if (f) await ghDel(`${DIR}/${id}.enc`, f.sha, `lab: delete "${m?.title}"`);
+    const { notes, sha } = await loadIndex();
+    S.notes = notes.filter(n=>n.id!==id);
+    await saveIndex(S.notes, sha);
+    S.cur = null; renderList(); pane('empty');
+    toast('Entry deleted');
+  } catch(e) { toast('Delete failed: '+e.message,'fail'); }
+  unload();
+}
+
+// ── LOGIN ─────────────────────────────────────────────────────────────
+async function login() {
+  const pw  = document.getElementById('inp-pw').value;
+  const tok = document.getElementById('inp-tok').value.trim();
+  const err = document.getElementById('err');
+  err.style.display='none';
+  if (!pw || !tok) { err.textContent='Both fields are required.'; err.style.display='block'; return; }
+
+  document.getElementById('login-btn').disabled=true;
+  document.getElementById('login-btn').textContent='Unlocking…';
+
+  try {
+    const r = await fetch(`${API}/repos/${REPO}`,{ headers:{ Authorization:`token ${tok}` } });
+    if (!r.ok) throw new Error('GitHub token invalid or lacks repo access.');
+    S.pw=pw; S.tok=tok;
+    sessionStorage.setItem('_lt', tok);
+
+    load('Loading notes…');
+    const { notes } = await loadIndex();
+    S.notes = notes;
+
+    document.getElementById('login').style.display='none';
+    document.getElementById('app').classList.add('on');
+    renderList(); pane('empty');
+  } catch(e) {
+    err.textContent = e.message; err.style.display='block';
+    S.pw=null; S.tok=null;
+  }
+
+  document.getElementById('login-btn').disabled=false;
+  document.getElementById('login-btn').textContent='Unlock Lab →';
+  unload();
+}
+
+function lock() {
+  Object.assign(S,{pw:null,tok:null,notes:[],cur:null,editing:null});
+  sessionStorage.clear();
+  document.getElementById('app').classList.remove('on');
+  document.getElementById('login').style.display='flex';
+  document.getElementById('inp-pw').value='';
+  document.getElementById('inp-tok').value='';
+}
+
+// ── WIRE UP ──────────────────────────────────────────────────────────
+document.getElementById('login-btn').onclick  = login;
+document.getElementById('lock-btn').onclick   = lock;
+document.getElementById('new-btn').onclick    = startNew;
+document.getElementById('edit-btn').onclick   = startEdit;
+document.getElementById('del-btn').onclick    = del;
+document.getElementById('save-btn').onclick   = save;
+document.getElementById('cancel-btn').onclick = () => S.cur ? openNote(S.cur) : pane('empty');
+
+document.getElementById('inp-pw').onkeydown   = e => { if(e.key==='Enter') document.getElementById('inp-tok').focus(); };
+document.getElementById('inp-tok').onkeydown  = e => { if(e.key==='Enter') login(); };
+
+// Restore token from session (password always required fresh)
+const st = sessionStorage.getItem('_lt');
+if (st) document.getElementById('inp-tok').value = st;
+</script>
+</body>
+</html>
