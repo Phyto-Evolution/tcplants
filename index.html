@@ -280,6 +280,123 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 ::-webkit-scrollbar{width:5px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
+
+/* ── MOBILE ── */
+#hamburger{display:none;background:transparent;border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-size:18px;cursor:pointer;padding:3px 9px;line-height:1}
+#install-btn{display:none;background:var(--gn);border:none;border-radius:6px;color:#0d1117;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:700;padding:5px 10px;white-space:nowrap}
+#sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:40}
+#sidebar-backdrop.on{display:block}
+
+@media(max-width:768px){
+  #hamburger{display:block}
+  .brand{font-size:13px}
+  .nav-tabs{overflow-x:auto;scrollbar-width:none;gap:1px}
+  .nav-tabs::-webkit-scrollbar{display:none}
+  .ntab{font-size:11px;padding:4px 8px}
+  .rbadge{font-size:9px;padding:1px 4px}
+  .nav-right .xl-hide{display:none}
+  aside{position:fixed;top:50px;left:0;bottom:0;z-index:50;transform:translateX(-110%);transition:transform .25s ease;box-shadow:4px 0 24px rgba(0,0,0,.6);width:280px}
+  aside.open{transform:translateX(0)}
+  main{padding:16px 14px}
+  .row2,.row3{grid-template-columns:1fr}
+  .contam-summary{grid-template-columns:1fr 1fr}
+  .dview,.editor{max-width:100%}
+  .dtitle{font-size:20px}
+  .section.fullpage{padding:16px}
+  .tools-layout{flex-direction:column}
+  .tools-left,.tools-right{width:100%!important;max-width:100%}
+  .calc-btn{font-size:15px;padding:12px 4px}
+  .dactions{flex-wrap:wrap}
+  .dbadges{gap:5px}
+  .sbadge,.tag{font-size:11px}
+  .view-badges{gap:5px}
+  .editor-toolbar{gap:1px}
+  .tb-btn{padding:3px 5px;font-size:12px}
+}
+@media(max-width:480px){
+  .ntab .tab-label{display:none}
+  .ntab .tab-icon{display:inline}
+  nav{padding:0 10px;gap:5px}
+}
+
+/* ── TOOLS ── */
+.tools-layout{display:flex;gap:20px;align-items:flex-start}
+.tools-left{flex:1;min-width:0;display:flex;flex-direction:column;gap:16px}
+.tools-right{width:340px;flex-shrink:0}
+.tool-card{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:16px}
+.tool-card h3{font-size:13px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
+/* timers */
+.timer-grid{display:flex;flex-direction:column;gap:10px}
+.tmr{background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:12px;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
+.tmr.done{border-color:var(--gn);background:rgba(63,185,80,.08)}
+.tmr.running{border-color:var(--ac)}
+.tmr-name{background:transparent;border:none;color:var(--tx);font-family:var(--font);font-size:13px;font-weight:600;width:100%;outline:none}
+.tmr-display{font-family:var(--mono);font-size:28px;font-weight:700;letter-spacing:2px;grid-column:1/-1;text-align:center;padding:6px 0}
+.tmr-display.done{color:var(--gn);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.tmr-inputs{display:flex;align-items:center;gap:4px;grid-column:1/-1;justify-content:center}
+.tmr-inputs input{width:52px;text-align:center;font-family:var(--mono);font-size:15px;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);padding:5px 4px}
+.tmr-inputs span{color:var(--mu);font-weight:700}
+.tmr-btns{display:flex;gap:5px;grid-column:1/-1;justify-content:center}
+.tmr-progress{height:4px;background:var(--bd);border-radius:2px;grid-column:1/-1;margin-top:4px}
+.tmr-bar{height:100%;background:var(--ac);border-radius:2px;transition:width .5s linear}
+.tmr-bar.done{background:var(--gn)}
+/* stopwatch */
+.sw-grid{display:flex;flex-direction:column;gap:10px}
+.sw-card{background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:12px}
+.sw-display{font-family:var(--mono);font-size:24px;font-weight:700;text-align:center;letter-spacing:2px;padding:6px 0}
+.sw-laps{max-height:80px;overflow-y:auto;margin-top:6px;font-size:11px;color:var(--mu);font-family:var(--mono)}
+.sw-laps div{padding:1px 0;border-bottom:1px solid var(--bd)}
+/* calculator */
+.calc-modes{display:flex;gap:3px;margin-bottom:12px;background:var(--sf2);border-radius:7px;padding:3px}
+.calc-mode-btn{flex:1;background:transparent;border:none;border-radius:5px;color:var(--mu);cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;padding:5px;transition:all .15s}
+.calc-mode-btn.active{background:var(--sf3);color:var(--tx)}
+.calc-display{background:var(--bg);border:1px solid var(--bd);border-radius:7px;padding:10px 14px;margin-bottom:10px;min-height:52px;text-align:right}
+.calc-expr{font-size:11px;color:var(--mu);font-family:var(--mono);min-height:16px;word-break:break-all}
+.calc-val{font-size:24px;font-weight:700;font-family:var(--mono)}
+.calc-grid{display:grid;gap:5px}
+.calc-grid.reg{grid-template-columns:repeat(4,1fr)}
+.calc-grid.sci{grid-template-columns:repeat(5,1fr)}
+.calc-btn{background:var(--sf2);border:1px solid var(--bd);border-radius:6px;color:var(--tx);cursor:pointer;font-family:var(--font);font-size:14px;font-weight:500;padding:10px 4px;transition:all .12s;text-align:center}
+.calc-btn:hover{background:var(--sf3)}
+.calc-btn:active{transform:scale(.95)}
+.calc-btn.op{background:rgba(88,166,255,.15);color:var(--ac)}
+.calc-btn.eq{background:var(--ac);color:#0d1117;font-weight:700}
+.calc-btn.fn{background:rgba(188,140,255,.1);color:var(--pu);font-size:12px}
+.calc-btn.wide{grid-column:span 2}
+.calc-btn.danger{background:rgba(248,81,73,.12);color:var(--rd)}
+/* biochem calculator */
+.bc-panel{display:none}
+.bc-panel.on{display:block}
+.bc-tabs{display:flex;gap:3px;margin-bottom:12px;flex-wrap:wrap}
+.bc-tab{background:var(--sf2);border:1px solid var(--bd);border-radius:5px;color:var(--mu);cursor:pointer;font-size:11px;font-weight:600;padding:4px 9px;transition:all .15s;font-family:var(--font)}
+.bc-tab.active{background:rgba(188,140,255,.15);border-color:var(--pu);color:var(--pu)}
+.bc-calc{background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:14px}
+.bc-calc label{font-size:12px;font-weight:600;color:var(--mu);display:block;margin-bottom:3px}
+.bc-calc input{margin-bottom:10px;font-size:14px}
+.bc-result{background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:10px;font-family:var(--mono);font-size:15px;font-weight:700;color:var(--ac);margin-top:6px;min-height:42px;word-break:break-all}
+.bc-result small{display:block;font-size:11px;color:var(--mu);font-weight:400;margin-top:2px}
+/* autoclave presets */
+.ac-presets{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.ac-preset{background:var(--sf2);border:1px solid var(--bd);border-radius:5px;color:var(--mu);cursor:pointer;font-family:var(--mono);font-size:11px;padding:3px 9px;transition:all .15s}
+.ac-preset:hover{border-color:var(--ac);color:var(--ac)}
+/* custom media */
+#re-base-custom-wrap{display:none;margin-top:6px}
+
+/* ── HELP ── */
+.help-body{max-width:800px}
+.help-body h2{font-size:20px;font-weight:700;margin:28px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--bd)}
+.help-body h2:first-child{margin-top:0}
+.help-body h3{font-size:15px;font-weight:700;margin:16px 0 6px;color:var(--ac)}
+.help-body p{font-size:14px;line-height:1.75;color:var(--tx);margin:6px 0}
+.help-body ul{font-size:14px;line-height:1.75;padding-left:20px;margin:6px 0}
+.help-body li{margin:3px 0}
+.help-body code{background:rgba(255,255,255,.08);border-radius:4px;font-family:var(--mono);font-size:12px;padding:2px 6px}
+.help-body .kbd{background:var(--sf2);border:1px solid var(--bd);border-radius:4px;font-family:var(--mono);font-size:12px;padding:2px 7px}
+.help-body table{border-collapse:collapse;width:100%;margin:10px 0;font-size:13px}
+.help-body th,.help-body td{border:1px solid var(--bd);padding:7px 10px;text-align:left}
+.help-body th{background:var(--sf2)}
+.help-section-card{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:16px;margin-bottom:14px}
 </style>
 </head>
 <body>
@@ -310,20 +427,25 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 </div>
 
 <!-- ═══════════ APP ═══════════ -->
+<div id="sidebar-backdrop"></div>
 <div id="app">
   <nav>
+    <button id="hamburger" title="Menu">☰</button>
     <div class="brand">🌿 TC Plants <span>/ Lab</span></div>
     <div class="nav-tabs">
-      <button class="ntab active" data-sec="notes">📋 Notes</button>
-      <button class="ntab" data-sec="registry">🌿 Registry</button>
-      <button class="ntab" data-sec="recipes">🧪 Recipes</button>
-      <button class="ntab" data-sec="reminders">⏰ Reminders<span class="rbadge" id="rbadge">0</span></button>
-      <button class="ntab" data-sec="contam">☣️ Contamination</button>
+      <button class="ntab active" data-sec="notes"><span class="tab-icon">📋</span><span class="tab-label"> Notes</span></button>
+      <button class="ntab" data-sec="registry"><span class="tab-icon">🌿</span><span class="tab-label"> Registry</span></button>
+      <button class="ntab" data-sec="recipes"><span class="tab-icon">🧪</span><span class="tab-label"> Recipes</span></button>
+      <button class="ntab" data-sec="reminders"><span class="tab-icon">⏰</span><span class="tab-label"> Reminders</span><span class="rbadge" id="rbadge">0</span></button>
+      <button class="ntab" data-sec="contam"><span class="tab-icon">☣️</span><span class="tab-label"> Contam</span></button>
+      <button class="ntab" data-sec="tools"><span class="tab-icon">⏱</span><span class="tab-label"> Tools</span></button>
+      <button class="ntab" data-sec="help"><span class="tab-icon">❓</span><span class="tab-label"> Help</span></button>
     </div>
     <div class="nav-right">
       <span id="offline-pill">● Offline</span>
-      <button class="btn ghost sm" id="export-all-btn" title="Export all notes as ZIP">⬇ Export</button>
-      <button class="btn ghost sm" id="lock-btn">🔒 Lock</button>
+      <button id="install-btn" title="Install as app">⬇ Install App</button>
+      <button class="btn ghost sm xl-hide" id="export-all-btn" title="Export ZIP">⬇ Export</button>
+      <button class="btn ghost sm" id="lock-btn">🔒</button>
     </div>
   </nav>
 
@@ -614,15 +736,36 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
             <label>Base Medium</label>
             <select id="re-base">
               <option value="">— select —</option>
-              <option>Murashige-Skoog (MS) Full</option>
+              <option value="__custom">✏️ Custom (type below)</option>
+              <option disabled>── General ──</option>
+              <option>Murashige &amp; Skoog (MS) Full</option>
               <option>½ MS</option>
               <option>¼ MS</option>
-              <option>WPM (Lloyd & McCown)</option>
-              <option>B5 (Gamborg)</option>
-              <option>Knudson C</option>
-              <option>Anderson's</option>
-              <option>Custom / Other</option>
+              <option>MS + vitamins (modified)</option>
+              <option>Linsmaier &amp; Skoog (LS)</option>
+              <option disabled>── Orchids ──</option>
+              <option>Knudson C (KC)</option>
+              <option>Vacin &amp; Went (VW)</option>
+              <option>Pierik's medium</option>
+              <option>New Dogashima (ND)</option>
+              <option>Hyponex-based</option>
+              <option disabled>── Monocots / Banana ──</option>
+              <option>Gamborg B5</option>
+              <option>N6 (Chu) — Monocots / Cereals</option>
+              <option>MS Modified for Musa</option>
+              <option disabled>── Woody Plants ──</option>
+              <option>WPM (Lloyd &amp; McCown)</option>
+              <option>DKW (Driver &amp; Kuniyuki)</option>
+              <option>Anderson's Rhododendron</option>
+              <option disabled>── Specialised ──</option>
+              <option>Nitsch &amp; Nitsch (NN) — Anther</option>
+              <option>Schenk &amp; Hildebrandt (SH)</option>
+              <option>White's — Roots</option>
+              <option>Gamborg B5 Modified</option>
             </select>
+            <div id="re-base-custom-wrap">
+              <input type="text" id="re-base-custom" placeholder="Type custom medium name…">
+            </div>
           </div>
         </div>
         <div class="row3">
@@ -645,13 +788,24 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
             <input type="text" id="re-pgr" placeholder="e.g. BAP 0.5mg/L + NAA 0.1mg/L">
           </div>
           <div class="field">
-            <label>Autoclave</label>
-            <select id="re-autoclave">
-              <option>121°C / 15 min</option>
-              <option>121°C / 20 min</option>
-              <option>115°C / 20 min</option>
-              <option>Filter sterilized</option>
-            </select>
+            <label>Autoclave — Temperature &amp; Time</label>
+            <div class="ac-presets">
+              <button type="button" class="ac-preset" data-t="121" data-m="15">121°C/15m</button>
+              <button type="button" class="ac-preset" data-t="121" data-m="20">121°C/20m</button>
+              <button type="button" class="ac-preset" data-t="121" data-m="45">121°C/45m</button>
+              <button type="button" class="ac-preset" data-t="115" data-m="20">115°C/20m</button>
+              <button type="button" class="ac-preset" data-t="0" data-m="0">Filter sterile</button>
+            </div>
+            <div class="row2" style="gap:8px">
+              <div>
+                <label style="font-weight:400;font-size:11px;color:var(--mu)">Temp (°C)</label>
+                <input type="number" id="re-ac-temp" placeholder="121" min="0" max="200">
+              </div>
+              <div>
+                <label style="font-weight:400;font-size:11px;color:var(--mu)">Hold time (min)</label>
+                <input type="number" id="re-ac-time" placeholder="15" min="0">
+              </div>
+            </div>
           </div>
         </div>
         <div class="field">
@@ -703,6 +857,246 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
     <p style="font-size:13px;color:var(--mu);margin-bottom:20px">All contamination log entries across the lab.</p>
     <div class="contam-summary" id="contam-summary"></div>
     <div id="contam-list"></div>
+  </div>
+
+  <!-- ── TOOLS ── -->
+  <div class="section fullpage" id="sec-tools">
+    <h2 style="font-size:20px;font-weight:700;margin-bottom:4px">⏱ Lab Tools</h2>
+    <p style="font-size:13px;color:var(--mu);margin-bottom:20px">Timers, stopwatches and calculator — all run locally, no data saved.</p>
+    <div class="tools-layout">
+      <!-- LEFT: Timers + Stopwatches -->
+      <div class="tools-left">
+        <div class="tool-card">
+          <h3>Countdown Timers</h3>
+          <div class="timer-grid" id="timer-grid"></div>
+          <button class="btn ghost sm" id="add-timer-btn" style="margin-top:10px;width:100%">＋ Add Timer</button>
+        </div>
+        <div class="tool-card">
+          <h3>Stopwatches</h3>
+          <div class="sw-grid" id="sw-grid"></div>
+          <button class="btn ghost sm" id="add-sw-btn" style="margin-top:10px;width:100%">＋ Add Stopwatch</button>
+        </div>
+      </div>
+      <!-- RIGHT: Calculator -->
+      <div class="tools-right">
+        <div class="tool-card" style="position:sticky;top:20px">
+          <h3>Calculator</h3>
+          <div class="calc-modes">
+            <button class="calc-mode-btn active" data-cmode="reg">Regular</button>
+            <button class="calc-mode-btn" data-cmode="sci">Scientific</button>
+            <button class="calc-mode-btn" data-cmode="bio">BioChemistry</button>
+          </div>
+          <!-- Regular + Scientific display + grid -->
+          <div id="calc-std">
+            <div class="calc-display">
+              <div class="calc-expr" id="calc-expr"></div>
+              <div class="calc-val" id="calc-val">0</div>
+            </div>
+            <!-- Scientific extra row (hidden in reg mode) -->
+            <div id="calc-sci-row" style="display:none">
+              <div class="calc-grid sci" style="margin-bottom:5px">
+                <button class="calc-btn fn" data-ca="sin(">sin</button>
+                <button class="calc-btn fn" data-ca="cos(">cos</button>
+                <button class="calc-btn fn" data-ca="tan(">tan</button>
+                <button class="calc-btn fn" data-ca="log(">log</button>
+                <button class="calc-btn fn" data-ca="ln(">ln</button>
+                <button class="calc-btn fn" data-ca="asin(">sin⁻¹</button>
+                <button class="calc-btn fn" data-ca="acos(">cos⁻¹</button>
+                <button class="calc-btn fn" data-ca="atan(">tan⁻¹</button>
+                <button class="calc-btn fn" data-ca="sqrt(">√</button>
+                <button class="calc-btn fn" data-ca="**2)">x²</button>
+                <button class="calc-btn fn" data-ca="**">xʸ</button>
+                <button class="calc-btn fn" data-ca="Math.PI">π</button>
+                <button class="calc-btn fn" data-ca="Math.E">e</button>
+                <button class="calc-btn fn" data-ca="(">（</button>
+                <button class="calc-btn fn" data-ca=")">）</button>
+              </div>
+              <div style="display:flex;gap:5px;margin-bottom:5px">
+                <button class="calc-btn fn" style="flex:1;font-size:11px" id="deg-rad-btn">DEG</button>
+              </div>
+            </div>
+            <!-- Standard grid -->
+            <div class="calc-grid reg">
+              <button class="calc-btn danger" data-ca="AC">AC</button>
+              <button class="calc-btn" data-ca="+/-">+/-</button>
+              <button class="calc-btn" data-ca="%">%</button>
+              <button class="calc-btn op" data-ca="/">÷</button>
+              <button class="calc-btn" data-ca="7">7</button>
+              <button class="calc-btn" data-ca="8">8</button>
+              <button class="calc-btn" data-ca="9">9</button>
+              <button class="calc-btn op" data-ca="*">×</button>
+              <button class="calc-btn" data-ca="4">4</button>
+              <button class="calc-btn" data-ca="5">5</button>
+              <button class="calc-btn" data-ca="6">6</button>
+              <button class="calc-btn op" data-ca="-">−</button>
+              <button class="calc-btn" data-ca="1">1</button>
+              <button class="calc-btn" data-ca="2">2</button>
+              <button class="calc-btn" data-ca="3">3</button>
+              <button class="calc-btn op" data-ca="+">+</button>
+              <button class="calc-btn wide" data-ca="0">0</button>
+              <button class="calc-btn" data-ca=".">.</button>
+              <button class="calc-btn eq" data-ca="=">=</button>
+            </div>
+          </div>
+          <!-- BioChemistry panel -->
+          <div class="bc-panel" id="calc-bio">
+            <div class="bc-tabs">
+              <button class="bc-tab active" data-bt="molarity">Molarity</button>
+              <button class="bc-tab" data-bt="dilution">Dilution</button>
+              <button class="bc-tab" data-bt="percent">% Solution</button>
+              <button class="bc-tab" data-bt="ph">pH</button>
+              <button class="bc-tab" data-bt="pgr">PGR Convert</button>
+            </div>
+            <!-- Molarity -->
+            <div class="bc-calc" id="bt-molarity">
+              <label>Molecular Weight (g/mol)</label><input type="number" id="bc-mw" placeholder="e.g. 342.3">
+              <label>Mass (g)</label><input type="number" id="bc-mass" placeholder="e.g. 5">
+              <label>Volume (L)</label><input type="number" id="bc-vol" placeholder="e.g. 1">
+              <button class="btn sm" onclick="bcCalc('molarity')">Calculate →</button>
+              <div class="bc-result" id="bc-res-molarity">—</div>
+            </div>
+            <!-- Dilution -->
+            <div class="bc-calc" id="bt-dilution" style="display:none">
+              <label>C₁ (stock concentration, mM)</label><input type="number" id="bc-c1" placeholder="e.g. 1000">
+              <label>V₁ (stock volume to use, mL) — leave blank to solve</label><input type="number" id="bc-v1" placeholder="solve for this">
+              <label>C₂ (final concentration, mM)</label><input type="number" id="bc-c2" placeholder="e.g. 0.5">
+              <label>V₂ (final volume, mL)</label><input type="number" id="bc-v2" placeholder="e.g. 100">
+              <button class="btn sm" onclick="bcCalc('dilution')">Calculate →</button>
+              <div class="bc-result" id="bc-res-dilution">—</div>
+            </div>
+            <!-- % Solution -->
+            <div class="bc-calc" id="bt-percent" style="display:none">
+              <label>Mass (g)</label><input type="number" id="bc-pm" placeholder="e.g. 3">
+              <label>Volume (mL)</label><input type="number" id="bc-pv" placeholder="e.g. 100">
+              <button class="btn sm" onclick="bcCalc('percent')">Calculate % (w/v) →</button>
+              <div class="bc-result" id="bc-res-percent">—</div>
+            </div>
+            <!-- pH -->
+            <div class="bc-calc" id="bt-ph" style="display:none">
+              <label>[H⁺] concentration (mol/L) — OR —</label><input type="number" id="bc-h" placeholder="e.g. 0.001" step="any">
+              <label>pOH (to get pH from pOH)</label><input type="number" id="bc-poh" placeholder="e.g. 9" step="any">
+              <button class="btn sm" onclick="bcCalc('ph')">Calculate →</button>
+              <div class="bc-result" id="bc-res-ph">—</div>
+            </div>
+            <!-- PGR conversion -->
+            <div class="bc-calc" id="bt-pgr" style="display:none">
+              <label>Molecular Weight of PGR (g/mol)</label><input type="number" id="bc-pgrmw" placeholder="e.g. 225.25 for BAP">
+              <label>mg/L → μM: enter mg/L</label><input type="number" id="bc-mgl" placeholder="e.g. 0.5" step="any">
+              <label>μM → mg/L: enter μM</label><input type="number" id="bc-um" placeholder="e.g. 2.22" step="any">
+              <button class="btn sm" onclick="bcCalc('pgr')">Convert →</button>
+              <div class="bc-result" id="bc-res-pgr">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── HELP ── -->
+  <div class="section fullpage" id="sec-help">
+    <div class="help-body">
+      <h2>Getting Started</h2>
+      <div class="help-section-card">
+        <h3>First Login</h3>
+        <p>You need two things to log in: your <strong>Encryption Password</strong> (you chose this — it never leaves your browser) and a <strong>GitHub Personal Access Token</strong> with <code>repo</code> scope.</p>
+        <p>Get a token at: <code>github.com → Settings → Developer settings → Personal access tokens → Classic → New token → tick repo → Generate</code></p>
+        <p>⚠️ <strong>Never lose your encryption password.</strong> There is no recovery — all note content is encrypted with it. The GitHub repo only stores ciphertext.</p>
+        <h3>Session Behaviour</h3>
+        <p>Your token is stored in <code>sessionStorage</code> only — it disappears when you close the tab. Your password is held in memory only. Every lock or tab close wipes both. This is by design.</p>
+      </div>
+
+      <h2>Lab Notes</h2>
+      <div class="help-section-card">
+        <h3>Creating an Entry</h3>
+        <p>Click <strong>＋ New Entry</strong>. Fill in Title (required), Experiment Type, TC Stage, Species/Accession, Tags, and optionally a Next Review Date for reminders. The <strong>Experiment Type</strong> dropdown auto-loads a Markdown template for that type when the body is empty.</p>
+        <h3>Fields</h3>
+        <table><tr><th>Field</th><th>Purpose</th></tr>
+          <tr><td>Experiment Type</td><td>Categorises the entry; drives template and dashboard filters</td></tr>
+          <tr><td>TC Stage</td><td>Stage I–IV or Self Notes for uncategorised entries</td></tr>
+          <tr><td>Species / Accession</td><td>Links the entry to Registry accessions automatically</td></tr>
+          <tr><td>Recipe Used</td><td>Pick a saved recipe; shows as a clickable purple badge on the note</td></tr>
+          <tr><td>Next Review Date</td><td>Sets a reminder shown in the ⏰ Reminders tab</td></tr>
+          <tr><td>Tags</td><td>Comma-separated; searchable and filterable</td></tr>
+        </table>
+        <h3>Markdown Toolbar</h3>
+        <p>The editor toolbar wraps selected text or inserts at cursor. All standard Markdown is supported — headings, bold, italic, lists, tables, code blocks, images.</p>
+        <h3>Image Embeds</h3>
+        <p>Click <strong>🖼</strong> to pick an image file. It is base64-encoded and inserted inline — it will be encrypted inside the note. Keep images under 1MB to avoid large file sizes.</p>
+        <h3>Search</h3>
+        <p><strong>Typing</strong> in the search box instantly filters the sidebar by title, species, and tags. Pressing <span class="kbd">Enter</span> triggers a <strong>deep search</strong> — it decrypts every note body and finds matches with highlighted excerpts.</p>
+        <h3>Filters</h3>
+        <p>The filter pills below the search box filter by experiment type, TC stage, or show only overdue reminders / contamination entries.</p>
+      </div>
+
+      <h2>Keyboard Shortcuts</h2>
+      <div class="help-section-card">
+        <table><tr><th>Shortcut</th><th>Action</th></tr>
+          <tr><td><span class="kbd">Ctrl+S</span></td><td>Save current note to GitHub</td></tr>
+          <tr><td><span class="kbd">Ctrl+B</span></td><td>Bold selected text</td></tr>
+          <tr><td><span class="kbd">Ctrl+I</span></td><td>Italic selected text</td></tr>
+          <tr><td><span class="kbd">Ctrl+K</span></td><td>Insert link</td></tr>
+          <tr><td><span class="kbd">Tab</span></td><td>Insert 2 spaces (inside editor)</td></tr>
+          <tr><td><span class="kbd">Enter</span> in search</td><td>Deep full-text search across all notes</td></tr>
+        </table>
+      </div>
+
+      <h2>Accession Registry</h2>
+      <div class="help-section-card">
+        <p>Track every plant accession — species, accession number, origin, source, acquisition date, and status. Linked lab entries appear automatically on the accession page: any note whose <em>Species/Accession</em> field contains the accession's species name is shown as a linked entry.</p>
+        <h3>Status options</h3>
+        <ul><li><strong>Active in culture</strong> — currently growing in vitro</li><li><strong>In acclimatization</strong> — Stage IV, being hardened off</li><li><strong>Dormant</strong> — paused, not actively subcultured</li><li><strong>Transferred out</strong> — moved to another lab or person</li><li><strong>Lost</strong> — culture failed or contaminated</li></ul>
+      </div>
+
+      <h2>Media Recipe Book</h2>
+      <div class="help-section-card">
+        <p>Store complete media formulations. Each recipe records base medium, sucrose, agar/gelrite, pH, growth regulators, autoclave parameters, and free-text preparation notes.</p>
+        <h3>Base Medium</h3>
+        <p>Choose from the curated list covering general (MS, LS), orchid-specific (Knudson C, VW, Pierik), monocot/banana (B5, N6, MS-Musa), and woody plant media (WPM, DKW). Select <strong>✏️ Custom</strong> to type any name.</p>
+        <h3>Autoclave</h3>
+        <p>Use the preset buttons (121°C/15m, 121°C/20m, 121°C/45m for large autoclaves, 115°C/20m) or type exact temperature and hold time manually. For heat-sensitive components, use <strong>Filter sterilized</strong> (sets temp to 0).</p>
+        <h3>Linking to notes</h3>
+        <p>When creating a lab entry, the <strong>Recipe Used</strong> dropdown lists all saved recipes. The linked recipe appears as a purple badge on the note — clicking it opens the recipe directly.</p>
+      </div>
+
+      <h2>Reminders</h2>
+      <div class="help-section-card">
+        <p>Any lab entry with a <strong>Next Review Date</strong> appears in the ⏰ Reminders tab, grouped by urgency:</p>
+        <ul><li><strong>🔴 Overdue</strong> — past the review date</li><li><strong>🟡 This week</strong> — due within 7 days</li><li><strong>📅 This month</strong> — due within 30 days</li><li><strong>🗓 Later</strong> — more than 30 days away</li></ul>
+        <p>The nav badge shows a count of overdue + this-week entries. Click any reminder card to open the note.</p>
+      </div>
+
+      <h2>⏱ Tools — Timers &amp; Calculator</h2>
+      <div class="help-section-card">
+        <h3>Countdown Timers</h3>
+        <p>Click <strong>＋ Add Timer</strong> to create a countdown. Enter hours, minutes and seconds, give it a name (e.g. "Autoclave", "Surface sterilization"), then press ▶. Up to 5 timers can run simultaneously. A repeating beep plays when any timer reaches zero. Press ↺ to reset.</p>
+        <h3>Stopwatches</h3>
+        <p>Multiple stopwatches with lap recording. Press ⏱ Lap to record a split time without stopping. Press ↺ to clear.</p>
+        <h3>Regular / Scientific Calculator</h3>
+        <p>Standard calculator with memory. Switch to <strong>Scientific</strong> for sin/cos/tan and inverse trig (uses DEG by default, toggle to RAD), log, ln, √, x², xʸ, π and e.</p>
+        <h3>BioChemistry Calculator</h3>
+        <ul>
+          <li><strong>Molarity</strong> — calculates molar concentration from MW, mass, and volume</li>
+          <li><strong>Dilution</strong> — C₁V₁ = C₂V₂; leave V₁ blank to solve for it</li>
+          <li><strong>% Solution</strong> — w/v percentage from mass and volume</li>
+          <li><strong>pH</strong> — pH from [H⁺] or from pOH</li>
+          <li><strong>PGR Convert</strong> — converts growth regulator concentrations between mg/L and μM using molecular weight</li>
+        </ul>
+      </div>
+
+      <h2>Export &amp; Backup</h2>
+      <div class="help-section-card">
+        <p>Click <strong>⬇ Export</strong> in the top bar to download all notes as a ZIP of decrypted Markdown files, plus accessions and recipes as JSON. Each note file includes YAML front matter with all metadata.</p>
+        <p>Your data is also always in the GitHub repo as encrypted <code>.enc</code> files — every save is a git commit, so you have full version history. The repo itself is your backup.</p>
+        <h3>Print / PDF</h3>
+        <p>Open any note or recipe and click <strong>🖨 Print / PDF</strong>. This opens a clean print-optimised page. Use your browser's print dialog and choose <em>Save as PDF</em>.</p>
+      </div>
+
+      <h2>PWA — Install as App</h2>
+      <div class="help-section-card">
+        <p>On Chrome/Edge: click <strong>⬇ Install App</strong> in the nav bar when it appears (usually after your first visit). On Safari/iOS: tap the Share button → <em>Add to Home Screen</em>. The app then opens in its own window without browser chrome.</p>
+        <p>The app shell is cached offline — you can open it without internet. However, loading or saving notes requires GitHub API access (internet connection).</p>
+      </div>
+    </div>
   </div>
 
 </div><!-- /app -->
@@ -1763,9 +2157,438 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.register('/sw.js').catch(()=>{});
 }
 
-// Force HTTPS — crypto.subtle only works in secure contexts
+// Force HTTPS
 if(location.protocol==='http:'&&location.hostname!=='localhost'){
   location.replace('https:'+location.href.slice(location.protocol.length));
+}
+
+// ════════════════════════════════════════════════════════════
+// PWA INSTALL PROMPT
+// ════════════════════════════════════════════════════════════
+let _pwaPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault(); _pwaPrompt=e;
+  document.getElementById('install-btn').style.display='block';
+});
+document.getElementById('install-btn').onclick=async()=>{
+  if(!_pwaPrompt) return;
+  _pwaPrompt.prompt();
+  const {outcome}=await _pwaPrompt.userChoice;
+  _pwaPrompt=null;
+  document.getElementById('install-btn').style.display='none';
+  if(outcome==='accepted') toast('App installed ✓');
+};
+window.addEventListener('appinstalled',()=>{
+  document.getElementById('install-btn').style.display='none';
+});
+
+// ════════════════════════════════════════════════════════════
+// MOBILE SIDEBAR
+// ════════════════════════════════════════════════════════════
+function toggleSidebar(){
+  const aside=document.querySelector(`#sec-${S.section} aside`);
+  if(!aside) return;
+  const bd=document.getElementById('sidebar-backdrop');
+  const open=aside.classList.toggle('open');
+  bd.classList.toggle('on',open);
+}
+document.getElementById('hamburger').onclick=toggleSidebar;
+document.getElementById('sidebar-backdrop').onclick=()=>{
+  document.querySelectorAll('aside.open').forEach(a=>a.classList.remove('open'));
+  document.getElementById('sidebar-backdrop').classList.remove('on');
+};
+// Close sidebar when a note/item is opened on mobile
+function closeSidebarMobile(){
+  if(window.innerWidth<=768){
+    document.querySelectorAll('aside.open').forEach(a=>a.classList.remove('open'));
+    document.getElementById('sidebar-backdrop').classList.remove('on');
+  }
+}
+// Patch openNote/openAccession/openRecipe to close sidebar on mobile
+const _origOpenNote=openNote;
+openNote=async function(id){ await _origOpenNote(id); closeSidebarMobile(); };
+const _origOpenAcc=openAccession;
+openAccession=function(id){ _origOpenAcc(id); closeSidebarMobile(); };
+const _origOpenRec=openRecipe;
+openRecipe=function(id){ _origOpenRec(id); closeSidebarMobile(); };
+
+// ════════════════════════════════════════════════════════════
+// RECIPE FORM — CUSTOM MEDIA + AUTOCLAVE PRESETS
+// ════════════════════════════════════════════════════════════
+document.getElementById('re-base').addEventListener('change',function(){
+  const wrap=document.getElementById('re-base-custom-wrap');
+  wrap.style.display=this.value==='__custom'?'block':'none';
+});
+
+document.querySelectorAll('.ac-preset').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    const t=this.dataset.t, m=this.dataset.m;
+    if(t==='0'&&m==='0'){
+      document.getElementById('re-ac-temp').value='';
+      document.getElementById('re-ac-time').value='';
+      document.getElementById('re-ac-temp').placeholder='Filter sterilized';
+      document.getElementById('re-ac-time').placeholder='N/A';
+    } else {
+      document.getElementById('re-ac-temp').value=t;
+      document.getElementById('re-ac-time').value=m;
+    }
+  });
+});
+
+// Patch saveRecipe to use new autoclave fields + custom media
+const _origSaveRecipe=saveRecipe;
+saveRecipe=async function(){
+  // Read autoclave
+  const t=document.getElementById('re-ac-temp').value;
+  const m=document.getElementById('re-ac-time').value;
+  const acStr=(!t&&!m)?'Filter sterilized':(t&&m)?`${t}°C / ${m} min`:(t?`${t}°C`:`${m} min`);
+  // Temporarily set the old field value so existing saveRecipe reads it
+  // Instead, we override the whole thing here:
+  const name=document.getElementById('re-name').value.trim();
+  if(!name){toast('Name is required','fail');return;}
+  let base=document.getElementById('re-base').value;
+  if(base==='__custom') base=document.getElementById('re-base-custom').value.trim()||'Custom';
+  const data={
+    id:S.editingRec||uid(),
+    name, base,
+    sucrose:document.getElementById('re-sucrose').value,
+    agar:document.getElementById('re-agar').value,
+    ph:document.getElementById('re-ph').value,
+    pgr:document.getElementById('re-pgr').value.trim(),
+    autoclave:acStr,
+    target:document.getElementById('re-target').value.trim(),
+    notes_md:document.getElementById('rr-notes').value,
+    date_created:S.editingRec?(S.recs.find(r=>r.id===S.editingRec)?.date_created||new Date().toISOString()):new Date().toISOString(),
+  };
+  document.getElementById('save-rec-btn').disabled=true;
+  load('Saving recipe…');
+  try{
+    const {recs,sha}=await loadRecipes();
+    if(S.editingRec){const idx=recs.findIndex(r=>r.id===S.editingRec);if(idx!==-1)recs[idx]=data;else recs.push(data);}
+    else recs.push(data);
+    S.recs=recs; S.recSha=await saveRecipes(recs,sha);
+    S.curRec=data.id;
+    toast('Recipe saved ✓');
+    renderRecList(); openRecipe(data.id);
+  }catch(e){toast('Save failed: '+e.message,'fail');}
+  document.getElementById('save-rec-btn').disabled=false;
+  unload();
+};
+
+// Patch startEditRecipe to populate autoclave fields
+const _origStartEditRecipe=startEditRecipe;
+startEditRecipe=function(){
+  _origStartEditRecipe();
+  const r=S.recs.find(x=>x.id===S.curRec); if(!r) return;
+  // Parse stored autoclave string back to temp + time
+  const ac=r.autoclave||'';
+  const tMatch=ac.match(/(\d+)°C/);
+  const mMatch=ac.match(/(\d+)\s*min/);
+  document.getElementById('re-ac-temp').value=tMatch?tMatch[1]:'';
+  document.getElementById('re-ac-time').value=mMatch?mMatch[1]:'';
+  // Custom base
+  const knownBases=['Murashige & Skoog (MS) Full','½ MS','¼ MS','MS + vitamins (modified)',
+    'Linsmaier & Skoog (LS)','Knudson C (KC)','Vacin & Went (VW)','Pierik\'s medium',
+    'New Dogashima (ND)','Hyponex-based','Gamborg B5','N6 (Chu) — Monocots / Cereals',
+    'MS Modified for Musa','WPM (Lloyd & McCown)','DKW (Driver & Kuniyuki)',
+    'Anderson\'s Rhododendron','Nitsch & Nitsch (NN) — Anther','Schenk & Hildebrandt (SH)',
+    'White\'s — Roots','Gamborg B5 Modified',''];
+  if(r.base&&!knownBases.includes(r.base)){
+    document.getElementById('re-base').value='__custom';
+    document.getElementById('re-base-custom').value=r.base;
+    document.getElementById('re-base-custom-wrap').style.display='block';
+  }
+};
+
+const _origStartNewRecipe=startNewRecipe;
+startNewRecipe=function(){
+  _origStartNewRecipe();
+  document.getElementById('re-ac-temp').value='121';
+  document.getElementById('re-ac-time').value='15';
+  document.getElementById('re-base-custom-wrap').style.display='none';
+};
+
+// ════════════════════════════════════════════════════════════
+// TOOLS — TIMERS
+// ════════════════════════════════════════════════════════════
+let timerList=[], swList=[];
+
+function playBeep(n=3){
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    let t=ctx.currentTime;
+    for(let i=0;i<n;i++){
+      const o=ctx.createOscillator(), g=ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value=880; o.type='sine';
+      g.gain.setValueAtTime(0.4,t);
+      g.gain.exponentialRampToValueAtTime(0.001,t+0.35);
+      o.start(t); o.stop(t+0.35); t+=0.45;
+    }
+    ctx.resume();
+  }catch(_){}
+}
+
+function fmtHMS(s){
+  s=Math.max(0,Math.round(s));
+  const h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+}
+
+function renderTimers(){
+  const grid=document.getElementById('timer-grid');
+  if(!timerList.length){grid.innerHTML='<p style="font-size:13px;color:var(--mu);text-align:center">No timers. Click + Add Timer.</p>';return;}
+  grid.innerHTML=timerList.map((t,i)=>`
+    <div class="tmr${t.done?' done':t.running?' running':''}" id="tmr-${t.id}">
+      <input class="tmr-name" value="${esc(t.name)}" placeholder="Timer name…" onchange="timerList[${i}].name=this.value">
+      <button class="btn ghost xs" onclick="removeTimer('${t.id}')" style="padding:2px 7px">✕</button>
+      <div class="tmr-display${t.done?' done':''}">${t.done?'DONE':fmtHMS(t.remaining)}</div>
+      <div class="tmr-inputs">
+        <input type="number" min="0" max="99" placeholder="HH" value="${Math.floor(t.duration/3600)||''}" onchange="setTimerDuration('${t.id}',this)" data-unit="h">
+        <span>:</span>
+        <input type="number" min="0" max="59" placeholder="MM" value="${Math.floor((t.duration%3600)/60)||''}" onchange="setTimerDuration('${t.id}',this)" data-unit="m">
+        <span>:</span>
+        <input type="number" min="0" max="59" placeholder="SS" value="${t.duration%60||''}" onchange="setTimerDuration('${t.id}',this)" data-unit="s">
+      </div>
+      <div class="tmr-btns">
+        ${t.running
+          ? `<button class="btn sm ghost" onclick="pauseTimer('${t.id}')">⏸ Pause</button>`
+          : `<button class="btn sm" onclick="startTimer('${t.id}')">▶ Start</button>`}
+        <button class="btn sm ghost" onclick="resetTimer('${t.id}')">↺ Reset</button>
+      </div>
+      <div class="tmr-progress"><div class="tmr-bar${t.done?' done':''}" style="width:${t.duration>0?Math.round((1-t.remaining/t.duration)*100):0}%"></div></div>
+    </div>`).join('');
+}
+
+function addTimer(){
+  if(timerList.length>=5){toast('Max 5 timers','fail');return;}
+  timerList.push({id:uid(),name:'',duration:0,remaining:0,running:false,done:false,_iv:null});
+  renderTimers();
+}
+function removeTimer(id){
+  const t=timerList.find(x=>x.id===id);
+  if(t?._iv) clearInterval(t._iv);
+  timerList=timerList.filter(x=>x.id!==id);
+  renderTimers();
+}
+function setTimerDuration(id,input){
+  const t=timerList.find(x=>x.id===id); if(!t||t.running) return;
+  const el=document.getElementById(`tmr-${id}`);
+  const h=+el.querySelector('[data-unit=h]').value||0;
+  const m=+el.querySelector('[data-unit=m]').value||0;
+  const s=+el.querySelector('[data-unit=s]').value||0;
+  t.duration=h*3600+m*60+s; t.remaining=t.duration; t.done=false;
+  renderTimers();
+}
+function startTimer(id){
+  const t=timerList.find(x=>x.id===id); if(!t||t.running) return;
+  if(t.remaining<=0&&t.duration>0) t.remaining=t.duration;
+  if(t.remaining<=0){toast('Set a duration first','fail');return;}
+  t.running=true; t.done=false;
+  t._iv=setInterval(()=>{
+    t.remaining=Math.max(0,t.remaining-1);
+    if(t.remaining<=0){clearInterval(t._iv);t._iv=null;t.running=false;t.done=true;playBeep(5);}
+    renderTimers();
+  },1000);
+  renderTimers();
+}
+function pauseTimer(id){
+  const t=timerList.find(x=>x.id===id); if(!t) return;
+  if(t._iv){clearInterval(t._iv);t._iv=null;}
+  t.running=false; renderTimers();
+}
+function resetTimer(id){
+  const t=timerList.find(x=>x.id===id); if(!t) return;
+  if(t._iv){clearInterval(t._iv);t._iv=null;}
+  t.running=false; t.done=false; t.remaining=t.duration; renderTimers();
+}
+document.getElementById('add-timer-btn').onclick=addTimer;
+
+// ════════════════════════════════════════════════════════════
+// TOOLS — STOPWATCHES
+// ════════════════════════════════════════════════════════════
+function fmtSW(ms){
+  const t=Math.floor(ms/10), cs=t%100, s=Math.floor(t/100)%60, m=Math.floor(t/6000)%60, h=Math.floor(t/360000);
+  return `${h?String(h).padStart(2,'0')+':':''}${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${String(cs).padStart(2,'0')}`;
+}
+
+function renderSWs(){
+  const grid=document.getElementById('sw-grid');
+  if(!swList.length){grid.innerHTML='<p style="font-size:13px;color:var(--mu);text-align:center">No stopwatches. Click + Add Stopwatch.</p>';return;}
+  grid.innerHTML=swList.map((sw,i)=>`
+    <div class="sw-card" id="sw-${sw.id}">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <input class="tmr-name" value="${esc(sw.name)}" placeholder="Stopwatch name…" onchange="swList[${i}].name=this.value" style="flex:1">
+        <button class="btn ghost xs" onclick="removeSW('${sw.id}')">✕</button>
+      </div>
+      <div class="sw-display">${fmtSW(sw.elapsed+(sw.running?(Date.now()-sw.startedAt):0))}</div>
+      <div style="display:flex;gap:5px;justify-content:center;margin-top:8px">
+        ${sw.running
+          ? `<button class="btn sm danger" onclick="stopSW('${sw.id}')">⏹ Stop</button>`
+          : `<button class="btn sm" onclick="startSW('${sw.id}')">▶ Start</button>`}
+        <button class="btn sm ghost" onclick="lapSW('${sw.id}')">⏱ Lap</button>
+        <button class="btn sm ghost" onclick="resetSW('${sw.id}')">↺ Reset</button>
+      </div>
+      ${sw.laps.length?`<div class="sw-laps">${sw.laps.map((l,i)=>`<div>Lap ${i+1}: ${fmtSW(l)}</div>`).join('')}</div>`:''}
+    </div>`).join('');
+}
+
+function addSW(){
+  if(swList.length>=4){toast('Max 4 stopwatches','fail');return;}
+  swList.push({id:uid(),name:'',elapsed:0,running:false,startedAt:0,laps:[],_iv:null});
+  renderSWs();
+}
+function removeSW(id){
+  const sw=swList.find(x=>x.id===id);
+  if(sw?._iv) clearInterval(sw._iv);
+  swList=swList.filter(x=>x.id!==id); renderSWs();
+}
+function startSW(id){
+  const sw=swList.find(x=>x.id===id); if(!sw||sw.running) return;
+  sw.running=true; sw.startedAt=Date.now();
+  sw._iv=setInterval(()=>renderSWs(),50);
+  renderSWs();
+}
+function stopSW(id){
+  const sw=swList.find(x=>x.id===id); if(!sw) return;
+  if(sw._iv){clearInterval(sw._iv);sw._iv=null;}
+  sw.elapsed+=Date.now()-sw.startedAt; sw.running=false; renderSWs();
+}
+function lapSW(id){
+  const sw=swList.find(x=>x.id===id); if(!sw) return;
+  const cur=sw.elapsed+(sw.running?(Date.now()-sw.startedAt):0);
+  sw.laps.push(cur); renderSWs();
+}
+function resetSW(id){
+  const sw=swList.find(x=>x.id===id); if(!sw) return;
+  if(sw._iv){clearInterval(sw._iv);sw._iv=null;}
+  sw.elapsed=0; sw.running=false; sw.laps=[]; renderSWs();
+}
+document.getElementById('add-sw-btn').onclick=addSW;
+
+// ════════════════════════════════════════════════════════════
+// TOOLS — CALCULATOR
+// ════════════════════════════════════════════════════════════
+const C={expr:'',result:'0',lastOp:false,useDeg:true};
+
+function calcDisplay(){
+  document.getElementById('calc-expr').textContent=C.expr;
+  document.getElementById('calc-val').textContent=C.result;
+}
+
+function calcAction(a){
+  if(a==='AC'){C.expr='';C.result='0';calcDisplay();return;}
+  if(a==='='){
+    try{
+      let e=C.expr
+        .replace(/sin\(/g,C.useDeg?'Math.sin(Math.PI/180*':'Math.sin(')
+        .replace(/cos\(/g,C.useDeg?'Math.cos(Math.PI/180*':'Math.cos(')
+        .replace(/tan\(/g,C.useDeg?'Math.tan(Math.PI/180*':'Math.tan(')
+        .replace(/asin\(/g,C.useDeg?'(180/Math.PI)*Math.asin(':'Math.asin(')
+        .replace(/acos\(/g,C.useDeg?'(180/Math.PI)*Math.acos(':'Math.acos(')
+        .replace(/atan\(/g,C.useDeg?'(180/Math.PI)*Math.atan(':'Math.atan(')
+        .replace(/log\(/g,'Math.log10(')
+        .replace(/ln\(/g,'Math.log(')
+        .replace(/sqrt\(/g,'Math.sqrt(');
+      // auto-close unclosed parens
+      const opens=(e.match(/\(/g)||[]).length-(e.match(/\)/g)||[]).length;
+      e+=')'.repeat(Math.max(0,opens));
+      const val=Function('"use strict";return('+e+')')();
+      C.result=isFinite(val)?String(+val.toPrecision(10)).replace(/\.?0+$/,''):'Error';
+    }catch(_){C.result='Error';}
+    calcDisplay(); return;
+  }
+  if(a==='+/-'){
+    if(C.result!=='0') C.result=C.result.startsWith('-')?C.result.slice(1):'-'+C.result;
+    C.expr=C.result; calcDisplay(); return;
+  }
+  if(a==='%'){
+    try{C.result=String(parseFloat(C.result)/100);}catch(_){} calcDisplay(); return;
+  }
+  if(a==='Math.PI'){C.expr+='3.14159265358979';C.result='π';calcDisplay();return;}
+  if(a==='Math.E'){C.expr+='2.71828182845905';C.result='e';calcDisplay();return;}
+  // For function tokens ending with '(', append last result if expr is empty
+  if(a.endsWith('(')){
+    if(!C.expr) C.expr=(C.result!=='0'&&C.result!=='Error')?C.result:'';
+    C.expr+=a; calcDisplay(); return;
+  }
+  C.expr+=a; calcDisplay();
+}
+
+document.querySelectorAll('[data-ca]').forEach(btn=>{
+  btn.addEventListener('click',()=>calcAction(btn.dataset.ca));
+});
+
+// Mode switcher
+document.querySelectorAll('.calc-mode-btn').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    document.querySelectorAll('.calc-mode-btn').forEach(b=>b.classList.remove('active'));
+    this.classList.add('active');
+    const mode=this.dataset.cmode;
+    document.getElementById('calc-std').style.display=mode==='bio'?'none':'block';
+    document.getElementById('calc-bio').style.display=mode==='bio'?'block':'none';
+    document.getElementById('calc-sci-row').style.display=mode==='sci'?'block':'none';
+  });
+});
+
+// DEG/RAD toggle
+document.getElementById('deg-rad-btn').addEventListener('click',function(){
+  C.useDeg=!C.useDeg; this.textContent=C.useDeg?'DEG':'RAD';
+});
+
+// BioChemistry tabs
+document.querySelectorAll('.bc-tab').forEach(t=>{
+  t.addEventListener('click',function(){
+    document.querySelectorAll('.bc-tab').forEach(x=>x.classList.remove('active'));
+    this.classList.add('active');
+    document.querySelectorAll('.bc-calc').forEach(x=>x.style.display='none');
+    document.getElementById('bt-'+this.dataset.bt).style.display='block';
+  });
+});
+
+function bcCalc(mode){
+  const v=id=>parseFloat(document.getElementById(id).value)||0;
+  const res=id=>el=>{document.getElementById(id).innerHTML=el;};
+  const show=res;
+  if(mode==='molarity'){
+    const mw=v('bc-mw'),mass=v('bc-mass'),vol=v('bc-vol');
+    if(!mw||!vol){show('bc-res-molarity')('Enter MW and Volume.');return;}
+    const mol=mass/mw, M=mol/vol;
+    show('bc-res-molarity')(`<strong>${M.toExponential(4)} M</strong> (${(M*1000).toFixed(4)} mM)<small>${mol.toExponential(4)} mol in ${vol} L</small>`);
+  }
+  if(mode==='dilution'){
+    const c1=v('bc-c1'),v2=v('bc-v2'),c2=v('bc-c2');
+    const v1raw=document.getElementById('bc-v1').value;
+    if(!c1||!c2||!v2){show('bc-res-dilution')('Enter C₁, C₂ and V₂.');return;}
+    const v1=v1raw?parseFloat(v1raw):(c2*v2/c1);
+    show('bc-res-dilution')(`<strong>V₁ = ${v1.toFixed(4)} mL</strong><small>Take ${v1.toFixed(3)} mL of ${c1} mM stock → make up to ${v2} mL → gives ${c2} mM</small>`);
+  }
+  if(mode==='percent'){
+    const m=v('bc-pm'),vol=v('bc-pv');
+    if(!vol){show('bc-res-percent')('Enter volume.');return;}
+    show('bc-res-percent')(`<strong>${((m/vol)*100).toFixed(4)}% w/v</strong><small>${m}g in ${vol}mL</small>`);
+  }
+  if(mode==='ph'){
+    const h=parseFloat(document.getElementById('bc-h').value);
+    const poh=parseFloat(document.getElementById('bc-poh').value);
+    if(!isNaN(h)&&h>0){
+      const ph=-Math.log10(h);
+      show('bc-res-ph')(`<strong>pH = ${ph.toFixed(3)}</strong><small>pOH = ${(14-ph).toFixed(3)}</small>`);
+    } else if(!isNaN(poh)){
+      show('bc-res-ph')(`<strong>pH = ${(14-poh).toFixed(3)}</strong><small>from pOH ${poh}</small>`);
+    } else show('bc-res-ph')('Enter [H⁺] or pOH.');
+  }
+  if(mode==='pgr'){
+    const mw=v('bc-pgrmw');
+    const mgl=parseFloat(document.getElementById('bc-mgl').value);
+    const um=parseFloat(document.getElementById('bc-um').value);
+    if(!mw){show('bc-res-pgr')('Enter molecular weight.');return;}
+    if(!isNaN(mgl)&&mgl>0){
+      show('bc-res-pgr')(`<strong>${(mgl/mw*1000).toFixed(4)} μM</strong><small>${mgl} mg/L ÷ ${mw} g/mol × 1000</small>`);
+    } else if(!isNaN(um)&&um>0){
+      show('bc-res-pgr')(`<strong>${(um*mw/1000).toFixed(4)} mg/L</strong><small>${um} μM × ${mw} g/mol ÷ 1000</small>`);
+    } else show('bc-res-pgr')('Enter mg/L or μM value.');
+  }
 }
 
 // Restore token from session
