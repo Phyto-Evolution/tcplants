@@ -1,5 +1,5 @@
 const V = 'tcplants-v3';
-const SHELL = ['/', '/index.html', '/manifest.json', '/icon.svg'];
+const SHELL = ['/', '/index.html', '/manifest.json', '/icon.svg', '/icon-192.png', '/icon-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(V).then(c => c.addAll(SHELL)));

@@ -2163,24 +2163,46 @@ if(location.protocol==='http:'&&location.hostname!=='localhost'){
 }
 
 // ════════════════════════════════════════════════════════════
-// PWA INSTALL PROMPT
+// PWA INSTALL
 // ════════════════════════════════════════════════════════════
 let _pwaPrompt=null;
-window.addEventListener('beforeinstallprompt',e=>{
-  e.preventDefault(); _pwaPrompt=e;
-  document.getElementById('install-btn').style.display='block';
-});
-document.getElementById('install-btn').onclick=async()=>{
-  if(!_pwaPrompt) return;
-  _pwaPrompt.prompt();
-  const {outcome}=await _pwaPrompt.userChoice;
-  _pwaPrompt=null;
-  document.getElementById('install-btn').style.display='none';
-  if(outcome==='accepted') toast('App installed ✓');
-};
-window.addEventListener('appinstalled',()=>{
-  document.getElementById('install-btn').style.display='none';
-});
+const _installBtn=document.getElementById('install-btn');
+const _isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+const _isStandalone=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+
+// Already installed — hide button entirely
+if(_isStandalone){ _installBtn.style.display='none'; }
+
+// iOS: show manual guide button always (no beforeinstallprompt on Safari)
+else if(_isIOS){
+  _installBtn.style.display='block';
+  _installBtn.textContent='⬇ Install (iOS)';
+  _installBtn.onclick=()=>{
+    alert('To install on iOS:\n\n1. Tap the Share button (□↑) at the bottom of Safari\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" in the top right\n\nThe app will appear on your home screen.');
+  };
+}
+
+// Chrome / Edge — wait for beforeinstallprompt
+else {
+  window.addEventListener('beforeinstallprompt',e=>{
+    e.preventDefault();
+    _pwaPrompt=e;
+    _installBtn.style.display='block';
+  });
+  _installBtn.onclick=async()=>{
+    if(_pwaPrompt){
+      _pwaPrompt.prompt();
+      const {outcome}=await _pwaPrompt.userChoice;
+      _pwaPrompt=null;
+      _installBtn.style.display='none';
+      if(outcome==='accepted') toast('App installed ✓');
+    } else {
+      // Prompt was already used or dismissed — show manual guide
+      alert('To install manually in Chrome:\n\n1. Click the ⋮ menu (three dots) in the top-right\n2. Click "Cast, save, and share"\n3. Click "Install page as app…"\n\nOr look for the install icon (⊕) in the address bar.');
+    }
+  };
+  window.addEventListener('appinstalled',()=>{ _installBtn.style.display='none'; });
+}
 
 // ════════════════════════════════════════════════════════════
 // MOBILE SIDEBAR
