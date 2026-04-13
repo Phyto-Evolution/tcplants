@@ -168,6 +168,21 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 .editor-toolbar{display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap}
 #e-body,#ra-notes,#rr-notes{height:340px;font-family:var(--mono);font-size:13px;resize:vertical;line-height:1.7}
 .eactions{display:flex;gap:7px;margin-top:14px;flex-wrap:wrap}
+
+/* Markdown toolbar */
+.editor-toolbar{
+  display:flex;gap:2px;flex-wrap:wrap;align-items:center;
+  background:var(--sf2);border:1px solid var(--bd);border-bottom:none;
+  border-radius:6px 6px 0 0;padding:5px 6px;
+}
+.editor-toolbar + textarea{border-radius:0 0 6px 6px}
+.tb-btn{
+  background:transparent;border:none;border-radius:4px;color:var(--mu);
+  cursor:pointer;font-family:var(--font);font-size:13px;padding:3px 7px;
+  transition:background .1s,color .1s;line-height:1.4;
+}
+.tb-btn:hover{background:var(--sf3);color:var(--tx)}
+.tb-div{width:1px;background:var(--bd);height:18px;margin:0 3px;flex-shrink:0}
 .tmpl-hint{font-size:12px;color:var(--mu);margin-top:4px}
 
 /* ── MARKDOWN ── */
@@ -377,6 +392,8 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
               <option>Protocol Update</option>
               <option>Harvest / Transfer</option>
               <option>Other</option>
+              <option disabled>──────────</option>
+              <option>Self Notes / Brainstorming</option>
             </select>
           </div>
           <div class="field">
@@ -389,6 +406,8 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
               <option>Stage III — Rooting</option>
               <option>Stage IV — Acclimatization</option>
               <option>N/A</option>
+              <option disabled>──────────</option>
+              <option>Self Notes / Unclassified</option>
             </select>
           </div>
         </div>
@@ -409,9 +428,25 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
         <div class="field">
           <label>Notes <span style="font-weight:400;color:var(--mu)">(Markdown)</span></label>
           <div class="editor-toolbar">
-            <button class="btn ghost xs" id="img-btn" type="button">🖼 Image</button>
-            <button class="btn ghost xs" id="tbl-btn" type="button">📊 Table</button>
-            <span style="font-size:11px;color:var(--mu);align-self:center">Markdown supported</span>
+            <button class="tb-btn" id="tb-h2"     title="Heading 2 (##)">H2</button>
+            <button class="tb-btn" id="tb-h3"     title="Heading 3 (###)">H3</button>
+            <div class="tb-div"></div>
+            <button class="tb-btn" id="tb-bold"   title="Bold (Ctrl+B)"><b>B</b></button>
+            <button class="tb-btn" id="tb-italic" title="Italic (Ctrl+I)"><i>I</i></button>
+            <button class="tb-btn" id="tb-strike" title="Strikethrough"><s>S</s></button>
+            <div class="tb-div"></div>
+            <button class="tb-btn" id="tb-code"   title="Inline code">`c`</button>
+            <button class="tb-btn" id="tb-codebl" title="Code block">```</button>
+            <button class="tb-btn" id="tb-quote"  title="Blockquote">"</button>
+            <button class="tb-btn" id="tb-hr"     title="Horizontal rule">—</button>
+            <div class="tb-div"></div>
+            <button class="tb-btn" id="tb-ul"     title="Bullet list">• List</button>
+            <button class="tb-btn" id="tb-ol"     title="Numbered list">1. List</button>
+            <button class="tb-btn" id="tb-task"   title="Task / checkbox list">☑ Task</button>
+            <div class="tb-div"></div>
+            <button class="tb-btn" id="tb-link"   title="Link (Ctrl+K)">🔗</button>
+            <button class="tb-btn" id="img-btn"   title="Embed image">🖼</button>
+            <button class="tb-btn" id="tbl-btn"   title="Insert table">⊞</button>
           </div>
           <textarea id="ne-body" placeholder="Write lab notes here…"></textarea>
           <div class="tmpl-hint" id="ne-tmpl-hint"></div>
@@ -1085,20 +1120,43 @@ document.getElementById('close-search-btn').addEventListener('click',()=>showNot
 // ════════════════════════════════════════════════════════════
 // NOTES — IMAGE INSERT
 // ════════════════════════════════════════════════════════════
+// ── MARKDOWN TOOLBAR ────────────────────────────────────────
+function mdWrap(before, after, placeholder){
+  const ta=document.getElementById('ne-body');
+  const s=ta.selectionStart, e=ta.selectionEnd;
+  const sel=ta.value.slice(s,e)||placeholder||'';
+  const ins=before+sel+after;
+  ta.value=ta.value.slice(0,s)+ins+ta.value.slice(e);
+  ta.focus();
+  if(s!==e){ ta.selectionStart=s; ta.selectionEnd=s+ins.length; }
+  else { ta.selectionStart=s+before.length; ta.selectionEnd=s+before.length+sel.length; }
+}
+
+function mdLinePrefix(prefix){
+  const ta=document.getElementById('ne-body');
+  const s=ta.selectionStart;
+  const lineStart=ta.value.lastIndexOf('\n',s-1)+1;
+  const ins='\n'+prefix;
+  ta.value=ta.value.slice(0,lineStart)+ins+ta.value.slice(lineStart);
+  ta.focus();
+  ta.selectionStart=ta.selectionEnd=lineStart+ins.length;
+}
+
 function insertImage(){
   const input=document.createElement('input');
   input.type='file'; input.accept='image/*';
   input.onchange=e=>{
     const file=e.target.files[0]; if(!file) return;
-    if(file.size>1048576 && !confirm(`Image is ${(file.size/1048576).toFixed(1)}MB. Large images inflate note size. Continue?`)) return;
+    if(file.size>1048576&&!confirm(`Image is ${(file.size/1048576).toFixed(1)}MB. Large images inflate note size. Continue?`)) return;
     const reader=new FileReader();
-    reader.onload=e=>{
+    reader.onload=ev=>{
       const ta=document.getElementById('ne-body');
       const pos=ta.selectionStart;
-      const ins=`\n![${file.name}](${e.target.result})\n`;
+      const ins=`\n![${file.name}](${ev.target.result})\n`;
       ta.value=ta.value.slice(0,pos)+ins+ta.value.slice(pos);
       ta.selectionStart=ta.selectionEnd=pos+ins.length;
-      toast('Image inserted — it will be encrypted with the note');
+      ta.focus();
+      toast('Image inserted — encrypted with the note');
     };
     reader.readAsDataURL(file);
   };
@@ -1106,12 +1164,48 @@ function insertImage(){
 }
 
 function insertTable(){
-  const ta=document.getElementById('ne-body');
-  const pos=ta.selectionStart;
-  const ins=`\n| Header 1 | Header 2 | Header 3 |\n|----------|----------|----------|\n| Cell     | Cell     | Cell     |\n`;
-  ta.value=ta.value.slice(0,pos)+ins+ta.value.slice(pos);
-  ta.selectionStart=ta.selectionEnd=pos+ins.length;
+  mdWrap('\n| Header 1 | Header 2 | Header 3 |\n|----------|----------|----------|\n| Cell     | Cell     | Cell     |\n','','');
 }
+
+// Toolbar button actions
+const TB={
+  'tb-h2':     ()=>mdLinePrefix('## '),
+  'tb-h3':     ()=>mdLinePrefix('### '),
+  'tb-bold':   ()=>mdWrap('**','**','bold text'),
+  'tb-italic': ()=>mdWrap('*','*','italic text'),
+  'tb-strike': ()=>mdWrap('~~','~~','strikethrough'),
+  'tb-code':   ()=>mdWrap('`','`','code'),
+  'tb-codebl': ()=>mdWrap('\n```\n','\n```\n','code here'),
+  'tb-quote':  ()=>mdLinePrefix('> '),
+  'tb-hr':     ()=>mdWrap('\n\n---\n\n','',''),
+  'tb-ul':     ()=>mdLinePrefix('- '),
+  'tb-ol':     ()=>mdLinePrefix('1. '),
+  'tb-task':   ()=>mdLinePrefix('- [ ] '),
+  'tb-link':   ()=>mdWrap('[','](https://)','link text'),
+  'img-btn':   insertImage,
+  'tbl-btn':   insertTable,
+};
+Object.entries(TB).forEach(([id,fn])=>{
+  const el=document.getElementById(id);
+  if(el) el.addEventListener('click',fn);
+});
+
+// Keyboard shortcuts in the textarea
+document.getElementById('ne-body').addEventListener('keydown',e=>{
+  if(e.ctrlKey||e.metaKey){
+    if(e.key==='b'){e.preventDefault();TB['tb-bold']();}
+    else if(e.key==='i'){e.preventDefault();TB['tb-italic']();}
+    else if(e.key==='k'){e.preventDefault();TB['tb-link']();}
+    else if(e.key==='s'){e.preventDefault();saveNoteAction();}
+  }
+  // Tab key inserts 2 spaces instead of focusing next element
+  if(e.key==='Tab'){
+    e.preventDefault();
+    const ta=e.target, s=ta.selectionStart;
+    ta.value=ta.value.slice(0,s)+'  '+ta.value.slice(ta.selectionEnd);
+    ta.selectionStart=ta.selectionEnd=s+2;
+  }
+});
 
 // ════════════════════════════════════════════════════════════
 // ACCESSION REGISTRY
@@ -1564,8 +1658,7 @@ document.getElementById('del-note-btn').onclick=deleteNote;
 document.getElementById('save-note-btn').onclick=saveNoteAction;
 document.getElementById('cancel-note-btn').onclick=()=>S.cur?openNote(S.cur):showNote('empty');
 document.getElementById('print-btn').onclick=printNote;
-document.getElementById('img-btn').onclick=insertImage;
-document.getElementById('tbl-btn').onclick=insertTable;
+// img-btn and tbl-btn wired via TB map above
 
 // Registry
 document.getElementById('new-acc-btn').onclick=startNewAccession;
