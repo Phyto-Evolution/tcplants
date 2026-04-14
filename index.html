@@ -64,20 +64,33 @@ select option{background:var(--sf2)}
 
 /* ── APP SHELL ── */
 #app{display:none;height:100vh;flex-direction:column}
-#app.on{display:flex;padding-bottom:44px}
+#app.on{display:flex}
 
 /* ── NAV ── */
 nav{
   background:var(--sf);border-bottom:1px solid var(--bd);
-  padding:0 14px;height:48px;display:flex;align-items:center;gap:10px;flex-shrink:0
+  padding:0 10px;height:48px;display:flex;align-items:center;gap:6px;flex-shrink:0;
+  position:relative;z-index:10
 }
-.brand{font-size:15px;font-weight:700;flex:1;white-space:nowrap}
-.brand span{color:var(--mu);font-weight:400;font-size:13px}
-#nav-hamburger{background:transparent;border:none;color:var(--tx);cursor:pointer;font-size:20px;padding:4px 6px;border-radius:6px;line-height:1;display:flex;align-items:center}
+.brand{font-size:14px;font-weight:700;margin-right:4px;white-space:nowrap}
+.brand span{color:var(--mu);font-weight:400;font-size:12px}
+#nav-hamburger{background:transparent;border:none;color:var(--tx);cursor:pointer;font-size:18px;padding:4px 6px;border-radius:6px;line-height:1;display:flex;align-items:center;flex-shrink:0}
 #nav-hamburger:hover{background:var(--sf2)}
+.nav-spacer{flex:1}
+#weather-chip{
+  background:transparent;border:none;color:var(--tx);cursor:pointer;
+  font-size:11px;font-weight:500;padding:3px 8px;border-radius:14px;
+  border:1px solid var(--bd);white-space:nowrap;display:none
+}
+#weather-chip.on{display:flex;align-items:center;gap:3px}
+#weather-chip:hover{background:var(--sf2)}
+#offline-pill{background:rgba(248,81,73,.15);border:1px solid var(--rd);border-radius:12px;color:var(--rd);font-size:10px;padding:2px 8px;display:none}
+#offline-pill.on{display:block}
+.nav-icon-btn{background:transparent;border:none;color:var(--mu);cursor:pointer;font-size:14px;padding:5px 7px;border-radius:6px;line-height:1;transition:all .12s}
+.nav-icon-btn:hover{background:var(--sf2);color:var(--tx)}
 /* ── NAV DRAWER ── */
 #nav-drawer{
-  position:fixed;top:0;left:0;bottom:0;width:240px;z-index:500;
+  position:fixed;top:0;left:0;bottom:0;width:300px;z-index:500;
   background:var(--sf);border-right:1px solid var(--bd);
   display:flex;flex-direction:column;
   transform:translateX(-100%);transition:transform .25s ease;
@@ -85,46 +98,37 @@ nav{
 }
 #nav-drawer.open{transform:translateX(0)}
 #nav-drawer-head{
-  padding:14px 16px;border-bottom:1px solid var(--bd);
-  display:flex;align-items:center;gap:10px;flex-shrink:0
+  padding:10px 12px;border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;gap:8px;flex-shrink:0;height:48px
 }
-#nav-drawer-head .brand{font-size:15px;font-weight:700}
-.nd-close{background:transparent;border:none;color:var(--mu);cursor:pointer;font-size:18px;padding:4px 6px;border-radius:6px;line-height:1;margin-left:auto}
+#nav-drawer-head .brand{font-size:14px;font-weight:700;flex:1}
+.nd-close{background:transparent;border:none;color:var(--mu);cursor:pointer;font-size:16px;padding:4px;border-radius:5px;line-height:1}
 .nd-close:hover{background:var(--sf2);color:var(--tx)}
-#nav-drawer-list{flex:1;overflow-y:auto;padding:8px 0}
+#nav-drawer-tabs{display:flex;flex-wrap:wrap;gap:2px;padding:8px 8px;border-bottom:1px solid var(--bd);flex-shrink:0}
 .ndtab{
-  display:flex;align-items:center;gap:10px;width:100%;
-  background:transparent;border:none;border-radius:0;color:var(--mu);
-  cursor:pointer;font-family:var(--font);font-size:14px;font-weight:500;
-  padding:10px 18px;text-align:left;transition:all .12s;
+  display:flex;align-items:center;gap:5px;
+  background:transparent;border:none;border-radius:6px;color:var(--mu);
+  cursor:pointer;font-family:var(--font);font-size:12px;font-weight:500;
+  padding:5px 8px;transition:all .12s;white-space:nowrap
 }
 .ndtab:hover{background:var(--sf2);color:var(--tx)}
 .ndtab.active{background:var(--sf2);color:var(--tx);font-weight:600}
-.ndtab .nd-icon{width:20px;text-align:center;font-size:15px;flex-shrink:0}
-.ndtab .nd-badge{
-  background:var(--rd);border-radius:8px;color:#fff;font-size:10px;
-  font-weight:700;padding:1px 6px;margin-left:auto
-}
-.nd-divider{height:1px;background:var(--bd);margin:6px 12px}
+.ndtab .nd-icon{font-size:12px}
+.ndtab .nd-badge{background:var(--rd);border-radius:8px;color:#fff;font-size:10px;font-weight:700;padding:1px 5px}
+.nd-divider{width:100%;height:1px;background:var(--bd);margin:3px 0}
+/* ── LIST PANEL (inside drawer) ── */
+#nd-panel{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+.nd-list-area{display:none;flex:1;flex-direction:column;overflow:hidden;min-height:0}
+.nd-list-area.on{display:flex}
+#nd-panel .aside-top{padding:8px 10px;border-bottom:1px solid var(--bd);flex-shrink:0;display:flex;flex-direction:column;gap:6px}
+#nd-panel .aside-top .btn{width:100%;padding:7px;font-size:13px}
+#nd-panel .aside-stats{font-size:11px;color:var(--mu);text-align:center;padding:2px 0}
+#nd-panel #note-list,#nd-panel #acc-list,#nd-panel #rec-list{flex:1;overflow-y:auto}
 #nav-backdrop{
   position:fixed;inset:0;z-index:499;background:rgba(0,0,0,.35);
   display:none;opacity:0;transition:opacity .25s
 }
 #nav-backdrop.on{display:block;opacity:1}
-/* ── BOTTOM BAR ── */
-#bottom-bar{
-  position:fixed;bottom:0;left:0;right:0;z-index:180;
-  background:var(--sf);border-top:1px solid var(--bd);
-  padding:6px 14px;display:none;align-items:center;gap:8px;
-  height:44px
-}
-#bottom-bar.on{display:flex}
-#bottom-bar .bb-spacer{flex:1}
-#offline-pill{
-  background:rgba(248,81,73,.15);border:1px solid var(--rd);border-radius:12px;
-  color:var(--rd);font-size:11px;padding:2px 9px;display:none
-}
-#offline-pill.on{display:block}
 
 /* ── LAYOUT ── */
 .section{display:none;flex:1;overflow:hidden}
@@ -132,10 +136,8 @@ nav{
 .section.fullpage{display:none;flex:1;overflow-y:auto;padding:32px 40px}
 .section.fullpage.on{display:block}
 
-aside{
-  width:268px;background:var(--sf);border-right:1px solid var(--bd);
-  display:flex;flex-direction:column;flex-shrink:0;overflow:hidden
-}
+/* aside elements moved to nav drawer — kept as stub for compatibility */
+aside{display:none}
 .aside-top{padding:10px;border-bottom:1px solid var(--bd);flex-shrink:0;display:flex;flex-direction:column;gap:8px}
 .aside-top .btn{width:100%;padding:8px;font-size:13px}
 .aside-stats{font-size:11px;color:var(--mu);text-align:center;padding:4px 0}
@@ -327,16 +329,12 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 #sidebar-backdrop.on{display:block}
 
 @media(max-width:768px){
-  aside{position:fixed;top:48px;left:0;bottom:0;z-index:50;transform:translateX(-110%);transition:transform .25s ease;box-shadow:4px 0 24px rgba(0,0,0,.6);width:280px}
-  aside.open{transform:translateX(0)}
   main{padding:16px 14px}
   .row2,.row3{grid-template-columns:1fr}
   .contam-summary{grid-template-columns:1fr 1fr}
   .dview,.editor{max-width:100%}
   .dtitle{font-size:20px}
   .section.fullpage{padding:16px}
-  .tools-layout{flex-direction:column}
-  .tools-left{width:100%!important;max-width:100%}
   .dactions{flex-wrap:wrap}
   .dbadges{gap:5px}
   .sbadge,.tag{font-size:11px}
@@ -346,9 +344,9 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 }
 
 /* ── TOOLS ── */
-.tools-layout{display:flex;gap:20px;align-items:flex-start}
-.tools-left{flex:1;min-width:0;display:flex;flex-direction:column;gap:16px}
-.tool-card{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:16px}
+.tools-layout{max-width:960px;margin:0 auto;width:100%}
+.tools-widgets{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:20px}
+.tool-card{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
 .tool-card h3{font-size:13px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
 /* timers */
 .timer-grid{display:flex;flex-direction:column;gap:10px}
@@ -356,7 +354,7 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 .tmr.done{border-color:var(--gn);background:rgba(63,185,80,.08)}
 .tmr.running{border-color:var(--ac)}
 .tmr-name{background:transparent;border:none;color:var(--tx);font-family:var(--font);font-size:13px;font-weight:600;width:100%;outline:none}
-.tmr-display{font-family:var(--mono);font-size:28px;font-weight:700;letter-spacing:2px;grid-column:1/-1;text-align:center;padding:6px 0}
+.tmr-display{font-family:var(--mono);font-size:32px;font-weight:700;letter-spacing:3px;text-align:center;padding:8px 0;color:var(--tx);grid-column:1/-1}
 .tmr-display.done{color:var(--gn);animation:pulse 1s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 .tmr-inputs{display:flex;align-items:center;gap:4px;grid-column:1/-1;justify-content:center}
@@ -369,7 +367,7 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 /* stopwatch */
 .sw-grid{display:flex;flex-direction:column;gap:10px}
 .sw-card{background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:12px}
-.sw-display{font-family:var(--mono);font-size:24px;font-weight:700;text-align:center;letter-spacing:2px;padding:6px 0}
+.sw-display{font-family:var(--mono);font-size:28px;font-weight:700;text-align:center;letter-spacing:2px;padding:8px 0}
 .sw-laps{max-height:80px;overflow-y:auto;margin-top:6px;font-size:11px;color:var(--mu);font-family:var(--mono)}
 .sw-laps div{padding:1px 0;border-bottom:1px solid var(--bd)}
 /* stepper */
@@ -392,11 +390,6 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 .stepper-bar{height:100%;background:var(--ac);border-radius:3px;transition:width .5s linear}
 /* scaler */
 .scaler-result{background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:10px;font-family:var(--mono);font-size:13px;margin-top:8px;white-space:pre-wrap;min-height:40px;line-height:1.8}
-/* culture age */
-.age-result{background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:12px;margin-top:8px;display:none}
-.age-result.on{display:block}
-.age-big{font-size:28px;font-weight:700;font-family:var(--mono);color:var(--ac)}
-.age-sub{font-size:12px;color:var(--mu);margin-top:4px}
 /* autoclave presets */
 .ac-presets{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
 .ac-preset{background:var(--sf2);border:1px solid var(--bd);border-radius:5px;color:var(--mu);cursor:pointer;font-family:var(--mono);font-size:11px;padding:3px 9px;transition:all .15s}
@@ -429,7 +422,7 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 #weather-chip:hover{background:var(--sf3)}
 #weather-chip.on{display:flex}
 #weather-pop{
-  position:fixed;bottom:52px;left:14px;z-index:200;
+  position:fixed;top:54px;right:12px;z-index:200;
   background:var(--sf);border:1px solid var(--bd);border-radius:10px;
   padding:16px;display:none;min-width:340px;box-shadow:0 8px 24px rgba(0,0,0,.3)
 }
@@ -709,35 +702,18 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
   <nav>
     <button id="nav-hamburger" title="Menu" onclick="toggleNavDrawer()">☰</button>
     <div class="brand">🌿 TC Plants <span>/ Lab</span></div>
+    <span class="nav-spacer"></span>
+    <button id="weather-chip" title="Lab &amp; Greenhouse weather">🌡️ —</button>
+    <span id="offline-pill">● Offline</span>
+    <button class="nav-icon-btn" id="export-all-btn" title="Export ZIP">⬇</button>
+    <button class="nav-icon-btn" id="export-csv-btn" title="Export CSV">CSV</button>
+    <button class="nav-icon-btn" id="lock-btn" title="Lock">🔒</button>
     <button id="theme-btn" title="Toggle theme">☀️</button>
   </nav>
 
   <!-- ── NOTES ── -->
   <div class="section on" id="sec-notes">
-    <aside>
-      <div class="aside-top">
-        <button class="btn" id="new-note-btn">＋ New Entry</button>
-        <div class="search-wrap">
-          <span class="search-icon">🔍</span>
-          <input type="text" id="note-search" placeholder="Search titles, tags, species…">
-        </div>
-        <div class="filter-row" id="type-filters">
-          <button class="fpill active" data-filter="type" data-val="">All</button>
-          <button class="fpill red" data-filter="type" data-val="Contamination Log">☣️ Contam</button>
-          <button class="fpill yellow" data-filter="type" data-val="__overdue">⏰ Overdue</button>
-        </div>
-        <div class="filter-row" id="stage-filters">
-          <button class="fpill active" data-filter="stage" data-val="">Any stage</button>
-          <button class="fpill" data-filter="stage" data-val="Stage I — Initiation">I</button>
-          <button class="fpill" data-filter="stage" data-val="Stage II — Multiplication">II</button>
-          <button class="fpill" data-filter="stage" data-val="Stage III — Rooting">III</button>
-          <button class="fpill" data-filter="stage" data-val="Stage IV — Acclimatization">IV</button>
-        </div>
-        <div class="aside-stats" id="note-stats"></div>
-      </div>
-      <div id="note-list"></div>
-    </aside>
-    <main id="notes-main">
+    <main id="notes-main" style="flex:1;overflow-y:auto">
       <div class="empty-state" id="notes-empty">
         <h2>Lab Notes</h2>
         <p>Encrypted lab journal.<br>Every save is an AES-256 encrypted commit in GitHub.<br><br>Press <strong>＋ New Entry</strong> to begin.</p>
@@ -896,17 +872,6 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 
   <!-- ── REGISTRY ── -->
   <div class="section" id="sec-registry">
-    <aside>
-      <div class="aside-top">
-        <button class="btn green" id="new-acc-btn">＋ New Accession</button>
-        <div class="search-wrap">
-          <span class="search-icon">🔍</span>
-          <input type="text" id="acc-search" placeholder="Search accessions…">
-        </div>
-        <div class="aside-stats" id="acc-stats"></div>
-      </div>
-      <div id="acc-list"></div>
-    </aside>
     <main id="registry-main">
       <div class="empty-state" id="reg-empty">
         <h2>Accession Registry</h2>
@@ -996,17 +961,6 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 
   <!-- ── RECIPES ── -->
   <div class="section" id="sec-recipes">
-    <aside>
-      <div class="aside-top">
-        <button class="btn" style="background:var(--pu);color:#0d1117" id="new-rec-btn">＋ New Recipe</button>
-        <div class="search-wrap">
-          <span class="search-icon">🔍</span>
-          <input type="text" id="rec-search" placeholder="Search recipes…">
-        </div>
-        <div class="aside-stats" id="rec-stats"></div>
-      </div>
-      <div id="rec-list"></div>
-    </aside>
     <main id="recipes-main">
       <div class="empty-state" id="rec-empty">
         <h2>Media Recipe Book</h2>
@@ -1173,7 +1127,7 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
     <h2 style="font-size:20px;font-weight:700;margin-bottom:4px">⏱ Lab Tools</h2>
     <p style="font-size:13px;color:var(--mu);margin-bottom:20px">Timers, stopwatches and lab utilities — all run locally, no data saved.</p>
     <div class="tools-layout">
-      <div class="tools-left">
+      <div class="tools-widgets">
         <div class="tool-card">
           <h3>Countdown Timers</h3>
           <div class="timer-grid" id="timer-grid"></div>
@@ -1225,26 +1179,6 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
           </div>
           <button class="btn sm" onclick="scaleMedia()">Scale →</button>
           <div class="scaler-result" id="scaler-result"></div>
-        </div>
-        <!-- ── Culture Age Calculator ── -->
-        <div class="tool-card">
-          <h3>🌱 Culture Age</h3>
-          <div class="row2" style="margin-bottom:10px">
-            <div class="field" style="margin:0">
-              <label>Initiation date</label>
-              <input type="date" id="age-date">
-            </div>
-            <div class="field" style="margin:0">
-              <label>Subculture interval (days)</label>
-              <input type="number" id="age-interval" placeholder="28" value="28" min="1">
-            </div>
-          </div>
-          <button class="btn sm" onclick="calcCultureAge()">Calculate →</button>
-          <div class="age-result" id="age-result">
-            <div class="age-big" id="age-days"></div>
-            <div class="age-sub" id="age-next"></div>
-            <div class="age-sub" id="age-overdue"></div>
-          </div>
         </div>
       </div>
     </div>
@@ -1513,29 +1447,69 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
       <div class="brand">🌿 TC Plants</div>
       <button class="nd-close" onclick="closeNavDrawer()">✕</button>
     </div>
-    <div id="nav-drawer-list">
+    <div id="nav-drawer-tabs">
       <button class="ndtab active" data-sec="notes" onclick="navTo('notes')"><span class="nd-icon">📋</span>Notes</button>
       <button class="ndtab" data-sec="registry" onclick="navTo('registry')"><span class="nd-icon">🌿</span>Registry</button>
       <button class="ndtab" data-sec="recipes" onclick="navTo('recipes')"><span class="nd-icon">🧪</span>Recipes</button>
       <button class="ndtab" data-sec="reminders" onclick="navTo('reminders')"><span class="nd-icon">⏰</span>Reminders<span class="nd-badge" id="nd-rbadge" style="display:none">0</span></button>
-      <button class="ndtab" data-sec="contam" onclick="navTo('contam')"><span class="nd-icon">☣️</span>Contamination</button>
+      <button class="ndtab" data-sec="contam" onclick="navTo('contam')"><span class="nd-icon">☣️</span>Contam</button>
       <div class="nd-divider"></div>
       <button class="ndtab" data-sec="analytics" onclick="navTo('analytics')"><span class="nd-icon">📊</span>Analytics</button>
       <button class="ndtab" data-sec="species" onclick="navTo('species')"><span class="nd-icon">🌱</span>Species</button>
-      <div class="nd-divider"></div>
       <button class="ndtab" data-sec="tools" onclick="navTo('tools')"><span class="nd-icon">⏱</span>Tools</button>
       <button class="ndtab" data-sec="news" onclick="navTo('news')"><span class="nd-icon">📰</span>News</button>
       <button class="ndtab" data-sec="help" onclick="navTo('help')"><span class="nd-icon">❓</span>Help</button>
     </div>
-  </div>
-  <!-- ── BOTTOM BAR ── -->
-  <div id="bottom-bar">
-    <button id="weather-chip" title="Lab & Greenhouse weather">🌡️ —</button>
-    <div class="bb-spacer"></div>
-    <span id="offline-pill">● Offline</span>
-    <button class="btn ghost sm" id="export-all-btn" title="Export all notes as ZIP">⬇ ZIP</button>
-    <button class="btn ghost sm" id="export-csv-btn" title="Export notes metadata as CSV">⬇ CSV</button>
-    <button class="btn ghost sm" id="lock-btn">🔒 Lock</button>
+    <div id="nd-panel">
+      <!-- Notes list panel -->
+      <div class="nd-list-area on" id="nd-notes">
+        <div class="aside-top">
+          <button class="btn" id="new-note-btn">＋ New Entry</button>
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="note-search" placeholder="Search titles, tags, species…">
+          </div>
+          <div class="filter-row" id="type-filters">
+            <button class="fpill active" data-filter="type" data-val="">All</button>
+            <button class="fpill red" data-filter="type" data-val="Contamination Log">☣️</button>
+            <button class="fpill yellow" data-filter="type" data-val="__overdue">⏰</button>
+          </div>
+          <div class="filter-row" id="stage-filters">
+            <button class="fpill active" data-filter="stage" data-val="">All</button>
+            <button class="fpill" data-filter="stage" data-val="Stage I — Initiation">I</button>
+            <button class="fpill" data-filter="stage" data-val="Stage II — Multiplication">II</button>
+            <button class="fpill" data-filter="stage" data-val="Stage III — Rooting">III</button>
+            <button class="fpill" data-filter="stage" data-val="Stage IV — Acclimatization">IV</button>
+          </div>
+          <div class="aside-stats" id="note-stats"></div>
+        </div>
+        <div id="note-list"></div>
+      </div>
+      <!-- Registry list panel -->
+      <div class="nd-list-area" id="nd-registry">
+        <div class="aside-top">
+          <button class="btn green" id="new-acc-btn">＋ New Accession</button>
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="acc-search" placeholder="Search accessions…">
+          </div>
+          <div class="aside-stats" id="acc-stats"></div>
+        </div>
+        <div id="acc-list"></div>
+      </div>
+      <!-- Recipes list panel -->
+      <div class="nd-list-area" id="nd-recipes">
+        <div class="aside-top">
+          <button class="btn" style="background:var(--pu);color:#0d1117" id="new-rec-btn">＋ New Recipe</button>
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="rec-search" placeholder="Search recipes…">
+          </div>
+          <div class="aside-stats" id="rec-stats"></div>
+        </div>
+        <div id="rec-list"></div>
+      </div>
+    </div>
   </div>
 
 </div><!-- /app -->
@@ -2581,7 +2555,7 @@ function renderSpecies(){
 
 // ── NEWS (PUBMED) ─────────────────────────────────────────────
 let _newsData=null;
-const NEWS_QUERY='plant+tissue+culture';
+const NEWS_QUERY='("plant+tissue+culture"[ti]+OR+"micropropagation"[ti]+OR+"in+vitro+propagation"[ti]+OR+"plant+cell+culture"[ti]+OR+"somatic+embryogenesis"[ti])';
 const NEWS_MAX=100;
 
 async function handleNewsToggle(on){
@@ -3462,7 +3436,18 @@ function closeNavDrawer(){
 }
 function navTo(sec){
   switchSection(sec);
-  closeNavDrawer();
+  // For list sections: show the panel but keep drawer open
+  const listSecs=['notes','registry','recipes'];
+  if(listSecs.includes(sec)){
+    document.getElementById('nd-notes').classList.toggle('on',sec==='notes');
+    document.getElementById('nd-registry').classList.toggle('on',sec==='registry');
+    document.getElementById('nd-recipes').classList.toggle('on',sec==='recipes');
+    // Don't close drawer for list sections — it becomes the sidebar
+  } else {
+    // For non-list sections: close the drawer
+    document.querySelectorAll('.nd-list-area').forEach(el=>el.classList.remove('on'));
+    closeNavDrawer();
+  }
 }
 
 // Filters
@@ -3530,7 +3515,6 @@ async function login(){
     }
     document.getElementById('login').style.display='none';
     document.getElementById('app').classList.add('on');
-    document.getElementById('bottom-bar').classList.add('on');
     renderNoteList(); renderAccList(); renderRecList();
     populateTagsDatalist();
     updateReminderBadge();
@@ -3564,7 +3548,6 @@ function lock(){
   document.getElementById('actlog-tab').classList.remove('on');
   document.getElementById('actlog-panel').classList.remove('open');
   sessionStorage.clear();
-  document.getElementById('bottom-bar').classList.remove('on');
   document.getElementById('app').classList.remove('on');
   document.getElementById('login').style.display='flex';
   document.getElementById('lpw').value='';
@@ -4118,30 +4101,6 @@ function scaleMedia(){
     return `${m[1]}: ${disp} ${m[3]}`;
   });
   out.textContent=`— Scaled to ${target} mL (×${ratio.toFixed(4)}) —\n`+lines.join('\n');
-}
-
-// ════════════════════════════════════════════════════════════
-// TOOLS — CULTURE AGE CALCULATOR
-// ════════════════════════════════════════════════════════════
-function calcCultureAge(){
-  const dateVal=document.getElementById('age-date').value;
-  const interval=parseInt(document.getElementById('age-interval').value)||28;
-  if(!dateVal){toast('Select an initiation date','fail');return;}
-  const init=new Date(dateVal);
-  const today=new Date(); today.setHours(0,0,0,0);
-  const days=Math.floor((today-init)/86400000);
-  const cyclesSince=Math.floor(days/interval);
-  const lastSub=new Date(init.getTime()+cyclesSince*interval*86400000);
-  const nextSub=new Date(lastSub.getTime()+interval*86400000);
-  const daysToNext=Math.ceil((nextSub-today)/86400000);
-  const overdue=daysToNext<0;
-  document.getElementById('age-days').textContent=`${days} days old`;
-  document.getElementById('age-next').textContent=`Next subculture: ${fmtDate(nextSub.toISOString().slice(0,10))}`;
-  document.getElementById('age-overdue').textContent=overdue
-    ?`⚠️ Overdue by ${Math.abs(daysToNext)} days`
-    :`${daysToNext} day${daysToNext===1?'':'s'} until subculture`;
-  document.getElementById('age-overdue').style.color=overdue?'var(--rd)':'var(--gn)';
-  document.getElementById('age-result').classList.add('on');
 }
 
 // Restore token from session
