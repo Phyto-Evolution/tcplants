@@ -341,6 +341,13 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
   .view-badges{gap:5px}
   .editor-toolbar{gap:1px}
   .tb-btn{padding:3px 5px;font-size:12px}
+  /* Keep save button always visible on mobile */
+  #rec-editor .eactions,#note-editor .eactions{
+    position:sticky;bottom:0;background:var(--sf);
+    padding:10px 0 6px;margin-top:8px;
+    border-top:1px solid var(--bd);z-index:5
+  }
+  #rr-notes{height:180px}
 }
 
 /* ── TOOLS ── */
@@ -1174,9 +1181,10 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
             </div>
           </div>
         </div>
-        <div class="field">
+        <div class="field" style="position:relative">
           <label>Target Organism / Use</label>
-          <input type="text" id="re-target" placeholder="e.g. Nepenthes spp. multiplication">
+          <input type="text" id="re-target" placeholder="e.g. Nepenthes spp. multiplication"
+            oninput="_taxSuggest(this)" onkeydown="_taxDropdownKeyNav(event)" autocomplete="off">
         </div>
         <div class="field">
           <label>Preparation Notes <span style="font-weight:400;color:var(--mu)">(Markdown)</span></label>
@@ -1256,8 +1264,11 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
           <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
             <button class="btn xs ghost" id="stepper-add-btn">＋ Step</button>
             <button class="btn xs ghost" id="stepper-preset-btn">📋 Standard</button>
-            <button class="btn xs ghost" id="stepper-save-btn" title="Save protocol to clipboard">💾 Save</button>
-            <button class="btn xs ghost" id="stepper-load-btn" title="Paste saved protocol">📂 Load</button>
+            <button class="btn xs ghost" id="stepper-save-btn" title="Save protocol">💾 Save</button>
+          </div>
+          <div id="stepper-saved" style="margin-bottom:10px;display:none">
+            <div style="font-size:11px;color:var(--mu);font-weight:600;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em">Saved Protocols</div>
+            <div id="stepper-saved-list" style="display:flex;flex-direction:column;gap:4px"></div>
           </div>
           <div id="stepper-run" style="display:none">
             <div id="stepper-step-label" style="font-size:13px;font-weight:600;text-align:center;margin-bottom:4px;color:var(--mu)"></div>
@@ -1645,6 +1656,8 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
       <button class="ndtab" data-sec="calendar" onclick="navTo('calendar')"><span class="nd-icon">📅</span>Calendar</button>
       <button class="ndtab" data-sec="news" onclick="navTo('news')"><span class="nd-icon">📰</span>News</button>
       <button class="ndtab" data-sec="help" onclick="navTo('help')"><span class="nd-icon">❓</span>Help</button>
+      <div class="nd-divider"></div>
+      <button class="ndtab" onclick="closeNavDrawer();lock()" style="color:var(--rd)"><span class="nd-icon">🔒</span>Lock</button>
     </div>
     <div id="nd-panel">
       <!-- Notes list panel -->
@@ -1723,7 +1736,13 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 <div id="ai-panel">
   <div id="ai-head">
     <div class="ai-title">✦ Gemini AI</div>
+    <button class="al-hbtn" onclick="document.getElementById('ai-key-row').style.display=document.getElementById('ai-key-row').style.display==='none'?'flex':'none'" title="API key settings">⚙️</button>
     <button class="al-hbtn" onclick="document.getElementById('ai-panel').classList.remove('on')" title="Close">✕</button>
+  </div>
+  <div id="ai-key-row" style="display:none;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid var(--bd);background:var(--sf2)">
+    <input type="password" id="ai-key-input" placeholder="Paste your Gemini API key here…" style="flex:1;font-size:12px;padding:5px 8px">
+    <button class="btn xs green" onclick="_saveGeminiKey()">Save</button>
+    <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
   </div>
   <div id="ai-chips">
     <button class="ai-chip" onclick="askAI('Summarise this note in 3-5 bullet points, highlighting key observations, results, and recommended next steps.')">Summarise note</button>
@@ -2359,6 +2378,15 @@ async function toggleBarcodeMode(){
     btn.textContent='❌ Stop scan';
     result.style.display='none';
     const hints=new Map();
+    // Prioritise QR Code, then common 1D formats
+    if(ZXing.DecodeHintType&&ZXing.BarcodeFormat){
+      hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS,[
+        ZXing.BarcodeFormat.QR_CODE,
+        ZXing.BarcodeFormat.DATA_MATRIX,
+        ZXing.BarcodeFormat.CODE_128,
+        ZXing.BarcodeFormat.EAN_13
+      ]);
+    }
     _barcodeReader=new ZXing.BrowserMultiFormatReader(hints);
     try{
       await _barcodeReader.decodeFromVideoDevice(null,'cam-video',(res,err)=>{
@@ -2606,7 +2634,7 @@ function _taxDropdownKeyNav(e){
 
 // Close dropdown on outside click
 document.addEventListener('click',function(e){
-  if(!e.target.closest('#tax-dropdown')&&!e.target.matches('#ne-species,#ae-species')){
+  if(!e.target.closest('#tax-dropdown')&&!e.target.matches('#ne-species,#ae-species,#re-target')){
     document.getElementById('tax-dropdown')?.classList.remove('on');
     _taxFocusIdx=-1;
   }
@@ -3538,8 +3566,23 @@ async function _saveNewsToRepo(articles){
 }
 
 // ── GEMINI AI ────────────────────────────────────────────────
-const GEMINI_KEY='AIzaSyBUNFdl4ywNFEpdMZgFLm6NpS7joyEf2AU';
-const GEMINI_URL=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
+const _getGeminiKey=()=>localStorage.getItem('tcplants_gemini_key')||'';
+const _getGeminiURL=()=>`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${_getGeminiKey()}`;
+function _saveGeminiKey(){
+  const k=document.getElementById('ai-key-input').value.trim();
+  if(!k){toast('Paste your API key first','fail');return;}
+  localStorage.setItem('tcplants_gemini_key',k);
+  document.getElementById('ai-key-row').style.display='none';
+  document.getElementById('ai-key-input').value='';
+  toast('Gemini API key saved ✓');
+}
+function _initAIKeyHint(){
+  if(!_getGeminiKey()){
+    const msg=document.getElementById('ai-msgs');
+    msg.innerHTML='<div class="ai-msg ai">👋 To use the AI assistant, tap ⚙️ above and paste your free Gemini API key. Get one at <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--ac)">aistudio.google.com</a> — it\'s free with a Google account.</div>';
+    document.getElementById('ai-key-row').style.display='flex';
+  }
+}
 const GEMINI_SYS=`You are a plant tissue culture lab assistant for TC Plants Lab Notes. You help with: TC protocols, media formulations, PGR concentrations, contamination prevention, species-specific cultivation notes, and lab management. Be concise, practical, and scientific. When mentioning concentrations use mg/L or µM. The lab is based in Chennai, India.`;
 
 async function _buildAIContext(){
@@ -3630,15 +3673,24 @@ async function askAI(prompt){
   msgs.scrollTop=msgs.scrollHeight;
   // Build rich context
   const context=await _buildAIContext();
+  if(!_getGeminiKey()){
+    thinking.remove();
+    msgs.innerHTML+='<div class="ai-msg ai">⚙️ No API key set. Tap ⚙️ above to add your Gemini key.</div>';
+    document.getElementById('ai-key-row').style.display='flex';
+    return;
+  }
   try{
-    const r=await fetch(GEMINI_URL,{
+    const r=await fetch(_getGeminiURL(),{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         contents:[{role:'user',parts:[{text:GEMINI_SYS+context+'\n\nUser question: '+prompt}]}]
       })
     });
-    if(!r.ok) throw new Error('Gemini API error '+r.status);
+    if(!r.ok){
+      if(r.status===429) throw new Error('Rate limit hit (429). Your key may be over quota — try again in a minute, or check your Google AI Studio limits.');
+      throw new Error('Gemini API error '+r.status);
+    }
     const data=await r.json();
     const text=data.candidates?.[0]?.content?.parts?.[0]?.text||'No response.';
     thinking.remove();
@@ -4121,7 +4173,15 @@ function openRecipe(id){
   document.getElementById('rv-date').textContent=r.date_created?`Created: ${fmtDateShort(r.date_created)}`:'';
   const badges=[];
   if(r.base) badges.push(`<span class="sbadge type">${esc(r.base)}</span>`);
-  if(r.target) badges.push(`<span class="sbadge species">${esc(r.target)}</span>`);
+  if(r.target){
+    // If target matches an accession species, make it a clickable link
+    const matchAcc=S.accs.find(a=>(a.species||'').toLowerCase()===r.target.toLowerCase());
+    if(matchAcc){
+      badges.push(`<span class="sbadge species" style="cursor:pointer;text-decoration:underline dotted" title="Open accession" onclick="navTo('registry');openAccession('${matchAcc.id}')">${esc(r.target)} 🔗</span>`);
+    } else {
+      badges.push(`<span class="sbadge species">${esc(r.target)}</span>`);
+    }
+  }
   document.getElementById('rv-badges').innerHTML=badges.join('');
   // Spec table
   const rows=[
@@ -4503,6 +4563,7 @@ async function login(){
     switchSection('notes'); showNote('empty');
     document.getElementById('ql-fab').classList.add('on');
     document.getElementById('ai-btn').classList.add('on');
+    _initAIKeyHint();
     document.getElementById('actlog-tab').classList.add('on');
     fetchActivityLog();
     // Offer to save device if not already saved
@@ -5052,19 +5113,47 @@ function resetStepper(){
 }
 document.getElementById('stepper-add-btn').onclick=()=>{SS.steps.push({name:'New step',secs:60});renderStepperEdit();};
 document.getElementById('stepper-preset-btn').onclick=()=>{SS.steps=STEPPER_PRESET.map(s=>({...s}));resetStepper();};
+function _stepperGetSaved(){
+  try{ return JSON.parse(localStorage.getItem('tcplants_stepper_protos')||'[]'); }catch(e){ return []; }
+}
+function _stepperRenderSaved(){
+  const protos=_stepperGetSaved();
+  const wrap=document.getElementById('stepper-saved');
+  const list=document.getElementById('stepper-saved-list');
+  if(!protos.length){ wrap.style.display='none'; return; }
+  wrap.style.display='';
+  list.innerHTML=protos.map((p,i)=>`
+    <div style="display:flex;align-items:center;gap:6px;padding:5px 8px;background:var(--sf2);border-radius:6px;border:1px solid var(--bd)">
+      <span style="flex:1;font-size:12px;font-weight:500">${esc(p.name)}</span>
+      <span style="font-size:11px;color:var(--mu)">${p.steps.length} steps</span>
+      <button class="btn xs ghost" onclick="_stepperLoadProto(${i})">Load</button>
+      <button class="btn xs ghost" style="color:var(--rd)" onclick="_stepperDeleteProto(${i})">✕</button>
+    </div>`).join('');
+}
+function _stepperLoadProto(i){
+  const p=_stepperGetSaved()[i];
+  if(p){ SS.steps=p.steps.map(s=>({...s})); resetStepper(); toast('Protocol loaded: '+p.name); }
+}
+function _stepperDeleteProto(i){
+  const protos=_stepperGetSaved();
+  protos.splice(i,1);
+  localStorage.setItem('tcplants_stepper_protos',JSON.stringify(protos));
+  _stepperRenderSaved();
+}
 document.getElementById('stepper-save-btn').onclick=()=>{
-  navigator.clipboard.writeText(JSON.stringify(SS.steps)).then(()=>toast('Protocol copied to clipboard'));
-};
-document.getElementById('stepper-load-btn').onclick=()=>{
-  navigator.clipboard.readText().then(text=>{
-    try{ SS.steps=JSON.parse(text); resetStepper(); toast('Protocol loaded'); }
-    catch(e){ toast('Invalid protocol data','fail'); }
-  }).catch(()=>toast('Clipboard access denied','fail'));
+  const name=prompt('Protocol name:','Autoclave 121°C / 20 min');
+  if(!name) return;
+  const protos=_stepperGetSaved();
+  protos.push({name,steps:SS.steps.map(s=>({...s}))});
+  localStorage.setItem('tcplants_stepper_protos',JSON.stringify(protos));
+  _stepperRenderSaved();
+  toast('Protocol saved: '+name);
 };
 document.getElementById('stepper-start-btn').onclick=startStepper;
 document.getElementById('stepper-pause-btn').onclick=pauseStepper;
 document.getElementById('stepper-reset-btn').onclick=resetStepper;
 renderStepperEdit();
+_stepperRenderSaved();
 
 // ════════════════════════════════════════════════════════════
 // TOOLS — MEDIA VOLUME SCALER
