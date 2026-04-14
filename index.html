@@ -1478,6 +1478,7 @@ async function saveNoteAction(){
       S.notes=notes; S.cur=id;
     }
     S.notesSha=await saveNotesIndex(S.notes,iSha);
+    _writeCache();
     updateReminderBadge();
     toast('Saved ✓ — committed to GitHub');
     renderNoteList(); await openNote(S.cur);
@@ -1497,6 +1498,7 @@ async function deleteNote(){
     const {notes,sha}=await loadNotesIndex();
     S.notes=notes.filter(n=>n.id!==id);
     S.notesSha=await saveNotesIndex(S.notes,sha);
+    _writeCache();
     S.cur=null; updateReminderBadge(); renderNoteList(); showNote('empty');
     toast('Entry deleted');
   }catch(e){toast('Delete failed: '+e.message,'fail');}
@@ -1795,6 +1797,7 @@ async function saveAccession(){
       if(idx!==-1) accs[idx]=data; else accs.push(data);
     } else { accs.push(data); }
     S.accs=accs; S.accSha=await saveAccessions(accs,sha);
+    _writeCache();
     S.curAcc=data.id;
     toast('Accession saved ✓');
     renderAccList(); openAccession(data.id);
@@ -1811,6 +1814,7 @@ async function deleteAccession(){
     const {accs,sha}=await loadAccessions();
     S.accs=accs.filter(x=>x.id!==a.id);
     S.accSha=await saveAccessions(S.accs,sha);
+    _writeCache();
     S.curAcc=null; renderAccList(); showReg('empty');
     toast('Accession deleted');
   }catch(e){toast('Delete failed: '+e.message,'fail');}
@@ -1938,6 +1942,7 @@ async function saveRecipe(){
       if(idx!==-1) recs[idx]=data; else recs.push(data);
     } else { recs.push(data); }
     S.recs=recs; S.recSha=await saveRecipes(recs,sha);
+    _writeCache();
     S.curRec=data.id;
     toast('Recipe saved ✓');
     renderRecList(); openRecipe(data.id);
@@ -1954,6 +1959,7 @@ async function deleteRecipe(){
     const {recs,sha}=await loadRecipes();
     S.recs=recs.filter(x=>x.id!==r.id);
     S.recSha=await saveRecipes(S.recs,sha);
+    _writeCache();
     S.curRec=null; renderRecList(); showRec('empty');
     toast('Recipe deleted');
   }catch(e){toast('Delete failed: '+e.message,'fail');}
@@ -2133,11 +2139,20 @@ async function login(){
     if(!r.ok) throw new Error('GitHub token invalid or lacks repo access.');
     S.pw=pw; S.tok=tok;
     sessionStorage.setItem('_lt',tok);
-    load('Loading all data…');
-    const [{notes,sha:nSha},{accs,sha:aSha},{recs,sha:rSha}]=await Promise.all([loadNotesIndex(),loadAccessions(),loadRecipes()]);
-    S.notes=notes; S.notesSha=nSha;
-    S.accs=accs; S.accSha=aSha;
-    S.recs=recs; S.recSha=rSha;
+    const cached=_readCache();
+    if(cached){
+      S.notes=cached.notes; S.notesSha=cached.notesSha;
+      S.accs=cached.accs; S.accSha=cached.accSha;
+      S.recs=cached.recs; S.recSha=cached.recSha;
+      toast('⚡ Loaded from cache');
+    }else{
+      load('Loading all data…');
+      const [{notes,sha:nSha},{accs,sha:aSha},{recs,sha:rSha}]=await Promise.all([loadNotesIndex(),loadAccessions(),loadRecipes()]);
+      S.notes=notes; S.notesSha=nSha;
+      S.accs=accs; S.accSha=aSha;
+      S.recs=recs; S.recSha=rSha;
+      _writeCache();
+    }
     document.getElementById('login').style.display='none';
     document.getElementById('app').classList.add('on');
     renderNoteList(); renderAccList(); renderRecList();
@@ -2159,6 +2174,26 @@ function lock(){
   document.getElementById('login').style.display='flex';
   document.getElementById('lpw').value='';
   document.getElementById('ltok').value='';
+}
+
+// ── SESSION CACHE ────────────────────────────────────────────
+function _writeCache(){
+  try{
+    sessionStorage.setItem('tcplants_cache', JSON.stringify({
+      notes:S.notes, accs:S.accs, recs:S.recs,
+      notesSha:S.notesSha, accSha:S.accSha, recSha:S.recSha,
+      cachedAt:Date.now()
+    }));
+  }catch(e){}
+}
+function _readCache(){
+  try{
+    const raw=sessionStorage.getItem('tcplants_cache');
+    if(!raw) return null;
+    const c=JSON.parse(raw);
+    if(Date.now()-c.cachedAt>600000) return null; // 10 min TTL
+    return c;
+  }catch(e){ return null; }
 }
 
 // ════════════════════════════════════════════════════════════
