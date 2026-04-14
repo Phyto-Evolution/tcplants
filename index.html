@@ -646,6 +646,23 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 .sp-active{background:rgba(63,185,80,.15);color:var(--gn)}
 .sp-dormant{background:rgba(210,153,34,.15);color:var(--yw)}
 .sp-lost{background:rgba(248,81,73,.12);color:var(--rd)}
+/* ── NEWS ── */
+.news-toggle-row{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.toggle-switch{position:relative;width:44px;height:24px;flex-shrink:0}
+.toggle-switch input{opacity:0;width:0;height:0}
+.toggle-track{position:absolute;inset:0;background:var(--bd);border-radius:12px;cursor:pointer;transition:background .2s}
+.toggle-track::after{content:'';position:absolute;width:18px;height:18px;top:3px;left:3px;background:#fff;border-radius:50%;transition:transform .2s}
+.toggle-switch input:checked+.toggle-track{background:var(--gn)}
+.toggle-switch input:checked+.toggle-track::after{transform:translateX(20px)}
+.article-card{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:14px;margin-bottom:10px;transition:border-color .15s}
+.article-card:hover{border-color:var(--ac)}
+.article-title{font-size:14px;font-weight:600;color:var(--ac);text-decoration:none;line-height:1.4;display:block;margin-bottom:6px}
+.article-title:hover{text-decoration:underline}
+.article-meta{font-size:11px;color:var(--mu);display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px}
+.article-doi{font-size:11px;color:var(--mu)}
+.article-doi a{color:var(--pu);text-decoration:none}
+.article-doi a:hover{text-decoration:underline}
+.news-status{font-size:13px;color:var(--mu);padding:12px 0}
 </style>
 <script>(function(){var t=localStorage.getItem('tcplants_theme')||'dark';document.documentElement.dataset.theme=t;}());</script>
 </head>
@@ -1245,6 +1262,23 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
     </div>
   </div>
 
+  <!-- ── NEWS ── -->
+  <div class="section fullpage" id="sec-news">
+    <div style="max-width:900px;margin:0 auto;width:100%;padding-bottom:40px">
+      <h2 style="font-size:20px;font-weight:700;margin-bottom:4px">📰 TC Research News</h2>
+      <p style="font-size:13px;color:var(--mu);margin-bottom:16px">Latest plant tissue culture publications from PubMed. Results are saved to your repo as dated JSON files for future reference.</p>
+      <div class="news-toggle-row">
+        <label class="toggle-switch">
+          <input type="checkbox" id="news-toggle" onchange="handleNewsToggle(this.checked)">
+          <div class="toggle-track"></div>
+        </label>
+        <span id="news-toggle-label" style="font-size:14px;font-weight:500">Load latest research</span>
+        <span id="news-count" style="font-size:12px;color:var(--mu);margin-left:auto"></span>
+      </div>
+      <div id="news-content"><p class="news-status">Toggle on to load the latest 100 plant tissue culture papers from PubMed.</p></div>
+    </div>
+  </div>
+
   <!-- ── HELP ── -->
   <div class="section fullpage" id="sec-help">
     <div class="help-body">
@@ -1411,6 +1445,12 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
       <h2>✦ Gemini AI Assistant</h2>
       <div class="help-section-card">
         <p>Tap the <strong>✦</strong> button (bottom-right, above the quick log FAB) to open the AI assistant. Uses Google Gemini to answer TC protocol questions, suggest PGR doses, explain contamination causes, and summarise the currently open note. The assistant has context about your current note (species, type, stage). Pre-built prompt chips are shown at the top for quick access. Press <strong>Enter</strong> to send.</p>
+      </div>
+
+      <h2>📰 TC Research News</h2>
+      <div class="help-section-card">
+        <p>Click <strong>News</strong> in the nav drawer to see the latest 100 plant tissue culture publications from <strong>PubMed</strong>. Toggle the switch to <strong>load</strong> articles as individual cards — each shows title (linked to DOI), authors, journal, and year. Toggle off to <strong>clear</strong> from memory.</p>
+        <p>When loaded, results are automatically <strong>archived to your GitHub repo</strong> at <code>news/YYYY-MM-DD.json</code> with the date stamp. These files accumulate over time as a research archive you can reference later.</p>
       </div>
 
       <h2>Activity Log</h2>
@@ -2537,6 +2577,108 @@ function renderSpecies(){
   </table></div>`;
 }
 
+// ── NEWS (PUBMED) ─────────────────────────────────────────────
+let _newsData=null;
+const NEWS_QUERY='plant+tissue+culture';
+const NEWS_MAX=100;
+
+async function handleNewsToggle(on){
+  const label=document.getElementById('news-toggle-label');
+  const content=document.getElementById('news-content');
+  const countEl=document.getElementById('news-count');
+  if(!on){
+    _newsData=null;
+    content.innerHTML='<p class="news-status">Toggle on to load the latest 100 plant tissue culture papers from PubMed.</p>';
+    label.textContent='Load latest research';
+    countEl.textContent='';
+    return;
+  }
+  label.textContent='Loading…';
+  content.innerHTML='<p class="news-status">Fetching from PubMed…</p>';
+  countEl.textContent='';
+  try{
+    // Step 1: Search PubMed for IDs
+    const searchUrl=`https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=${NEWS_QUERY}&retmax=${NEWS_MAX}&sort=date&retmode=json`;
+    const searchRes=await fetch(searchUrl);
+    if(!searchRes.ok) throw new Error('PubMed search failed '+searchRes.status);
+    const searchData=await searchRes.json();
+    const ids=searchData.esearchresult?.idlist||[];
+    if(!ids.length){ content.innerHTML='<p class="news-status">No results found.</p>'; return; }
+
+    // Step 2: Fetch summaries
+    const sumUrl=`https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=${ids.join(',')}&retmode=json`;
+    const sumRes=await fetch(sumUrl);
+    if(!sumRes.ok) throw new Error('PubMed summary fetch failed '+sumRes.status);
+    const sumData=await sumRes.json();
+
+    // Step 3: Build articles array
+    const articles=ids.map(id=>{
+      const d=sumData.result?.[id];
+      if(!d) return null;
+      const doi=d.articleids?.find(a=>a.idtype==='doi')?.value||'';
+      const pmcid=d.articleids?.find(a=>a.idtype==='pmc')?.value||'';
+      const authors=(d.authors||[]).slice(0,3).map(a=>a.name).join(', ')+(d.authors?.length>3?' et al.':'');
+      const journal=d.source||'';
+      const year=d.pubdate?.slice(0,4)||'';
+      return {
+        id, title:d.title||'Untitled', authors, journal, year, doi,
+        pubdate:d.pubdate||'',
+        url:doi?`https://doi.org/${doi}`:`https://pubmed.ncbi.nlm.nih.gov/${id}/`,
+        pmid:id
+      };
+    }).filter(Boolean);
+
+    _newsData=articles;
+
+    // Step 4: Render cards
+    renderNewsCards(articles);
+    countEl.textContent=`${articles.length} articles`;
+    label.textContent='Research loaded';
+
+    // Step 5: Save to GitHub repo as dated JSON
+    _saveNewsToRepo(articles);
+
+  }catch(e){
+    content.innerHTML=`<p class="news-status" style="color:var(--rd)">Error loading news: ${esc(e.message)}</p>`;
+    label.textContent='Load latest research';
+    document.getElementById('news-toggle').checked=false;
+  }
+}
+
+function renderNewsCards(articles){
+  const el=document.getElementById('news-content');
+  el.innerHTML=articles.map(a=>`
+    <div class="article-card">
+      <a href="${esc(a.url)}" target="_blank" rel="noopener" class="article-title">${esc(a.title)}</a>
+      <div class="article-meta">
+        <span>${esc(a.authors)}</span>
+        <span style="color:var(--bd)">·</span>
+        <span><em>${esc(a.journal)}</em></span>
+        <span style="color:var(--bd)">·</span>
+        <span>${esc(a.year)}</span>
+      </div>
+      ${a.doi?`<div class="article-doi">DOI: <a href="https://doi.org/${esc(a.doi)}" target="_blank" rel="noopener">${esc(a.doi)}</a></div>`:''}
+      <div style="margin-top:4px"><a href="https://pubmed.ncbi.nlm.nih.gov/${esc(a.pmid)}/" target="_blank" rel="noopener" style="font-size:11px;color:var(--mu)">PubMed ↗</a></div>
+    </div>`).join('');
+}
+
+async function _saveNewsToRepo(articles){
+  if(!S.tok) return; // Not logged in, skip silently
+  try{
+    const today=new Date().toISOString().slice(0,10);
+    const path=`news/${today}.json`;
+    const content=JSON.stringify({date:today,query:'plant tissue culture',count:articles.length,articles},null,2);
+    // Check if file already exists today (avoid overwrite with same data)
+    const existing=await ghGet(path);
+    if(existing) return; // Already saved today
+    await ghPut(path, btoa(unescape(encodeURIComponent(content))), null, `news: PubMed archive ${today} (${articles.length} articles)`);
+    toast(`📰 News archived to repo (${today})`);
+  }catch(e){
+    // Silent fail — archiving is bonus, not critical
+    console.warn('News archive failed:',e.message);
+  }
+}
+
 // ── GEMINI AI ────────────────────────────────────────────────
 const GEMINI_KEY='AIzaSyBUNFdl4ywNFEpdMZgFLm6NpS7joyEf2AU';
 const GEMINI_URL=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
@@ -3302,6 +3444,7 @@ function switchSection(name){
   if(name==='contam') renderContamDashboard();
   if(name==='analytics') renderAnalytics();
   if(name==='species') renderSpecies();
+  if(name==='news' && document.getElementById('news-toggle').checked && !_newsData) handleNewsToggle(true);
 }
 function toggleNavDrawer(){
   const open=document.getElementById('nav-drawer').classList.contains('open');
