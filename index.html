@@ -696,7 +696,7 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 .al-ghlink{color:var(--mu);text-decoration:none;font-size:10px;opacity:.7}
 .al-ghlink:hover{opacity:1;color:var(--ac)}
 #actlog-footer{padding:8px 14px;border-top:1px solid var(--bd);font-family:var(--mono);font-size:10px;color:var(--mu);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
-@media(max-width:700px){#actlog-panel{width:100vw}#actlog-tab{display:none!important}}
+@media(max-width:700px){#actlog-panel{width:100vw}}
 /* ── TRUSTED DEVICE ── */
 #trust-banner{
   background:rgba(63,185,80,.1);border:1px solid var(--gn);border-radius:6px;
@@ -1657,6 +1657,7 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
       <button class="ndtab" data-sec="news" onclick="navTo('news')"><span class="nd-icon">📰</span>News</button>
       <button class="ndtab" data-sec="help" onclick="navTo('help')"><span class="nd-icon">❓</span>Help</button>
       <div class="nd-divider"></div>
+      <button class="ndtab" onclick="closeNavDrawer();openActLog()"><span class="nd-icon">⚡</span>Activity</button>
       <button class="ndtab" onclick="closeNavDrawer();lock()" style="color:var(--rd)"><span class="nd-icon">🔒</span>Lock</button>
     </div>
     <div id="nd-panel">
@@ -2377,17 +2378,10 @@ async function toggleBarcodeMode(){
     document.getElementById('cam-mode-label').textContent='🔍 Scanning…';
     btn.textContent='❌ Stop scan';
     result.style.display='none';
-    const hints=new Map();
-    // Prioritise QR Code, then common 1D formats
-    if(ZXing.DecodeHintType&&ZXing.BarcodeFormat){
-      hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS,[
-        ZXing.BarcodeFormat.QR_CODE,
-        ZXing.BarcodeFormat.DATA_MATRIX,
-        ZXing.BarcodeFormat.CODE_128,
-        ZXing.BarcodeFormat.EAN_13
-      ]);
-    }
-    _barcodeReader=new ZXing.BrowserMultiFormatReader(hints);
+    // Use QR-specific reader for best mobile performance
+    _barcodeReader=ZXing.BrowserQRCodeReader
+      ? new ZXing.BrowserQRCodeReader()
+      : new ZXing.BrowserMultiFormatReader();
     try{
       await _barcodeReader.decodeFromVideoDevice(null,'cam-video',(res,err)=>{
         if(res){
@@ -2604,7 +2598,7 @@ function _taxSuggest(input){
       return `<span style="font-size:11px;color:var(--mu)">${esc(a.number||a.species)}</span> ${pills}`;
     }).join(' · ');
 
-    return `<div class="tax-row" data-idx="${i}" onclick="_taxDropdownSelect(${JSON.stringify(sp.full_name)})">
+    return `<div class="tax-row" data-idx="${i}" onpointerdown="event.preventDefault();_taxDropdownSelect(${JSON.stringify(sp.full_name)})">
       <div class="tax-row-name">${esc(sp.full_name)}</div>
       <div class="tax-row-common">${esc(sp.common_name)}</div>
       ${_taxConBadge(sp.conservation_status)}
