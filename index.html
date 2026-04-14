@@ -606,6 +606,46 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
   padding:10px 14px;margin-bottom:14px;font-size:13px;display:none
 }
 #saved-device-banner.on{display:block}
+/* ── GEMINI AI ── */
+#ai-btn{
+  position:fixed;bottom:80px;right:24px;z-index:155;
+  width:44px;height:44px;border-radius:50%;
+  background:linear-gradient(135deg,#4285f4,#8250df);
+  border:none;color:#fff;font-size:20px;cursor:pointer;
+  box-shadow:0 4px 16px rgba(0,0,0,.3);display:none;
+  align-items:center;justify-content:center;transition:opacity .15s
+}
+#ai-btn.on{display:flex}
+#ai-btn:hover{opacity:.88}
+#ai-panel{
+  position:fixed;bottom:132px;right:14px;z-index:200;
+  width:340px;max-width:96vw;
+  background:var(--sf);border:1px solid var(--bd);border-radius:12px;
+  box-shadow:0 8px 32px rgba(0,0,0,.25);display:none;flex-direction:column;
+  max-height:70vh
+}
+#ai-panel.on{display:flex}
+#ai-head{padding:12px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px;flex-shrink:0}
+#ai-head .ai-title{flex:1;font-weight:700;font-size:14px;background:linear-gradient(135deg,#4285f4,#8250df);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+#ai-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.ai-msg{padding:8px 12px;border-radius:8px;font-size:13px;line-height:1.6;max-width:90%}
+.ai-msg.user{background:var(--ac);color:#fff;align-self:flex-end;border-radius:8px 8px 2px 8px}
+.ai-msg.ai{background:var(--sf2);color:var(--tx);align-self:flex-start;border-radius:8px 8px 8px 2px}
+.ai-msg.thinking{color:var(--mu);font-style:italic;font-size:12px}
+#ai-input-row{padding:10px;border-top:1px solid var(--bd);display:flex;gap:6px;flex-shrink:0}
+#ai-input{flex:1;font-size:13px;padding:7px 10px;resize:none;height:36px;min-height:36px;max-height:100px;overflow-y:auto}
+.ai-chip{background:var(--sf2);border:1px solid var(--bd);border-radius:14px;color:var(--mu);cursor:pointer;font-size:11px;padding:3px 10px;white-space:nowrap;font-family:var(--font)}
+.ai-chip:hover{background:var(--sf3);color:var(--tx)}
+#ai-chips{display:flex;gap:5px;overflow-x:auto;padding:8px 12px 4px;flex-shrink:0;border-bottom:1px solid var(--bd)}
+/* ── SPECIES TABLE ── */
+.sp-table{width:100%;border-collapse:collapse;font-size:13px}
+.sp-table th{text-align:left;padding:8px 12px;border-bottom:2px solid var(--bd);color:var(--mu);font-size:11px;text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+.sp-table td{padding:8px 12px;border-bottom:1px solid var(--sf2);vertical-align:middle}
+.sp-table tr:hover td{background:var(--sf2)}
+.sp-badge{display:inline-block;border-radius:4px;padding:2px 7px;font-size:11px;font-weight:600}
+.sp-active{background:rgba(63,185,80,.15);color:var(--gn)}
+.sp-dormant{background:rgba(210,153,34,.15);color:var(--yw)}
+.sp-lost{background:rgba(248,81,73,.12);color:var(--rd)}
 </style>
 <script>(function(){var t=localStorage.getItem('tcplants_theme')||'dark';document.documentElement.dataset.theme=t;}());</script>
 </head>
@@ -1193,6 +1233,18 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
     </div>
   </div>
 
+  <!-- ── SPECIES ── -->
+  <div class="section fullpage" id="sec-species">
+    <div style="max-width:960px;margin:0 auto;width:100%;padding-bottom:40px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+        <h2 style="font-size:20px;font-weight:700">🌱 Species in Culture</h2>
+        <a href="https://phyto-evolution.github.io/PhytoCommerce/taxonomy/" target="_blank" rel="noopener" class="btn ghost sm" style="margin-left:auto">🌿 Taxonomy DB ↗</a>
+      </div>
+      <p style="font-size:13px;color:var(--mu);margin-bottom:20px">Derived from your notes and accession registry. Cultures Out data feeds expected propagule counts.</p>
+      <div id="species-content"></div>
+    </div>
+  </div>
+
   <!-- ── HELP ── -->
   <div class="section fullpage" id="sec-help">
     <div class="help-body">
@@ -1351,6 +1403,16 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
         <p>💡 <strong>Tip:</strong> Always fill in <strong>Cultures Out</strong> when saving a Multiplication or Rooting note to get meaningful efficiency data. Without it, the Avg Out and Score columns show "—".</p>
       </div>
 
+      <h2>🌱 Species in Culture</h2>
+      <div class="help-section-card">
+        <p>Click <strong>Species</strong> in the nav drawer to see a live table of all species derived from your notes and accession registry. Shows: note count, TC stages distribution, contamination rate, average Cultures Out, and accession status. Click <strong>Taxonomy ↗</strong> next to any species to look it up in the PhytoCommerce taxonomy database.</p>
+      </div>
+
+      <h2>✦ Gemini AI Assistant</h2>
+      <div class="help-section-card">
+        <p>Tap the <strong>✦</strong> button (bottom-right, above the quick log FAB) to open the AI assistant. Uses Google Gemini to answer TC protocol questions, suggest PGR doses, explain contamination causes, and summarise the currently open note. The assistant has context about your current note (species, type, stage). Pre-built prompt chips are shown at the top for quick access. Press <strong>Enter</strong> to send.</p>
+      </div>
+
       <h2>Activity Log</h2>
       <div class="help-section-card">
         <p>The <strong>⚡ Activity</strong> tab on the right edge of the screen opens a live panel showing the last 30 GitHub commits on your lab repo. Each entry shows the commit message, time ago, and date.</p>
@@ -1387,7 +1449,8 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 
       <h2>Export &amp; Backup</h2>
       <div class="help-section-card">
-        <p>Click <strong>⬇ Export</strong> in the top bar to download all notes as a ZIP of decrypted Markdown files, plus accessions and recipes as JSON. Each note file includes YAML front matter with all metadata.</p>
+        <p>Click <strong>⬇ ZIP</strong> in the bottom bar to download all notes as a ZIP of decrypted Markdown files, plus accessions and recipes as JSON. Click <strong>⬇ CSV</strong> to download two CSV files: one for all note metadata (id, title, date, type, stage, species, tags, next review, recipe name, cultures out), and one for all accessions.</p>
+        <p>Each ZIP note file includes YAML front matter with all metadata.</p>
         <p>Your data is always in the GitHub repo as encrypted <code>.enc</code> files — every save is a git commit, so you have full version history at <code>github.com/Phyto-Evolution/tcplants</code>. The repo is your backup.</p>
         <h3>Print / PDF</h3>
         <p>Open any note or recipe, then click <strong>🖨 Print / PDF</strong>. A clean print-optimised window opens. Use your browser's print dialog → <em>Save as PDF</em>.</p>
@@ -1428,7 +1491,8 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
     <button id="weather-chip" title="Lab & Greenhouse weather">🌡️ —</button>
     <div class="bb-spacer"></div>
     <span id="offline-pill">● Offline</span>
-    <button class="btn ghost sm" id="export-all-btn" title="Export ZIP">⬇ Export</button>
+    <button class="btn ghost sm" id="export-all-btn" title="Export all notes as ZIP">⬇ ZIP</button>
+    <button class="btn ghost sm" id="export-csv-btn" title="Export notes metadata as CSV">⬇ CSV</button>
     <button class="btn ghost sm" id="lock-btn">🔒 Lock</button>
   </div>
 
@@ -1449,6 +1513,26 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
       <button class="btn" id="cam-capture-btn" onclick="capturePhoto()">📸 Capture Photo</button>
       <button class="btn ghost" id="cam-scan-btn" onclick="toggleBarcodeMode()" style="color:#fff;border-color:rgba(255,255,255,.3)">🔍 Scan Barcode</button>
     </div>
+  </div>
+</div>
+
+<!-- ═══════════ GEMINI AI ═══════════ -->
+<button id="ai-btn" title="Ask AI assistant">✦</button>
+<div id="ai-panel">
+  <div id="ai-head">
+    <div class="ai-title">✦ Gemini AI</div>
+    <button class="al-hbtn" onclick="document.getElementById('ai-panel').classList.remove('on')" title="Close">✕</button>
+  </div>
+  <div id="ai-chips">
+    <button class="ai-chip" onclick="askAI('Summarise the current open note in 3 bullet points.')">Summarise note</button>
+    <button class="ai-chip" onclick="askAI('What PGR concentrations are commonly used for Stage II multiplication of the current species?')">PGR advice</button>
+    <button class="ai-chip" onclick="askAI('What are contamination prevention best practices for plant tissue culture?')">Contam tips</button>
+    <button class="ai-chip" onclick="askAI('Explain the taxonomy and cultivation notes for the species currently open.')">Species info</button>
+  </div>
+  <div id="ai-msgs"><div class="ai-msg ai">Hello! I can help with TC protocols, species info, PGR doses, and note summaries. What would you like to know?</div></div>
+  <div id="ai-input-row">
+    <textarea id="ai-input" placeholder="Ask anything about TC…" rows="1"></textarea>
+    <button class="btn sm" id="ai-send-btn">→</button>
   </div>
 </div>
 
@@ -2400,6 +2484,100 @@ function closeActLog(){
   document.getElementById('actlog-tab').classList.add('on');
 }
 
+// ── SPECIES TABLE ────────────────────────────────────────────
+function renderSpecies(){
+  const el=document.getElementById('species-content');
+  if(!S.notes.length&&!S.accs.length){
+    el.innerHTML='<p style="color:var(--mu);font-size:13px">No species data yet. Add accessions and notes with species names.</p>';
+    return;
+  }
+  // Aggregate from notes
+  const spMap={};
+  S.notes.forEach(n=>{
+    if(!n.species) return;
+    const k=n.species.toLowerCase();
+    if(!spMap[k]) spMap[k]={name:n.species,notes:0,stages:{},contam:0,culturesOut:[]};
+    spMap[k].notes++;
+    if(n.stage) spMap[k].stages[n.stage]=(spMap[k].stages[n.stage]||0)+1;
+    if(n.type==='Contamination Log') spMap[k].contam++;
+    if(n.cultures_out!=null) spMap[k].culturesOut.push(n.cultures_out);
+  });
+  // Merge accession data
+  S.accs.forEach(a=>{
+    if(!a.species) return;
+    const k=a.species.toLowerCase();
+    if(!spMap[k]) spMap[k]={name:a.species,notes:0,stages:{},contam:0,culturesOut:[]};
+    spMap[k].accStatus=a.status;
+  });
+  const rows=Object.values(spMap).sort((a,b)=>b.notes-a.notes);
+  const stageAbbr=s=>s.replace('Stage ','S').replace(/ — .*/,'');
+  const statusBadge=s=>{
+    if(!s) return '';
+    const cls=s.includes('Active')?'sp-active':s==='Lost'?'sp-lost':'sp-dormant';
+    return `<span class="sp-badge ${cls}">${s}</span>`;
+  };
+  el.innerHTML=`<div style="overflow-x:auto"><table class="sp-table">
+    <thead><tr>
+      <th>Species</th><th>Notes</th><th>Stages</th><th>Contam%</th><th>Avg Out</th><th>Status</th><th></th>
+    </tr></thead>
+    <tbody>${rows.map(sp=>{
+      const contamPct=sp.notes?Math.round(sp.contam/sp.notes*100):0;
+      const avgOut=sp.culturesOut.length?(sp.culturesOut.reduce((a,b)=>a+b,0)/sp.culturesOut.length).toFixed(1):'—';
+      const stagesStr=Object.entries(sp.stages).map(([s,c])=>`${stageAbbr(s)}×${c}`).join(', ')||'—';
+      return`<tr>
+        <td style="font-weight:600">${esc(sp.name)}</td>
+        <td>${sp.notes}</td>
+        <td style="font-size:12px;color:var(--mu)">${stagesStr}</td>
+        <td style="${contamPct>20?'color:var(--rd)':''}">${contamPct}%</td>
+        <td>${avgOut}</td>
+        <td>${statusBadge(sp.accStatus||'')}</td>
+        <td><a href="https://phyto-evolution.github.io/PhytoCommerce/taxonomy/?q=${encodeURIComponent(sp.name)}" target="_blank" rel="noopener" style="font-size:11px;color:var(--ac)">Taxonomy ↗</a></td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table></div>`;
+}
+
+// ── GEMINI AI ────────────────────────────────────────────────
+const GEMINI_KEY='AIzaSyBUNFdl4ywNFEpdMZgFLm6NpS7joyEf2AU';
+const GEMINI_URL=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
+const GEMINI_SYS=`You are a plant tissue culture lab assistant for TC Plants Lab Notes. You help with: TC protocols, media formulations, PGR concentrations, contamination prevention, species-specific cultivation notes, and lab management. Be concise, practical, and scientific. When mentioning concentrations use mg/L or µM. The lab is based in Chennai, India.`;
+
+async function askAI(prompt){
+  const panel=document.getElementById('ai-panel');
+  panel.classList.add('on');
+  const msgs=document.getElementById('ai-msgs');
+  // Append user message
+  msgs.innerHTML+=`<div class="ai-msg user">${esc(prompt)}</div>`;
+  const thinking=document.createElement('div');
+  thinking.className='ai-msg thinking'; thinking.textContent='Thinking…';
+  msgs.appendChild(thinking);
+  msgs.scrollTop=msgs.scrollHeight;
+  // Build context from open note if available
+  let context='';
+  if(S.cur){
+    const m=S.notes.find(n=>n.id===S.cur);
+    if(m) context=`\n\nCurrent open note — Title: "${m.title}", Type: ${m.type||'—'}, Stage: ${m.stage||'—'}, Species: ${m.species||'—'}.`;
+  }
+  try{
+    const r=await fetch(GEMINI_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        contents:[{role:'user',parts:[{text:GEMINI_SYS+context+'\n\nUser question: '+prompt}]}]
+      })
+    });
+    if(!r.ok) throw new Error('Gemini API error '+r.status);
+    const data=await r.json();
+    const text=data.candidates?.[0]?.content?.parts?.[0]?.text||'No response.';
+    thinking.remove();
+    msgs.innerHTML+=`<div class="ai-msg ai">${esc(text).replace(/\n/g,'<br>')}</div>`;
+  }catch(e){
+    thinking.remove();
+    msgs.innerHTML+=`<div class="ai-msg ai" style="color:var(--rd)">Error: ${esc(e.message)}</div>`;
+  }
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
 function startNewNote(){
   S.editing=null; S.cur=null; renderNoteList();
   document.getElementById('ne-head').textContent='New Lab Entry';
@@ -3075,6 +3253,41 @@ async function bulkExport(){
   unload();
 }
 
+function exportCSV(){
+  if(!S.notes.length){ toast('No notes to export','fail'); return; }
+  const headers=['id','title','date','type','stage','species','tags','next_review','recipe_name','cultures_out'];
+  const rows=S.notes.map(n=>{
+    const rec=S.recs.find(r=>r.id===n.recipe_id);
+    return [
+      n.id||'',
+      n.title||'',
+      n.date?new Date(n.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'',
+      n.type||'',
+      n.stage||'',
+      n.species||'',
+      (n.tags||[]).join('; '),
+      n.next_review||'',
+      rec?rec.name:'',
+      n.cultures_out!=null?n.cultures_out:''
+    ].map(v=>'"'+String(v).replace(/"/g,'""')+'"');
+  });
+  const csv=[headers.map(h=>'"'+h+'"').join(','),...rows.map(r=>r.join(','))].join('\n');
+  // Accessions CSV
+  const accHeaders=['accession_number','species','common_name','source','status','acquired'];
+  const accRows=S.accs.map(a=>[a.num||'',a.species||'',a.common||'',a.source||'',a.status||'',a.acquired||'']
+    .map(v=>'"'+String(v).replace(/"/g,'""')+'"'));
+  const accCsv=[accHeaders.map(h=>'"'+h+'"').join(','),...accRows.map(r=>r.join(','))].join('\n');
+  // Download both
+  const dl=(content,filename)=>{
+    const blob=new Blob([content],{type:'text/csv;charset=utf-8;'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+    a.download=filename; a.click();
+  };
+  dl(csv,`tcplants_notes_${new Date().toISOString().slice(0,10)}.csv`);
+  setTimeout(()=>dl(accCsv,`tcplants_accessions_${new Date().toISOString().slice(0,10)}.csv`),400);
+  toast('CSV files downloading…');
+}
+
 // ════════════════════════════════════════════════════════════
 // NAVIGATION
 // ════════════════════════════════════════════════════════════
@@ -3088,6 +3301,7 @@ function switchSection(name){
   if(name==='reminders') renderReminders();
   if(name==='contam') renderContamDashboard();
   if(name==='analytics') renderAnalytics();
+  if(name==='species') renderSpecies();
 }
 function toggleNavDrawer(){
   const open=document.getElementById('nav-drawer').classList.contains('open');
@@ -3177,6 +3391,7 @@ async function login(){
     updateReminderBadge();
     switchSection('notes'); showNote('empty');
     document.getElementById('ql-fab').classList.add('on');
+    document.getElementById('ai-btn').classList.add('on');
     document.getElementById('actlog-tab').classList.add('on');
     fetchActivityLog();
     // Offer to save device if not already saved
@@ -3199,6 +3414,8 @@ function lock(){
   if(window._wxInterval){ clearInterval(window._wxInterval); window._wxInterval=null; }
   Object.assign(S,{pw:null,tok:null,notes:[],cur:null,editing:null,notesSha:null,accs:[],curAcc:null,editingAcc:null,accSha:null,recs:[],curRec:null,editingRec:null,recSha:null});
   document.getElementById('ql-fab').classList.remove('on');
+  document.getElementById('ai-btn').classList.remove('on');
+  document.getElementById('ai-panel').classList.remove('on');
   document.getElementById('actlog-tab').classList.remove('on');
   document.getElementById('actlog-panel').classList.remove('open');
   sessionStorage.clear();
@@ -3324,6 +3541,16 @@ document.getElementById('weather-chip').addEventListener('click', function(e){
 document.addEventListener('click', ()=>document.getElementById('weather-pop').classList.remove('on'));
 document.getElementById('weather-pop').addEventListener('click', e=>e.stopPropagation());
 document.getElementById('export-all-btn').onclick=bulkExport;
+document.getElementById('export-csv-btn').onclick=exportCSV;
+document.getElementById('ai-btn').onclick=()=>document.getElementById('ai-panel').classList.toggle('on');
+document.getElementById('ai-send-btn').onclick=()=>{
+  const input=document.getElementById('ai-input');
+  const q=input.value.trim();
+  if(q){ input.value=''; askAI(q); }
+};
+document.getElementById('ai-input').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); document.getElementById('ai-send-btn').click(); }
+});
 
 // Notes
 document.getElementById('new-note-btn').onclick=startNewNote;
