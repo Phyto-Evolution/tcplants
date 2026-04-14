@@ -428,6 +428,14 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 .wx-row{font-size:12px;color:var(--mu);display:flex;gap:6px}
 .wx-row span:first-child{width:16px;text-align:center}
 .wx-updated{font-size:11px;color:var(--mu);text-align:center;margin-top:10px}
+/* ── DRAFT BANNER ── */
+#draft-banner{
+  background:rgba(210,153,34,.12);border:1px solid var(--yw);border-radius:6px;
+  color:var(--yw);font-size:12px;padding:7px 12px;margin-bottom:10px;
+  display:none;align-items:center;gap:10px
+}
+#draft-banner.on{display:flex}
+#draft-banner span{flex:1}
 </style>
 <script>(function(){var t=localStorage.getItem('tcplants_theme')||'dark';document.documentElement.dataset.theme=t;}());</script>
 </head>
@@ -530,6 +538,7 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
       </div>
       <div class="editor" id="note-editor">
         <div class="ehead" id="ne-head">New Lab Entry</div>
+        <div id="draft-banner"><span id="draft-msg"></span><button class="btn xs ghost" id="draft-discard-btn">Discard</button></div>
         <div class="field">
           <label>Title</label>
           <input type="text" id="ne-title" placeholder="e.g. Stage II subculture — Nepenthes rajah batch 4">
@@ -1448,6 +1457,61 @@ function populateTagsDatalist(){
   dl.innerHTML=all.map(t=>`<option value="${esc(t)}">`).join('');
 }
 
+// ── DRAFT AUTO-SAVE ──────────────────────────────────────────
+let _draftTimer=null;
+function _saveDraft(){
+  const d={
+    editing:S.editing||null,
+    title:document.getElementById('ne-title').value,
+    type:document.getElementById('ne-type').value,
+    stage:document.getElementById('ne-stage').value,
+    species:document.getElementById('ne-species').value,
+    tags:document.getElementById('ne-tags').value,
+    review:document.getElementById('ne-review').value,
+    recipe_id:document.getElementById('ne-recipe').value,
+    cultures_out:document.getElementById('ne-cultures-out').value,
+    body:document.getElementById('ne-body').value,
+    savedAt:Date.now()
+  };
+  sessionStorage.setItem('tcplants_draft',JSON.stringify(d));
+}
+function _clearDraft(){
+  sessionStorage.removeItem('tcplants_draft');
+  document.getElementById('draft-banner').classList.remove('on');
+}
+function _checkDraft(editingId){
+  try{
+    const raw=sessionStorage.getItem('tcplants_draft');
+    if(!raw) return;
+    const d=JSON.parse(raw);
+    if(d.editing!==editingId) return;
+    document.getElementById('ne-title').value=d.title||'';
+    document.getElementById('ne-type').value=d.type||'';
+    document.getElementById('ne-stage').value=d.stage||'';
+    document.getElementById('ne-species').value=d.species||'';
+    document.getElementById('ne-tags').value=d.tags||'';
+    document.getElementById('ne-review').value=d.review||'';
+    document.getElementById('ne-recipe').value=d.recipe_id||'';
+    document.getElementById('ne-cultures-out').value=d.cultures_out||'';
+    document.getElementById('ne-body').value=d.body||'';
+    const ago=Math.round((Date.now()-d.savedAt)/60000);
+    document.getElementById('draft-msg').textContent=`Draft restored from ${ago<1?'just now':ago+'m ago'} — unsaved changes.`;
+    document.getElementById('draft-banner').classList.add('on');
+  }catch(e){}
+}
+function _wireDraftListeners(){
+  const ids=['ne-title','ne-type','ne-stage','ne-species','ne-tags','ne-review','ne-recipe','ne-cultures-out','ne-body'];
+  ids.forEach(id=>{
+    const el=document.getElementById(id);
+    el.addEventListener('input',()=>{ clearTimeout(_draftTimer); _draftTimer=setTimeout(_saveDraft,1500); });
+    el.addEventListener('change',()=>{ clearTimeout(_draftTimer); _draftTimer=setTimeout(_saveDraft,1500); });
+  });
+  document.getElementById('draft-discard-btn').addEventListener('click',()=>{
+    _clearDraft();
+    S.editing ? startEditNote() : startNewNote();
+  });
+}
+
 function startNewNote(){
   S.editing=null; S.cur=null; renderNoteList();
   document.getElementById('ne-head').textContent='New Lab Entry';
@@ -1458,6 +1522,7 @@ function startNewNote(){
   document.getElementById('ne-tmpl-hint').textContent='';
   populateRecipeSelect();
   showNote('editor');
+  _checkDraft(null);
 }
 
 async function startEditNote(){
@@ -1479,6 +1544,7 @@ async function startEditNote(){
     document.getElementById('ne-tmpl-hint').textContent='';
     populateRecipeSelect(m.recipe_id||'');
     showNote('editor');
+    _checkDraft(id);
   }catch(e){toast('Load failed: '+e.message,'fail');}
   unload();
 }
@@ -1513,6 +1579,7 @@ async function saveNoteAction(){
     S.notesSha=await saveNotesIndex(S.notes,iSha);
     _writeCache();
     populateTagsDatalist();
+    _clearDraft();
     updateReminderBadge();
     toast('Saved ✓ — committed to GitHub');
     renderNoteList(); await openNote(S.cur);
@@ -2294,7 +2361,7 @@ document.getElementById('new-note-btn').onclick=startNewNote;
 document.getElementById('edit-note-btn').onclick=startEditNote;
 document.getElementById('del-note-btn').onclick=deleteNote;
 document.getElementById('save-note-btn').onclick=saveNoteAction;
-document.getElementById('cancel-note-btn').onclick=()=>S.cur?openNote(S.cur):showNote('empty');
+document.getElementById('cancel-note-btn').onclick=()=>{ _clearDraft(); S.cur?openNote(S.cur):showNote('empty'); };
 document.getElementById('print-btn').onclick=printNote;
 // img-btn and tbl-btn wired via TB map above
 
@@ -2312,6 +2379,7 @@ document.getElementById('del-rec-btn').onclick=deleteRecipe;
 document.getElementById('save-rec-btn').onclick=saveRecipe;
 document.getElementById('cancel-rec-btn').onclick=()=>S.curRec?openRecipe(S.curRec):showRec('empty');
 document.getElementById('print-rec-btn').onclick=printRecipe;
+_wireDraftListeners();
 
 // ════════════════════════════════════════════════════════════
 // OFFLINE DETECTION
