@@ -1380,7 +1380,14 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 
       <h2>✦ Gemini AI Assistant</h2>
       <div class="help-section-card">
-        <p>Tap the <strong>✦</strong> button (bottom-right, above the quick log FAB) to open the AI assistant. Uses Google Gemini to answer TC protocol questions, suggest PGR doses, explain contamination causes, and summarise the currently open note. The assistant has context about your current note (species, type, stage). Pre-built prompt chips are shown at the top for quick access. Press <strong>Enter</strong> to send.</p>
+        <p>Tap <strong>✦</strong> (bottom-right, above the quick log FAB) to open the AI assistant powered by Google Gemini. When you ask a question, the assistant automatically sends rich context about your current session:</p>
+        <ul>
+          <li><strong>Open note</strong> — title, type, stage, species, date, and the <em>full decrypted note body</em> (fetched on demand if not already loaded)</li>
+          <li><strong>Linked recipe</strong> — base medium, PGRs, pH, sucrose, agar</li>
+          <li><strong>Accession record</strong> — status, source, origin for the note's species</li>
+          <li><strong>Species summary</strong> — top 10 species by note count, with stage distribution, contamination rate, and average cultures per transfer</li>
+        </ul>
+        <p>Pre-built chips: <em>Summarise note</em> (bullet-point summary of the open note body), <em>PGR advice</em> (recommendations based on species + media context), <em>Contam analysis</em> (likely causes + prevention), <em>Lab overview</em> (status across all species). Press <strong>Enter</strong> to send free-text questions.</p>
       </div>
 
       <h2>📰 TC Research News</h2>
@@ -1542,10 +1549,10 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
     <button class="al-hbtn" onclick="document.getElementById('ai-panel').classList.remove('on')" title="Close">✕</button>
   </div>
   <div id="ai-chips">
-    <button class="ai-chip" onclick="askAI('Summarise the current open note in 3 bullet points.')">Summarise note</button>
-    <button class="ai-chip" onclick="askAI('What PGR concentrations are commonly used for Stage II multiplication of the current species?')">PGR advice</button>
-    <button class="ai-chip" onclick="askAI('What are contamination prevention best practices for plant tissue culture?')">Contam tips</button>
-    <button class="ai-chip" onclick="askAI('Explain the taxonomy and cultivation notes for the species currently open.')">Species info</button>
+    <button class="ai-chip" onclick="askAI('Summarise this note in 3-5 bullet points, highlighting key observations, results, and recommended next steps.')">Summarise note</button>
+    <button class="ai-chip" onclick="askAI('Based on the species, stage, and media shown in context, what PGR concentrations and media modifications would you recommend? Cite typical ranges from literature.')">PGR advice</button>
+    <button class="ai-chip" onclick="askAI('Looking at the species and contamination data in context, what are the likely contamination sources and the most effective prevention strategies for this lab setup?')">Contam analysis</button>
+    <button class="ai-chip" onclick="askAI('Using the species summary and note history in context, give a brief cultivation assessment: which species are thriving, which are at risk, and what actions to prioritise.')">Lab overview</button>
   </div>
   <div id="ai-msgs"><div class="ai-msg ai">Hello! I can help with TC protocols, species info, PGR doses, and note summaries. What would you like to know?</div></div>
   <div id="ai-input-row">
@@ -2662,6 +2669,82 @@ const GEMINI_KEY='AIzaSyBUNFdl4ywNFEpdMZgFLm6NpS7joyEf2AU';
 const GEMINI_URL=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
 const GEMINI_SYS=`You are a plant tissue culture lab assistant for TC Plants Lab Notes. You help with: TC protocols, media formulations, PGR concentrations, contamination prevention, species-specific cultivation notes, and lab management. Be concise, practical, and scientific. When mentioning concentrations use mg/L or µM. The lab is based in Chennai, India.`;
 
+async function _buildAIContext(){
+  let ctx='';
+
+  if(S.cur){
+    const m=S.notes.find(n=>n.id===S.cur);
+    if(m){
+      ctx+=`\n\n## Currently Open Note`;
+      ctx+=`\nTitle: "${m.title}"`;
+      ctx+=`\nType: ${m.type||'—'} | Stage: ${m.stage||'—'} | Species: ${m.species||'—'}`;
+      ctx+=`\nDate: ${m.date?.slice(0,10)||'—'}`;
+      if(m.cultures_out!=null) ctx+=` | Cultures out: ${m.cultures_out}`;
+      if(m.next_review) ctx+=` | Next review: ${m.next_review}`;
+
+      // Include body — from cache or fetch from GitHub
+      let body=S.bodyCache[m.id]||null;
+      if(!body&&S.tok){
+        try{
+          const res=await loadNote(m.id);
+          body=res.body;
+          S.bodyCache[m.id]=body;
+        }catch(e){ /* skip */ }
+      }
+      if(body) ctx+=`\n\nNote body:\n${body.slice(0,3000)}${body.length>3000?'\n[…truncated]':''}`;
+
+      // Include linked recipe
+      if(m.recipe_id){
+        const rec=S.recs.find(r=>r.id===m.recipe_id);
+        if(rec){
+          ctx+=`\n\n## Linked Recipe: ${rec.name}`;
+          if(rec.base) ctx+=`\nBase medium: ${rec.base}`;
+          if(rec.pgr) ctx+=`\nPGRs: ${rec.pgr}`;
+          if(rec.ph) ctx+=`\npH: ${rec.ph}`;
+          if(rec.sucrose) ctx+=`\nSucrose: ${rec.sucrose} g/L`;
+          if(rec.agar) ctx+=`\nAgar/Gelrite: ${rec.agar} g/L`;
+          if(rec.target) ctx+=`\nTarget organism: ${rec.target}`;
+        }
+      }
+
+      // Include accession for this species
+      if(m.species){
+        const acc=S.accs.find(a=>(a.species||'').toLowerCase()===m.species.toLowerCase());
+        if(acc){
+          ctx+=`\n\n## Accession for ${m.species}`;
+          if(acc.num) ctx+=`\nAccession #: ${acc.num}`;
+          if(acc.status) ctx+=`\nStatus: ${acc.status}`;
+          if(acc.source) ctx+=`\nSource: ${acc.source}`;
+          if(acc.origin) ctx+=`\nOrigin: ${acc.origin}`;
+        }
+      }
+    }
+  }
+
+  // Species in culture summary (top 10 by note count)
+  const spMap={};
+  S.notes.forEach(n=>{
+    if(!n.species) return;
+    const k=n.species.toLowerCase();
+    if(!spMap[k]) spMap[k]={name:n.species,notes:0,stages:{},contam:0,out:[]};
+    spMap[k].notes++;
+    if(n.stage) spMap[k].stages[n.stage]=(spMap[k].stages[n.stage]||0)+1;
+    if(n.type==='Contamination Log') spMap[k].contam++;
+    if(n.cultures_out!=null) spMap[k].out.push(n.cultures_out);
+  });
+  const spList=Object.values(spMap).sort((a,b)=>b.notes-a.notes).slice(0,10);
+  if(spList.length){
+    ctx+=`\n\n## Lab Species Summary`;
+    spList.forEach(sp=>{
+      const stages=Object.entries(sp.stages).map(([s,c])=>`${s.replace('Stage ','S').replace(/ — .*/,'')}×${c}`).join(', ');
+      const avgOut=sp.out.length?(sp.out.reduce((a,b)=>a+b,0)/sp.out.length).toFixed(1):null;
+      ctx+=`\n- ${sp.name}: ${sp.notes} notes${stages?`, ${stages}`:''}${sp.contam?`, ${sp.contam} contam`:''}${avgOut?`, avg ${avgOut} cultures/transfer`:''}`;
+    });
+  }
+
+  return ctx;
+}
+
 async function askAI(prompt){
   const panel=document.getElementById('ai-panel');
   panel.classList.add('on');
@@ -2672,12 +2755,8 @@ async function askAI(prompt){
   thinking.className='ai-msg thinking'; thinking.textContent='Thinking…';
   msgs.appendChild(thinking);
   msgs.scrollTop=msgs.scrollHeight;
-  // Build context from open note if available
-  let context='';
-  if(S.cur){
-    const m=S.notes.find(n=>n.id===S.cur);
-    if(m) context=`\n\nCurrent open note — Title: "${m.title}", Type: ${m.type||'—'}, Stage: ${m.stage||'—'}, Species: ${m.species||'—'}.`;
-  }
+  // Build rich context
+  const context=await _buildAIContext();
   try{
     const r=await fetch(GEMINI_URL,{
       method:'POST',
