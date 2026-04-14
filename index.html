@@ -2194,14 +2194,14 @@ async function fetchActivityLog(){
 }
 function openActLog(){
   document.getElementById('actlog-panel').classList.add('open');
-  document.getElementById('actlog-tab').style.display='none';
+  document.getElementById('actlog-tab').classList.remove('on');
   if(!document.getElementById('actlog-list').querySelector('.al-entry')){
     fetchActivityLog();
   }
 }
 function closeActLog(){
   document.getElementById('actlog-panel').classList.remove('open');
-  document.getElementById('actlog-tab').style.display='';
+  document.getElementById('actlog-tab').classList.add('on');
 }
 
 function startNewNote(){
@@ -3062,11 +3062,6 @@ document.addEventListener('click', ()=>document.getElementById('weather-pop').cl
 document.getElementById('weather-pop').addEventListener('click', e=>e.stopPropagation());
 document.getElementById('export-all-btn').onclick=bulkExport;
 
-// Activity log
-document.getElementById('actlog-tab').addEventListener('click', openActLog);
-document.getElementById('actlog-close-btn').addEventListener('click', closeActLog);
-document.getElementById('actlog-refresh-btn').addEventListener('click', fetchActivityLog);
-
 // Notes
 document.getElementById('new-note-btn').onclick=startNewNote;
 document.getElementById('edit-note-btn').onclick=startEditNote;
@@ -3561,13 +3556,13 @@ document.getElementById('theme-btn').addEventListener('click', function(){
   <div class="wx-updated" id="wx-updated"></div>
 </div>
 <!-- ═══════════ ACTIVITY LOG ═══════════ -->
-<div id="actlog-tab" title="Activity log">⚡ Activity</div>
+<div id="actlog-tab" title="Activity log" onclick="openActLog()">⚡ Activity</div>
 <div id="actlog-panel">
   <div id="actlog-header">
     <div class="al-dot"></div>
     <div class="al-title">tcplants@github — activity log</div>
-    <button class="al-hbtn" id="actlog-refresh-btn" title="Refresh">↻</button>
-    <button class="al-hbtn" id="actlog-close-btn" title="Close">✕</button>
+    <button class="al-hbtn" title="Refresh" onclick="fetchActivityLog()">↻</button>
+    <button class="al-hbtn" title="Close" onclick="closeActLog()">✕</button>
   </div>
   <div id="actlog-list"><div class="al-empty">Loading…</div></div>
   <div id="actlog-footer">
