@@ -459,6 +459,26 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
   .editor-body-wrap[data-pane="split"] #ne-body,
   .editor-body-wrap[data-pane="split"] #ne-preview{height:200px}
 }
+/* ── QUICK LOG FAB ── */
+#ql-fab{
+  position:fixed;bottom:24px;right:24px;z-index:150;
+  width:48px;height:48px;border-radius:50%;
+  background:var(--ac);border:none;color:#0d1117;
+  font-size:24px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.3);
+  display:none;align-items:center;justify-content:center;transition:opacity .15s
+}
+#ql-fab.on{display:flex}
+#ql-fab:hover{opacity:.88}
+#ql-modal{
+  position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.6);
+  display:none;align-items:center;justify-content:center
+}
+#ql-modal.on{display:flex}
+#ql-box{
+  background:var(--sf);border:1px solid var(--bd);border-radius:10px;
+  padding:24px;width:520px;max-width:96vw;max-height:90vh;overflow-y:auto
+}
+#ql-box .ehead{margin-bottom:16px;font-size:16px;font-weight:700}
 </style>
 <script>(function(){var t=localStorage.getItem('tcplants_theme')||'dark';document.documentElement.dataset.theme=t;}());</script>
 </head>
@@ -1341,6 +1361,7 @@ let _tt;
 function toast(msg,type='ok'){const t=document.getElementById('toast');t.textContent=msg;t.className=`on ${type}`;clearTimeout(_tt);_tt=setTimeout(()=>t.className='',3200);}
 
 function showNote(name){
+  document.getElementById('ql-fab').style.display = name==='editor' ? 'none' : '';
   document.getElementById('notes-empty').style.display      = name==='empty'  ?'block':'none';
   document.getElementById('note-view').className            = name==='view'   ?'dview on':'dview';
   document.getElementById('note-editor').className         = name==='editor' ?'editor on':'editor';
@@ -1563,6 +1584,37 @@ function _wirePaneToggle(){
     const wrap=document.getElementById('editor-body-wrap');
     if(wrap.dataset.pane!=='editor') _updatePreview();
   });
+}
+
+// ── QUICK LOG ────────────────────────────────────────────────
+function showQuickLog(){
+  document.getElementById('ql-title').value='';
+  document.getElementById('ql-body').value='';
+  document.getElementById('ql-modal').classList.add('on');
+  document.getElementById('ql-title').focus();
+}
+function hideQuickLog(){ document.getElementById('ql-modal').classList.remove('on'); }
+async function saveQuickLog(){
+  const title=document.getElementById('ql-title').value.trim();
+  const body=document.getElementById('ql-body').value;
+  if(!title){ toast('Title required','fail'); return; }
+  document.getElementById('ql-save-btn').disabled=true;
+  load('Saving quick note…');
+  try{
+    const {notes,sha:iSha}=await loadNotesIndex();
+    const id=uid(), date=new Date().toISOString();
+    await writeNote(id,body,null,`lab: quick log "${title}"`);
+    notes.push({id,title,date,type:'Self Notes / Brainstorming',stage:'',species:'',tags:[],next_review:null,recipe_id:null,cultures_out:null});
+    const newSha=await saveNotesIndex(notes,iSha);
+    S.notes=notes; S.notesSha=newSha;
+    _writeCache(); populateTagsDatalist();
+    renderNoteList(); updateReminderBadge();
+    hideQuickLog();
+    toast('Quick note saved ⚡');
+    S.cur=id; openNote(id);
+  }catch(e){ toast('Save failed: '+e.message,'fail'); }
+  document.getElementById('ql-save-btn').disabled=false;
+  unload();
 }
 
 function startNewNote(){
@@ -2319,6 +2371,7 @@ async function login(){
     populateTagsDatalist();
     updateReminderBadge();
     switchSection('notes'); showNote('empty');
+    document.getElementById('ql-fab').classList.add('on');
     fetchWeather();
     setInterval(fetchWeather, 60000);
   }catch(e){
@@ -2332,6 +2385,7 @@ async function login(){
 
 function lock(){
   Object.assign(S,{pw:null,tok:null,notes:[],cur:null,editing:null,notesSha:null,accs:[],curAcc:null,editingAcc:null,accSha:null,recs:[],curRec:null,editingRec:null,recSha:null});
+  document.getElementById('ql-fab').classList.remove('on');
   sessionStorage.clear();
   document.getElementById('app').classList.remove('on');
   document.getElementById('login').style.display='flex';
@@ -2438,6 +2492,11 @@ document.getElementById('del-rec-btn').onclick=deleteRecipe;
 document.getElementById('save-rec-btn').onclick=saveRecipe;
 document.getElementById('cancel-rec-btn').onclick=()=>S.curRec?openRecipe(S.curRec):showRec('empty');
 document.getElementById('print-rec-btn').onclick=printRecipe;
+document.getElementById('ql-fab').onclick=showQuickLog;
+document.getElementById('ql-cancel-btn').onclick=hideQuickLog;
+document.getElementById('ql-save-btn').onclick=saveQuickLog;
+document.getElementById('ql-modal').addEventListener('click',e=>{ if(e.target===document.getElementById('ql-modal')) hideQuickLog(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&document.getElementById('ql-modal').classList.contains('on')) hideQuickLog(); });
 _wireDraftListeners();
 _wirePaneToggle();
 
@@ -2861,6 +2920,25 @@ document.getElementById('theme-btn').addEventListener('click', function(){
   document.querySelector('meta[name="theme-color"]').setAttribute('content', next === 'dark' ? '#161b22' : '#f6f8fa');
 });
 </script>
+<!-- ═══════════ QUICK LOG ═══════════ -->
+<button id="ql-fab" title="Quick log (fast note)">＋</button>
+<div id="ql-modal">
+  <div id="ql-box">
+    <div class="ehead">⚡ Quick Log</div>
+    <div class="field">
+      <label>Title</label>
+      <input type="text" id="ql-title" placeholder="Quick observation…">
+    </div>
+    <div class="field">
+      <label>Notes <span style="font-weight:400;color:var(--mu)">(Markdown)</span></label>
+      <textarea id="ql-body" style="height:160px" placeholder="Write quickly…"></textarea>
+    </div>
+    <div class="eactions">
+      <button class="btn" id="ql-save-btn">⚡ Save Quick Note</button>
+      <button class="btn ghost" id="ql-cancel-btn">Cancel</button>
+    </div>
+  </div>
+</div>
 <!-- ═══════════ WEATHER POPOVER ═══════════ -->
 <div id="weather-pop">
   <div class="wx-grid">
