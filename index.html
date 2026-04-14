@@ -1809,8 +1809,8 @@ async function ghPut(path,content,sha,msg){
     method:'PUT',headers:ghH(),
     body:JSON.stringify(body)
   });
-  // Auto-retry on SHA mismatch (stale SHA from long session)
-  if(res.status===422){
+  // Auto-retry on SHA mismatch (422 or 409 — GitHub returns both)
+  if(res.status===422||res.status===409){
     const fresh=await ghGet(path);
     if(fresh){ body.sha=fresh.sha; }
     res=await fetch(`${API}/repos/${REPO}/contents/${path}`,{
