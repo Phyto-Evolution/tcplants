@@ -1223,34 +1223,49 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
       <h2>Getting Started</h2>
       <div class="help-section-card">
         <h3>First Login</h3>
-        <p>You need two things to log in: your <strong>Encryption Password</strong> (you chose this — it never leaves your browser) and a <strong>GitHub Personal Access Token</strong> with <code>repo</code> scope.</p>
-        <p>Get a token at: <code>github.com → Settings → Developer settings → Personal access tokens → Classic → New token → tick repo → Generate</code></p>
-        <p>⚠️ <strong>Never lose your encryption password.</strong> There is no recovery — all note content is encrypted with it. The GitHub repo only stores ciphertext.</p>
+        <p>You need two things: your <strong>Encryption Password</strong> (chosen by you — never leaves your browser) and a <strong>GitHub Personal Access Token</strong> with <code>repo</code> scope.</p>
+        <p>Create a token: <code>github.com → Settings → Developer settings → Personal access tokens → Classic → New token → tick repo → Generate</code></p>
+        <p>⚠️ <strong>Never lose your encryption password.</strong> There is no recovery — all note content is AES-256-GCM encrypted client-side. The GitHub repo stores only ciphertext.</p>
         <h3>Session Behaviour</h3>
-        <p>Your token is stored in <code>sessionStorage</code> only — it disappears when you close the tab. Your password is held in memory only. Every lock or tab close wipes both. This is by design.</p>
+        <p>Your token is stored in <code>sessionStorage</code> only — it disappears when you close the tab. Your password is held in memory only. Lock or tab-close wipes both. After your first login, the decrypted data is cached for 10 minutes in <code>sessionStorage</code> so re-unlocking is near-instant (⚡ Loaded from cache).</p>
+        <h3>Light / Dark Mode</h3>
+        <p>Click the <strong>☀️ / 🌙</strong> button in the top-right nav bar to toggle themes. Your preference is saved in <code>localStorage</code> and applied immediately on every future visit — no flash.</p>
       </div>
 
       <h2>Lab Notes</h2>
       <div class="help-section-card">
         <h3>Creating an Entry</h3>
-        <p>Click <strong>＋ New Entry</strong>. Fill in Title (required), Experiment Type, TC Stage, Species/Accession, Tags, and optionally a Next Review Date for reminders. The <strong>Experiment Type</strong> dropdown auto-loads a Markdown template for that type when the body is empty.</p>
-        <h3>Fields</h3>
+        <p>Click <strong>＋ New Entry</strong> or tap the blue <strong>＋ FAB</strong> (floating button, bottom-right) for a quick two-field entry. The full editor has:</p>
         <table><tr><th>Field</th><th>Purpose</th></tr>
-          <tr><td>Experiment Type</td><td>Categorises the entry; drives template and dashboard filters</td></tr>
-          <tr><td>TC Stage</td><td>Stage I–IV or Self Notes for uncategorised entries</td></tr>
-          <tr><td>Species / Accession</td><td>Links the entry to Registry accessions automatically</td></tr>
-          <tr><td>Recipe Used</td><td>Pick a saved recipe; shows as a clickable purple badge on the note</td></tr>
-          <tr><td>Next Review Date</td><td>Sets a reminder shown in the ⏰ Reminders tab</td></tr>
-          <tr><td>Tags</td><td>Comma-separated; searchable and filterable</td></tr>
+          <tr><td>Title</td><td>Required. Shown in sidebar and search results.</td></tr>
+          <tr><td>Experiment Type</td><td>Categorises the entry; auto-loads a Markdown template when body is empty.</td></tr>
+          <tr><td>TC Stage</td><td>Stage 0 – IV, Self Notes / Unclassified, or N/A.</td></tr>
+          <tr><td>Species / Accession</td><td>Links this entry to Registry accessions automatically.</td></tr>
+          <tr><td>Recipe Used</td><td>Pick a saved recipe; shows as a clickable purple badge on the note.</td></tr>
+          <tr><td>Next Review Date</td><td>Sets a reminder shown in the ⏰ Reminders tab with nav badge count.</td></tr>
+          <tr><td>Tags</td><td>Comma-separated. Start typing to see autocomplete suggestions from your existing tags.</td></tr>
+          <tr><td>Cultures Out</td><td>Optional integer — number of propagules / cultures produced. Powers media efficiency analytics.</td></tr>
         </table>
+        <h3>Auto-Save Draft</h3>
+        <p>Every keystroke is debounced and saved to <code>sessionStorage</code> after 1.5 s. If you accidentally refresh or navigate away, reopen the editor and a <strong>yellow banner</strong> appears: "Draft restored from Xm ago". Click <strong>Discard</strong> to clear it.</p>
+        <h3>Split-Pane Preview</h3>
+        <p>Above the note body, three buttons toggle the view: <strong>✏️ Edit</strong> (textarea only), <strong>⬛ Split</strong> (editor left, live Markdown preview right), <strong>👁 Preview</strong> (rendered only). On mobile, Split stacks vertically.</p>
+        <h3>Wiki-Links</h3>
+        <p>Type <code>[[Note Title]]</code> anywhere in the body to create a link to another note. In the rendered view, it becomes a <span style="color:var(--pu);border-bottom:1px dashed var(--pu)">purple link</span> — click to navigate. If the title doesn't match any note, it shows greyed out.</p>
+        <p>Use the <strong>[[]]</strong> toolbar button to open a searchable note picker instead of typing manually.</p>
+        <p>Below the note body, a <strong>Linked from</strong> section lists notes whose body contains <code>[[this note's title]]</code> — populated from notes you've opened in this session.</p>
+        <h3>Edit History</h3>
+        <p>On any note's view panel, click <strong>📜 History</strong>. A slide-in panel shows every GitHub commit for that note file, newest first. The current version is labelled. Click <strong>↩ Restore this version</strong> to load an old body into the editor for review — you must explicitly Save to overwrite.</p>
+        <h3>Quick Log (FAB)</h3>
+        <p>The blue <strong>＋</strong> button in the bottom-right corner opens a minimal modal: just Title and Body. Saves immediately as a <em>Self Notes / Brainstorming</em> entry. Disappears while the full editor is open.</p>
         <h3>Markdown Toolbar</h3>
-        <p>The editor toolbar wraps selected text or inserts at cursor. All standard Markdown is supported — headings, bold, italic, lists, tables, code blocks, images.</p>
+        <p>The toolbar wraps selected text or inserts at cursor. Buttons: H2, H3, Bold, Italic, Strikethrough, inline <code>code</code>, code block, blockquote, horizontal rule, bullet list, numbered list, task list, link, image embed, table, <strong>[[]]</strong> wiki-link. Shortcuts: <span class="kbd">Ctrl+B</span> Bold, <span class="kbd">Ctrl+I</span> Italic, <span class="kbd">Ctrl+K</span> Link, <span class="kbd">Tab</span> = 2 spaces.</p>
         <h3>Image Embeds</h3>
-        <p>Click <strong>🖼</strong> to pick an image file. It is base64-encoded and inserted inline — it will be encrypted inside the note. Keep images under 1MB to avoid large file sizes.</p>
+        <p>Click <strong>🖼</strong> to pick an image. It is base64-encoded and inserted inline — encrypted inside the note. Keep under 1 MB.</p>
         <h3>Search</h3>
-        <p><strong>Typing</strong> in the search box instantly filters the sidebar by title, species, and tags. Pressing <span class="kbd">Enter</span> triggers a <strong>deep search</strong> — it decrypts every note body and finds matches with highlighted excerpts.</p>
+        <p>Typing in the search box instantly filters the sidebar by title, species, and tags. Pressing <span class="kbd">Enter</span> triggers a <strong>deep search</strong> — decrypts every note body and returns highlighted excerpts.</p>
         <h3>Filters</h3>
-        <p>The filter pills below the search box filter by experiment type, TC stage, or show only overdue reminders / contamination entries.</p>
+        <p>Filter pills below the search box: All types, ☣️ Contamination only, ⏰ Overdue, and TC Stages I–IV.</p>
       </div>
 
       <h2>Keyboard Shortcuts</h2>
@@ -1262,64 +1277,146 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
           <tr><td><span class="kbd">Ctrl+K</span></td><td>Insert link</td></tr>
           <tr><td><span class="kbd">Tab</span></td><td>Insert 2 spaces (inside editor)</td></tr>
           <tr><td><span class="kbd">Enter</span> in search</td><td>Deep full-text search across all notes</td></tr>
+          <tr><td><span class="kbd">Escape</span></td><td>Close Quick Log modal / Wiki picker</td></tr>
         </table>
       </div>
 
       <h2>Accession Registry</h2>
       <div class="help-section-card">
-        <p>Track every plant accession — species, accession number, origin, source, acquisition date, and status. Linked lab entries appear automatically on the accession page: any note whose <em>Species/Accession</em> field contains the accession's species name is shown as a linked entry.</p>
+        <p>Track every plant accession — species, accession number, origin, source, acquisition date, and status. Any note whose <em>Species/Accession</em> field matches the accession's species name is automatically linked.</p>
+        <h3>Timeline Tab</h3>
+        <p>Each accession view has two tabs: <strong>📋 Details</strong> (the accession record) and <strong>📅 Timeline</strong>. The Timeline tab shows all linked lab entries as a chronological vertical timeline with stage icons — click any entry title to open that note.</p>
         <h3>Status options</h3>
-        <ul><li><strong>Active in culture</strong> — currently growing in vitro</li><li><strong>In acclimatization</strong> — Stage IV, being hardened off</li><li><strong>Dormant</strong> — paused, not actively subcultured</li><li><strong>Transferred out</strong> — moved to another lab or person</li><li><strong>Lost</strong> — culture failed or contaminated</li></ul>
+        <ul>
+          <li><strong>Active in culture</strong> — currently growing in vitro</li>
+          <li><strong>In acclimatization</strong> — Stage IV, being hardened off</li>
+          <li><strong>Dormant</strong> — paused, not actively subcultured</li>
+          <li><strong>Transferred out</strong> — moved to another lab or person</li>
+          <li><strong>Lost</strong> — culture failed or contaminated</li>
+        </ul>
       </div>
 
       <h2>Media Recipe Book</h2>
       <div class="help-section-card">
-        <p>Store complete media formulations. Each recipe records base medium, sucrose, agar/gelrite, pH, growth regulators, autoclave parameters, and free-text preparation notes.</p>
+        <p>Store complete media formulations. Each recipe records base medium, sucrose, agar/gelrite, pH, growth regulators, autoclave parameters, and preparation notes.</p>
         <h3>Base Medium</h3>
-        <p>Choose from the curated list covering general (MS, LS), orchid-specific (Knudson C, VW, Pierik), monocot/banana (B5, N6, MS-Musa), and woody plant media (WPM, DKW). Select <strong>✏️ Custom</strong> to type any name.</p>
+        <p>Choose from the curated list: general (MS, LS), orchid-specific (Knudson C, VW, Pierik, New Dogashima), monocot/banana (B5, N6, MS-Musa), woody plants (WPM, DKW, Anderson's). Select <strong>✏️ Custom</strong> to type any name.</p>
         <h3>Autoclave</h3>
-        <p>Use the preset buttons (121°C/15m, 121°C/20m, 121°C/45m for large autoclaves, 115°C/20m) or type exact temperature and hold time manually. For heat-sensitive components, use <strong>Filter sterilized</strong> (sets temp to 0).</p>
+        <p>Presets: 121°C/15m, 121°C/20m, 121°C/45m, 115°C/20m, Filter sterile. Or type exact temperature and hold time manually.</p>
         <h3>Linking to notes</h3>
-        <p>When creating a lab entry, the <strong>Recipe Used</strong> dropdown lists all saved recipes. The linked recipe appears as a purple badge on the note — clicking it opens the recipe directly.</p>
+        <p>Pick a recipe in the <strong>Recipe Used</strong> dropdown when creating a note. It shows as a purple badge — clicking opens the recipe. Recipe links are used in the <strong>Analytics</strong> tab to compute usage frequency and media efficiency.</p>
       </div>
 
       <h2>Reminders</h2>
       <div class="help-section-card">
         <p>Any lab entry with a <strong>Next Review Date</strong> appears in the ⏰ Reminders tab, grouped by urgency:</p>
-        <ul><li><strong>🔴 Overdue</strong> — past the review date</li><li><strong>🟡 This week</strong> — due within 7 days</li><li><strong>📅 This month</strong> — due within 30 days</li><li><strong>🗓 Later</strong> — more than 30 days away</li></ul>
-        <p>The nav badge shows a count of overdue + this-week entries. Click any reminder card to open the note.</p>
+        <ul>
+          <li><strong>🔴 Overdue</strong> — past the review date</li>
+          <li><strong>🟡 This week</strong> — due within 7 days</li>
+          <li><strong>📅 This month</strong> — due within 30 days</li>
+          <li><strong>🗓 Later</strong> — more than 30 days away</li>
+        </ul>
+        <p>The nav badge shows overdue + this-week count. Click any reminder card to open the note.</p>
       </div>
 
-      <h2>⏱ Tools — Timers &amp; Calculator</h2>
+      <h2>Weather Widget</h2>
+      <div class="help-section-card">
+        <p>The <strong>🌡️ weather chip</strong> in the nav bar shows the current real-feel temperature at the lab (SARE, Thiruporur). Data is fetched from Open-Meteo every 60 seconds — no API key, always live.</p>
+        <p>Click the chip to expand a popover showing both locations side by side:</p>
+        <table><tr><th>Location</th><th>Metrics shown</th></tr>
+          <tr><td>🏛️ Lab — SARE, Thiruporur</td><td>Feels-like °C, 💧 Humidity %, ☀️ UV Index, 🌧️ Rain probability %</td></tr>
+          <tr><td>🌿 Greenhouse — Thaiyur, Kelambakkam</td><td>Same four metrics</td></tr>
+        </table>
+        <p>Click anywhere outside the popover to close it.</p>
+      </div>
+
+      <h2>📊 Lab Analytics</h2>
+      <div class="help-section-card">
+        <p>Click the <strong>📊 Analytics</strong> tab to see all metrics computed from your notes, accessions, and recipes in real time. No data is sent anywhere — everything runs in your browser from already-decrypted in-memory data.</p>
+
+        <h3>Notes / Month</h3>
+        <p>A line chart of how many lab entries you created in each of the last 6 calendar months. Useful for spotting quiet periods or high-activity sprints.</p>
+
+        <h3>Stage Distribution</h3>
+        <p>A donut chart showing what proportion of your notes are at each TC stage (Stage I–IV). Helps you see where most of your active work is concentrated. Each stage has a distinct colour: blue (I), green (II), yellow (III), purple (IV), red (Contamination).</p>
+
+        <h3>Species Success Rate</h3>
+        <p>Horizontal bars showing <em>success rate</em> for each species — the percentage of notes for that species that are <strong>not</strong> Contamination Log entries. Only species with 2 or more notes are shown. Colour-coded: green &gt;70%, yellow 40–70%, red &lt;40%.</p>
+
+        <h3>Contamination Trend</h3>
+        <p>A line chart of how many Contamination Log entries occurred per month over the last 6 months. An upward trend is a warning signal to investigate media, laminar flow, or explant source.</p>
+
+        <h3>Recipe Usage</h3>
+        <p>Horizontal bars for the top 6 most-used recipes — counted by how many notes reference each recipe. Shows which media formulations you rely on most.</p>
+
+        <h3>Tag Cloud</h3>
+        <p>Your top 30 tags displayed as sized pills — larger and more opaque tags are used more frequently. Gives a quick overview of recurring themes and topics in your lab journal.</p>
+
+        <h3>Stage Funnel by Species</h3>
+        <p>Stacked horizontal bars for your top 5 species (by note count), showing how their notes are distributed across Stage I → II → III → IV. A healthy progression should show entries at multiple stages. A species with only Stage I entries may have stalled.</p>
+
+        <h3>Average Days Between Entries</h3>
+        <p>Badge cards showing the average number of days between consecutive lab entries for each species with 3 or more notes. This approximates your <strong>subculture interval</strong> — useful for optimising transfer frequency.</p>
+
+        <h3>Media Efficiency</h3>
+        <p>A ranked table showing how well each combination of <strong>Recipe × Species × Stage</strong> performs. Requires at least 2 notes sharing the same recipe, species, and stage.</p>
+        <table><tr><th>Column</th><th>Meaning</th></tr>
+          <tr><td>Recipe</td><td>The saved media recipe used</td></tr>
+          <tr><td>Species</td><td>The plant species</td></tr>
+          <tr><td>Stage</td><td>TC Stage (I–IV, abbreviated)</td></tr>
+          <tr><td>Avg Out</td><td>Average value of the <strong>Cultures Out</strong> field across all matching notes. This is the number of propagules or cultures produced per transfer. Set "Cultures Out" on your notes to populate this.</td></tr>
+          <tr><td>Contam%</td><td>Percentage of matching notes that are Contamination Log entries</td></tr>
+          <tr><td>Score</td><td>Composite efficiency score (0–100). Formula: <code>(Avg Out ÷ global average) × (1 − contamination rate) × 100</code>, capped at 100. Higher is better. A recipe with high output but high contamination will score lower than a reliable medium with moderate output.</td></tr>
+        </table>
+        <p>💡 <strong>Tip:</strong> Always fill in <strong>Cultures Out</strong> when saving a Multiplication or Rooting note to get meaningful efficiency data. Without it, the Avg Out and Score columns show "—".</p>
+      </div>
+
+      <h2>Activity Log</h2>
+      <div class="help-section-card">
+        <p>The <strong>⚡ Activity</strong> tab on the right edge of the screen opens a live panel showing the last 30 GitHub commits on your lab repo. Each entry shows the commit message, time ago, and date.</p>
+        <p>Icons indicate the type of activity:</p>
+        <table><tr><th>Icon</th><th>Meaning</th></tr>
+          <tr><td>🌱</td><td>New note added or Quick Log</td></tr>
+          <tr><td>✏️</td><td>Note updated</td></tr>
+          <tr><td>🗑</td><td>Note deleted</td></tr>
+          <tr><td>🌿</td><td>Accession registry updated</td></tr>
+          <tr><td>🧪</td><td>Recipe saved or updated</td></tr>
+          <tr><td>📋</td><td>Index updated</td></tr>
+          <tr><td>✨</td><td>App feature added</td></tr>
+        </table>
+        <p>Click <strong>↻</strong> to refresh. Click <strong>✕</strong> or click the <strong>⚡ Activity</strong> tab again to close. The panel is minimised by default — just a small tab on the right edge.</p>
+      </div>
+
+      <h2>⏱ Tools</h2>
       <div class="help-section-card">
         <h3>Countdown Timers</h3>
-        <p>Click <strong>＋ Add Timer</strong> to create a countdown. Enter hours, minutes and seconds, give it a name (e.g. "Autoclave", "Surface sterilization"), then press ▶. Up to 5 timers can run simultaneously. A repeating beep plays when any timer reaches zero. Press ↺ to reset.</p>
+        <p>Click <strong>＋ Add Timer</strong>. Enter hours, minutes, seconds, and a name (e.g. "Autoclave", "Surface sterilisation"). Press ▶ to start. Up to 5 simultaneous timers. A repeating beep plays when a timer reaches zero. Press ↺ to reset.</p>
         <h3>Stopwatches</h3>
-        <p>Multiple stopwatches with lap recording. Press ⏱ Lap to record a split time without stopping. Press ↺ to clear.</p>
+        <p>Up to 4 stopwatches with lap recording. Press <strong>⏱ Lap</strong> to record a split without stopping. Press ↺ to clear laps and reset.</p>
         <h3>Regular / Scientific Calculator</h3>
-        <p>Standard calculator with memory. Switch to <strong>Scientific</strong> for sin/cos/tan and inverse trig (uses DEG by default, toggle to RAD), log, ln, √, x², xʸ, π and e.</p>
+        <p>Standard calculator with memory (M+, MR, MC). Switch to <strong>Scientific</strong> for sin/cos/tan, inverse trig (DEG/RAD toggle), log, ln, √, x², xʸ, π, e.</p>
         <h3>BioChemistry Calculator</h3>
         <ul>
-          <li><strong>Molarity</strong> — calculates molar concentration from MW, mass, and volume</li>
+          <li><strong>Molarity</strong> — molar concentration from MW, mass, and volume</li>
           <li><strong>Dilution</strong> — C₁V₁ = C₂V₂; leave V₁ blank to solve for it</li>
           <li><strong>% Solution</strong> — w/v percentage from mass and volume</li>
           <li><strong>pH</strong> — pH from [H⁺] or from pOH</li>
-          <li><strong>PGR Convert</strong> — converts growth regulator concentrations between mg/L and μM using molecular weight</li>
+          <li><strong>PGR Convert</strong> — growth regulator concentrations between mg/L and μM using molecular weight</li>
         </ul>
       </div>
 
       <h2>Export &amp; Backup</h2>
       <div class="help-section-card">
         <p>Click <strong>⬇ Export</strong> in the top bar to download all notes as a ZIP of decrypted Markdown files, plus accessions and recipes as JSON. Each note file includes YAML front matter with all metadata.</p>
-        <p>Your data is also always in the GitHub repo as encrypted <code>.enc</code> files — every save is a git commit, so you have full version history. The repo itself is your backup.</p>
+        <p>Your data is always in the GitHub repo as encrypted <code>.enc</code> files — every save is a git commit, so you have full version history at <code>github.com/Phyto-Evolution/tcplants</code>. The repo is your backup.</p>
         <h3>Print / PDF</h3>
-        <p>Open any note or recipe and click <strong>🖨 Print / PDF</strong>. This opens a clean print-optimised page. Use your browser's print dialog and choose <em>Save as PDF</em>.</p>
+        <p>Open any note or recipe, then click <strong>🖨 Print / PDF</strong>. A clean print-optimised window opens. Use your browser's print dialog → <em>Save as PDF</em>.</p>
       </div>
 
-      <h2>PWA — Install as App</h2>
+      <h2>Privacy &amp; Security</h2>
       <div class="help-section-card">
-        <p>On Chrome/Edge: click <strong>⬇ Install App</strong> in the nav bar when it appears (usually after your first visit). On Safari/iOS: tap the Share button → <em>Add to Home Screen</em>. The app then opens in its own window without browser chrome.</p>
-        <p>The app shell is cached offline — you can open it without internet. However, loading or saving notes requires GitHub API access (internet connection).</p>
+        <p>All note content is encrypted client-side with <strong>AES-256-GCM</strong> using a key derived from your password via PBKDF2 (600,000 iterations, SHA-256). The GitHub repo contains only ciphertext — even repo admins cannot read your notes without your password.</p>
+        <p>Your password never leaves your browser. The GitHub token is stored only in <code>sessionStorage</code> (cleared on tab close). The session data cache in <code>sessionStorage</code> contains decrypted data but is cleared on lock and on tab close.</p>
       </div>
     </div>
   </div>
