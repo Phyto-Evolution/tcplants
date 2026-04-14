@@ -404,6 +404,30 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 .help-body th,.help-body td{border:1px solid var(--bd);padding:7px 10px;text-align:left}
 .help-body th{background:var(--sf2)}
 .help-section-card{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:16px;margin-bottom:14px}
+
+/* ── WEATHER ── */
+#weather-chip{
+  background:var(--sf2);border:1px solid var(--bd);border-radius:20px;
+  color:var(--tx);cursor:pointer;font-size:12px;font-weight:500;
+  padding:3px 10px;white-space:nowrap;display:none;align-items:center;gap:4px;
+  transition:background .15s
+}
+#weather-chip:hover{background:var(--sf3)}
+#weather-chip.on{display:flex}
+#weather-pop{
+  position:absolute;top:54px;right:12px;z-index:200;
+  background:var(--sf);border:1px solid var(--bd);border-radius:10px;
+  padding:16px;display:none;min-width:340px;box-shadow:0 8px 24px rgba(0,0,0,.3)
+}
+#weather-pop.on{display:block}
+.wx-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.wx-card{background:var(--sf2);border-radius:8px;padding:12px}
+.wx-label{font-size:11px;color:var(--mu);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.wx-feels{font-size:22px;font-weight:700;margin-bottom:4px}
+.wx-rows{display:flex;flex-direction:column;gap:3px}
+.wx-row{font-size:12px;color:var(--mu);display:flex;gap:6px}
+.wx-row span:first-child{width:16px;text-align:center}
+.wx-updated{font-size:11px;color:var(--mu);text-align:center;margin-top:10px}
 </style>
 <script>(function(){var t=localStorage.getItem('tcplants_theme')||'dark';document.documentElement.dataset.theme=t;}());</script>
 </head>
@@ -452,6 +476,7 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
       <button class="ntab" data-sec="help"><span class="tab-icon">❓</span><span class="tab-label"> Help</span></button>
     </div>
     <div class="nav-right">
+      <button id="weather-chip" title="Lab & Greenhouse weather">🌡️ —</button>
       <button id="theme-btn" title="Toggle light/dark mode">☀️</button>
       <span id="offline-pill">● Offline</span>
       <button id="install-btn" title="Install as app">⬇ Install App</button>
@@ -1146,6 +1171,7 @@ const S = {
   recs:[], curRec:null, editingRec:null, recSha:null,
   // section
   section:'notes',
+  weather:{lab:null,gh:null,updatedAt:null},
 };
 
 // ════════════════════════════════════════════════════════════
@@ -2158,6 +2184,8 @@ async function login(){
     renderNoteList(); renderAccList(); renderRecList();
     updateReminderBadge();
     switchSection('notes'); showNote('empty');
+    fetchWeather();
+    setInterval(fetchWeather, 60000);
   }catch(e){
     err.textContent=e.message; err.style.display='block';
     S.pw=null; S.tok=null;
@@ -2196,6 +2224,45 @@ function _readCache(){
   }catch(e){ return null; }
 }
 
+// ── WEATHER ──────────────────────────────────────────────────
+const WX_LOCS = {
+  lab:{lat:12.7434,lon:80.1931},
+  gh: {lat:12.7742,lon:80.2105}
+};
+async function fetchWeather(){
+  const base='https://api.open-meteo.com/v1/forecast?current=apparent_temperature,relative_humidity_2m,uv_index,precipitation_probability&timezone=Asia%2FKolkata';
+  try{
+    const [rLab,rGh]=await Promise.all([
+      fetch(`${base}&latitude=${WX_LOCS.lab.lat}&longitude=${WX_LOCS.lab.lon}`).then(r=>r.json()),
+      fetch(`${base}&latitude=${WX_LOCS.gh.lat}&longitude=${WX_LOCS.gh.lon}`).then(r=>r.json())
+    ]);
+    S.weather.lab=rLab.current;
+    S.weather.gh=rGh.current;
+    S.weather.updatedAt=new Date();
+    _renderWeatherChip();
+    _renderWeatherPop();
+  }catch(e){ /* silent fail — chip stays at — */ }
+}
+function _renderWeatherChip(){
+  const d=S.weather.lab; if(!d) return;
+  const chip=document.getElementById('weather-chip');
+  chip.classList.add('on');
+  chip.innerHTML=`🌡️ ${Math.round(d.apparent_temperature)}°C`;
+}
+function _renderWeatherPop(){
+  const d=S.weather; if(!d.lab||!d.gh) return;
+  const fmtLoc=(loc)=>{
+    const c=d[loc];
+    document.getElementById(`wx-${loc}-feels`).textContent=`Feels ${Math.round(c.apparent_temperature)}°C`;
+    document.getElementById(`wx-${loc}-hum`).textContent=`${c.relative_humidity_2m}% humidity`;
+    document.getElementById(`wx-${loc}-uv`).textContent=`UV Index ${c.uv_index}`;
+    document.getElementById(`wx-${loc}-rain`).textContent=`${c.precipitation_probability}% rain`;
+  };
+  fmtLoc('lab'); fmtLoc('gh');
+  const t=d.updatedAt;
+  document.getElementById('wx-updated').textContent=`Updated ${t.toLocaleDateString('en-IN',{day:'numeric',month:'short'})} ${t.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}`;
+}
+
 // ════════════════════════════════════════════════════════════
 // EVENT WIRING
 // ════════════════════════════════════════════════════════════
@@ -2203,6 +2270,14 @@ document.getElementById('lbtn').onclick=login;
 document.getElementById('lpw').onkeydown=e=>{if(e.key==='Enter')document.getElementById('ltok').focus();};
 document.getElementById('ltok').onkeydown=e=>{if(e.key==='Enter')login();};
 document.getElementById('lock-btn').onclick=lock;
+
+// Weather chip toggle
+document.getElementById('weather-chip').addEventListener('click', function(e){
+  e.stopPropagation();
+  document.getElementById('weather-pop').classList.toggle('on');
+});
+document.addEventListener('click', ()=>document.getElementById('weather-pop').classList.remove('on'));
+document.getElementById('weather-pop').addEventListener('click', e=>e.stopPropagation());
 document.getElementById('export-all-btn').onclick=bulkExport;
 
 // Notes
@@ -2649,5 +2724,29 @@ document.getElementById('theme-btn').addEventListener('click', function(){
   document.querySelector('meta[name="theme-color"]').setAttribute('content', next === 'dark' ? '#161b22' : '#f6f8fa');
 });
 </script>
+<!-- ═══════════ WEATHER POPOVER ═══════════ -->
+<div id="weather-pop">
+  <div class="wx-grid">
+    <div class="wx-card">
+      <div class="wx-label">🏛️ Lab — SARE, Thiruporur</div>
+      <div class="wx-feels" id="wx-lab-feels">—</div>
+      <div class="wx-rows">
+        <div class="wx-row"><span>💧</span><span id="wx-lab-hum">—</span></div>
+        <div class="wx-row"><span>☀️</span><span id="wx-lab-uv">UV —</span></div>
+        <div class="wx-row"><span>🌧️</span><span id="wx-lab-rain">Rain —</span></div>
+      </div>
+    </div>
+    <div class="wx-card">
+      <div class="wx-label">🌿 Greenhouse — Thaiyur</div>
+      <div class="wx-feels" id="wx-gh-feels">—</div>
+      <div class="wx-rows">
+        <div class="wx-row"><span>💧</span><span id="wx-gh-hum">—</span></div>
+        <div class="wx-row"><span>☀️</span><span id="wx-gh-uv">UV —</span></div>
+        <div class="wx-row"><span>🌧️</span><span id="wx-gh-rain">Rain —</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="wx-updated" id="wx-updated"></div>
+</div>
 </body>
 </html>
