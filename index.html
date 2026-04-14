@@ -436,6 +436,29 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 }
 #draft-banner.on{display:flex}
 #draft-banner span{flex:1}
+/* ── SPLIT PANE ── */
+.editor-body-wrap{position:relative}
+.pane-btns{display:flex;gap:2px;margin-bottom:6px}
+.pane-btn{background:var(--sf2);border:1px solid var(--bd);border-radius:4px;color:var(--mu);cursor:pointer;font-size:11px;padding:3px 8px;font-family:var(--font)}
+.pane-btn.active{background:var(--ac);color:#0d1117;border-color:var(--ac)}
+.editor-body-wrap[data-pane="editor"] #ne-preview{display:none}
+.editor-body-wrap[data-pane="preview"] #ne-body{display:none}
+.editor-body-wrap[data-pane="preview"] .editor-toolbar{display:none}
+.editor-body-wrap[data-pane="split"]{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.editor-body-wrap[data-pane="split"] .pane-btns{grid-column:1/-1}
+.editor-body-wrap[data-pane="split"] .editor-toolbar{grid-column:1/-1}
+.editor-body-wrap[data-pane="split"] #ne-body{height:320px}
+#ne-preview{
+  border:1px solid var(--bd);border-radius:6px;padding:12px;
+  overflow-y:auto;font-size:14px;line-height:1.7;
+  min-height:200px;background:var(--bg)
+}
+.editor-body-wrap[data-pane="split"] #ne-preview{height:320px}
+@media(max-width:700px){
+  .editor-body-wrap[data-pane="split"]{grid-template-columns:1fr}
+  .editor-body-wrap[data-pane="split"] #ne-body,
+  .editor-body-wrap[data-pane="split"] #ne-preview{height:200px}
+}
 </style>
 <script>(function(){var t=localStorage.getItem('tcplants_theme')||'dark';document.documentElement.dataset.theme=t;}());</script>
 </head>
@@ -610,29 +633,37 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
         </div>
         <div class="field">
           <label>Notes <span style="font-weight:400;color:var(--mu)">(Markdown)</span></label>
-          <div class="editor-toolbar">
-            <button class="tb-btn" id="tb-h2"     title="Heading 2 (##)">H2</button>
-            <button class="tb-btn" id="tb-h3"     title="Heading 3 (###)">H3</button>
-            <div class="tb-div"></div>
-            <button class="tb-btn" id="tb-bold"   title="Bold (Ctrl+B)"><b>B</b></button>
-            <button class="tb-btn" id="tb-italic" title="Italic (Ctrl+I)"><i>I</i></button>
-            <button class="tb-btn" id="tb-strike" title="Strikethrough"><s>S</s></button>
-            <div class="tb-div"></div>
-            <button class="tb-btn" id="tb-code"   title="Inline code">`c`</button>
-            <button class="tb-btn" id="tb-codebl" title="Code block">```</button>
-            <button class="tb-btn" id="tb-quote"  title="Blockquote">"</button>
-            <button class="tb-btn" id="tb-hr"     title="Horizontal rule">—</button>
-            <div class="tb-div"></div>
-            <button class="tb-btn" id="tb-ul"     title="Bullet list">• List</button>
-            <button class="tb-btn" id="tb-ol"     title="Numbered list">1. List</button>
-            <button class="tb-btn" id="tb-task"   title="Task / checkbox list">☑ Task</button>
-            <div class="tb-div"></div>
-            <button class="tb-btn" id="tb-link"   title="Link (Ctrl+K)">🔗</button>
-            <button class="tb-btn" id="img-btn"   title="Embed image">🖼</button>
-            <button class="tb-btn" id="tbl-btn"   title="Insert table">⊞</button>
+          <div class="editor-body-wrap" id="editor-body-wrap" data-pane="editor">
+            <div class="pane-btns">
+              <button type="button" class="pane-btn active" data-pane="editor">✏️ Edit</button>
+              <button type="button" class="pane-btn" data-pane="split">⬛ Split</button>
+              <button type="button" class="pane-btn" data-pane="preview">👁 Preview</button>
+            </div>
+            <div class="editor-toolbar">
+              <button class="tb-btn" id="tb-h2"     title="Heading 2 (##)">H2</button>
+              <button class="tb-btn" id="tb-h3"     title="Heading 3 (###)">H3</button>
+              <div class="tb-div"></div>
+              <button class="tb-btn" id="tb-bold"   title="Bold (Ctrl+B)"><b>B</b></button>
+              <button class="tb-btn" id="tb-italic" title="Italic (Ctrl+I)"><i>I</i></button>
+              <button class="tb-btn" id="tb-strike" title="Strikethrough"><s>S</s></button>
+              <div class="tb-div"></div>
+              <button class="tb-btn" id="tb-code"   title="Inline code">`c`</button>
+              <button class="tb-btn" id="tb-codebl" title="Code block">```</button>
+              <button class="tb-btn" id="tb-quote"  title="Blockquote">"</button>
+              <button class="tb-btn" id="tb-hr"     title="Horizontal rule">—</button>
+              <div class="tb-div"></div>
+              <button class="tb-btn" id="tb-ul"     title="Bullet list">• List</button>
+              <button class="tb-btn" id="tb-ol"     title="Numbered list">1. List</button>
+              <button class="tb-btn" id="tb-task"   title="Task / checkbox list">☑ Task</button>
+              <div class="tb-div"></div>
+              <button class="tb-btn" id="tb-link"   title="Link (Ctrl+K)">🔗</button>
+              <button class="tb-btn" id="img-btn"   title="Embed image">🖼</button>
+              <button class="tb-btn" id="tbl-btn"   title="Insert table">⊞</button>
+            </div>
+            <textarea id="ne-body" placeholder="Write lab notes here…"></textarea>
+            <div id="ne-preview" class="md"></div>
+            <div class="tmpl-hint" id="ne-tmpl-hint"></div>
           </div>
-          <textarea id="ne-body" placeholder="Write lab notes here…"></textarea>
-          <div class="tmpl-hint" id="ne-tmpl-hint"></div>
         </div>
         <div class="eactions">
           <button class="btn" id="save-note-btn">💾 Save to GitHub</button>
@@ -1512,6 +1543,28 @@ function _wireDraftListeners(){
   });
 }
 
+// ── SPLIT PANE PREVIEW ───────────────────────────────────────
+function _wikiPreprocess(md){ return md; } // placeholder — replaced in Task 11
+function _updatePreview(){
+  const body=document.getElementById('ne-body').value;
+  document.getElementById('ne-preview').innerHTML=marked.parse(_wikiPreprocess(body));
+}
+function _wirePaneToggle(){
+  const wrap=document.getElementById('editor-body-wrap');
+  wrap.querySelectorAll('.pane-btn').forEach(btn=>{
+    btn.addEventListener('click',function(){
+      wrap.querySelectorAll('.pane-btn').forEach(b=>b.classList.remove('active'));
+      this.classList.add('active');
+      wrap.dataset.pane=this.dataset.pane;
+      if(this.dataset.pane!=='editor') _updatePreview();
+    });
+  });
+  document.getElementById('ne-body').addEventListener('input',()=>{
+    const wrap=document.getElementById('editor-body-wrap');
+    if(wrap.dataset.pane!=='editor') _updatePreview();
+  });
+}
+
 function startNewNote(){
   S.editing=null; S.cur=null; renderNoteList();
   document.getElementById('ne-head').textContent='New Lab Entry';
@@ -1521,6 +1574,9 @@ function startNewNote(){
   document.getElementById('ne-review').value='';
   document.getElementById('ne-tmpl-hint').textContent='';
   populateRecipeSelect();
+  const wrap=document.getElementById('editor-body-wrap');
+  wrap.dataset.pane='editor';
+  wrap.querySelectorAll('.pane-btn').forEach(b=>b.classList.toggle('active',b.dataset.pane==='editor'));
   showNote('editor');
   _checkDraft(null);
 }
@@ -1543,6 +1599,9 @@ async function startEditNote(){
     document.getElementById('ne-body').value=body;
     document.getElementById('ne-tmpl-hint').textContent='';
     populateRecipeSelect(m.recipe_id||'');
+    const wrap=document.getElementById('editor-body-wrap');
+    wrap.dataset.pane='editor';
+    wrap.querySelectorAll('.pane-btn').forEach(b=>b.classList.toggle('active',b.dataset.pane==='editor'));
     showNote('editor');
     _checkDraft(id);
   }catch(e){toast('Load failed: '+e.message,'fail');}
@@ -2380,6 +2439,7 @@ document.getElementById('save-rec-btn').onclick=saveRecipe;
 document.getElementById('cancel-rec-btn').onclick=()=>S.curRec?openRecipe(S.curRec):showRec('empty');
 document.getElementById('print-rec-btn').onclick=printRecipe;
 _wireDraftListeners();
+_wirePaneToggle();
 
 // ════════════════════════════════════════════════════════════
 // OFFLINE DETECTION
