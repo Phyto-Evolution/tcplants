@@ -310,8 +310,7 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
   .dtitle{font-size:20px}
   .section.fullpage{padding:16px}
   .tools-layout{flex-direction:column}
-  .tools-left,.tools-right{width:100%!important;max-width:100%}
-  .calc-btn{font-size:15px;padding:12px 4px}
+  .tools-left{width:100%!important;max-width:100%}
   .dactions{flex-wrap:wrap}
   .dbadges{gap:5px}
   .sbadge,.tag{font-size:11px}
@@ -328,7 +327,6 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 /* ── TOOLS ── */
 .tools-layout{display:flex;gap:20px;align-items:flex-start}
 .tools-left{flex:1;min-width:0;display:flex;flex-direction:column;gap:16px}
-.tools-right{width:340px;flex-shrink:0}
 .tool-card{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:16px}
 .tool-card h3{font-size:13px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
 /* timers */
@@ -353,35 +351,24 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 .sw-display{font-family:var(--mono);font-size:24px;font-weight:700;text-align:center;letter-spacing:2px;padding:6px 0}
 .sw-laps{max-height:80px;overflow-y:auto;margin-top:6px;font-size:11px;color:var(--mu);font-family:var(--mono)}
 .sw-laps div{padding:1px 0;border-bottom:1px solid var(--bd)}
-/* calculator */
-.calc-modes{display:flex;gap:3px;margin-bottom:12px;background:var(--sf2);border-radius:7px;padding:3px}
-.calc-mode-btn{flex:1;background:transparent;border:none;border-radius:5px;color:var(--mu);cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;padding:5px;transition:all .15s}
-.calc-mode-btn.active{background:var(--sf3);color:var(--tx)}
-.calc-display{background:var(--bg);border:1px solid var(--bd);border-radius:7px;padding:10px 14px;margin-bottom:10px;min-height:52px;text-align:right}
-.calc-expr{font-size:11px;color:var(--mu);font-family:var(--mono);min-height:16px;word-break:break-all}
-.calc-val{font-size:24px;font-weight:700;font-family:var(--mono)}
-.calc-grid{display:grid;gap:5px}
-.calc-grid.reg{grid-template-columns:repeat(4,1fr)}
-.calc-grid.sci{grid-template-columns:repeat(5,1fr)}
-.calc-btn{background:var(--sf2);border:1px solid var(--bd);border-radius:6px;color:var(--tx);cursor:pointer;font-family:var(--font);font-size:14px;font-weight:500;padding:10px 4px;transition:all .12s;text-align:center}
-.calc-btn:hover{background:var(--sf3)}
-.calc-btn:active{transform:scale(.95)}
-.calc-btn.op{background:rgba(88,166,255,.15);color:var(--ac)}
-.calc-btn.eq{background:var(--ac);color:#0d1117;font-weight:700}
-.calc-btn.fn{background:rgba(188,140,255,.1);color:var(--pu);font-size:12px}
-.calc-btn.wide{grid-column:span 2}
-.calc-btn.danger{background:rgba(248,81,73,.12);color:var(--rd)}
-/* biochem calculator */
-.bc-panel{display:none}
-.bc-panel.on{display:block}
-.bc-tabs{display:flex;gap:3px;margin-bottom:12px;flex-wrap:wrap}
-.bc-tab{background:var(--sf2);border:1px solid var(--bd);border-radius:5px;color:var(--mu);cursor:pointer;font-size:11px;font-weight:600;padding:4px 9px;transition:all .15s;font-family:var(--font)}
-.bc-tab.active{background:rgba(188,140,255,.15);border-color:var(--pu);color:var(--pu)}
-.bc-calc{background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:14px}
-.bc-calc label{font-size:12px;font-weight:600;color:var(--mu);display:block;margin-bottom:3px}
-.bc-calc input{margin-bottom:10px;font-size:14px}
-.bc-result{background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:10px;font-family:var(--mono);font-size:15px;font-weight:700;color:var(--ac);margin-top:6px;min-height:42px;word-break:break-all}
-.bc-result small{display:block;font-size:11px;color:var(--mu);font-weight:400;margin-top:2px}
+/* stepper */
+.stepper-steps{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.stepper-step{display:flex;align-items:center;gap:8px;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:8px 10px}
+.stepper-step.active-step{border-color:var(--ac);background:rgba(88,166,255,.08)}
+.stepper-step.done-step{border-color:var(--gn);background:rgba(63,185,80,.07);opacity:.6}
+.step-name{flex:1;background:transparent;border:none;color:var(--tx);font-family:var(--font);font-size:13px;outline:none}
+.step-dur{width:62px;text-align:center;font-family:var(--mono);font-size:13px;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);padding:4px 6px}
+.stepper-display{font-family:var(--mono);font-size:36px;font-weight:700;text-align:center;letter-spacing:3px;padding:10px 0;color:var(--ac)}
+.stepper-display.done{color:var(--gn)}
+.stepper-progress{height:6px;background:var(--bd);border-radius:3px;margin-bottom:10px;overflow:hidden}
+.stepper-bar{height:100%;background:var(--ac);border-radius:3px;transition:width .5s linear}
+/* scaler */
+.scaler-result{background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:10px;font-family:var(--mono);font-size:13px;margin-top:8px;white-space:pre-wrap;min-height:40px;line-height:1.8}
+/* culture age */
+.age-result{background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:12px;margin-top:8px;display:none}
+.age-result.on{display:block}
+.age-big{font-size:28px;font-weight:700;font-family:var(--mono);color:var(--ac)}
+.age-sub{font-size:12px;color:var(--mu);margin-top:4px}
 /* autoclave presets */
 .ac-presets{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
 .ac-preset{background:var(--sf2);border:1px solid var(--bd);border-radius:5px;color:var(--mu);cursor:pointer;font-family:var(--mono);font-size:11px;padding:3px 9px;transition:all .15s}
@@ -1087,9 +1074,8 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
   <!-- ── TOOLS ── -->
   <div class="section fullpage" id="sec-tools">
     <h2 style="font-size:20px;font-weight:700;margin-bottom:4px">⏱ Lab Tools</h2>
-    <p style="font-size:13px;color:var(--mu);margin-bottom:20px">Timers, stopwatches and calculator — all run locally, no data saved.</p>
+    <p style="font-size:13px;color:var(--mu);margin-bottom:20px">Timers, stopwatches and lab utilities — all run locally, no data saved.</p>
     <div class="tools-layout">
-      <!-- LEFT: Timers + Stopwatches -->
       <div class="tools-left">
         <div class="tool-card">
           <h3>Countdown Timers</h3>
@@ -1101,116 +1087,63 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
           <div class="sw-grid" id="sw-grid"></div>
           <button class="btn ghost sm" id="add-sw-btn" style="margin-top:10px;width:100%">＋ Add Stopwatch</button>
         </div>
-      </div>
-      <!-- RIGHT: Calculator -->
-      <div class="tools-right">
-        <div class="tool-card" style="position:sticky;top:20px">
-          <h3>Calculator</h3>
-          <div class="calc-modes">
-            <button class="calc-mode-btn active" data-cmode="reg">Regular</button>
-            <button class="calc-mode-btn" data-cmode="sci">Scientific</button>
-            <button class="calc-mode-btn" data-cmode="bio">BioChemistry</button>
+        <!-- ── Sterilisation Stepper ── -->
+        <div class="tool-card">
+          <h3>🧫 Sterilisation Stepper</h3>
+          <div class="stepper-steps" id="stepper-steps"></div>
+          <div style="display:flex;gap:6px;margin-bottom:12px">
+            <button class="btn xs ghost" id="stepper-add-btn">＋ Step</button>
+            <button class="btn xs ghost" id="stepper-preset-btn">📋 Standard preset</button>
           </div>
-          <!-- Regular + Scientific display + grid -->
-          <div id="calc-std">
-            <div class="calc-display">
-              <div class="calc-expr" id="calc-expr"></div>
-              <div class="calc-val" id="calc-val">0</div>
+          <div id="stepper-run" style="display:none">
+            <div id="stepper-step-label" style="font-size:13px;font-weight:600;text-align:center;margin-bottom:4px;color:var(--mu)"></div>
+            <div class="stepper-display" id="stepper-display">00:00</div>
+            <div class="stepper-progress"><div class="stepper-bar" id="stepper-bar" style="width:0%"></div></div>
+          </div>
+          <div style="display:flex;gap:6px">
+            <button class="btn sm" id="stepper-start-btn">▶ Start</button>
+            <button class="btn sm ghost" id="stepper-pause-btn" style="display:none">⏸ Pause</button>
+            <button class="btn sm ghost" id="stepper-reset-btn">↺ Reset</button>
+          </div>
+        </div>
+        <!-- ── Media Volume Scaler ── -->
+        <div class="tool-card">
+          <h3>⚗️ Media Volume Scaler</h3>
+          <div class="row2" style="margin-bottom:10px">
+            <div class="field" style="margin:0">
+              <label>Base volume (mL)</label>
+              <input type="number" id="scaler-base" placeholder="e.g. 1000" value="1000" min="0">
             </div>
-            <!-- Scientific extra row (hidden in reg mode) -->
-            <div id="calc-sci-row" style="display:none">
-              <div class="calc-grid sci" style="margin-bottom:5px">
-                <button class="calc-btn fn" data-ca="sin(">sin</button>
-                <button class="calc-btn fn" data-ca="cos(">cos</button>
-                <button class="calc-btn fn" data-ca="tan(">tan</button>
-                <button class="calc-btn fn" data-ca="log(">log</button>
-                <button class="calc-btn fn" data-ca="ln(">ln</button>
-                <button class="calc-btn fn" data-ca="asin(">sin⁻¹</button>
-                <button class="calc-btn fn" data-ca="acos(">cos⁻¹</button>
-                <button class="calc-btn fn" data-ca="atan(">tan⁻¹</button>
-                <button class="calc-btn fn" data-ca="sqrt(">√</button>
-                <button class="calc-btn fn" data-ca="**2)">x²</button>
-                <button class="calc-btn fn" data-ca="**">xʸ</button>
-                <button class="calc-btn fn" data-ca="Math.PI">π</button>
-                <button class="calc-btn fn" data-ca="Math.E">e</button>
-                <button class="calc-btn fn" data-ca="(">（</button>
-                <button class="calc-btn fn" data-ca=")">）</button>
-              </div>
-              <div style="display:flex;gap:5px;margin-bottom:5px">
-                <button class="calc-btn fn" style="flex:1;font-size:11px" id="deg-rad-btn">DEG</button>
-              </div>
-            </div>
-            <!-- Standard grid -->
-            <div class="calc-grid reg">
-              <button class="calc-btn danger" data-ca="AC">AC</button>
-              <button class="calc-btn" data-ca="+/-">+/-</button>
-              <button class="calc-btn" data-ca="%">%</button>
-              <button class="calc-btn op" data-ca="/">÷</button>
-              <button class="calc-btn" data-ca="7">7</button>
-              <button class="calc-btn" data-ca="8">8</button>
-              <button class="calc-btn" data-ca="9">9</button>
-              <button class="calc-btn op" data-ca="*">×</button>
-              <button class="calc-btn" data-ca="4">4</button>
-              <button class="calc-btn" data-ca="5">5</button>
-              <button class="calc-btn" data-ca="6">6</button>
-              <button class="calc-btn op" data-ca="-">−</button>
-              <button class="calc-btn" data-ca="1">1</button>
-              <button class="calc-btn" data-ca="2">2</button>
-              <button class="calc-btn" data-ca="3">3</button>
-              <button class="calc-btn op" data-ca="+">+</button>
-              <button class="calc-btn wide" data-ca="0">0</button>
-              <button class="calc-btn" data-ca=".">.</button>
-              <button class="calc-btn eq" data-ca="=">=</button>
+            <div class="field" style="margin:0">
+              <label>Target volume (mL)</label>
+              <input type="number" id="scaler-target" placeholder="e.g. 500" min="0">
             </div>
           </div>
-          <!-- BioChemistry panel -->
-          <div class="bc-panel" id="calc-bio">
-            <div class="bc-tabs">
-              <button class="bc-tab active" data-bt="molarity">Molarity</button>
-              <button class="bc-tab" data-bt="dilution">Dilution</button>
-              <button class="bc-tab" data-bt="percent">% Solution</button>
-              <button class="bc-tab" data-bt="ph">pH</button>
-              <button class="bc-tab" data-bt="pgr">PGR Convert</button>
+          <div class="field" style="margin-bottom:10px">
+            <label>Recipe <span style="font-weight:400;color:var(--mu)">(one ingredient per line: name: amount unit)</span></label>
+            <textarea id="scaler-input" style="height:100px;font-family:var(--mono);font-size:13px" placeholder="MS salts: 4.43 g&#10;Sucrose: 30 g&#10;Agar: 7 g&#10;BAP: 0.5 mg"></textarea>
+          </div>
+          <button class="btn sm" onclick="scaleMedia()">Scale →</button>
+          <div class="scaler-result" id="scaler-result"></div>
+        </div>
+        <!-- ── Culture Age Calculator ── -->
+        <div class="tool-card">
+          <h3>🌱 Culture Age</h3>
+          <div class="row2" style="margin-bottom:10px">
+            <div class="field" style="margin:0">
+              <label>Initiation date</label>
+              <input type="date" id="age-date">
             </div>
-            <!-- Molarity -->
-            <div class="bc-calc" id="bt-molarity">
-              <label>Molecular Weight (g/mol)</label><input type="number" id="bc-mw" placeholder="e.g. 342.3">
-              <label>Mass (g)</label><input type="number" id="bc-mass" placeholder="e.g. 5">
-              <label>Volume (L)</label><input type="number" id="bc-vol" placeholder="e.g. 1">
-              <button class="btn sm" onclick="bcCalc('molarity')">Calculate →</button>
-              <div class="bc-result" id="bc-res-molarity">—</div>
+            <div class="field" style="margin:0">
+              <label>Subculture interval (days)</label>
+              <input type="number" id="age-interval" placeholder="28" value="28" min="1">
             </div>
-            <!-- Dilution -->
-            <div class="bc-calc" id="bt-dilution" style="display:none">
-              <label>C₁ (stock concentration, mM)</label><input type="number" id="bc-c1" placeholder="e.g. 1000">
-              <label>V₁ (stock volume to use, mL) — leave blank to solve</label><input type="number" id="bc-v1" placeholder="solve for this">
-              <label>C₂ (final concentration, mM)</label><input type="number" id="bc-c2" placeholder="e.g. 0.5">
-              <label>V₂ (final volume, mL)</label><input type="number" id="bc-v2" placeholder="e.g. 100">
-              <button class="btn sm" onclick="bcCalc('dilution')">Calculate →</button>
-              <div class="bc-result" id="bc-res-dilution">—</div>
-            </div>
-            <!-- % Solution -->
-            <div class="bc-calc" id="bt-percent" style="display:none">
-              <label>Mass (g)</label><input type="number" id="bc-pm" placeholder="e.g. 3">
-              <label>Volume (mL)</label><input type="number" id="bc-pv" placeholder="e.g. 100">
-              <button class="btn sm" onclick="bcCalc('percent')">Calculate % (w/v) →</button>
-              <div class="bc-result" id="bc-res-percent">—</div>
-            </div>
-            <!-- pH -->
-            <div class="bc-calc" id="bt-ph" style="display:none">
-              <label>[H⁺] concentration (mol/L) — OR —</label><input type="number" id="bc-h" placeholder="e.g. 0.001" step="any">
-              <label>pOH (to get pH from pOH)</label><input type="number" id="bc-poh" placeholder="e.g. 9" step="any">
-              <button class="btn sm" onclick="bcCalc('ph')">Calculate →</button>
-              <div class="bc-result" id="bc-res-ph">—</div>
-            </div>
-            <!-- PGR conversion -->
-            <div class="bc-calc" id="bt-pgr" style="display:none">
-              <label>Molecular Weight of PGR (g/mol)</label><input type="number" id="bc-pgrmw" placeholder="e.g. 225.25 for BAP">
-              <label>mg/L → μM: enter mg/L</label><input type="number" id="bc-mgl" placeholder="e.g. 0.5" step="any">
-              <label>μM → mg/L: enter μM</label><input type="number" id="bc-um" placeholder="e.g. 2.22" step="any">
-              <button class="btn sm" onclick="bcCalc('pgr')">Convert →</button>
-              <div class="bc-result" id="bc-res-pgr">—</div>
-            </div>
+          </div>
+          <button class="btn sm" onclick="calcCultureAge()">Calculate →</button>
+          <div class="age-result" id="age-result">
+            <div class="age-big" id="age-days"></div>
+            <div class="age-sub" id="age-next"></div>
+            <div class="age-sub" id="age-overdue"></div>
           </div>
         </div>
       </div>
@@ -3432,128 +3365,128 @@ function resetSW(id){
 document.getElementById('add-sw-btn').onclick=addSW;
 
 // ════════════════════════════════════════════════════════════
-// TOOLS — CALCULATOR
+// TOOLS — STERILISATION STEPPER
 // ════════════════════════════════════════════════════════════
-const C={expr:'',result:'0',lastOp:false,useDeg:true};
+const SS={steps:[],cur:-1,running:false,elapsed:0,interval:null};
+const STEPPER_PRESET=[
+  {name:'70% Ethanol rinse',secs:30},
+  {name:'10% Bleach / NaOCl',secs:900},
+  {name:'Sterile water rinse 1',secs:60},
+  {name:'Sterile water rinse 2',secs:60},
+  {name:'Sterile water rinse 3',secs:60},
+];
+function renderStepperEdit(){
+  const el=document.getElementById('stepper-steps');
+  if(!SS.steps.length){el.innerHTML='<p style="font-size:12px;color:var(--mu);padding:4px 0">No steps — add one or use preset.</p>';return;}
+  el.innerHTML=SS.steps.map((s,i)=>`
+    <div class="stepper-step${SS.cur===i?' active-step':SS.cur>i?' done-step':''}">
+      <input class="step-name" value="${esc(s.name)}" placeholder="Step name" oninput="SS.steps[${i}].name=this.value">
+      <input class="step-dur" type="number" value="${s.secs}" min="1" title="Seconds" oninput="SS.steps[${i}].secs=parseInt(this.value)||0">
+      <span style="font-size:11px;color:var(--mu)">${fmtHMS(s.secs)}</span>
+      <button class="btn xs ghost" onclick="SS.steps.splice(${i},1);renderStepperEdit()" style="padding:2px 6px">✕</button>
+    </div>`).join('');
+}
+function _stepperTick(){
+  SS.elapsed++;
+  const step=SS.steps[SS.cur];
+  const rem=step.secs-SS.elapsed;
+  const pct=Math.min(100,(SS.elapsed/step.secs)*100);
+  document.getElementById('stepper-bar').style.width=pct+'%';
+  document.getElementById('stepper-display').textContent=fmtHMS(Math.max(0,rem));
+  if(rem<=0){
+    playBeep(1);
+    clearInterval(SS.interval); SS.interval=null;
+    SS.cur++; SS.elapsed=0;
+    if(SS.cur>=SS.steps.length){
+      document.getElementById('stepper-display').textContent='✓ Done';
+      document.getElementById('stepper-display').classList.add('done');
+      document.getElementById('stepper-step-label').textContent='All steps complete';
+      document.getElementById('stepper-pause-btn').style.display='none';
+      SS.running=false; SS.cur=-1;
+      renderStepperEdit(); return;
+    }
+    renderStepperEdit();
+    document.getElementById('stepper-step-label').textContent=`Step ${SS.cur+1}/${SS.steps.length}: ${SS.steps[SS.cur].name}`;
+    SS.interval=setInterval(_stepperTick,1000);
+  }
+}
+function startStepper(){
+  if(!SS.steps.length){toast('Add steps first','fail');return;}
+  if(SS.cur<0){SS.cur=0;SS.elapsed=0;}
+  SS.running=true;
+  document.getElementById('stepper-run').style.display='';
+  document.getElementById('stepper-display').classList.remove('done');
+  document.getElementById('stepper-step-label').textContent=`Step ${SS.cur+1}/${SS.steps.length}: ${SS.steps[SS.cur].name}`;
+  document.getElementById('stepper-pause-btn').style.display='';
+  document.getElementById('stepper-start-btn').style.display='none';
+  renderStepperEdit();
+  SS.interval=setInterval(_stepperTick,1000);
+}
+function pauseStepper(){
+  if(SS.interval){clearInterval(SS.interval);SS.interval=null;SS.running=false;
+    document.getElementById('stepper-pause-btn').style.display='none';
+    document.getElementById('stepper-start-btn').style.display='';
+    document.getElementById('stepper-start-btn').textContent='▶ Resume';
+  }
+}
+function resetStepper(){
+  clearInterval(SS.interval);SS.interval=null;SS.running=false;SS.cur=-1;SS.elapsed=0;
+  document.getElementById('stepper-run').style.display='none';
+  document.getElementById('stepper-start-btn').style.display='';
+  document.getElementById('stepper-start-btn').textContent='▶ Start';
+  document.getElementById('stepper-pause-btn').style.display='none';
+  renderStepperEdit();
+}
+document.getElementById('stepper-add-btn').onclick=()=>{SS.steps.push({name:'New step',secs:60});renderStepperEdit();};
+document.getElementById('stepper-preset-btn').onclick=()=>{SS.steps=STEPPER_PRESET.map(s=>({...s}));resetStepper();};
+document.getElementById('stepper-start-btn').onclick=startStepper;
+document.getElementById('stepper-pause-btn').onclick=pauseStepper;
+document.getElementById('stepper-reset-btn').onclick=resetStepper;
+renderStepperEdit();
 
-function calcDisplay(){
-  document.getElementById('calc-expr').textContent=C.expr;
-  document.getElementById('calc-val').textContent=C.result;
+// ════════════════════════════════════════════════════════════
+// TOOLS — MEDIA VOLUME SCALER
+// ════════════════════════════════════════════════════════════
+function scaleMedia(){
+  const base=parseFloat(document.getElementById('scaler-base').value)||0;
+  const target=parseFloat(document.getElementById('scaler-target').value)||0;
+  const raw=document.getElementById('scaler-input').value.trim();
+  const out=document.getElementById('scaler-result');
+  if(!base||!target){out.textContent='Enter both volumes.';return;}
+  if(!raw){out.textContent='Enter recipe ingredients.';return;}
+  const ratio=target/base;
+  const lines=raw.split('\n').map(line=>{
+    const m=line.match(/^(.*?):\s*([\d.]+)\s*(.*)$/);
+    if(!m) return line;
+    const scaled=parseFloat(m[2])*ratio;
+    const disp=scaled<0.01?scaled.toExponential(3):scaled%1===0?scaled.toFixed(0):scaled.toPrecision(4).replace(/\.?0+$/,'');
+    return `${m[1]}: ${disp} ${m[3]}`;
+  });
+  out.textContent=`— Scaled to ${target} mL (×${ratio.toFixed(4)}) —\n`+lines.join('\n');
 }
 
-function calcAction(a){
-  if(a==='AC'){C.expr='';C.result='0';calcDisplay();return;}
-  if(a==='='){
-    try{
-      let e=C.expr
-        .replace(/sin\(/g,C.useDeg?'Math.sin(Math.PI/180*':'Math.sin(')
-        .replace(/cos\(/g,C.useDeg?'Math.cos(Math.PI/180*':'Math.cos(')
-        .replace(/tan\(/g,C.useDeg?'Math.tan(Math.PI/180*':'Math.tan(')
-        .replace(/asin\(/g,C.useDeg?'(180/Math.PI)*Math.asin(':'Math.asin(')
-        .replace(/acos\(/g,C.useDeg?'(180/Math.PI)*Math.acos(':'Math.acos(')
-        .replace(/atan\(/g,C.useDeg?'(180/Math.PI)*Math.atan(':'Math.atan(')
-        .replace(/log\(/g,'Math.log10(')
-        .replace(/ln\(/g,'Math.log(')
-        .replace(/sqrt\(/g,'Math.sqrt(');
-      // auto-close unclosed parens
-      const opens=(e.match(/\(/g)||[]).length-(e.match(/\)/g)||[]).length;
-      e+=')'.repeat(Math.max(0,opens));
-      const val=Function('"use strict";return('+e+')')();
-      C.result=isFinite(val)?String(+val.toPrecision(10)).replace(/\.?0+$/,''):'Error';
-    }catch(_){C.result='Error';}
-    calcDisplay(); return;
-  }
-  if(a==='+/-'){
-    if(C.result!=='0') C.result=C.result.startsWith('-')?C.result.slice(1):'-'+C.result;
-    C.expr=C.result; calcDisplay(); return;
-  }
-  if(a==='%'){
-    try{C.result=String(parseFloat(C.result)/100);}catch(_){} calcDisplay(); return;
-  }
-  if(a==='Math.PI'){C.expr+='3.14159265358979';C.result='π';calcDisplay();return;}
-  if(a==='Math.E'){C.expr+='2.71828182845905';C.result='e';calcDisplay();return;}
-  // For function tokens ending with '(', append last result if expr is empty
-  if(a.endsWith('(')){
-    if(!C.expr) C.expr=(C.result!=='0'&&C.result!=='Error')?C.result:'';
-    C.expr+=a; calcDisplay(); return;
-  }
-  C.expr+=a; calcDisplay();
-}
-
-document.querySelectorAll('[data-ca]').forEach(btn=>{
-  btn.addEventListener('click',()=>calcAction(btn.dataset.ca));
-});
-
-// Mode switcher
-document.querySelectorAll('.calc-mode-btn').forEach(btn=>{
-  btn.addEventListener('click',function(){
-    document.querySelectorAll('.calc-mode-btn').forEach(b=>b.classList.remove('active'));
-    this.classList.add('active');
-    const mode=this.dataset.cmode;
-    document.getElementById('calc-std').style.display=mode==='bio'?'none':'block';
-    document.getElementById('calc-bio').style.display=mode==='bio'?'block':'none';
-    document.getElementById('calc-sci-row').style.display=mode==='sci'?'block':'none';
-  });
-});
-
-// DEG/RAD toggle
-document.getElementById('deg-rad-btn').addEventListener('click',function(){
-  C.useDeg=!C.useDeg; this.textContent=C.useDeg?'DEG':'RAD';
-});
-
-// BioChemistry tabs
-document.querySelectorAll('.bc-tab').forEach(t=>{
-  t.addEventListener('click',function(){
-    document.querySelectorAll('.bc-tab').forEach(x=>x.classList.remove('active'));
-    this.classList.add('active');
-    document.querySelectorAll('.bc-calc').forEach(x=>x.style.display='none');
-    document.getElementById('bt-'+this.dataset.bt).style.display='block';
-  });
-});
-
-function bcCalc(mode){
-  const v=id=>parseFloat(document.getElementById(id).value)||0;
-  const res=id=>el=>{document.getElementById(id).innerHTML=el;};
-  const show=res;
-  if(mode==='molarity'){
-    const mw=v('bc-mw'),mass=v('bc-mass'),vol=v('bc-vol');
-    if(!mw||!vol){show('bc-res-molarity')('Enter MW and Volume.');return;}
-    const mol=mass/mw, M=mol/vol;
-    show('bc-res-molarity')(`<strong>${M.toExponential(4)} M</strong> (${(M*1000).toFixed(4)} mM)<small>${mol.toExponential(4)} mol in ${vol} L</small>`);
-  }
-  if(mode==='dilution'){
-    const c1=v('bc-c1'),v2=v('bc-v2'),c2=v('bc-c2');
-    const v1raw=document.getElementById('bc-v1').value;
-    if(!c1||!c2||!v2){show('bc-res-dilution')('Enter C₁, C₂ and V₂.');return;}
-    const v1=v1raw?parseFloat(v1raw):(c2*v2/c1);
-    show('bc-res-dilution')(`<strong>V₁ = ${v1.toFixed(4)} mL</strong><small>Take ${v1.toFixed(3)} mL of ${c1} mM stock → make up to ${v2} mL → gives ${c2} mM</small>`);
-  }
-  if(mode==='percent'){
-    const m=v('bc-pm'),vol=v('bc-pv');
-    if(!vol){show('bc-res-percent')('Enter volume.');return;}
-    show('bc-res-percent')(`<strong>${((m/vol)*100).toFixed(4)}% w/v</strong><small>${m}g in ${vol}mL</small>`);
-  }
-  if(mode==='ph'){
-    const h=parseFloat(document.getElementById('bc-h').value);
-    const poh=parseFloat(document.getElementById('bc-poh').value);
-    if(!isNaN(h)&&h>0){
-      const ph=-Math.log10(h);
-      show('bc-res-ph')(`<strong>pH = ${ph.toFixed(3)}</strong><small>pOH = ${(14-ph).toFixed(3)}</small>`);
-    } else if(!isNaN(poh)){
-      show('bc-res-ph')(`<strong>pH = ${(14-poh).toFixed(3)}</strong><small>from pOH ${poh}</small>`);
-    } else show('bc-res-ph')('Enter [H⁺] or pOH.');
-  }
-  if(mode==='pgr'){
-    const mw=v('bc-pgrmw');
-    const mgl=parseFloat(document.getElementById('bc-mgl').value);
-    const um=parseFloat(document.getElementById('bc-um').value);
-    if(!mw){show('bc-res-pgr')('Enter molecular weight.');return;}
-    if(!isNaN(mgl)&&mgl>0){
-      show('bc-res-pgr')(`<strong>${(mgl/mw*1000).toFixed(4)} μM</strong><small>${mgl} mg/L ÷ ${mw} g/mol × 1000</small>`);
-    } else if(!isNaN(um)&&um>0){
-      show('bc-res-pgr')(`<strong>${(um*mw/1000).toFixed(4)} mg/L</strong><small>${um} μM × ${mw} g/mol ÷ 1000</small>`);
-    } else show('bc-res-pgr')('Enter mg/L or μM value.');
-  }
+// ════════════════════════════════════════════════════════════
+// TOOLS — CULTURE AGE CALCULATOR
+// ════════════════════════════════════════════════════════════
+function calcCultureAge(){
+  const dateVal=document.getElementById('age-date').value;
+  const interval=parseInt(document.getElementById('age-interval').value)||28;
+  if(!dateVal){toast('Select an initiation date','fail');return;}
+  const init=new Date(dateVal);
+  const today=new Date(); today.setHours(0,0,0,0);
+  const days=Math.floor((today-init)/86400000);
+  const cyclesSince=Math.floor(days/interval);
+  const lastSub=new Date(init.getTime()+cyclesSince*interval*86400000);
+  const nextSub=new Date(lastSub.getTime()+interval*86400000);
+  const daysToNext=Math.ceil((nextSub-today)/86400000);
+  const overdue=daysToNext<0;
+  document.getElementById('age-days').textContent=`${days} days old`;
+  document.getElementById('age-next').textContent=`Next subculture: ${fmtDate(nextSub.toISOString().slice(0,10))}`;
+  document.getElementById('age-overdue').textContent=overdue
+    ?`⚠️ Overdue by ${Math.abs(daysToNext)} days`
+    :`${daysToNext} day${daysToNext===1?'':'s'} until subculture`;
+  document.getElementById('age-overdue').style.color=overdue?'var(--rd)':'var(--gn)';
+  document.getElementById('age-result').classList.add('on');
 }
 
 // Restore token from session
