@@ -561,6 +561,19 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 .al-empty{padding:20px 14px;color:var(--mu);font-size:12px;font-family:var(--mono)}
 #actlog-footer{padding:8px 14px;border-top:1px solid var(--bd);font-family:var(--mono);font-size:10px;color:var(--mu);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
 @media(max-width:700px){#actlog-panel{width:100vw}#actlog-tab{display:none!important}}
+/* ── TRUSTED DEVICE ── */
+#trust-banner{
+  background:rgba(63,185,80,.1);border:1px solid var(--gn);border-radius:6px;
+  color:var(--gn);font-size:12px;padding:8px 12px;margin-top:10px;
+  display:none;align-items:center;gap:10px
+}
+#trust-banner.on{display:flex}
+#trust-banner span{flex:1}
+#saved-device-banner{
+  background:var(--sf2);border:1px solid var(--bd);border-radius:6px;
+  padding:10px 14px;margin-bottom:14px;font-size:13px;display:none
+}
+#saved-device-banner.on{display:block}
 </style>
 <script>(function(){var t=localStorage.getItem('tcplants_theme')||'dark';document.documentElement.dataset.theme=t;}());</script>
 </head>
@@ -586,8 +599,18 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
       <input type="password" id="ltok" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
       <div class="hint">Needs <strong>repo</strong> scope. Cleared on tab close. <a href="https://github.com/settings/tokens/new?scopes=repo&description=TC+Plants+Lab+Notes" target="_blank" rel="noopener">Create token →</a></div>
     </div>
+    <div id="saved-device-banner">
+      <div style="font-size:12px;color:var(--mu);margin-bottom:6px">🔐 Saved device — token auto-filled</div>
+      <div style="font-size:11px;color:var(--mu)">Enter your encryption password to unlock.</div>
+      <button class="btn xs ghost" onclick="forgetDevice()" style="margin-top:8px">Forget this device</button>
+    </div>
     <div id="lerr"></div>
     <button class="btn" id="lbtn">Unlock Lab →</button>
+    <div id="trust-banner">
+      <span>Trust this device? Your token will be saved encrypted.</span>
+      <button class="btn xs green" id="trust-yes-btn">Yes, save</button>
+      <button class="btn xs ghost" id="trust-no-btn">No thanks</button>
+    </div>
   </div>
 </div>
 
@@ -1161,6 +1184,8 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
         <p>⚠️ <strong>Never lose your encryption password.</strong> There is no recovery — all note content is AES-256-GCM encrypted client-side. The GitHub repo stores only ciphertext.</p>
         <h3>Session Behaviour</h3>
         <p>Your token is stored in <code>sessionStorage</code> only — it disappears when you close the tab. Your password is held in memory only. Lock or tab-close wipes both. After your first login, the decrypted data is cached for 10 minutes in <code>sessionStorage</code> so re-unlocking is near-instant (⚡ Loaded from cache).</p>
+        <h3>Trusted Device</h3>
+        <p>After logging in, you'll be offered to <strong>Trust this device</strong>. Your GitHub token is encrypted with your password and saved locally — on future visits, just enter your password (no token needed). Click <strong>Forget this device</strong> in the login screen to remove it.</p>
         <h3>Light / Dark Mode</h3>
         <p>Click the <strong>☀️ / 🌙</strong> button in the top-right nav bar to toggle themes. Your preference is saved in <code>localStorage</code> and applied immediately on every future visit — no flash.</p>
       </div>
@@ -1495,12 +1520,23 @@ async function ghGet(path){
   return r.json();
 }
 async function ghPut(path,content,sha,msg){
-  const r=await fetch(`${API}/repos/${REPO}/contents/${path}`,{
-    method:'PUT', headers:ghH(),
-    body:JSON.stringify({message:msg||`lab: update ${path}`, content:btoa(unescape(encodeURIComponent(content))), branch:BRANCH, ...(sha?{sha}:{})})
+  const body={message:msg||`lab: update ${path}`,content:btoa(unescape(encodeURIComponent(content))),branch:BRANCH};
+  if(sha) body.sha=sha;
+  let res=await fetch(`${API}/repos/${REPO}/contents/${path}`,{
+    method:'PUT',headers:ghH(),
+    body:JSON.stringify(body)
   });
-  if(!r.ok) throw new Error(`GitHub ${r.status}: ${await r.text()}`);
-  return r.json();
+  // Auto-retry on SHA mismatch (stale SHA from long session)
+  if(res.status===422){
+    const fresh=await ghGet(path);
+    if(fresh){ body.sha=fresh.sha; }
+    res=await fetch(`${API}/repos/${REPO}/contents/${path}`,{
+      method:'PUT',headers:ghH(),
+      body:JSON.stringify(body)
+    });
+  }
+  if(!res.ok) throw new Error(`GitHub ${res.status}: ${await res.text()}`);
+  return res.json();
 }
 async function ghDel(path,sha,msg){
   const r=await fetch(`${API}/repos/${REPO}/contents/${path}`,{
@@ -2927,7 +2963,11 @@ document.getElementById('ne-type').addEventListener('change',function(){
 // ════════════════════════════════════════════════════════════
 async function login(){
   const pw=document.getElementById('lpw').value;
-  const tok=document.getElementById('ltok').value.trim();
+  let tok=document.getElementById('ltok').value.trim();
+  // If no token typed but device is saved, try to decrypt it
+  if(!tok && localStorage.getItem(DEVICE_KEY)){
+    tok=await _tryRestoreDeviceToken(pw)||'';
+  }
   const err=document.getElementById('lerr');
   err.style.display='none';
   if(!crypto?.subtle){
@@ -2965,8 +3005,13 @@ async function login(){
     document.getElementById('ql-fab').classList.add('on');
     document.getElementById('actlog-tab').classList.add('on');
     fetchActivityLog();
+    // Offer to save device if not already saved
+    if(!localStorage.getItem(DEVICE_KEY)){
+      document.getElementById('trust-banner').classList.add('on');
+    }
     fetchWeather();
-    setInterval(fetchWeather, 60000);
+    if(window._wxInterval) clearInterval(window._wxInterval);
+    window._wxInterval = setInterval(fetchWeather, 60000);
   }catch(e){
     err.textContent=e.message; err.style.display='block';
     S.pw=null; S.tok=null;
@@ -2977,6 +3022,7 @@ async function login(){
 }
 
 function lock(){
+  if(window._wxInterval){ clearInterval(window._wxInterval); window._wxInterval=null; }
   Object.assign(S,{pw:null,tok:null,notes:[],cur:null,editing:null,notesSha:null,accs:[],curAcc:null,editingAcc:null,accSha:null,recs:[],curRec:null,editingRec:null,recSha:null});
   document.getElementById('ql-fab').classList.remove('on');
   document.getElementById('actlog-tab').classList.remove('on');
@@ -3006,6 +3052,44 @@ function _readCache(){
     if(Date.now()-c.cachedAt>600000) return null; // 10 min TTL
     return c;
   }catch(e){ return null; }
+}
+
+// ── TRUSTED DEVICE ───────────────────────────────────────────
+const DEVICE_KEY='tcplants_device';
+async function _encryptForDevice(tok, pw){
+  const salt=crypto.getRandomValues(new Uint8Array(16));
+  const key=await deriveKey(pw, salt);
+  const iv=crypto.getRandomValues(new Uint8Array(12));
+  const enc=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,new TextEncoder().encode(tok));
+  const b64=(arr)=>btoa(String.fromCharCode(...new Uint8Array(arr)));
+  return {salt:b64(salt),iv:b64(iv),data:b64(enc)};
+}
+async function _decryptForDevice(stored, pw){
+  const from64=(s)=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+  const key=await deriveKey(pw, from64(stored.salt));
+  const dec=await crypto.subtle.decrypt({name:'AES-GCM',iv:from64(stored.iv)},key,from64(stored.data));
+  return new TextDecoder().decode(dec);
+}
+async function saveTrustedDevice(pw, tok){
+  try{
+    const encrypted=await _encryptForDevice(tok, pw);
+    localStorage.setItem(DEVICE_KEY, JSON.stringify(encrypted));
+    document.getElementById('trust-banner').classList.remove('on');
+    toast('Device saved — next visit just enter your password 🔐');
+  }catch(e){ toast('Could not save device: '+e.message,'fail'); }
+}
+function forgetDevice(){
+  localStorage.removeItem(DEVICE_KEY);
+  document.getElementById('saved-device-banner').classList.remove('on');
+  document.getElementById('ltok').value='';
+  document.getElementById('ltok').style.display='';
+  toast('Device forgotten');
+}
+async function _tryRestoreDeviceToken(pw){
+  const raw=localStorage.getItem(DEVICE_KEY);
+  if(!raw) return null;
+  try{ return await _decryptForDevice(JSON.parse(raw), pw); }
+  catch(e){ return null; }
 }
 
 // ── WEATHER ──────────────────────────────────────────────────
@@ -3053,6 +3137,8 @@ function _renderWeatherPop(){
 document.getElementById('lbtn').onclick=login;
 document.getElementById('lpw').onkeydown=e=>{if(e.key==='Enter')document.getElementById('ltok').focus();};
 document.getElementById('ltok').onkeydown=e=>{if(e.key==='Enter')login();};
+document.getElementById('trust-yes-btn').onclick=()=>saveTrustedDevice(document.getElementById('lpw').value, S.tok);
+document.getElementById('trust-no-btn').onclick=()=>document.getElementById('trust-banner').classList.remove('on');
 document.getElementById('lock-btn').onclick=lock;
 
 // Weather chip toggle
@@ -3492,6 +3578,13 @@ function calcCultureAge(){
 // Restore token from session
 const _st=sessionStorage.getItem('_lt');
 if(_st) document.getElementById('ltok').value=_st;
+// Show saved device banner if device credentials exist
+(function(){
+  if(localStorage.getItem('tcplants_device')){
+    document.getElementById('saved-device-banner').classList.add('on');
+    document.getElementById('ltok').style.display='none'; // hide token field, will be auto-filled
+  }
+})();
 // ── THEME ────────────────────────────────────────────────────
 (function(){
   const saved = localStorage.getItem('tcplants_theme') || 'dark';
