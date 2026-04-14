@@ -527,6 +527,53 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 .an-table td{padding:7px 10px;border-bottom:1px solid var(--sf2)}
 .score-track{height:8px;background:var(--sf2);border-radius:4px;overflow:hidden}
 .score-fill{height:100%;border-radius:4px;background:var(--gn)}
+
+/* ── ACTIVITY LOG ── */
+#actlog-tab{
+  position:fixed;right:0;top:50%;transform:translateY(-50%);
+  background:var(--sf2);border:1px solid var(--bd);border-left:3px solid var(--gn);
+  border-radius:6px 0 0 6px;color:var(--gn);cursor:pointer;
+  font-family:var(--mono);font-size:11px;font-weight:700;
+  padding:14px 6px;writing-mode:vertical-rl;text-orientation:mixed;
+  letter-spacing:.08em;z-index:180;display:none;transition:background .15s;
+  user-select:none
+}
+#actlog-tab:hover{background:var(--sf3)}
+#actlog-tab.on{display:flex;align-items:center;gap:6px}
+#actlog-panel{
+  position:fixed;right:0;top:0;bottom:0;width:310px;z-index:190;
+  background:var(--sf);border-left:1px solid var(--bd);
+  display:flex;flex-direction:column;
+  transform:translateX(100%);transition:transform .25s ease;
+  box-shadow:-4px 0 20px rgba(0,0,0,.25)
+}
+#actlog-panel.open{transform:translateX(0)}
+#actlog-header{
+  padding:11px 14px;border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;gap:8px;flex-shrink:0
+}
+#actlog-header .al-title{
+  font-family:var(--mono);font-size:12px;font-weight:700;
+  color:var(--gn);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+#actlog-header .al-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--gn);
+  box-shadow:0 0 6px var(--gn);flex-shrink:0;animation:al-pulse 2s infinite
+}
+@keyframes al-pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.al-hbtn{background:transparent;border:none;color:var(--mu);cursor:pointer;font-size:14px;padding:2px 5px;border-radius:4px;line-height:1}
+.al-hbtn:hover{background:var(--sf2);color:var(--tx)}
+#actlog-list{flex:1;overflow-y:auto;padding:8px 0;font-family:var(--mono);font-size:12px}
+.al-entry{padding:6px 14px;border-bottom:1px solid rgba(128,128,128,.08);display:flex;gap:8px;align-items:flex-start}
+.al-entry:hover{background:var(--sf2)}
+.al-icon{width:16px;flex-shrink:0;text-align:center;font-size:13px;margin-top:1px}
+.al-meta{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.al-msg{color:var(--tx);line-height:1.4;word-break:break-word;font-size:11.5px}
+.al-msg .al-highlight{color:var(--ac)}
+.al-time{color:var(--mu);font-size:10px}
+.al-empty{padding:20px 14px;color:var(--mu);font-size:12px;font-family:var(--mono)}
+#actlog-footer{padding:8px 14px;border-top:1px solid var(--bd);font-family:var(--mono);font-size:10px;color:var(--mu);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+@media(max-width:700px){#actlog-panel{width:100vw}#actlog-tab{display:none!important}}
 </style>
 <script>(function(){var t=localStorage.getItem('tcplants_theme')||'dark';document.documentElement.dataset.theme=t;}());</script>
 </head>
@@ -1994,6 +2041,72 @@ function renderAnalytics(){
   `;
 }
 
+// ── ACTIVITY LOG ─────────────────────────────────────────────
+function _alTimeAgo(iso){
+  const s=Math.round((Date.now()-new Date(iso))/1000);
+  if(s<60) return `${s}s ago`;
+  if(s<3600) return `${Math.floor(s/60)}m ago`;
+  if(s<86400) return `${Math.floor(s/3600)}h ago`;
+  return `${Math.floor(s/86400)}d ago`;
+}
+function _alParseCommit(msg){
+  const m=msg.trim();
+  // lab actions
+  if(/^lab: (add|quick log)/i.test(m))   return {icon:'🌱',col:'var(--gn)'};
+  if(/^lab: update/i.test(m))            return {icon:'✏️',col:'var(--ac)'};
+  if(/^lab: delete/i.test(m))            return {icon:'🗑',col:'var(--rd)'};
+  if(/^lab: (registry|accession)/i.test(m)) return {icon:'🌿',col:'var(--gn)'};
+  if(/^lab: (recipe|media)/i.test(m))    return {icon:'🧪',col:'var(--pu)'};
+  if(/^lab: index/i.test(m))             return {icon:'📋',col:'var(--mu)'};
+  if(/^feat:/i.test(m))                  return {icon:'✨',col:'var(--yw)'};
+  if(/^fix:/i.test(m))                   return {icon:'🔧',col:'var(--yw)'};
+  if(/^chore:|^docs:/i.test(m))          return {icon:'⚙️',col:'var(--mu)'};
+  return {icon:'📝',col:'var(--mu)'};
+}
+function _alFormatMsg(msg){
+  // Bold anything in quotes
+  return esc(msg).replace(/&quot;([^&]+)&quot;/g,'<span class="al-highlight">"$1"</span>');
+}
+async function fetchActivityLog(){
+  if(!S.tok) return;
+  try{
+    const r=await fetch(`${API}/repos/${REPO}/commits?per_page=30`,
+      {headers:{Authorization:`token ${S.tok}`}});
+    if(!r.ok) throw new Error(r.status);
+    const commits=await r.json();
+    const list=document.getElementById('actlog-list');
+    const now=new Date();
+    const entries=commits.filter(c=>!c.commit.message.startsWith('Co-Authored')).map(c=>{
+      const msg=c.commit.message.split('\n')[0]; // first line only
+      const {icon,col}=_alParseCommit(msg);
+      const ago=_alTimeAgo(c.commit.author.date);
+      return `<div class="al-entry">
+        <div class="al-icon" style="color:${col}">${icon}</div>
+        <div class="al-meta">
+          <div class="al-msg">${_alFormatMsg(msg)}</div>
+          <div class="al-time">${ago} · ${new Date(c.commit.author.date).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</div>
+        </div>
+      </div>`;
+    }).join('');
+    list.innerHTML=entries||'<div class="al-empty">No commits found.</div>';
+    document.getElementById('actlog-updated').textContent=`Updated ${now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}`;
+    document.getElementById('actlog-count').textContent=`${commits.length} entries`;
+  }catch(e){
+    document.getElementById('actlog-list').innerHTML=`<div class="al-empty">Error loading: ${esc(String(e.message))}</div>`;
+  }
+}
+function openActLog(){
+  document.getElementById('actlog-panel').classList.add('open');
+  document.getElementById('actlog-tab').style.display='none';
+  if(!document.getElementById('actlog-list').querySelector('.al-entry')){
+    fetchActivityLog();
+  }
+}
+function closeActLog(){
+  document.getElementById('actlog-panel').classList.remove('open');
+  document.getElementById('actlog-tab').style.display='';
+}
+
 function startNewNote(){
   S.editing=null; S.cur=null; renderNoteList();
   document.getElementById('ne-head').textContent='New Lab Entry';
@@ -2751,6 +2864,8 @@ async function login(){
     updateReminderBadge();
     switchSection('notes'); showNote('empty');
     document.getElementById('ql-fab').classList.add('on');
+    document.getElementById('actlog-tab').classList.add('on');
+    fetchActivityLog();
     fetchWeather();
     setInterval(fetchWeather, 60000);
   }catch(e){
@@ -2765,6 +2880,8 @@ async function login(){
 function lock(){
   Object.assign(S,{pw:null,tok:null,notes:[],cur:null,editing:null,notesSha:null,accs:[],curAcc:null,editingAcc:null,accSha:null,recs:[],curRec:null,editingRec:null,recSha:null});
   document.getElementById('ql-fab').classList.remove('on');
+  document.getElementById('actlog-tab').classList.remove('on');
+  document.getElementById('actlog-panel').classList.remove('open');
   sessionStorage.clear();
   document.getElementById('app').classList.remove('on');
   document.getElementById('login').style.display='flex';
@@ -2847,6 +2964,11 @@ document.getElementById('weather-chip').addEventListener('click', function(e){
 document.addEventListener('click', ()=>document.getElementById('weather-pop').classList.remove('on'));
 document.getElementById('weather-pop').addEventListener('click', e=>e.stopPropagation());
 document.getElementById('export-all-btn').onclick=bulkExport;
+
+// Activity log
+document.getElementById('actlog-tab').addEventListener('click', openActLog);
+document.getElementById('actlog-close-btn').addEventListener('click', closeActLog);
+document.getElementById('actlog-refresh-btn').addEventListener('click', fetchActivityLog);
 
 // Notes
 document.getElementById('new-note-btn').onclick=startNewNote;
@@ -3340,6 +3462,21 @@ document.getElementById('theme-btn').addEventListener('click', function(){
     </div>
   </div>
   <div class="wx-updated" id="wx-updated"></div>
+</div>
+<!-- ═══════════ ACTIVITY LOG ═══════════ -->
+<div id="actlog-tab" title="Activity log">⚡ Activity</div>
+<div id="actlog-panel">
+  <div id="actlog-header">
+    <div class="al-dot"></div>
+    <div class="al-title">tcplants@github — activity log</div>
+    <button class="al-hbtn" id="actlog-refresh-btn" title="Refresh">↻</button>
+    <button class="al-hbtn" id="actlog-close-btn" title="Close">✕</button>
+  </div>
+  <div id="actlog-list"><div class="al-empty">Loading…</div></div>
+  <div id="actlog-footer">
+    <span id="actlog-updated"></span>
+    <span id="actlog-count"></span>
+  </div>
 </div>
 </body>
 </html>
