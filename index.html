@@ -459,6 +459,10 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
   .editor-body-wrap[data-pane="split"] #ne-body,
   .editor-body-wrap[data-pane="split"] #ne-preview{height:200px}
 }
+/* ── WIKI LINKS ── */
+.wikilink{color:var(--pu);text-decoration:none;border-bottom:1px dashed var(--pu)}
+.wikilink:hover{border-bottom-style:solid}
+.wikilink-missing{color:var(--mu);opacity:.6}
 /* ── ACC TABS ── */
 .acc-tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid var(--bd);padding-bottom:8px;flex-shrink:0}
 .acc-tab{background:transparent;border:none;color:var(--mu);cursor:pointer;font-family:var(--font);font-size:13px;font-weight:500;padding:4px 12px;border-radius:6px;transition:all .15s}
@@ -590,6 +594,10 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
           </div>
         </div>
         <div class="md" id="nv-body"></div>
+        <div id="nv-backlinks" style="margin-top:24px;display:none">
+          <div style="font-size:12px;font-weight:600;color:var(--mu);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">Linked from</div>
+          <div id="nv-backlinks-list" style="display:flex;flex-direction:column;gap:4px"></div>
+        </div>
       </div>
       <div class="editor" id="note-editor">
         <div class="ehead" id="ne-head">New Lab Entry</div>
@@ -691,6 +699,7 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
               <button class="tb-btn" id="tb-link"   title="Link (Ctrl+K)">🔗</button>
               <button class="tb-btn" id="img-btn"   title="Embed image">🖼</button>
               <button class="tb-btn" id="tbl-btn"   title="Insert table">⊞</button>
+              <button class="tb-btn" id="wiki-btn"  title="Insert wiki link">[[]]</button>
             </div>
             <textarea id="ne-body" placeholder="Write lab notes here…"></textarea>
             <div id="ne-preview" class="md"></div>
@@ -1252,6 +1261,7 @@ const S = {
   // section
   section:'notes',
   weather:{lab:null,gh:null,updatedAt:null},
+  bodyCache:{},
 };
 
 // ════════════════════════════════════════════════════════════
@@ -1489,7 +1499,9 @@ async function openNote(id){
     document.getElementById('nv-badges').querySelectorAll('[data-recipe-id]').forEach(el=>{
       el.addEventListener('click',()=>{ switchSection('recipes'); openRecipe(el.dataset.recipeId); });
     });
-    document.getElementById('nv-body').innerHTML=marked.parse(body);
+    S.bodyCache[id]=body;
+    document.getElementById('nv-body').innerHTML=marked.parse(_wikiPreprocess(body));
+    _renderBacklinks(id);
     switchSection('notes'); showNote('view');
   }catch(e){toast('Decrypt failed: '+e.message,'fail');}
   unload();
@@ -1584,7 +1596,13 @@ function _wireDraftListeners(){
 }
 
 // ── SPLIT PANE PREVIEW ───────────────────────────────────────
-function _wikiPreprocess(md){ return md; } // placeholder — replaced in Task 11
+function _wikiPreprocess(md){
+  return md.replace(/\[\[([^\]]+)\]\]/g,(_,title)=>{
+    const note=S.notes.find(n=>n.title.toLowerCase()===title.trim().toLowerCase());
+    if(note) return `<a href="#" class="wikilink" data-note-id="${esc(note.id)}">${esc(title.trim())}</a>`;
+    return `<span class="wikilink-missing" title="Note not found">[[${esc(title.trim())}]]</span>`;
+  });
+}
 function _updatePreview(){
   const body=document.getElementById('ne-body').value;
   document.getElementById('ne-preview').innerHTML=marked.parse(_wikiPreprocess(body));
@@ -1663,6 +1681,25 @@ function renderAccTimeline(){
     </div>`).join('')+'</div>';
   pane.querySelectorAll('[data-note-id]').forEach(el=>{
     el.addEventListener('click',()=>{ switchSection('notes'); openNote(el.dataset.noteId); });
+  });
+}
+
+// ── BACKLINKS ────────────────────────────────────────────────
+function _renderBacklinks(noteId){
+  const title=S.notes.find(n=>n.id===noteId)?.title||'';
+  if(!title){ document.getElementById('nv-backlinks').style.display='none'; return; }
+  const re=new RegExp('\\[\\['+title.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\]\\]','i');
+  const linkers=Object.entries(S.bodyCache)
+    .filter(([id,body])=>id!==noteId && re.test(body))
+    .map(([id])=>S.notes.find(n=>n.id===id))
+    .filter(Boolean);
+  const panel=document.getElementById('nv-backlinks');
+  const list=document.getElementById('nv-backlinks-list');
+  if(!linkers.length){ panel.style.display='none'; return; }
+  panel.style.display='';
+  list.innerHTML=linkers.map(n=>`<a href="#" class="wikilink" data-note-id="${esc(n.id)}">${esc(n.title)}</a>`).join('');
+  list.querySelectorAll('[data-note-id]').forEach(a=>{
+    a.addEventListener('click',e=>{ e.preventDefault(); openNote(a.dataset.noteId); });
   });
 }
 
@@ -2551,6 +2588,32 @@ document.getElementById('acc-view').addEventListener('click',e=>{
   const t=e.target.closest('.acc-tab');
   if(t) switchAccTab(t.dataset.atab);
 });
+// Wiki-link click handler in note view
+document.getElementById('nv-body').addEventListener('click',e=>{
+  const a=e.target.closest('.wikilink');
+  if(a){ e.preventDefault(); openNote(a.dataset.noteId); }
+});
+// Wiki picker
+function _renderWikiResults(q){
+  const notes=S.notes.filter(n=>!q||n.title.toLowerCase().includes(q.toLowerCase())).slice(0,20);
+  const r=document.getElementById('wiki-results');
+  r.innerHTML=notes.map(n=>`<button class="btn ghost sm" style="text-align:left;justify-content:flex-start;width:100%" data-title="${esc(n.title)}">${esc(n.title)}</button>`).join('');
+  r.querySelectorAll('[data-title]').forEach(b=>{
+    b.addEventListener('click',()=>{
+      mdWrap('ne-body',`[[${b.dataset.title}]]`,'','');
+      document.getElementById('wiki-modal').style.display='none';
+    });
+  });
+}
+document.getElementById('wiki-btn').addEventListener('click',()=>{
+  document.getElementById('wiki-modal').style.display='flex';
+  document.getElementById('wiki-search').value='';
+  _renderWikiResults('');
+  setTimeout(()=>document.getElementById('wiki-search').focus(),50);
+});
+document.getElementById('wiki-cancel-btn').onclick=()=>document.getElementById('wiki-modal').style.display='none';
+document.getElementById('wiki-search').addEventListener('input',function(){ _renderWikiResults(this.value); });
+document.getElementById('wiki-modal').addEventListener('click',e=>{ if(e.target===document.getElementById('wiki-modal')) document.getElementById('wiki-modal').style.display='none'; });
 _wireDraftListeners();
 _wirePaneToggle();
 
@@ -2974,6 +3037,15 @@ document.getElementById('theme-btn').addEventListener('click', function(){
   document.querySelector('meta[name="theme-color"]').setAttribute('content', next === 'dark' ? '#161b22' : '#f6f8fa');
 });
 </script>
+<!-- ═══════════ WIKI PICKER ═══════════ -->
+<div id="wiki-modal" style="position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center">
+  <div style="background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:20px;width:400px;max-width:96vw">
+    <div style="font-weight:700;margin-bottom:12px">Insert link to note</div>
+    <input type="text" id="wiki-search" placeholder="Search note titles…" style="width:100%;margin-bottom:8px">
+    <div id="wiki-results" style="max-height:240px;overflow-y:auto;display:flex;flex-direction:column;gap:2px"></div>
+    <button class="btn ghost sm" style="margin-top:10px;width:100%" id="wiki-cancel-btn">Cancel</button>
+  </div>
+</div>
 <!-- ═══════════ QUICK LOG ═══════════ -->
 <button id="ql-fab" title="Quick log (fast note)">＋</button>
 <div id="ql-modal">
