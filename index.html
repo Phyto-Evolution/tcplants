@@ -405,6 +405,7 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 .help-body th{background:var(--sf2)}
 .help-section-card{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:16px;margin-bottom:14px}
 </style>
+<script>(function(){var t=localStorage.getItem('tcplants_theme')||'dark';document.documentElement.dataset.theme=t;}());</script>
 </head>
 <body>
 
@@ -2592,7 +2593,6 @@ if(_st) document.getElementById('ltok').value=_st;
 // ── THEME ────────────────────────────────────────────────────
 (function(){
   const saved = localStorage.getItem('tcplants_theme') || 'dark';
-  document.documentElement.dataset.theme = saved;
   document.getElementById('theme-btn').textContent = saved === 'dark' ? '☀️' : '🌙';
 })();
 document.getElementById('theme-btn').addEventListener('click', function(){
@@ -2600,6 +2600,7 @@ document.getElementById('theme-btn').addEventListener('click', function(){
   document.documentElement.dataset.theme = next;
   localStorage.setItem('tcplants_theme', next);
   this.textContent = next === 'dark' ? '☀️' : '🌙';
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', next === 'dark' ? '#161b22' : '#f6f8fa');
 });
 </script>
 </body>
