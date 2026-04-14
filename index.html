@@ -576,7 +576,8 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
           </div>
           <div class="field">
             <label>Tags <span style="font-weight:400;color:var(--mu)">(comma separated)</span></label>
-            <input type="text" id="ne-tags" placeholder="MS media, contamination…">
+            <input type="text" id="ne-tags" placeholder="MS media, contamination…" list="tags-list" autocomplete="off">
+<datalist id="tags-list"></datalist>
           </div>
         </div>
         <div class="row2">
@@ -1441,6 +1442,12 @@ function populateRecipeSelect(selectedId=''){
   });
 }
 
+function populateTagsDatalist(){
+  const all=[...new Set(S.notes.flatMap(n=>n.tags||[]))].sort();
+  const dl=document.getElementById('tags-list');
+  dl.innerHTML=all.map(t=>`<option value="${esc(t)}">`).join('');
+}
+
 function startNewNote(){
   S.editing=null; S.cur=null; renderNoteList();
   document.getElementById('ne-head').textContent='New Lab Entry';
@@ -1505,6 +1512,7 @@ async function saveNoteAction(){
     }
     S.notesSha=await saveNotesIndex(S.notes,iSha);
     _writeCache();
+    populateTagsDatalist();
     updateReminderBadge();
     toast('Saved ✓ — committed to GitHub');
     renderNoteList(); await openNote(S.cur);
@@ -2182,6 +2190,7 @@ async function login(){
     document.getElementById('login').style.display='none';
     document.getElementById('app').classList.add('on');
     renderNoteList(); renderAccList(); renderRecList();
+    populateTagsDatalist();
     updateReminderBadge();
     switchSection('notes'); showNote('empty');
     fetchWeather();
