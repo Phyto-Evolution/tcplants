@@ -1222,12 +1222,14 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
         <p>You need two things: your <strong>Encryption Password</strong> (chosen by you — never leaves your browser) and a <strong>GitHub Personal Access Token</strong> with <code>repo</code> scope.</p>
         <p>Create a token: <code>github.com → Settings → Developer settings → Personal access tokens → Classic → New token → tick repo → Generate</code></p>
         <p>⚠️ <strong>Never lose your encryption password.</strong> There is no recovery — all note content is AES-256-GCM encrypted client-side. The GitHub repo stores only ciphertext.</p>
+        <h3>Navigation</h3>
+        <p>Tap <strong>☰</strong> (top-left) to open the <strong>left navigation drawer</strong>. For Notes, Registry, and Recipes, the drawer stays open and shows the search, filters, and list — the main panel on the right shows the selected entry or editor. For all other sections (Analytics, Tools, Help, etc.) the drawer closes after navigating. The top bar contains: weather, export, lock, and theme toggle.</p>
         <h3>Session Behaviour</h3>
-        <p>Your token is stored in <code>sessionStorage</code> only — it disappears when you close the tab. Your password is held in memory only. Lock or tab-close wipes both. After your first login, the decrypted data is cached for 10 minutes in <code>sessionStorage</code> so re-unlocking is near-instant (⚡ Loaded from cache).</p>
+        <p>Your token is stored in <code>sessionStorage</code> only — cleared on tab close. Your password is in memory only. Lock or tab-close wipes both. After first login, data is cached for 10 minutes so re-unlocking is near-instant (⚡ Loaded from cache).</p>
         <h3>Trusted Device</h3>
-        <p>After logging in, you'll be offered to <strong>Trust this device</strong>. Your GitHub token is encrypted with your password and saved locally — on future visits, just enter your password (no token needed). Click <strong>Forget this device</strong> in the login screen to remove it.</p>
+        <p>After logging in, tap <strong>Yes, save</strong> on the trust banner. Your GitHub token is saved encrypted in <code>localStorage</code> — next visit just enter your password, no token needed. Tap <strong>Forget this device</strong> on the login screen to remove it.</p>
         <h3>Light / Dark Mode</h3>
-        <p>Click the <strong>☀️ / 🌙</strong> button in the top-right nav bar to toggle themes. Your preference is saved in <code>localStorage</code> and applied immediately on every future visit — no flash.</p>
+        <p>Click <strong>☀️ / 🌙</strong> in the top bar to toggle themes. Preference persists across visits.</p>
       </div>
 
       <h2>Lab Notes</h2>
@@ -1235,7 +1237,7 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
         <h3>Creating an Entry</h3>
         <p>Click <strong>＋ New Entry</strong> or tap the blue <strong>＋ FAB</strong> (floating button, bottom-right) for a quick two-field entry. The full editor has:</p>
         <table><tr><th>Field</th><th>Purpose</th></tr>
-          <tr><td>Title</td><td>Required. Shown in sidebar and search results.</td></tr>
+          <tr><td>Title</td><td>Required. Shown in the drawer note list and search results.</td></tr>
           <tr><td>Experiment Type</td><td>Categorises the entry; auto-loads a Markdown template when body is empty.</td></tr>
           <tr><td>TC Stage</td><td>Stage 0 – IV, Self Notes / Unclassified, or N/A.</td></tr>
           <tr><td>Species / Accession</td><td>Links this entry to Registry accessions automatically.</td></tr>
@@ -1263,9 +1265,9 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
         <h3>Image Embeds</h3>
         <p>Click <strong>🖼</strong> to pick an image. It is base64-encoded and inserted inline — encrypted inside the note. Keep under 1 MB.</p>
         <h3>Search</h3>
-        <p>Typing in the search box instantly filters the sidebar by title, species, and tags. Pressing <span class="kbd">Enter</span> triggers a <strong>deep search</strong> — decrypts every note body and returns highlighted excerpts.</p>
+        <p>The search box in the left drawer instantly filters the note list by title, species, and tags. Pressing <span class="kbd">Enter</span> triggers a <strong>deep search</strong> — decrypts every note body and returns highlighted excerpts.</p>
         <h3>Filters</h3>
-        <p>Filter pills below the search box: All types, ☣️ Contamination only, ⏰ Overdue, and TC Stages I–IV.</p>
+        <p>Filter pills in the drawer: All types, ☣️ Contamination only, ⏰ Overdue, and TC Stages I–IV.</p>
       </div>
 
       <h2>Keyboard Shortcuts</h2>
@@ -1425,7 +1427,7 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 
       <h2>Export &amp; Backup</h2>
       <div class="help-section-card">
-        <p>Click <strong>⬇ ZIP</strong> in the bottom bar to download all notes as a ZIP of decrypted Markdown files, plus accessions and recipes as JSON. Click <strong>⬇ CSV</strong> to download two CSV files: one for all note metadata (id, title, date, type, stage, species, tags, next review, recipe name, cultures out), and one for all accessions.</p>
+        <p>Click <strong>⬇</strong> (ZIP) or <strong>CSV</strong> in the top bar to export your data. ZIP downloads all notes as decrypted Markdown files plus accessions and recipes as JSON. CSV downloads two spreadsheet files: one for all note metadata (id, title, date, type, stage, species, tags, next review, recipe, cultures out), one for all accessions.</p>
         <p>Each ZIP note file includes YAML front matter with all metadata.</p>
         <p>Your data is always in the GitHub repo as encrypted <code>.enc</code> files — every save is a git commit, so you have full version history at <code>github.com/Phyto-Evolution/tcplants</code>. The repo is your backup.</p>
         <h3>Print / PDF</h3>
