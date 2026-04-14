@@ -508,6 +508,26 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 .hist-item .hist-date{color:var(--mu);font-size:11px;margin-bottom:4px}
 .hist-item .hist-msg{font-weight:500;margin-bottom:6px}
 #notes-main{position:relative}
+/* ── ANALYTICS ── */
+.an-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-bottom:24px}
+.an-card{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:20px}
+.an-title{font-size:13px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:14px}
+.an-empty{color:var(--mu);font-size:13px;font-style:italic}
+.an-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px}
+.an-bar-label{width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
+.an-bar-track{flex:1;background:var(--sf2);border-radius:4px;height:12px;overflow:hidden}
+.an-bar-fill{height:100%;border-radius:4px;transition:width .4s}
+.an-bar-val{width:32px;text-align:right;color:var(--mu)}
+.an-stat{text-align:center;padding:10px}
+.an-stat .big{font-size:28px;font-weight:700}
+.an-stat .lbl{font-size:12px;color:var(--mu);margin-top:2px}
+.tag-cloud{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tag-cloud .tc-tag{border-radius:20px;padding:3px 10px;background:var(--sf2);color:var(--tx);cursor:default;line-height:1.4}
+.an-table{width:100%;border-collapse:collapse;font-size:13px}
+.an-table th{text-align:left;padding:6px 10px;border-bottom:2px solid var(--bd);color:var(--mu);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+.an-table td{padding:7px 10px;border-bottom:1px solid var(--sf2)}
+.score-track{height:8px;background:var(--sf2);border-radius:4px;overflow:hidden}
+.score-fill{height:100%;border-radius:4px;background:var(--gn)}
 </style>
 <script>(function(){var t=localStorage.getItem('tcplants_theme')||'dark';document.documentElement.dataset.theme=t;}());</script>
 </head>
@@ -552,6 +572,7 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
       <button class="ntab" data-sec="recipes"><span class="tab-icon">🧪</span><span class="tab-label"> Recipes</span></button>
       <button class="ntab" data-sec="reminders"><span class="tab-icon">⏰</span><span class="tab-label"> Reminders</span><span class="rbadge" id="rbadge">0</span></button>
       <button class="ntab" data-sec="contam"><span class="tab-icon">☣️</span><span class="tab-label"> Contam</span></button>
+      <button class="ntab" data-sec="analytics"><span class="tab-icon">📊</span><span class="tab-label"> Analytics</span></button>
       <button class="ntab" data-sec="tools"><span class="tab-icon">⏱</span><span class="tab-label"> Tools</span></button>
       <button class="ntab" data-sec="help"><span class="tab-icon">❓</span><span class="tab-label"> Help</span></button>
     </div>
@@ -1010,6 +1031,14 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
     <p style="font-size:13px;color:var(--mu);margin-bottom:20px">All contamination log entries across the lab.</p>
     <div class="contam-summary" id="contam-summary"></div>
     <div id="contam-list"></div>
+  </div>
+
+  <!-- ── ANALYTICS ── -->
+  <div class="section fullpage" id="sec-analytics">
+    <div style="max-width:960px;margin:0 auto;width:100%;padding-bottom:40px">
+      <h2 style="font-size:20px;font-weight:700;margin-bottom:24px">📊 Lab Analytics</h2>
+      <div id="analytics-content"></div>
+    </div>
   </div>
 
   <!-- ── TOOLS ── -->
@@ -1775,6 +1804,200 @@ async function restoreNoteVersion(noteId, commitSha){
   unload();
 }
 
+// ── SVG CHART HELPERS ────────────────────────────────────────
+function svgLine(points, w, h, color){
+  if(points.length<2) return '';
+  const xs=points.map(p=>p[0]),ys=points.map(p=>p[1]);
+  const minX=Math.min(...xs),maxX=Math.max(...xs),minY=0,maxY=Math.max(...ys,1);
+  const px=x=>((x-minX)/(maxX-minX||1))*(w-20)+10;
+  const py=y=>(h-10)-((y-minY)/(maxY-minY))*(h-20);
+  const pts=points.map(p=>`${px(p[0]).toFixed(1)},${py(p[1]).toFixed(1)}`).join(' ');
+  const fill=`<polygon points="${pts} ${px(maxX).toFixed(1)},${h-10} ${px(minX).toFixed(1)},${h-10}" fill="${color}" opacity=".15"/>`;
+  const line=`<polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round"/>`;
+  const dots=points.map(p=>`<circle cx="${px(p[0]).toFixed(1)}" cy="${py(p[1]).toFixed(1)}" r="3" fill="${color}"/>`).join('');
+  return `${fill}${line}${dots}`;
+}
+function svgDonut(slices,size){
+  const total=slices.reduce((s,sl)=>s+sl.v,0)||1;
+  let angle=-Math.PI/2; const r=size/2,ri=r*.55,cx=r,cy=r;
+  return slices.map(sl=>{
+    const a=(sl.v/total)*Math.PI*2;
+    const x1=cx+r*Math.cos(angle),y1=cy+r*Math.sin(angle);
+    const x2=cx+r*Math.cos(angle+a),y2=cy+r*Math.sin(angle+a);
+    const xi1=cx+ri*Math.cos(angle),yi1=cy+ri*Math.sin(angle);
+    const xi2=cx+ri*Math.cos(angle+a),yi2=cy+ri*Math.sin(angle+a);
+    const lg=a>Math.PI?1:0;
+    const d=`M${xi1.toFixed(1)},${yi1.toFixed(1)} L${x1.toFixed(1)},${y1.toFixed(1)} A${r},${r} 0 ${lg} 1 ${x2.toFixed(1)},${y2.toFixed(1)} L${xi2.toFixed(1)},${yi2.toFixed(1)} A${ri},${ri} 0 ${lg} 0 ${xi1.toFixed(1)},${yi1.toFixed(1)} Z`;
+    angle+=a;
+    return `<path d="${d}" fill="${sl.color}" opacity=".9"/>`;
+  }).join('');
+}
+
+// ── ANALYTICS ────────────────────────────────────────────────
+function renderAnalytics(){
+  const notes=S.notes, recs=S.recs;
+  if(!notes.length){
+    document.getElementById('analytics-content').innerHTML='<p class="an-empty">No notes yet — analytics will appear once you have lab entries.</p>';
+    return;
+  }
+
+  // Stage colours
+  const SC={'Stage I — Initiation':'#58a6ff','Stage II — Multiplication':'#3fb950',
+    'Stage III — Rooting':'#d29922','Stage IV — Acclimatization':'#bc8cff','Contamination Log':'#f85149'};
+
+  // ── 1. Notes per month (last 6)
+  const now=new Date(); const months=[];
+  for(let i=5;i>=0;i--){
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    months.push({key:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`,
+      label:d.toLocaleDateString('en-IN',{month:'short',year:'2-digit'}),count:0,contam:0});
+  }
+  notes.forEach(n=>{
+    const k=n.date?.slice(0,7);
+    const m=months.find(x=>x.key===k);
+    if(m){ m.count++; if(n.type==='Contamination Log') m.contam++; }
+  });
+  const W=260,H=70;
+  const notesPoints=months.map((m,i)=>[i,m.count]);
+  const contamPoints=months.map((m,i)=>[i,m.contam]);
+  const mkXLabels=(arr)=>arr.map((m,i)=>`<text x="${(i/(arr.length-1||1)*240+10).toFixed(0)}" y="${H+15}" text-anchor="middle" font-size="10" fill="var(--mu)">${m.label}</text>`).join('');
+  const notesChart=`<div class="an-card"><div class="an-title">Notes / Month</div>
+    <svg width="${W}" height="${H+20}" viewBox="0 0 ${W} ${H+20}" style="overflow:visible">
+      ${svgLine(notesPoints,W,H,'var(--ac)')}${mkXLabels(months)}</svg></div>`;
+  const contamChart=`<div class="an-card"><div class="an-title">Contamination Trend</div>
+    <svg width="${W}" height="${H+20}" viewBox="0 0 ${W} ${H+20}" style="overflow:visible">
+      ${svgLine(contamPoints,W,H,'var(--rd)')}${mkXLabels(months)}</svg></div>`;
+
+  // ── 2. Stage distribution donut
+  const stageCounts={};
+  notes.forEach(n=>{ if(n.stage) stageCounts[n.stage]=(stageCounts[n.stage]||0)+1; });
+  const donutSlices=Object.entries(stageCounts).map(([k,v])=>({v,color:SC[k]||'var(--mu)',label:k}));
+  const DS=120;
+  const donut=`<svg width="${DS}" height="${DS}" viewBox="0 0 ${DS} ${DS}">${svgDonut(donutSlices,DS)}</svg>`;
+  const donutLegend=donutSlices.map(s=>`<div style="display:flex;align-items:center;gap:6px;font-size:12px;margin-bottom:4px">
+    <span style="width:10px;height:10px;border-radius:50%;background:${s.color};flex-shrink:0;display:inline-block"></span>
+    <span style="flex:1">${esc(s.label.replace('Stage ','S').replace(/ — .*/,''))}</span>
+    <span style="color:var(--mu)">${s.v}</span></div>`).join('');
+  const stageDist=`<div class="an-card"><div class="an-title">Stage Distribution</div>
+    <div style="display:flex;gap:16px;align-items:center">${donut}<div style="flex:1">${donutLegend||'<p class="an-empty">No stage data</p>'}</div></div></div>`;
+
+  // ── 3. Species success rate
+  const speciesMap={};
+  notes.forEach(n=>{
+    if(!n.species) return;
+    const k=n.species.toLowerCase();
+    if(!speciesMap[k]) speciesMap[k]={name:n.species,total:0,contam:0};
+    speciesMap[k].total++;
+    if(n.type==='Contamination Log') speciesMap[k].contam++;
+  });
+  const speciesList=Object.values(speciesMap).filter(s=>s.total>=2)
+    .sort((a,b)=>((b.total-b.contam)/b.total)-((a.total-a.contam)/a.total)).slice(0,8);
+  const speciesBars=speciesList.length?speciesList.map(s=>{
+    const pct=Math.round((1-s.contam/s.total)*100);
+    const col=pct>70?'var(--gn)':pct>40?'var(--yw)':'var(--rd)';
+    return `<div class="an-bar-row"><div class="an-bar-label" title="${esc(s.name)}">${esc(s.name)}</div>
+      <div class="an-bar-track"><div class="an-bar-fill" style="width:${pct}%;background:${col}"></div></div>
+      <div class="an-bar-val">${pct}%</div></div>`;
+  }).join(''):`<p class="an-empty">Need ≥2 notes per species.</p>`;
+  const speciesCard=`<div class="an-card"><div class="an-title">Species Success Rate</div>${speciesBars}</div>`;
+
+  // ── 4. Recipe usage
+  const recipeUsage={};
+  notes.forEach(n=>{ if(n.recipe_id) recipeUsage[n.recipe_id]=(recipeUsage[n.recipe_id]||0)+1; });
+  const recipeList=Object.entries(recipeUsage).sort((a,b)=>b[1]-a[1]).slice(0,6)
+    .map(([id,cnt])=>({name:(recs.find(r=>r.id===id)?.name)||id,cnt}));
+  const maxR=Math.max(...recipeList.map(r=>r.cnt),1);
+  const recipeBars=recipeList.length?recipeList.map(r=>`<div class="an-bar-row">
+    <div class="an-bar-label" title="${esc(r.name)}">${esc(r.name)}</div>
+    <div class="an-bar-track"><div class="an-bar-fill" style="width:${Math.round(r.cnt/maxR*100)}%;background:var(--pu)"></div></div>
+    <div class="an-bar-val">${r.cnt}</div></div>`).join(''):`<p class="an-empty">Link recipes to notes to enable.</p>`;
+  const recipeCard=`<div class="an-card"><div class="an-title">Recipe Usage</div>${recipeBars}</div>`;
+
+  // ── 5. Tag cloud
+  const tagFreq={};
+  notes.forEach(n=>(n.tags||[]).forEach(t=>{ tagFreq[t]=(tagFreq[t]||0)+1; }));
+  const tagList=Object.entries(tagFreq).sort((a,b)=>b[1]-a[1]).slice(0,30);
+  const maxT=Math.max(...tagList.map(t=>t[1]),1);
+  const tagCloud=tagList.length
+    ?`<div class="tag-cloud">${tagList.map(([t,c])=>`<span class="tc-tag" style="font-size:${Math.round(11+c/maxT*8)}px;opacity:${(0.5+c/maxT*0.5).toFixed(2)}">${esc(t)}</span>`).join('')}</div>`
+    :`<p class="an-empty">Add tags to notes to see the cloud.</p>`;
+  const tagCard=`<div class="an-card"><div class="an-title">Tag Cloud</div>${tagCloud}</div>`;
+
+  // ── 6. Stage funnel per species (top 5)
+  const stageOrder=['Stage I — Initiation','Stage II — Multiplication','Stage III — Rooting','Stage IV — Acclimatization'];
+  const topSp=Object.values(speciesMap).sort((a,b)=>b.total-a.total).slice(0,5);
+  const funnelBars=topSp.map(sp=>{
+    const spNotes=notes.filter(n=>(n.species||'').toLowerCase()===sp.name.toLowerCase());
+    const stageCnt=stageOrder.map(s=>spNotes.filter(n=>n.stage===s).length);
+    const tot=stageCnt.reduce((a,b)=>a+b,0)||1;
+    const segs=stageOrder.map((s,i)=>stageCnt[i]
+      ?`<div title="${s}: ${stageCnt[i]}" style="width:${(stageCnt[i]/tot*100).toFixed(1)}%;background:${Object.values(SC)[i]};height:100%"></div>`:'').join('');
+    return `<div class="an-bar-row"><div class="an-bar-label" title="${esc(sp.name)}">${esc(sp.name)}</div>
+      <div class="an-bar-track" style="height:14px;display:flex">${segs}</div></div>`;
+  }).join('');
+  const stageLegend=stageOrder.map((s,i)=>`<span style="font-size:11px;color:var(--mu);display:flex;align-items:center;gap:4px">
+    <span style="width:8px;height:8px;border-radius:50%;background:${Object.values(SC)[i]};display:inline-block"></span>
+    ${s.replace('Stage ','S').replace(/ — .*/,'')}</span>`).join('');
+  const funnelCard=`<div class="an-card" style="grid-column:1/-1"><div class="an-title">Stage Funnel by Species</div>
+    ${topSp.length?funnelBars:`<p class="an-empty">Need notes with species + stage.</p>`}
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:10px">${stageLegend}</div></div>`;
+
+  // ── 7. Avg days between notes per species
+  const intervalCards=Object.values(speciesMap).filter(s=>s.total>=3).slice(0,4).map(sp=>{
+    const spNotes=notes.filter(n=>(n.species||'').toLowerCase()===sp.name.toLowerCase())
+      .sort((a,b)=>new Date(a.date)-new Date(b.date));
+    const diffs=spNotes.slice(1).map((n,i)=>Math.round((new Date(n.date)-new Date(spNotes[i].date))/86400000));
+    const avg=diffs.length?Math.round(diffs.reduce((a,b)=>a+b,0)/diffs.length):null;
+    return avg!==null?`<div class="an-stat an-card"><div class="big">${avg}d</div><div class="lbl">Avg interval<br><span style="font-size:10px">${esc(sp.name)}</span></div></div>`:'';
+  }).filter(Boolean).join('');
+
+  // ── 8. Media efficiency table
+  const effMap={};
+  notes.forEach(n=>{
+    if(!n.recipe_id||!n.species||!n.stage) return;
+    const key=`${n.recipe_id}|${n.species.toLowerCase()}|${n.stage}`;
+    if(!effMap[key]) effMap[key]={recipe_id:n.recipe_id,species:n.species,stage:n.stage,total:0,contam:0,outputs:[]};
+    effMap[key].total++;
+    if(n.type==='Contamination Log') effMap[key].contam++;
+    if(n.cultures_out!=null) effMap[key].outputs.push(n.cultures_out);
+  });
+  const effRows=Object.values(effMap).filter(e=>e.total>=2);
+  const allOutputs=effRows.flatMap(e=>e.outputs);
+  const globalAvg=allOutputs.length?allOutputs.reduce((a,b)=>a+b,0)/allOutputs.length:1;
+  const effScored=effRows.map(e=>{
+    const avgOut=e.outputs.length?e.outputs.reduce((a,b)=>a+b,0)/e.outputs.length:null;
+    const contamRate=e.contam/e.total;
+    const score=avgOut!=null?Math.min(100,Math.round((avgOut/globalAvg)*(1-contamRate)*100)):null;
+    return{...e,avgOut,contamRate,score};
+  }).sort((a,b)=>(b.score||0)-(a.score||0));
+  const effTable=effScored.length
+    ?`<div style="overflow-x:auto"><table class="an-table">
+    <thead><tr><th>Recipe</th><th>Species</th><th>Stage</th><th>Avg Out</th><th>Contam%</th><th style="min-width:80px">Score</th></tr></thead>
+    <tbody>${effScored.map(e=>{
+      const rec=recs.find(r=>r.id===e.recipe_id);
+      return`<tr>
+        <td>${esc(rec?.name||e.recipe_id)}</td>
+        <td>${esc(e.species)}</td>
+        <td>${esc(e.stage.replace('Stage ','S').replace(/ — .*/,''))}</td>
+        <td>${e.avgOut!=null?e.avgOut.toFixed(1):'—'}</td>
+        <td>${Math.round(e.contamRate*100)}%</td>
+        <td><div class="score-track"><div class="score-fill" style="width:${e.score||0}%"></div></div><span style="font-size:11px;color:var(--mu)">${e.score!=null?e.score+'%':'—'}</span></td>
+      </tr>`;}).join('')}</tbody>
+  </table></div>`
+    :`<p class="an-empty">Need ≥2 notes with the same recipe + species + stage. Add 'Cultures Out' to notes to unlock efficiency scores.</p>`;
+  const effCard=`<div class="an-card" style="grid-column:1/-1"><div class="an-title">Media Efficiency</div>${effTable}</div>`;
+
+  // ── Assemble
+  const intervalSection=intervalCards?`<div class="an-grid">${intervalCards}</div>`:'';
+  document.getElementById('analytics-content').innerHTML=`
+    <div class="an-grid">${notesChart}${stageDist}${contamChart}${recipeCard}</div>
+    <div class="an-grid">${speciesCard}${tagCard}</div>
+    ${intervalSection}
+    <div class="an-grid">${funnelCard}</div>
+    <div class="an-grid">${effCard}</div>
+  `;
+}
+
 function startNewNote(){
   S.editing=null; S.cur=null; renderNoteList();
   document.getElementById('ne-head').textContent='New Lab Entry';
@@ -2462,6 +2685,7 @@ function switchSection(name){
   document.querySelector(`[data-sec="${name}"]`)?.classList.add('active');
   if(name==='reminders') renderReminders();
   if(name==='contam') renderContamDashboard();
+  if(name==='analytics') renderAnalytics();
 }
 document.querySelectorAll('.ntab').forEach(t=>t.addEventListener('click',()=>switchSection(t.dataset.sec)));
 
