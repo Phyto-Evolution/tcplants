@@ -3145,16 +3145,20 @@ function _renderTaxonomyPanel(){
   let html='';
   for(const cat of categories){
     const enabled=cat.packs.some(p=>activePacks.has(p));
-    // Count species from this category: filter by genus that belongs to known genera in these packs
-    // Since we don't track pack per species, use category id via TAX_PACKS lookup
-    const catSpecies=S.taxSpecies.filter(sp=>{
-      if(sp.is_custom) return false;
-      // Check if genus matches any genera in this category's packs
-      const genus=sp.full_name.split(' ')[0];
-      // We check if the species appears when this category's packs are active
-      // Use a simple heuristic: species genus matches known genera
-      return cat.packs.some(p=>TAX_PACKS[p]===cat.id);
-    });
+    const catKnownGenera={
+      carnivorous:['Nepenthes','Drosera','Dionaea','Aldrovanda','Sarracenia','Darlingtonia',
+                   'Heliamphora','Cephalotus','Utricularia','Pinguicula','Genlisea','Byblis',
+                   'Roridula','Triphyophyllum'],
+      orchids:['Paphiopedilum','Dendrobium','Vanda','Coelogyne','Bulbophyllum','Cattleya',
+               'Cymbidium','Epidendrum','Maxillaria','Oncidium','Phalaenopsis','Pleurothallis',
+               'Zygopetalum','Masdevallia','Dracula','Miltoniopsis','Vanilla','Rhynchostylis',
+               'Aerides','Habenaria'],
+      banana:['Musa','Ensete','Heliconia','Zingiber','Curcuma','Alpinia','Elettaria','Amomum',
+              'Hedychium','Kaempferia','Etlingera']
+    };
+    const catSpecies=S.taxSpecies.filter(sp=>
+      !sp.is_custom && (catKnownGenera[cat.id]||[]).includes(sp.full_name.split(' ')[0])
+    );
     html+=`<div class="tax-section">
       <div class="tax-section-head" onclick="_taxToggleSection(this)">
         <h3>${cat.name}</h3>
@@ -3224,9 +3228,15 @@ function _renderGenusGroups(catId){
   // Can't determine which pack a species came from after flattening
   // Use genus-based heuristic from known genera in each category
   const knownGenera={
-    carnivorous:['Nepenthes','Drosera','Dionaea','Aldrovanda','Sarracenia','Darlingtonia','Heliamphora','Cephalotus','Utricularia','Pinguicula','Genlisea','Byblis','Roridula','Triphyophyllum'],
-    orchids:['Paphiopedilum','Dendrobium','Vanda','Coelogyne','Bulbophyllum','Cattleya','Cymbidium','Epidendrum','Maxillaria','Oncidium','Phalaenopsis','Pleurothallis','Zygopetalum'],
-    banana:['Musa','Ensete','Heliconia','Zingiber','Curcuma','Alpinia','Elettaria','Amomum']
+    carnivorous:['Nepenthes','Drosera','Dionaea','Aldrovanda','Sarracenia','Darlingtonia',
+                 'Heliamphora','Cephalotus','Utricularia','Pinguicula','Genlisea','Byblis',
+                 'Roridula','Triphyophyllum'],
+    orchids:['Paphiopedilum','Dendrobium','Vanda','Coelogyne','Bulbophyllum','Cattleya',
+             'Cymbidium','Epidendrum','Maxillaria','Oncidium','Phalaenopsis','Pleurothallis',
+             'Zygopetalum','Masdevallia','Dracula','Miltoniopsis','Vanilla','Rhynchostylis',
+             'Aerides','Habenaria'],
+    banana:['Musa','Ensete','Heliconia','Zingiber','Curcuma','Alpinia','Elettaria','Amomum',
+            'Hedychium','Kaempferia','Etlingera']
   };
   const genera=knownGenera[catId]||[];
   const species=S.taxSpecies.filter(sp=>!sp.is_custom&&genera.includes(sp.full_name.split(' ')[0]));
@@ -3288,13 +3298,18 @@ async function _taxDeleteCustomSpecies(id){
   const idx=S.taxCustom.species.findIndex(s=>s.id===id);
   if(idx===-1) return;
   const removed=S.taxCustom.species.splice(idx,1)[0];
+  const removedFromSpecies=S.taxSpecies.filter(s=>s.is_custom&&s.full_name===removed.full_name);
   S.taxSpecies=S.taxSpecies.filter(s=>!(s.is_custom&&s.full_name===removed.full_name));
   try{
     await saveCustomTaxonomy();
     _writeCache();
     _renderTaxonomyPanel();
     toast('Species removed');
-  }catch(e){ S.taxCustom.species.splice(idx,0,removed); toast('Delete failed: '+e.message,'fail'); }
+  }catch(e){
+    S.taxCustom.species.splice(idx,0,removed);
+    removedFromSpecies.forEach(s=>S.taxSpecies.push(s));
+    toast('Delete failed: '+e.message,'fail');
+  }
 }
 
 function _renderFlairsPanel(){
