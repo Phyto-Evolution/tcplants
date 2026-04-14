@@ -566,6 +566,13 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
             <input type="date" id="ne-review">
           </div>
         </div>
+        <div class="row2">
+          <div class="field">
+            <label>Cultures Out <span style="font-weight:400;color:var(--mu)">(optional — for analytics)</span></label>
+            <input type="number" id="ne-cultures-out" placeholder="e.g. 24" min="0" step="1">
+            <div class="hint">Number of propagules / cultures produced in this entry.</div>
+          </div>
+        </div>
         <div class="field">
           <label>Notes <span style="font-weight:400;color:var(--mu)">(Markdown)</span></label>
           <div class="editor-toolbar">
@@ -1411,7 +1418,7 @@ function populateRecipeSelect(selectedId=''){
 function startNewNote(){
   S.editing=null; S.cur=null; renderNoteList();
   document.getElementById('ne-head').textContent='New Lab Entry';
-  ['ne-title','ne-species','ne-tags','ne-body'].forEach(id=>document.getElementById(id).value='');
+  ['ne-title','ne-species','ne-tags','ne-body','ne-cultures-out'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('ne-type').value='';
   document.getElementById('ne-stage').value='';
   document.getElementById('ne-review').value='';
@@ -1434,6 +1441,7 @@ async function startEditNote(){
     document.getElementById('ne-species').value=m.species||'';
     document.getElementById('ne-tags').value=(m.tags||[]).join(', ');
     document.getElementById('ne-review').value=m.next_review||'';
+    document.getElementById('ne-cultures-out').value=m.cultures_out||'';
     document.getElementById('ne-body').value=body;
     document.getElementById('ne-tmpl-hint').textContent='';
     populateRecipeSelect(m.recipe_id||'');
@@ -1450,6 +1458,7 @@ async function saveNoteAction(){
   const tags   =document.getElementById('ne-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
   const review   =document.getElementById('ne-review').value||null;
   const recipe_id=document.getElementById('ne-recipe').value||null;
+  const cultures_out = parseInt(document.getElementById('ne-cultures-out').value,10)||null;
   const body   =document.getElementById('ne-body').value;
   if(!title){toast('Title is required','fail');return;}
   document.getElementById('save-note-btn').disabled=true;
@@ -1460,12 +1469,12 @@ async function saveNoteAction(){
       const ef=await ghGet(`${DIR}/${S.editing}.enc`);
       await writeNote(S.editing,body,ef.sha,`lab: update "${title}"`);
       const idx=notes.findIndex(n=>n.id===S.editing);
-      if(idx!==-1) notes[idx]={...notes[idx],title,type,stage,species,tags,next_review:review,recipe_id};
+      if(idx!==-1) notes[idx]={...notes[idx],title,type,stage,species,tags,next_review:review,recipe_id,cultures_out};
       S.notes=notes; S.cur=S.editing;
     }else{
       const id=uid(), date=new Date().toISOString();
       await writeNote(id,body,null,`lab: add "${title}"`);
-      notes.push({id,title,date,type,stage,species,tags,next_review:review,recipe_id});
+      notes.push({id,title,date,type,stage,species,tags,next_review:review,recipe_id,cultures_out});
       S.notes=notes; S.cur=id;
     }
     S.notesSha=await saveNotesIndex(S.notes,iSha);
