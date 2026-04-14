@@ -1,0 +1,38 @@
+{
+  "pack_id": "dioncophyllaceae",
+  "schema_version": "1.1",
+  "family": "Dioncophyllaceae",
+  "common_name": "Tangle Liana",
+  "description": "Dioncophyllaceae is a small family of West African lianas with only three genera. Only one species, <em>Triphyophyllum peltatum</em>, is carnivorous — and only during a specific juvenile leaf phase. It is the world's largest carnivorous plant by biomass and the only known annual-phase carnivore: the plant produces sticky insectivorous leaves for a brief developmental window before abandoning carnivory and becoming a conventional liana.",
+  "meta_title": "Tangle Liana — Triphyophyllum | PhytoCommerce",
+  "meta_description": "Shop the extraordinary Triphyophyllum peltatum — the world's largest carnivorous plant. West African liana with a transient carnivorous phase.",
+  "meta_keywords": "Triphyophyllum, tangle liana, carnivorous liana, West Africa carnivore, Dioncophyllaceae",
+  "genera": [
+    {
+      "genus": "Triphyophyllum",
+      "common_name": "Tangle Liana",
+      "description": "<em>Triphyophyllum peltatum</em> is the sole species in this monotypic genus and one of the most remarkable carnivorous plants in existence. Native to tropical rainforests in Sierra Leone, Liberia, and Côte d'Ivoire, it produces three distinct leaf types across its life: simple juvenile leaves, sticky glandular carnivorous leaves, and hook-bearing liana leaves used for climbing. The carnivorous phase lasts only weeks to months and appears to be triggered by phosphorus limitation.",
+      "meta_title": "Triphyophyllum — World's Largest Carnivorous Plant",
+      "meta_description": "Buy Triphyophyllum peltatum — the world's largest carnivore, a West African tangle liana. Transient carnivory, tropical forest conditions, extremely rare.",
+      "meta_keywords": "Triphyophyllum peltatum, tangle liana, largest carnivorous plant, West Africa liana, rare carnivore",
+      "native_range": "West Africa (Sierra Leone, Liberia, Côte d'Ivoire)",
+      "care_level": "Expert",
+      "tc_suitability": "Low",
+      "conservation_status": "EN",
+      "species": [
+        {
+          "full_name": "Triphyophyllum peltatum",
+          "common_name": "Tangle Liana",
+          "description": "<em>Triphyophyllum peltatum</em> is the only carnivorous species in Dioncophyllaceae and one of the rarest in cultivation. The liana can reach 40–50 m in its native forest habitat. The transient carnivorous phase produces petiolate leaves densely coated in red stalked glands secreting mucilage. Mature plants climb using three-pronged grappling hooks. Cultivation requires stable tropical warmth (24–30°C), high humidity, and careful nutrient management to induce the carnivorous leaf phase.",
+          "meta_title": "Triphyophyllum peltatum — Tangle Liana Carnivore",
+          "meta_description": "Buy Triphyophyllum peltatum — world's largest carnivorous plant by biomass. Extremely rare West African liana; expert-level tropical cultivation required.",
+          "meta_keywords": "Triphyophyllum peltatum for sale, tangle liana, largest carnivore, West African carnivorous plant, rare liana",
+          "native_range": "West Africa (Sierra Leone, Liberia, Côte d'Ivoire) — lowland rainforest",
+          "conservation_status": "EN",
+          "notes": "Extremely rare in cultivation. Requires consistent tropical heat, high humidity, and low phosphorus to trigger carnivorous phase. Not recommended for beginners.",
+          "cultivars": []
+        }
+      ]
+    }
+  ]
+}

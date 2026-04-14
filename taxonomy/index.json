@@ -1,0 +1,7 @@
+{
+  "categories": [
+    { "id": "carnivorous", "name": "Carnivorous Plants", "index": "taxonomy/carnivorous/index.json" },
+    { "id": "orchids", "name": "Orchids", "index": "taxonomy/orchids/index.json" },
+    { "id": "banana", "name": "Banana & Relatives", "index": "taxonomy/banana/index.json" }
+  ]
+}

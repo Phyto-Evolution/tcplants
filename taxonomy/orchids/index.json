@@ -1,0 +1,18 @@
+{
+  "category": "orchids",
+  "name": "Orchids",
+  "packs": [
+    {
+      "id": "orchidaceae",
+      "name": "Orchids",
+      "file": "orchids/orchidaceae.json",
+      "genera": [
+        "Paphiopedilum",
+        "Dendrobium",
+        "Vanda",
+        "Coelogyne",
+        "Bulbophyllum"
+      ]
+    }
+  ]
+}

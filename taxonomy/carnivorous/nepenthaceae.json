@@ -1,0 +1,1048 @@
+{
+  "pack_id": "nepenthaceae",
+  "schema_version": "1.1",
+  "family": "Nepenthaceae",
+  "common_name": "Tropical Pitcher Plants",
+  "description": "Monogeneric family. Nepenthes contains 160+ currently accepted species native to tropical Asia (especially Borneo, Philippines, Sumatra), Madagascar, Sri Lanka, India, and Australia. N. khasiana is India's only native species (CITES Appendix I). Classification: lowland (<1000m), intermediate (1000-1500m), highland (>1500m).",
+  "meta_title": "Nepenthes — Complete Tropical Pitcher Plant Taxonomy",
+  "meta_description": "All 160+ accepted Nepenthes species with conservation status, altitude classification, and cultivar data.",
+  "meta_keywords": "Nepenthes, tropical pitcher plant, carnivorous, highland, lowland, CITES, Borneo, Philippines",
+  "genera": [
+    {
+      "genus": "Nepenthes",
+      "common_name": "Tropical Pitcher Plants",
+      "description": "Carnivorous vines and shrubs with pitfall-trap pitchers. 160+ accepted species; thousands of registered and unregistered hybrids. Cultivated in specialist collections worldwide; N. khasiana protected under CITES Appendix I in India.",
+      "species": [
+        {
+          "full_name": "Nepenthes acuminata",
+          "common_name": "Acuminate Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes adrianii",
+          "common_name": "Adrian's Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes alba",
+          "common_name": "White Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes alata",
+          "common_name": "Winged Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes albomarginata",
+          "common_name": "White-margined Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes alzapan",
+          "common_name": "Alzapan Pitcher Plant",
+          "conservation_status": "endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes andamana",
+          "common_name": "Andaman Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes angasanensis",
+          "common_name": "Angasan Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes angustifolia",
+          "common_name": "Narrow-leaved Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes aristolochioides",
+          "common_name": "Birthwort Pitcher Plant",
+          "conservation_status": "critically_endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes attenboroughii",
+          "common_name": "Attenborough's Pitcher Plant",
+          "conservation_status": "critically_endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes beccariana",
+          "common_name": "Beccari's Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes bellii",
+          "common_name": "Bell's Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes benstonei",
+          "common_name": "Benstone's Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes bicalcarata",
+          "common_name": "Fanged Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes bokorensis",
+          "common_name": "Bokor Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes borneensis",
+          "common_name": "Bornean Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes boschiana",
+          "common_name": "Bosch's Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes brachycarpa",
+          "common_name": "Short-fruited Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes bracteosa",
+          "common_name": "Bracted Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes brongersmaiana",
+          "common_name": "Brongersma's Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes burbidgeae",
+          "common_name": "Burbidge's Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes burkei",
+          "common_name": "Burke's Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes cabanensis",
+          "common_name": "Cabanes Pitcher Plant",
+          "conservation_status": "endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes cabuyaoensis",
+          "common_name": "Cabuyao Pitcher Plant",
+          "conservation_status": "critically_endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes campanulata",
+          "common_name": "Bell-shaped Pitcher Plant",
+          "conservation_status": "critically_endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes carunculata",
+          "common_name": "Fleshy-keeled Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes ceciliae",
+          "common_name": "Cecilia's Pitcher Plant",
+          "conservation_status": "endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes chaniana",
+          "common_name": "Chan's Pitcher Plant",
+          "conservation_status": "endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes clipeata",
+          "common_name": "Shield-leaved Pitcher Plant",
+          "conservation_status": "critically_endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes copelandii",
+          "common_name": "Copeland's Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes danseri",
+          "common_name": "Danser's Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes deaniana",
+          "common_name": "Dean's Pitcher Plant",
+          "conservation_status": "critically_endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes dentata",
+          "common_name": "Toothed Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes diatas",
+          "common_name": "Upper Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes distillatoria",
+          "common_name": "Distilling Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes dubia",
+          "common_name": "Doubtful Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes dussartii",
+          "common_name": "Dussart's Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes echinostoma",
+          "common_name": "Spiny-mouthed Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes edwardsiana",
+          "common_name": "Edwards' Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes ephippiata",
+          "common_name": "Saddle Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes epiphytica",
+          "common_name": "Epiphytic Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes eymae",
+          "common_name": "Eymae's Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes extincta",
+          "common_name": "Extinct Pitcher Plant",
+          "conservation_status": "extinct",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes faizaliana",
+          "common_name": "Faizal's Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes fallax",
+          "common_name": "Deceptive Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes faruqii",
+          "common_name": "Faruq's Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes flaccida",
+          "common_name": "Flaccid Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes floweri",
+          "common_name": "Flower's Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes fusca",
+          "common_name": "Dark Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes glabrata",
+          "common_name": "Smooth Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes gracilis",
+          "common_name": "Slender Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes gracillima",
+          "common_name": "Very Slender Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes gymnamphora",
+          "common_name": "Naked-pitcher Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes hamata",
+          "common_name": "Hooked Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes hamiguitanensis",
+          "common_name": "Hamiguitan Pitcher Plant",
+          "conservation_status": "critically_endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes hemsleyana",
+          "common_name": "Hemsley's Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes hirsuta",
+          "common_name": "Hairy Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes hispida",
+          "common_name": "Hispid Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes holdenii",
+          "common_name": "Holden's Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes hurrelliana",
+          "common_name": "Hurrell's Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes inermis",
+          "common_name": "Unarmed Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes insignis",
+          "common_name": "Notable Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes isabelae",
+          "common_name": "Isabella's Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes izumiae",
+          "common_name": "Izumi's Pitcher Plant",
+          "conservation_status": "endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes jacquelineae",
+          "common_name": "Jacqueline's Pitcher Plant",
+          "conservation_status": "critically_endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes jamban",
+          "common_name": "Toilet Pitcher Plant",
+          "conservation_status": "critically_endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes justinae",
+          "common_name": "Justine's Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes kagayanensis",
+          "common_name": "Cagayan Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes kampotiana",
+          "common_name": "Kampot Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes kerrii",
+          "common_name": "Kerr's Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes khasiana",
+          "common_name": "Khasi Pitcher Plant",
+          "conservation_status": "cites_appendix_i",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes klossii",
+          "common_name": "Kloss's Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes lamii",
+          "common_name": "Lam's Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes lavicola",
+          "common_name": "Lava-dweller Pitcher Plant",
+          "conservation_status": "endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes leonardoi",
+          "common_name": "Leonardo's Pitcher Plant",
+          "conservation_status": "critically_endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes leyte",
+          "common_name": "Leyte Pitcher Plant",
+          "conservation_status": "endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes lingulata",
+          "common_name": "Tongue Pitcher Plant",
+          "conservation_status": "critically_endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes longifolia",
+          "common_name": "Long-leaved Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes lowii",
+          "common_name": "Low's Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes macfarlanei",
+          "common_name": "Macfarlane's Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes macrovulgaris",
+          "common_name": "Common Large Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes madagascariensis",
+          "common_name": "Madagascar Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes mantalingajanensis",
+          "common_name": "Mantalingajan Pitcher Plant",
+          "conservation_status": "endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes mapuluensis",
+          "common_name": "Mapulu Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes masarangensis",
+          "common_name": "Masarang Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes masoalensis",
+          "common_name": "Masoala Pitcher Plant",
+          "conservation_status": "endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes maxima",
+          "common_name": "Large Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes merrilliana",
+          "common_name": "Merrill's Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes mikei",
+          "common_name": "Mike's Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes mindanaoensis",
+          "common_name": "Mindanao Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes mira",
+          "common_name": "Wonderful Pitcher Plant",
+          "conservation_status": "endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes mirabilis",
+          "common_name": "Common Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": [
+            "Globosa",
+            "Viking"
+          ]
+        },
+        {
+          "full_name": "Nepenthes mollis",
+          "common_name": "Soft Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes monticola",
+          "common_name": "Mountain Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes muluensis",
+          "common_name": "Mulu Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes murudensis",
+          "common_name": "Murud Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes naga",
+          "common_name": "Naga Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes nebularum",
+          "common_name": "Cloud Pitcher Plant",
+          "conservation_status": "endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes neoguineensis",
+          "common_name": "New Guinea Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes nigra",
+          "common_name": "Black Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes northiana",
+          "common_name": "North's Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes oblanceolata",
+          "common_name": "Oblanceolate Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes ovata",
+          "common_name": "Oval Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes palawanensis",
+          "common_name": "Palawan Pitcher Plant",
+          "conservation_status": "endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes paniculata",
+          "common_name": "Panicled Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes papuana",
+          "common_name": "Papuan Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes peltata",
+          "common_name": "Shield-leaved Pitcher Plant",
+          "conservation_status": "endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes pervillei",
+          "common_name": "Pervillé's Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes petiolata",
+          "common_name": "Petiolate Pitcher Plant",
+          "conservation_status": "endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes philippinensis",
+          "common_name": "Philippine Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes pilosa",
+          "common_name": "Hairy-stemmed Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes pitopangii",
+          "common_name": "Pitopang's Pitcher Plant",
+          "conservation_status": "critically_endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes platychila",
+          "common_name": "Flat-lipped Pitcher Plant",
+          "conservation_status": "endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes pulchra",
+          "common_name": "Beautiful Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes purpurascens",
+          "common_name": "Purple-tinged Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes putatan",
+          "common_name": "Putatan Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes rafflesiana",
+          "common_name": "Raffles' Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": [
+            "Giant",
+            "Elongata",
+            "Brunei Red"
+          ]
+        },
+        {
+          "full_name": "Nepenthes rajah",
+          "common_name": "Rajah Pitcher Plant",
+          "conservation_status": "endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes ramispina",
+          "common_name": "Branch-spined Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes ramos",
+          "common_name": "Ramos's Pitcher Plant",
+          "conservation_status": "endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes reinwardtiana",
+          "common_name": "Reinwardt's Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes rigidifolia",
+          "common_name": "Stiff-leaved Pitcher Plant",
+          "conservation_status": "endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes robcantleyi",
+          "common_name": "Rob Cantley's Pitcher Plant",
+          "conservation_status": "critically_endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes samar",
+          "common_name": "Samar Pitcher Plant",
+          "conservation_status": "endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes sanguinea",
+          "common_name": "Red-tinged Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes sibuyanensis",
+          "common_name": "Sibuyan Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes singalana",
+          "common_name": "Singgalang Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes smilesii",
+          "common_name": "Smiles' Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes spathulata",
+          "common_name": "Spatula-leaved Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes spectabilis",
+          "common_name": "Spectacular Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes spiculosa",
+          "common_name": "Spiculate Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes stenophylla",
+          "common_name": "Narrow-leaved Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes sumatrana",
+          "common_name": "Sumatran Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes surigaoensis",
+          "common_name": "Surigao Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes talangensis",
+          "common_name": "Talang Pitcher Plant",
+          "conservation_status": "endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes tenax",
+          "common_name": "Tenacious Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes tentaculata",
+          "common_name": "Tentacled Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes thorelii",
+          "common_name": "Thorel's Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes tobaica",
+          "common_name": "Toba Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes tomoriana",
+          "common_name": "Tomo Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes treubiana",
+          "common_name": "Treub's Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes truncata",
+          "common_name": "Truncated Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": [
+            "Highland",
+            "Lowland",
+            "Pasian"
+          ]
+        },
+        {
+          "full_name": "Nepenthes undulatifolia",
+          "common_name": "Wavy-leaved Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes veitchii",
+          "common_name": "Veitch's Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": [
+            "Bario",
+            "Candy",
+            "Murud",
+            "Hose Mountains"
+          ]
+        },
+        {
+          "full_name": "Nepenthes ventricosa",
+          "common_name": "Belly Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": [
+            "Red",
+            "Porcelain",
+            "Madja-as",
+            "Malesiana"
+          ]
+        },
+        {
+          "full_name": "Nepenthes vieillardii",
+          "common_name": "Vieillard's Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes vikingii",
+          "common_name": "Viking's Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes villosa",
+          "common_name": "Hairy Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes vogelii",
+          "common_name": "Vogel's Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes xiphioides",
+          "common_name": "Sword-like Pitcher Plant",
+          "conservation_status": "endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes ampullaria",
+          "common_name": "Flask-shaped Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": [
+            "Harlequin",
+            "Red Speckled",
+            "William's Red",
+            "Green Speckled",
+            "Brunei Red"
+          ]
+        },
+        {
+          "full_name": "Nepenthes macrophylla",
+          "common_name": "Large-leaved Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes argentii",
+          "common_name": "Argent's Pitcher Plant",
+          "conservation_status": "critically_endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes abalata",
+          "common_name": "",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes appendiculata",
+          "common_name": "Appendaged Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes batakiana",
+          "common_name": "Batak Pitcher Plant",
+          "conservation_status": "critically_endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes curtisii",
+          "common_name": "Curtis' Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes elongata",
+          "common_name": "Elongated Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes glandulifera",
+          "common_name": "Glandular Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes gronowii",
+          "common_name": "Gronow's Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes kinabaluensis",
+          "common_name": "Kinabalu Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes palembangensis",
+          "common_name": "Palembang Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes rhombicaulis",
+          "common_name": "Diamond-stemmed Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes barcelonae",
+          "common_name": "Barcelona's Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes cornuta",
+          "common_name": "Horned Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Nepenthes caballeroi",
+          "common_name": "Caballero's Pitcher Plant",
+          "conservation_status": "not_evaluated",
+          "cultivars": []
+        }
+      ]
+    }
+  ]
+}

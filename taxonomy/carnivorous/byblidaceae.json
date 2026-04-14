@@ -1,0 +1,107 @@
+{
+  "pack_id": "byblidaceae",
+  "schema_version": "1.1",
+  "family": "Byblidaceae",
+  "common_name": "Rainbow Plants",
+  "description": "Byblidaceae is a monogeneric family of carnivorous plants native to Australia and Papua New Guinea. The genus <em>Byblis</em> (rainbow plants) traps insects on sticky, mucilage-covered leaves. Though superficially similar to Drosera, Byblis is unrelated and represents a remarkable case of convergent evolution in carnivory.",
+  "meta_title": "Rainbow Plants — Byblis | PhytoCommerce",
+  "meta_description": "Shop rare Australian rainbow plants (Byblis). TC-grown specimens with full provenance, care guides and cultivar selection.",
+  "meta_keywords": "Byblis, rainbow plant, carnivorous plants, Australian carnivorous plant, buy Byblis",
+  "genera": [
+    {
+      "genus": "Byblis",
+      "common_name": "Rainbow Plants",
+      "description": "<em>Byblis</em> comprises seven species of annual and perennial carnivorous herbs native to Australia and New Guinea. Leaves are covered in stalked glands secreting mucilage that traps small insects. The flowers are attractive, five-petalled, and often violet or purple. Several species are fire-adapted annuals requiring smoke treatment for germination.",
+      "meta_title": "Byblis — Australian Rainbow Plants",
+      "meta_description": "Buy Byblis rainbow plants online. Annual and perennial species, seed-grown and TC stock, with smoke-germination notes and care instructions.",
+      "meta_keywords": "Byblis for sale, rainbow plant, Byblis liniflora, carnivorous herb, Australian native carnivore",
+      "native_range": "Australia (Western Australia, Northern Territory, Queensland), Papua New Guinea",
+      "care_level": "Beginner–Intermediate",
+      "tc_suitability": "Moderate",
+      "conservation_status": "varies by species",
+      "species": [
+        {
+          "full_name": "Byblis liniflora",
+          "common_name": "Dwarf Rainbow Plant",
+          "description": "<em>Byblis liniflora</em> is the most widely cultivated species — an annual native to tropical northern Australia and southern New Guinea. Slender linear leaves up to 10 cm bear dense glandular hairs. Mauve to violet flowers bloom freely under humid conditions. Readily grown from seed with no smoke treatment required.",
+          "meta_title": "Byblis liniflora — Dwarf Rainbow Plant",
+          "meta_description": "Buy Byblis liniflora seeds and plants. Easy annual rainbow plant for carnivorous plant beginners; thrives in peat-sand mix under high humidity.",
+          "meta_keywords": "Byblis liniflora, dwarf rainbow plant, annual carnivorous plant, Byblis for beginners",
+          "native_range": "Northern Australia, southern Papua New Guinea",
+          "conservation_status": "LC",
+          "notes": "Annual; self-sows readily. No smoke treatment needed. Ideal beginner Byblis.",
+          "cultivars": []
+        },
+        {
+          "full_name": "Byblis gigantea",
+          "common_name": "Giant Rainbow Plant",
+          "description": "<em>Byblis gigantea</em> is the largest species in the genus, a robust perennial reaching 60 cm. Endemic to the South West Australian Floristic Region near Perth. Large violet flowers. Seeds require smoke treatment to germinate, reflecting natural post-fire regeneration cycles.",
+          "meta_title": "Byblis gigantea — Giant Rainbow Plant",
+          "meta_description": "Buy Byblis gigantea, the giant perennial rainbow plant. Endemic to SW Australia; smoke germination, summer dormancy care notes included.",
+          "meta_keywords": "Byblis gigantea, giant rainbow plant, perennial Byblis, smoke germination carnivorous plant",
+          "native_range": "South West Australia (Perth coastal plains)",
+          "conservation_status": "VU",
+          "notes": "Seeds require smoke treatment. Cool dry summers; water must be clean.",
+          "cultivars": []
+        },
+        {
+          "full_name": "Byblis aquatica",
+          "common_name": "Aquatic Rainbow Plant",
+          "description": "<em>Byblis aquatica</em> is an annual species from tropical Australia that can grow partially submerged in seasonal wetlands. Pale pink to mauve flowers. Relatively new to cultivation but becoming more available through specialist growers.",
+          "meta_title": "Byblis aquatica — Aquatic Rainbow Plant",
+          "meta_description": "Buy Byblis aquatica, the tropical aquatic rainbow plant from northern Australia. Seasonal wetland species with pale pink flowers.",
+          "meta_keywords": "Byblis aquatica, aquatic rainbow plant, tropical Byblis, rare carnivorous plant",
+          "native_range": "Northern Australia (NT, WA)",
+          "conservation_status": "LC",
+          "notes": "Annual; tolerates seasonal flooding. Humid tropical conditions preferred.",
+          "cultivars": []
+        },
+        {
+          "full_name": "Byblis rorida",
+          "common_name": "Dewy Rainbow Plant",
+          "description": "<em>Byblis rorida</em> is a perennial species from the Kimberley region of Western Australia. Smaller than <em>B. gigantea</em> with attractive violet flowers and finer foliage. Requires smoke for germination and responds to a seasonal watering regime.",
+          "meta_title": "Byblis rorida — Dewy Rainbow Plant",
+          "meta_description": "Buy Byblis rorida from the Kimberley, WA. Perennial rainbow plant with violet flowers; smoke germination and seasonal watering required.",
+          "meta_keywords": "Byblis rorida, Kimberley rainbow plant, perennial Byblis, smoke germination",
+          "native_range": "Kimberley, Western Australia",
+          "conservation_status": "LC",
+          "notes": "Perennial; benefits from dry winter rest and seasonal watering cycles.",
+          "cultivars": []
+        },
+        {
+          "full_name": "Byblis filifolia",
+          "common_name": "Thread-leaved Rainbow Plant",
+          "description": "<em>Byblis filifolia</em> is a robust annual species from tropical northern Australia with very fine, thread-like leaves up to 30 cm long. Produces large mauve-pink flowers. Among the tallest of the annual Byblis species. Seeds germinate readily without smoke treatment.",
+          "meta_title": "Byblis filifolia — Thread-leaved Rainbow Plant",
+          "meta_description": "Buy Byblis filifolia, the tall thread-leaved annual rainbow plant. Large pink flowers, easy germination, striking tropical carnivore.",
+          "meta_keywords": "Byblis filifolia, thread-leaved rainbow plant, tall Byblis, tropical carnivorous plant",
+          "native_range": "Northern Australia (Kimberley, NT, Cape York)",
+          "conservation_status": "LC",
+          "notes": "Annual; tall and striking. No smoke needed. Grows fast under warm humid conditions.",
+          "cultivars": []
+        },
+        {
+          "full_name": "Byblis lamellata",
+          "common_name": "Lamellate Rainbow Plant",
+          "description": "<em>Byblis lamellata</em> is a perennial species from the Swan Coastal Plain of Western Australia. Smaller than <em>B. gigantea</em>, it has distinctive lamellar (plate-like) appendages on the style. Requires smoke or karrikinolide treatment for germination. Rarer in cultivation than other perennial species.",
+          "meta_title": "Byblis lamellata — Lamellate Rainbow Plant",
+          "meta_description": "Buy Byblis lamellata, a rare perennial rainbow plant endemic to the Swan Coastal Plain, WA. Smoke germination required.",
+          "meta_keywords": "Byblis lamellata, lamellate rainbow plant, rare Byblis, Swan Coastal Plain carnivore",
+          "native_range": "Swan Coastal Plain, Western Australia",
+          "conservation_status": "LC",
+          "notes": "Perennial; smoke or karrikinolide treatment required for germination. Less common in cultivation.",
+          "cultivars": []
+        },
+        {
+          "full_name": "Byblis guehoi",
+          "common_name": "Gueho's Rainbow Plant",
+          "description": "<em>Byblis guehoi</em> is a recently described annual species from Western Australia, related to <em>B. filifolia</em>. Named in honour of naturalist Gregory Gueho. Uncommon in cultivation.",
+          "native_range": "Northern Western Australia",
+          "conservation_status": "LC",
+          "notes": "Annual; similar culture to B. filifolia.",
+          "cultivars": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "pack_id": "cephalotaceae",
+  "schema_version": "1.1.0",
+  "family": "Cephalotaceae",
+  "common_name": "Albany Pitcher Plant",
+  "description": "The family Cephalotaceae is monogeneric and monotypic, containing only <em>Cephalotus follicularis</em> — the Albany Pitcher Plant of south-western Western Australia. Despite superficial resemblance to Sarracenia and Nepenthes, Cephalotus is not closely related to other pitcher plant families; it is a striking example of convergent evolution. The plant produces both non-carnivorous flat leaves and highly modified pitcher-shaped carnivorous leaves from the same rosette.",
+  "meta_title": "Cephalotaceae — Albany Pitcher Plant | PhytoCommerce",
+  "meta_description": "Shop Cephalotus follicularis — the unique Albany Pitcher Plant from Western Australia. Multiple named cultivars available as TC-grown plants.",
+  "meta_keywords": "Cephalotus follicularis, Albany pitcher plant, Cephalotus cultivar, Western Australia carnivorous plant",
+  "genera": [
+    {
+      "genus": "Cephalotus",
+      "common_name": "Albany Pitcher Plant",
+      "description": "<em>Cephalotus follicularis</em> grows in peaty, seasonally waterlogged coastal heathland near Albany, Western Australia. A compact rosette plant producing both flat assimilatory leaves and highly ornate lidded pitchers. The pitchers have ribbed peristomes and hairy interiors that prevent escape. Numerous cultivars have been selected for pitcher size, colouration, and vigour.",
+      "meta_title": "Cephalotus follicularis — Albany Pitcher Plant Cultivars",
+      "meta_description": "Rare Cephalotus follicularis — Albany Pitcher Plant. TC-grown cultivars including Hummer's Giant, Eden Black, Czech Giant and more. Intermediate care conditions.",
+      "meta_keywords": "Cephalotus follicularis, Albany pitcher plant, Cephalotus giant, Cephalotus Eden Black, Australian pitcher plant",
+      "native_range": "Australia — south-western Western Australia, near Albany (coastal heathland and peat swamps)",
+      "care_level": "intermediate",
+      "tc_suitability": "medium",
+      "conservation_status": "LC",
+      "species": [
+        {
+          "full_name": "Cephalotus follicularis",
+          "common_name": "Albany Pitcher Plant",
+          "description": "<em>Cephalotus follicularis</em> is the sole species in its family. It grows in open coastal heath on wet, nutrient-poor sandy peat, often in partial shade. In cultivation it prefers intermediate temperatures, high humidity, and a mix of sphagnum moss and perlite. Pitchers develop from spring through autumn; the plant goes semi-dormant in winter. Cultivar selection has produced plants with dramatically enhanced size and colouration.",
+          "meta_title": "Cephalotus follicularis — Albany Pitcher Plant",
+          "meta_description": "Buy Cephalotus follicularis. Compact yet spectacular pitcher plant from Western Australia. Multiple cultivars. TC-grown with full batch provenance.",
+          "meta_keywords": "Cephalotus follicularis, buy Cephalotus, Albany pitcher plant for sale, Cephalotus cultivar",
+          "native_range": "Australia — coastal south-western Western Australia, near Albany (32–35 °S)",
+          "conservation_status": "LC",
+          "notes": "Intermediate temperatures (15–28 °C); cool winters encourage dormancy and better pitchering. High humidity preferred. Mix of sphagnum and perlite. Avoid full summer heat.",
+          "cultivars": [
+            {
+              "cultivar": "Hummer's Giant",
+              "description": "Most famous giant cultivar; pitchers reliably exceeding 5 cm; selected by Peter Hummer. Vigorous and rapid-growing for the species."
+            },
+            {
+              "cultivar": "Eden Black",
+              "description": "Deep maroon to near-black pitcher colouration under strong light; selected by Eden Carnivorous Plants. Striking contrast to typical green forms."
+            },
+            {
+              "cultivar": "Dudley Watts",
+              "description": "Select clone named after Australian carnivorous plant authority Dudley Watts; vigorous and free-pitchering."
+            },
+            {
+              "cultivar": "Czech Giant",
+              "description": "European select clone producing pitchers approaching the size of Hummer's Giant; bred from Czech collection stock."
+            },
+            {
+              "cultivar": "Vigorous Clumping",
+              "description": "Selected for production of multiple offsets, forming large clumps quickly; useful for propagation stock."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

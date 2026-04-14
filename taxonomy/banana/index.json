@@ -1,0 +1,8 @@
+{
+  "category": "banana",
+  "name": "Bananas & Relatives",
+  "packs": [
+    { "id": "musaceae", "name": "Banana Family", "file": "musaceae.json", "genera": ["Musa", "Ensete"] },
+    { "id": "zingiberaceae", "name": "Ginger Family", "file": "zingiberaceae.json", "genera": ["Zingiber", "Curcuma", "Elettaria", "Alpinia", "Hedychium"] }
+  ]
+}

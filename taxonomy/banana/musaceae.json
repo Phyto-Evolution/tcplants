@@ -1,0 +1,579 @@
+{
+  "pack_id": "musaceae",
+  "schema_version": "1.1",
+  "family": "Musaceae",
+  "common_name": "Bananas & Plantains",
+  "description": "Musaceae is a family of monocots comprising Musa (60+ species — all bananas and plantains) and Ensete (7 species — Ethiopian banana/false banana). The cultivated banana Musa × paradisiaca and dessert banana varieties derived from M. acuminata are among the world's most important food crops. Called Kela in Hindi, Vaazha in Tamil, Arati in Telugu. India is one of the world's largest banana producers.",
+  "meta_title": "Musaceae — Bananas & Plantains Complete Taxonomy Pack",
+  "meta_description": "Full taxonomy of Musaceae: 60+ Musa species and 7 Ensete species with cultivar and conservation data.",
+  "meta_keywords": [
+    "banana",
+    "plantain",
+    "Musa",
+    "Ensete",
+    "kela",
+    "musaceae",
+    "tropical fruit"
+  ],
+  "genera": [
+    {
+      "genus": "Musa",
+      "common_name": "Bananas & Plantains",
+      "description": "60+ species of giant herbaceous plants (not trees) native from South Asia to the Pacific. All commercial bananas derive from crosses between M. acuminata and M. balbisiana. India cultivates hundreds of local banana varieties. Called Kela in Hindi, Vaazha in Tamil.",
+      "species": [
+        {
+          "full_name": "Musa acuminata",
+          "common_name": "Wild Banana / AA Banana / Kela",
+          "conservation_status": "least_concern",
+          "cultivars": [
+            {
+              "name": "Cavendish"
+            },
+            {
+              "name": "Grand Nain"
+            },
+            {
+              "name": "Dwarf Cavendish"
+            },
+            {
+              "name": "Giant Cavendish"
+            },
+            {
+              "name": "Williams"
+            },
+            {
+              "name": "Robusta"
+            },
+            {
+              "name": "Lacatan"
+            },
+            {
+              "name": "Valery"
+            },
+            {
+              "name": "Poyo"
+            },
+            {
+              "name": "Gros Michel"
+            },
+            {
+              "name": "Silk"
+            },
+            {
+              "name": "Pisang Mas"
+            },
+            {
+              "name": "Red Dacca"
+            },
+            {
+              "name": "Rasthali"
+            },
+            {
+              "name": "Nendran"
+            },
+            {
+              "name": "Poovan"
+            },
+            {
+              "name": "Ney Poovan"
+            },
+            {
+              "name": "Karpooravalli"
+            },
+            {
+              "name": "Monthan"
+            },
+            {
+              "name": "Palayankodan"
+            },
+            {
+              "name": "Virupakshi"
+            },
+            {
+              "name": "Chakkarakeli"
+            },
+            {
+              "name": "Safed Velchi"
+            },
+            {
+              "name": "Basrai"
+            }
+          ]
+        },
+        {
+          "full_name": "Musa balbisiana",
+          "common_name": "Wild Balbisiana Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa × paradisiaca",
+          "common_name": "Plantain / French Plantain / Kela",
+          "conservation_status": "not_evaluated",
+          "cultivars": [
+            {
+              "name": "Horn Plantain"
+            },
+            {
+              "name": "French Plantain"
+            },
+            {
+              "name": "False Horn"
+            },
+            {
+              "name": "Macho Plantain"
+            },
+            {
+              "name": "Bluggoe"
+            },
+            {
+              "name": "Pisang Awak"
+            },
+            {
+              "name": "Figue Rose"
+            }
+          ]
+        },
+        {
+          "full_name": "Musa textilis",
+          "common_name": "Abaca / Manila Hemp / Banana Hemp",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa coccinea",
+          "common_name": "Scarlet Banana / Red Flowering Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa velutina",
+          "common_name": "Pink Velvet Banana / Hairy Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa ornata",
+          "common_name": "Flowering Banana / Ornate Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa laterita",
+          "common_name": "Brick-red Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa aurantiaca",
+          "common_name": "Orange Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa gracilis",
+          "common_name": "Graceful Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa sanguinea",
+          "common_name": "Blood-red Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa mannii",
+          "common_name": "Mann's Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa nagensium",
+          "common_name": "Nagaland Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa rubinea",
+          "common_name": "Ruby Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa flaviflora",
+          "common_name": "Yellow-flowered Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa jackeyi",
+          "common_name": "Jackey's Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa lolodensis",
+          "common_name": "Loloda Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa maclayi",
+          "common_name": "Maclay's Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa peekelii",
+          "common_name": "Peekel's Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa schizocarpa",
+          "common_name": "Split-fruited Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa basjoo",
+          "common_name": "Japanese Fiber Banana / Japanese Banana",
+          "conservation_status": "least_concern",
+          "cultivars": [
+            {
+              "name": "Sakhalin"
+            }
+          ]
+        },
+        {
+          "full_name": "Musa cheesmanii",
+          "common_name": "Cheesman's Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa griersonii",
+          "common_name": "Grierson's Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa itinerans",
+          "common_name": "Traveller's Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa markkuana",
+          "common_name": "Markku's Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa salaccensis",
+          "common_name": "Salak Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa sikkimensis",
+          "common_name": "Sikkim Banana / Darjeeling Banana",
+          "conservation_status": "least_concern",
+          "cultivars": [
+            {
+              "name": "Red Tiger"
+            }
+          ]
+        },
+        {
+          "full_name": "Musa thomsonii",
+          "common_name": "Thomson's Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa tuberculata",
+          "common_name": "Tuberculate Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa yunnanensis",
+          "common_name": "Yunnan Banana",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa zebrina",
+          "common_name": "Blood Banana / Zebra Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa campestris",
+          "common_name": "Wild Field Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa cookii",
+          "common_name": "Cook's Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa fitzalanii",
+          "common_name": "Fitzalan's Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa ingens",
+          "common_name": "Giant Highland Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa monticola",
+          "common_name": "Mountain Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa muluensis",
+          "common_name": "Mulu Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa nana",
+          "common_name": "Dwarf Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa ochracea",
+          "common_name": "Ochre-coloured Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa olowaniana",
+          "common_name": "Olowani Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa paradisiaca",
+          "common_name": "Cooking Banana / True Plantain",
+          "conservation_status": "not_evaluated",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa ponapensis",
+          "common_name": "Ponape Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa pulneyensis",
+          "common_name": "Palni Hills Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa rosacea",
+          "common_name": "Rose-coloured Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa simiarum",
+          "common_name": "Monkey Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa sumatrana",
+          "common_name": "Sumatran Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa troglodytarum",
+          "common_name": "Fe'i Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa uranoscopos",
+          "common_name": "Sky-gazing Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa voonii",
+          "common_name": "Voon's Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa wilsonii",
+          "common_name": "Wilson's Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa zeylanica",
+          "common_name": "Ceylon Wild Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa angcorensis",
+          "common_name": "Angkor Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa borneensis",
+          "common_name": "Borneo Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa bukensis",
+          "common_name": "Buki Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa celebica",
+          "common_name": "Sulawesi Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa glaucophylla",
+          "common_name": "Blue-leaved Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa keejei",
+          "common_name": "Keejei Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa mindanaensis",
+          "common_name": "Mindanao Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa rungei",
+          "common_name": "Runge's Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa schizocarpoides",
+          "common_name": "Split-like Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa splendida",
+          "common_name": "Splendid Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Musa violascens",
+          "common_name": "Violet Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        }
+      ]
+    },
+    {
+      "genus": "Ensete",
+      "common_name": "Enset / Ethiopian Banana",
+      "description": "Seven species of banana relatives. Ensete ventricosum is a critically important staple crop in Ethiopia, feeding 20+ million people. Its starchy pseudostem and corm are fermented to make 'kocho' flatbread.",
+      "species": [
+        {
+          "full_name": "Ensete ventricosum",
+          "common_name": "Enset / Ethiopian Banana / Wild Banana",
+          "conservation_status": "least_concern",
+          "cultivars": [
+            {
+              "name": "Yanbulo"
+            },
+            {
+              "name": "Gena"
+            },
+            {
+              "name": "Necho"
+            },
+            {
+              "name": "Mazia"
+            },
+            {
+              "name": "Dopi"
+            },
+            {
+              "name": "Arkia"
+            },
+            {
+              "name": "Gimbicho"
+            }
+          ]
+        },
+        {
+          "full_name": "Ensete glaucum",
+          "common_name": "Snow Banana / Glacier Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Ensete lecongkietii",
+          "common_name": "Vietnam Enset",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Ensete perrieri",
+          "common_name": "Perrier's Enset",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Ensete superbum",
+          "common_name": "Cliff Banana / Rock Banana",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Ensete homblei",
+          "common_name": "Homblé's Enset",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Ensete lasiocarpum",
+          "common_name": "Hairy-fruited Enset",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Ensete wilsonii",
+          "common_name": "Wilson's Enset",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        }
+      ]
+    }
+  ]
+}

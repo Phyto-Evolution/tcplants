@@ -1,0 +1,50 @@
+{
+  "pack_id": "roridulaceae",
+  "schema_version": "1.1",
+  "family": "Roridulaceae",
+  "common_name": "Fly Bushes",
+  "description": "Roridulaceae is a monogeneric family of woody shrubs endemic to the Cape Floristic Region of South Africa. The genus <em>Roridula</em> produces sticky resin-coated leaves that trap insects, but lacks the digestive enzymes of true carnivores; instead, symbiotic assassin bugs (<em>Pameridea</em> spp.) consume prey and their frass fertilises the plant. Roridula represents a fascinating protocarnivorous or paracarnivorous strategy.",
+  "meta_title": "Fly Bushes — Roridula | PhytoCommerce",
+  "meta_description": "Shop rare South African Roridula fly bushes. Protocarnivorous resin-leaved shrubs with unique insect symbiosis. TC stock with provenance.",
+  "meta_keywords": "Roridula, fly bush, protocarnivorous plant, South Africa carnivore, buy Roridula",
+  "genera": [
+    {
+      "genus": "Roridula",
+      "common_name": "Fly Bushes",
+      "description": "<em>Roridula</em> comprises two species of resinous shrubs from the fynbos biome of the Western Cape, South Africa. Leaves are densely covered with multicellular hairs secreting a sticky non-digestive resin. Prey is captured but digestion relies entirely on symbiotic bugs. Both species bear attractive pink to mauve flowers and are of significant ecological and evolutionary interest.",
+      "meta_title": "Roridula — South African Fly Bushes",
+      "meta_description": "Buy Roridula online. Rare protocarnivorous Cape fynbos shrubs with resin-trap leaves. Seedlings and TC stock with full care information.",
+      "meta_keywords": "Roridula for sale, fly bush, fynbos carnivore, Roridula gorgonias, protocarnivorous shrub",
+      "native_range": "Western Cape, South Africa (Cape Floristic Region)",
+      "care_level": "Advanced",
+      "tc_suitability": "Low–Moderate",
+      "conservation_status": "VU (habitat pressure)",
+      "species": [
+        {
+          "full_name": "Roridula gorgonias",
+          "common_name": "Small Fly Bush",
+          "description": "<em>Roridula gorgonias</em> is the smaller of the two species, reaching 50–80 cm. Leaves are linear to lanceolate with densely resinous tips. Flowers are pink to magenta. Naturally occurs on nutrient-poor sandstone soils in the Cape mountains. Requires fynbos-type conditions: excellent drainage, high light, low humidity, and mineral-poor growing medium.",
+          "meta_title": "Roridula gorgonias — Small Cape Fly Bush",
+          "meta_description": "Buy Roridula gorgonias, the small protocarnivorous fly bush from South Africa. Fynbos native; excellent drainage and full sun essential.",
+          "meta_keywords": "Roridula gorgonias, small fly bush, Cape fynbos plant, protocarnivorous shrub",
+          "native_range": "Western Cape, South Africa (Cederberg to Hottentots Holland)",
+          "conservation_status": "VU",
+          "notes": "Fynbos conditions: sandy, acidic, nutrient-poor, summer-dry. Very difficult in cultivation.",
+          "cultivars": []
+        },
+        {
+          "full_name": "Roridula dentata",
+          "common_name": "Large Fly Bush",
+          "description": "<em>Roridula dentata</em> is the larger species, growing to 1.5 m as a multi-stemmed shrub. Leaves are broader and more distinctly dentate than <em>R. gorgonias</em>. Flowers are pale pink to white. Equally specific in cultivation requirements; the most-studied species in terms of its protocarnivorous symbiosis with <em>Pameridea roridulae</em>.",
+          "meta_title": "Roridula dentata — Large Cape Fly Bush",
+          "meta_description": "Buy Roridula dentata, the large toothed-leaf fly bush. Studies with Pameridea symbiosis; rare Cape fynbos specimen for advanced growers.",
+          "meta_keywords": "Roridula dentata, large fly bush, Pameridea symbiosis, Cape fynbos shrub",
+          "native_range": "Western Cape, South Africa (Caledon to Bredasdorp)",
+          "conservation_status": "VU",
+          "notes": "Taller and more robust than R. gorgonias. Same strict fynbos cultural requirements.",
+          "cultivars": []
+        }
+      ]
+    }
+  ]
+}

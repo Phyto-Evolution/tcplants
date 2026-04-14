@@ -1,0 +1,371 @@
+{
+  "pack_id": "sarraceniaceae",
+  "schema_version": "1.1",
+  "family": "Sarraceniaceae",
+  "common_name": "North American Pitcher Plants",
+  "description": "Three genera of New World pitcher plants. Sarracenia (N. America), Darlingtonia (California/Oregon), and Heliamphora (South American tepuis). All use pitfall traps with a hood over the opening.",
+  "meta_title": "Sarraceniaceae Taxonomy Pack — Sarracenia, Darlingtonia, Heliamphora",
+  "meta_description": "Complete species list for North American pitcher plants with conservation status and cultivars.",
+  "meta_keywords": "Sarracenia, Darlingtonia, Heliamphora, pitcher plant, carnivorous, tepui",
+  "genera": [
+    {
+      "genus": "Sarracenia",
+      "common_name": "North American Pitcher Plants",
+      "description": "11 species of trumpets and lidded pitchers native to eastern North America. S. oreophila is critically endangered. Many natural hybrids occur.",
+      "species": [
+        {
+          "full_name": "Sarracenia purpurea ssp. purpurea",
+          "common_name": "Purple Pitcher (Northern)",
+          "conservation_status": "least_concern",
+          "cultivars": [
+            "Montana",
+            "Typical"
+          ]
+        },
+        {
+          "full_name": "Sarracenia purpurea ssp. venosa",
+          "common_name": "Purple Pitcher (Southern)",
+          "conservation_status": "least_concern",
+          "cultivars": [
+            "Burkii",
+            "Montana",
+            "Red & Green"
+          ]
+        },
+        {
+          "full_name": "Sarracenia flava",
+          "common_name": "Yellow Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": [
+            "Maxima",
+            "Rubricorpora",
+            "Ornata",
+            "Coppertop",
+            "Red Tube",
+            "All Green",
+            "Atropurpurea"
+          ]
+        },
+        {
+          "full_name": "Sarracenia leucophylla",
+          "common_name": "White-topped Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": [
+            "Tarnok",
+            "Schnell's Ghost",
+            "Hurricane Creek White",
+            "Titan"
+          ]
+        },
+        {
+          "full_name": "Sarracenia rubra ssp. rubra",
+          "common_name": "Sweet Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Sarracenia rubra ssp. gulfensis",
+          "common_name": "Gulf Sweet Pitcher Plant",
+          "conservation_status": "vulnerable",
+          "cultivars": []
+        },
+        {
+          "full_name": "Sarracenia rubra ssp. alabamensis",
+          "common_name": "Alabama Canebrake Pitcher Plant",
+          "conservation_status": "critically_endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Sarracenia rubra ssp. jonesii",
+          "common_name": "Jones' Pitcher Plant",
+          "conservation_status": "endangered",
+          "cultivars": []
+        },
+        {
+          "full_name": "Sarracenia rubra ssp. wherryi",
+          "common_name": "Wherry's Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Sarracenia alata",
+          "common_name": "Pale Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": [
+            "Red Lid",
+            "Night",
+            "Black Tube"
+          ]
+        },
+        {
+          "full_name": "Sarracenia oreophila",
+          "common_name": "Green Pitcher Plant",
+          "conservation_status": "critically_endangered",
+          "cultivars": [
+            "Sand Mountain"
+          ]
+        },
+        {
+          "full_name": "Sarracenia minor",
+          "common_name": "Hooded Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": [
+            "Okefenokee Giant"
+          ]
+        },
+        {
+          "full_name": "Sarracenia psittacina",
+          "common_name": "Parrot Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": [
+            "Giant",
+            "Red"
+          ]
+        },
+        {
+          "full_name": "Sarracenia rosea",
+          "common_name": "Rosea Pitcher Plant",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Sarracenia × moorei",
+          "common_name": "Moore's Pitcher Plant (flava × leucophylla)",
+          "conservation_status": "not_evaluated",
+          "cultivars": [
+            "Brooks Hybrid"
+          ]
+        },
+        {
+          "full_name": "Sarracenia × catesbaei",
+          "common_name": "Catesby's Pitcher Plant (flava × purpurea)",
+          "conservation_status": "not_evaluated",
+          "cultivars": []
+        },
+        {
+          "full_name": "Sarracenia × readii",
+          "common_name": "Read's Pitcher Plant (leucophylla × rubra)",
+          "conservation_status": "not_evaluated",
+          "cultivars": []
+        },
+        {
+          "full_name": "Sarracenia × wrigleyana",
+          "common_name": "Wrigley's Pitcher Plant (leucophylla × psittacina)",
+          "conservation_status": "not_evaluated",
+          "cultivars": []
+        },
+        {
+          "full_name": "Sarracenia × excellens",
+          "common_name": "Excellent Pitcher Plant (leucophylla × minor)",
+          "conservation_status": "not_evaluated",
+          "cultivars": []
+        },
+        {
+          "full_name": "Sarracenia × mitchelliana",
+          "common_name": "Mitchell's Pitcher Plant (leucophylla × purpurea)",
+          "conservation_status": "not_evaluated",
+          "cultivars": []
+        }
+      ]
+    },
+    {
+      "genus": "Darlingtonia",
+      "common_name": "Cobra Lily",
+      "description": "Monotypic genus. Single species native to Northern California and Oregon, growing in cold serpentine seeps.",
+      "species": [
+        {
+          "full_name": "Darlingtonia californica",
+          "common_name": "California Pitcher Plant / Cobra Lily",
+          "conservation_status": "vulnerable",
+          "cultivars": [
+            "Othello",
+            "Willow Creek"
+          ]
+        }
+      ]
+    },
+    {
+      "genus": "Heliamphora",
+      "common_name": "Sun Pitchers",
+      "description": "25+ species of primitive pitcher plants native to the tepuis (table mountains) of Venezuela, Brazil, and Guyana. Among the oldest carnivorous plants evolutionarily.",
+      "species": [
+        {
+          "full_name": "Heliamphora nutans",
+          "common_name": "Nodding Sun Pitcher",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Heliamphora minor",
+          "common_name": "Lesser Sun Pitcher",
+          "conservation_status": "least_concern",
+          "cultivars": [
+            "Pilosa"
+          ]
+        },
+        {
+          "full_name": "Heliamphora heterodoxa",
+          "common_name": "Heterodox Sun Pitcher",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Heliamphora tatei",
+          "common_name": "Tate's Sun Pitcher",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Heliamphora ionasii",
+          "common_name": "Iona's Sun Pitcher",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Heliamphora folliculata",
+          "common_name": "Folliculate Sun Pitcher",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Heliamphora chimantensis",
+          "common_name": "Chimanta Sun Pitcher",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Heliamphora exappendiculata",
+          "common_name": "Appendageless Sun Pitcher",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Heliamphora elongata",
+          "common_name": "Elongated Sun Pitcher",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Heliamphora hispida",
+          "common_name": "Hispid Sun Pitcher",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Heliamphora parva",
+          "common_name": "Small Sun Pitcher",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Heliamphora pulchella",
+          "common_name": "Pretty Sun Pitcher",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Heliamphora sarracenioides",
+          "common_name": "Sarracenia-like Sun Pitcher",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Heliamphora uncinata",
+          "common_name": "Hooked Sun Pitcher",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Heliamphora ceracea",
+          "common_name": "Wax-like Sun Pitcher",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Heliamphora glabra",
+          "common_name": "Glabrous Sun Pitcher",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Heliamphora huberi",
+          "common_name": "Huber's Sun Pitcher",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Heliamphora macdonaldae",
+          "common_name": "MacDonald's Sun Pitcher",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Heliamphora neblinae",
+          "common_name": "Neblina Sun Pitcher",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Heliamphora purpurascens",
+          "common_name": "Purple-tinged Sun Pitcher",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Heliamphora viridis",
+          "common_name": "Green Sun Pitcher",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Heliamphora arenicola",
+          "common_name": "Sandy Sun Pitcher",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Heliamphora ciliata",
+          "common_name": "Fringed Sun Pitcher",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Heliamphora collina",
+          "common_name": "Hill Sun Pitcher",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Heliamphora deflexiflora",
+          "common_name": "Reflexed Sun Pitcher",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Heliamphora dexii",
+          "common_name": "Dex's Sun Pitcher",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Heliamphora ionasi",
+          "common_name": "Ionasi Sun Pitcher",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Heliamphora sp. Akopan",
+          "common_name": "Akopan Sun Pitcher",
+          "conservation_status": "not_evaluated",
+          "cultivars": []
+        },
+        {
+          "full_name": "Heliamphora sp. Aparaman",
+          "common_name": "Aparaman Sun Pitcher",
+          "conservation_status": "not_evaluated",
+          "cultivars": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1007 @@
+{
+  "pack_id": "zingiberaceae",
+  "schema_version": "1.1",
+  "family": "Zingiberaceae",
+  "common_name": "Gingers & Relatives",
+  "description": "Zingiberaceae (the ginger family) is one of the most economically important tropical plant families, providing ginger, turmeric, cardamom, galangal, and many ornamental gingers. Approximately 1600 species in 50+ genera. Hugely important in Indian cooking and Ayurvedic medicine.",
+  "meta_title": "Zingiberaceae — Gingers & Spice Plants Taxonomy Pack",
+  "meta_description": "Comprehensive taxonomy of Zingiberaceae: Zingiber, Curcuma, Elettaria, Alpinia, Hedychium, Kaempferia, Etlingera, Amomum, Costus and more.",
+  "meta_keywords": [
+    "ginger",
+    "turmeric",
+    "cardamom",
+    "galangal",
+    "Zingiber",
+    "Curcuma",
+    "Alpinia",
+    "Hedychium",
+    "Kaempferia"
+  ],
+  "genera": [
+    {
+      "genus": "Zingiber",
+      "common_name": "True Gingers",
+      "description": "150+ species including Z. officinale — the common ginger, one of the world's most important spices. Called Adrak (fresh) / Sonth (dry) in Hindi, Inji in Tamil/Malayalam. India produces ~35% of world ginger.",
+      "species": [
+        {
+          "full_name": "Zingiber officinale",
+          "common_name": "Common Ginger / Adrak / Inji",
+          "conservation_status": "least_concern",
+          "cultivars": [
+            {
+              "name": "Maran"
+            },
+            {
+              "name": "Nadia"
+            },
+            {
+              "name": "Rio-de-Janeiro"
+            },
+            {
+              "name": "Suprabha"
+            },
+            {
+              "name": "Suruchi"
+            },
+            {
+              "name": "Suravi"
+            },
+            {
+              "name": "IISR Varada"
+            },
+            {
+              "name": "IISR Mahima"
+            },
+            {
+              "name": "IISR Rejatha"
+            },
+            {
+              "name": "China"
+            },
+            {
+              "name": "Assam"
+            },
+            {
+              "name": "Himachal"
+            }
+          ]
+        },
+        {
+          "full_name": "Zingiber zerumbet",
+          "common_name": "Shampoo Ginger / Pinecone Ginger / Zerumbet",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Zingiber montanum",
+          "common_name": "Cassumunar Ginger / Thai Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Zingiber spectabile",
+          "common_name": "Beehive Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Zingiber chrysanthum",
+          "common_name": "Golden-flowered Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Zingiber collinsii",
+          "common_name": "Collins' Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Zingiber gramineum",
+          "common_name": "Grass-leaved Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Zingiber mioga",
+          "common_name": "Japanese Ginger / Myoga",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Zingiber nimmonii",
+          "common_name": "Nimmon's Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Zingiber neotriploideum",
+          "common_name": "Triploid Wild Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Zingiber ottensii",
+          "common_name": "Ottens' Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Zingiber pubescens",
+          "common_name": "Hairy Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Zingiber roseum",
+          "common_name": "Rose Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Zingiber rubens",
+          "common_name": "Red-stemmed Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Zingiber wightianum",
+          "common_name": "Wight's Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        }
+      ]
+    },
+    {
+      "genus": "Curcuma",
+      "common_name": "Turmeric & Curcumas",
+      "description": "100+ species of rhizomatous gingers. Curcuma longa (turmeric/haldi) is one of India's most important spices and medicinal plants. India produces 80% of the world's turmeric. Many species also grown as ornamental 'hidden gingers' or 'siam tulips'.",
+      "species": [
+        {
+          "full_name": "Curcuma longa",
+          "common_name": "Turmeric / Haldi / Manjal",
+          "conservation_status": "least_concern",
+          "cultivars": [
+            {
+              "name": "Alleppey"
+            },
+            {
+              "name": "Erode Local"
+            },
+            {
+              "name": "Lakadong"
+            },
+            {
+              "name": "Duggirala"
+            },
+            {
+              "name": "Suvarna"
+            },
+            {
+              "name": "Suguna"
+            },
+            {
+              "name": "Sudarsana"
+            },
+            {
+              "name": "BSR-1"
+            },
+            {
+              "name": "BSR-2"
+            },
+            {
+              "name": "Co-1"
+            },
+            {
+              "name": "Rajapore"
+            },
+            {
+              "name": "Tekurpeta"
+            },
+            {
+              "name": "Salem"
+            },
+            {
+              "name": "Kasturi"
+            }
+          ]
+        },
+        {
+          "full_name": "Curcuma amada",
+          "common_name": "Mango Ginger / Amba Haldi",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma aromatica",
+          "common_name": "Wild Turmeric / Jangli Haldi / Kasturi Manjal",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma alismatifolia",
+          "common_name": "Siam Tulip / Summer Tulip",
+          "conservation_status": "least_concern",
+          "cultivars": [
+            {
+              "name": "Chiang Mai Pink"
+            },
+            {
+              "name": "Doi Tung"
+            },
+            {
+              "name": "Pink Princess"
+            }
+          ]
+        },
+        {
+          "full_name": "Curcuma angustifolia",
+          "common_name": "East Indian Arrowroot / Tikhur",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma aeruginosa",
+          "common_name": "Blue-tinted Turmeric",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma aurantiaca",
+          "common_name": "Orange Curcuma",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma caesia",
+          "common_name": "Black Turmeric / Kali Haldi",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma comosa",
+          "common_name": "Waan Haa",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma coriacea",
+          "common_name": "Leathery Curcuma",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma decipiens",
+          "common_name": "Deceptive Curcuma",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma elata",
+          "common_name": "Tall Curcuma",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma flaviflora",
+          "common_name": "Yellow-flowered Curcuma",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma gracillima",
+          "common_name": "Slender Curcuma",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma harmandii",
+          "common_name": "Harmand's Curcuma",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma heyneana",
+          "common_name": "Heyne's Curcuma",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma inodora",
+          "common_name": "Scentless Curcuma",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma latifolia",
+          "common_name": "Broad-leaved Curcuma",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma leucorrhiza",
+          "common_name": "White Curcuma / East Indian Arrowroot",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma mangga",
+          "common_name": "Mango Curcuma / Temu Mangga",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma neilgherrensis",
+          "common_name": "Nilgiri Curcuma",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma oligantha",
+          "common_name": "Few-flowered Curcuma",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma ornata",
+          "common_name": "Ornamental Curcuma",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma parviflora",
+          "common_name": "Small-flowered Curcuma",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma petiolata",
+          "common_name": "Queen Lily / Jewel of Thailand",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma phaeocaulis",
+          "common_name": "Zedoary / Amba Haldi / Kachur",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma pierreana",
+          "common_name": "Pierre's Curcuma",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma pseudomontana",
+          "common_name": "Hill Turmeric",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma purpurascens",
+          "common_name": "Temu Tis / Koneng Tis",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma rhabdota",
+          "common_name": "Striated Curcuma",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma roscoeana",
+          "common_name": "Orange Jewel of Burma / Jewel of Myanmar",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma sessilis",
+          "common_name": "Sessile Curcuma",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma sparganiifolia",
+          "common_name": "Bur-reed-leaved Curcuma",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma viridiflora",
+          "common_name": "Green-flowered Curcuma",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma xanthorrhiza",
+          "common_name": "Java Turmeric / Temu Lawak",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma yunnanensis",
+          "common_name": "Yunnan Curcuma",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma zanthorrhiza",
+          "common_name": "Javanese Turmeric",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Curcuma zedoaria",
+          "common_name": "Zedoary / White Turmeric / Kachur",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        }
+      ]
+    },
+    {
+      "genus": "Elettaria",
+      "common_name": "True Cardamom",
+      "description": "Small genus of cardamom gingers. Elettaria cardamomum is the true green cardamom — the 'Queen of Spices' — critically important in Indian cuisine and Ayurveda. Called Elaichi in Hindi, Elakkai in Tamil. India is a major producer.",
+      "species": [
+        {
+          "full_name": "Elettaria cardamomum",
+          "common_name": "Green Cardamom / Elaichi / Elakkai",
+          "conservation_status": "least_concern",
+          "cultivars": [
+            {
+              "name": "Malabar"
+            },
+            {
+              "name": "Mysore"
+            },
+            {
+              "name": "Vazhukka"
+            },
+            {
+              "name": "IISR Avinash"
+            },
+            {
+              "name": "IISR Vijetha"
+            },
+            {
+              "name": "IISR Suvasini"
+            },
+            {
+              "name": "NKE-12"
+            },
+            {
+              "name": "PV-1"
+            },
+            {
+              "name": "Mudigere-1"
+            },
+            {
+              "name": "Alleppey Green Extra Bold"
+            }
+          ]
+        },
+        {
+          "full_name": "Elettaria ensal",
+          "common_name": "Wild Cardamom / Ensal",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        }
+      ]
+    },
+    {
+      "genus": "Alpinia",
+      "common_name": "Shell Gingers & Galangals",
+      "description": "250+ species. Includes galangal (A. galanga — Kulanjan in Hindi), shell ginger (A. zerumbet), and many ornamental species. Widely used in Southeast Asian cuisine and traditional medicine.",
+      "species": [
+        {
+          "full_name": "Alpinia galanga",
+          "common_name": "Greater Galangal / Thai Ginger / Kulanjan",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Alpinia officinarum",
+          "common_name": "Lesser Galangal / Chhota Kulanjan",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Alpinia zerumbet",
+          "common_name": "Shell Ginger / Pink Porcelain Lily",
+          "conservation_status": "least_concern",
+          "cultivars": [
+            {
+              "name": "Variegata"
+            }
+          ]
+        },
+        {
+          "full_name": "Alpinia purpurata",
+          "common_name": "Red Ginger / Ostrich Plume Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": [
+            {
+              "name": "Red"
+            },
+            {
+              "name": "Pink"
+            },
+            {
+              "name": "Jungle Queen"
+            }
+          ]
+        },
+        {
+          "full_name": "Alpinia vittata",
+          "common_name": "Variegated Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Alpinia oxymitra",
+          "common_name": "Pointed-cap Galangal",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Alpinia calcarata",
+          "common_name": "Indian Snap Ginger / Sishira",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Alpinia conchigera",
+          "common_name": "Little Galangal",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Alpinia formosana",
+          "common_name": "Taiwan Alpinia",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Alpinia henryi",
+          "common_name": "Henry's Alpinia",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Alpinia japonica",
+          "common_name": "Japanese Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Alpinia malaccensis",
+          "common_name": "Malacca Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Alpinia mutica",
+          "common_name": "Orchid Ginger / Mute Alpinia",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Alpinia nutans",
+          "common_name": "False Cardamom",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Alpinia oxyphylla",
+          "common_name": "Sharp-leaved Alpinia / Yi Zhi",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Alpinia speciosa",
+          "common_name": "Heliconia-like Alpinia",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Alpinia tricolor",
+          "common_name": "Tricoloured Alpinia",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        }
+      ]
+    },
+    {
+      "genus": "Hedychium",
+      "common_name": "Ginger Lilies / Kahili Gingers",
+      "description": "80+ species of spectacular flowering gingers native to Asia, particularly the Himalayas. Called Sontakka/Gulbakavali in Hindi. Hedychium coronarium (garland lily/white butterfly ginger) is the national flower of Cuba.",
+      "species": [
+        {
+          "full_name": "Hedychium coronarium",
+          "common_name": "White Butterfly Ginger / Garland Lily / Sontakka",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Hedychium gardnerianum",
+          "common_name": "Kahili Ginger / Sontakka",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Hedychium coccineum",
+          "common_name": "Scarlet Ginger Lily / Red Butterfly Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": [
+            {
+              "name": "Tara"
+            }
+          ]
+        },
+        {
+          "full_name": "Hedychium flavescens",
+          "common_name": "Yellow Butterfly Ginger / Cream Garland Lily",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Hedychium spicatum",
+          "common_name": "Spiked Ginger Lily / Spiked Hedychium",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Hedychium thyrsiforme",
+          "common_name": "Thyrse-form Ginger Lily",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Hedychium densiflorum",
+          "common_name": "Dense-flowered Ginger Lily",
+          "conservation_status": "least_concern",
+          "cultivars": [
+            {
+              "name": "Assam Orange"
+            },
+            {
+              "name": "Stephen"
+            },
+            {
+              "name": "Sorung"
+            }
+          ]
+        },
+        {
+          "full_name": "Hedychium ellipticum",
+          "common_name": "Elliptic-leaved Ginger Lily",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Hedychium forrestii",
+          "common_name": "Forrest's Ginger Lily",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Hedychium gracile",
+          "common_name": "Graceful Ginger Lily",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Hedychium greenii",
+          "common_name": "Green's Ginger Lily",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Hedychium hasseltii",
+          "common_name": "Hasselt's Ginger Lily",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Hedychium longicornutum",
+          "common_name": "Long-horned Ginger Lily",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Hedychium maximum",
+          "common_name": "Giant Ginger Lily",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Hedychium muluense",
+          "common_name": "Mulu Ginger Lily",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Hedychium stenopetalum",
+          "common_name": "Narrow-petalled Ginger Lily",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Hedychium villosum",
+          "common_name": "Hairy Ginger Lily",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Hedychium yunnanense",
+          "common_name": "Yunnan Ginger Lily",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        }
+      ]
+    },
+    {
+      "genus": "Kaempferia",
+      "common_name": "Peacock Gingers / Resurrection Lilies",
+      "description": "60+ species of low-growing gingers from tropical Asia. Known as peacock gingers or awn flowers. Kaempferia galanga (kencur/cekur) is important in Indonesian, Malaysian and Thai cooking. K. rotunda has beautiful flowers.",
+      "species": [
+        {
+          "full_name": "Kaempferia galanga",
+          "common_name": "Kencur / Aromatic Ginger / Chandramula",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Kaempferia rotunda",
+          "common_name": "Indian Crocus / Tropical Crocus / Bhoomi Champak",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Kaempferia elegans",
+          "common_name": "Elegant Peacock Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Kaempferia pulchra",
+          "common_name": "Beautiful Peacock Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": [
+            {
+              "name": "Silver Spot"
+            },
+            {
+              "name": "Roscoe"
+            }
+          ]
+        },
+        {
+          "full_name": "Kaempferia parviflora",
+          "common_name": "Thai Black Ginger / Krachai Dam",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Kaempferia roscoeana",
+          "common_name": "Roscoe's Peacock Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Kaempferia angustifolia",
+          "common_name": "Narrow-leaved Peacock Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Kaempferia marginata",
+          "common_name": "Margined Peacock Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Kaempferia uniflora",
+          "common_name": "One-flowered Peacock Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Kaempferia gilbertii",
+          "common_name": "Gilbert's Peacock Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Kaempferia larsenii",
+          "common_name": "Larsen's Peacock Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Kaempferia decora",
+          "common_name": "Decorative Peacock Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        }
+      ]
+    },
+    {
+      "genus": "Etlingera",
+      "common_name": "Torch Gingers",
+      "description": "57+ species of large gingers from Southeast Asia and Pacific. Etlingera elatior (torch ginger) is one of the most spectacular tropical flowers. The flower buds are used in Southeast Asian cuisine (particularly Laksa).",
+      "species": [
+        {
+          "full_name": "Etlingera elatior",
+          "common_name": "Torch Ginger / Wax Flower",
+          "conservation_status": "least_concern",
+          "cultivars": [
+            {
+              "name": "Red"
+            },
+            {
+              "name": "Pink"
+            },
+            {
+              "name": "White"
+            },
+            {
+              "name": "Dwarf"
+            }
+          ]
+        },
+        {
+          "full_name": "Etlingera hemisphaerica",
+          "common_name": "Hemispherical Torch Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Etlingera solaris",
+          "common_name": "Sunrise Torch Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Etlingera linguiformis",
+          "common_name": "Tongue-shaped Torch Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Etlingera brevilabra",
+          "common_name": "Short-lipped Torch Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Etlingera coccinea",
+          "common_name": "Scarlet Torch Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Etlingera corneri",
+          "common_name": "Corner's Torch Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Etlingera fimbriobracteata",
+          "common_name": "Fringed Torch Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Etlingera fulgens",
+          "common_name": "Glowing Torch Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Etlingera longipedunculata",
+          "common_name": "Long-peduncled Torch Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Etlingera maingayi",
+          "common_name": "Maingay's Torch Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Etlingera punicea",
+          "common_name": "Reddish Torch Ginger",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        }
+      ]
+    },
+    {
+      "genus": "Amomum",
+      "common_name": "Black Cardamom & Grains of Paradise",
+      "description": "150+ species of large cardamom relatives. Amomum subulatum (black/Nepal cardamom/Badi Elaichi) is critical in Indian cuisine and spice trade. India's Sikkim produces 90% of world black cardamom.",
+      "species": [
+        {
+          "full_name": "Amomum subulatum",
+          "common_name": "Black Cardamom / Nepal Cardamom / Badi Elaichi",
+          "conservation_status": "least_concern",
+          "cultivars": [
+            {
+              "name": "Ramsey"
+            },
+            {
+              "name": "Sawney"
+            },
+            {
+              "name": "Golsey"
+            },
+            {
+              "name": "Varlangey"
+            },
+            {
+              "name": "Dzongu Golsey"
+            }
+          ]
+        },
+        {
+          "full_name": "Amomum villosum",
+          "common_name": "Chinese Black Cardamom / Sha Ren",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Amomum costatum",
+          "common_name": "Round Cardamom / Java Cardamom",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Amomum compactum",
+          "common_name": "Cluster Cardamom",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Amomum tsao-ko",
+          "common_name": "Cao Guo Cardamom / Chinese Black Cardamom",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Amomum xanthioides",
+          "common_name": "Yellow-like Cardamom",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Amomum uliginosum",
+          "common_name": "Swamp Cardamom",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Amomum dealbatum",
+          "common_name": "White Cardamom",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Amomum odoratum",
+          "common_name": "Scented Cardamom",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        },
+        {
+          "full_name": "Amomum microcarpum",
+          "common_name": "Small-fruited Cardamom",
+          "conservation_status": "least_concern",
+          "cultivars": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "category": "carnivorous",
+  "name": "Carnivorous Plants",
+  "packs": [
+    {
+      "id": "nepenthaceae",
+      "name": "Tropical Pitcher Plants",
+      "file": "carnivorous/nepenthaceae.json",
+      "genera": [
+        "Nepenthes"
+      ]
+    },
+    {
+      "id": "droseraceae",
+      "name": "Sundews, Venus Flytrap & Waterwheel",
+      "file": "carnivorous/droseraceae.json",
+      "genera": [
+        "Drosera",
+        "Dionaea",
+        "Aldrovanda"
+      ]
+    },
+    {
+      "id": "sarraceniaceae",
+      "name": "North American Pitcher Plants",
+      "file": "carnivorous/sarraceniaceae.json",
+      "genera": [
+        "Sarracenia",
+        "Darlingtonia",
+        "Heliamphora"
+      ]
+    },
+    {
+      "id": "cephalotaceae",
+      "name": "Albany Pitcher Plant",
+      "file": "carnivorous/cephalotaceae.json",
+      "genera": [
+        "Cephalotus"
+      ]
+    },
+    {
+      "id": "lentibulariaceae",
+      "name": "Butterworts, Bladderworts & Corkscrew Plants",
+      "file": "carnivorous/lentibulariaceae.json",
+      "genera": [
+        "Pinguicula",
+        "Utricularia",
+        "Genlisea"
+      ]
+    },
+    {
+      "id": "byblidaceae",
+      "name": "Rainbow Plants",
+      "file": "carnivorous/byblidaceae.json",
+      "genera": [
+        "Byblis"
+      ]
+    },
+    {
+      "id": "roridulaceae",
+      "name": "Fly Bush",
+      "file": "carnivorous/roridulaceae.json",
+      "genera": [
+        "Roridula"
+      ]
+    },
+    {
+      "id": "dioncophyllaceae",
+      "name": "Tropical Liana Carnivores",
+      "file": "carnivorous/dioncophyllaceae.json",
+      "genera": [
+        "Triphyophyllum"
+      ]
+    }
+  ]
+}
