@@ -770,6 +770,26 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 .article-doi a:hover{text-decoration:underline}
 .news-status{font-size:13px;color:var(--mu);padding:12px 0}
 
+/* ── SPECIES PICKER MODAL ── */
+#species-picker-modal{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center}
+#species-picker-modal.on{display:flex}
+.sp-box{background:var(--sf);border:1px solid var(--bd);border-radius:10px;width:480px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column;overflow:hidden}
+.sp-head{padding:14px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px}
+.sp-head h3{flex:1;font-size:15px;font-weight:700}
+.sp-search-wrap{padding:10px 12px;border-bottom:1px solid var(--bd)}
+.sp-search-wrap input{width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-family:var(--font);font-size:13px;padding:7px 10px;outline:none}
+.sp-search-wrap input:focus{border-color:var(--ac)}
+.sp-body{flex:1;overflow-y:auto;padding:8px 0}
+.sp-group-head{font-size:11px;font-weight:700;color:var(--mu);letter-spacing:.07em;text-transform:uppercase;padding:10px 14px 4px;position:sticky;top:0;background:var(--sf)}
+.sp-row{display:flex;align-items:center;gap:10px;padding:7px 14px;cursor:pointer;transition:background .1s}
+.sp-row:hover{background:var(--sf2)}
+.sp-row-name{font-size:13px;font-style:italic;flex:1}
+.sp-row-common{font-size:11px;color:var(--mu)}
+.sp-row-flair{font-size:10px;color:var(--pu)}
+.sp-empty{padding:24px;text-align:center;font-size:13px;color:var(--mu)}
+.browse-btn{background:transparent;border:1px solid var(--bd);border-radius:5px;color:var(--mu);cursor:pointer;font-family:var(--font);font-size:12px;padding:4px 8px;white-space:nowrap;transition:all .12s;margin-left:4px}
+.browse-btn:hover{border-color:var(--ac);color:var(--tx)}
+
 /* ── BOTTLES ── */
 .bot-list-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;cursor:pointer;transition:background .12s}
 .bot-list-item:hover{background:var(--sf2)}
@@ -960,8 +980,11 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
         <div class="row2">
           <div class="field" style="position:relative">
             <label>Species / Accession</label>
-            <input type="text" id="ne-species" placeholder="e.g. Nepenthes rajah — ACC-2024-07"
-              oninput="_taxSuggest(this)" onkeydown="_taxDropdownKeyNav(event)" autocomplete="off">
+            <div style="display:flex;gap:4px;align-items:center">
+              <input type="text" id="ne-species" placeholder="e.g. Nepenthes rajah — ACC-2024-07"
+                oninput="_taxSuggest(this)" onkeydown="_taxDropdownKeyNav(event)" autocomplete="off" style="flex:1">
+              <button type="button" class="browse-btn" onclick="openSpeciesPicker('ne-species')">🌿 Browse</button>
+            </div>
           </div>
           <div class="field">
             <label>Tags <span style="font-weight:400;color:var(--mu)">(comma separated)</span></label>
@@ -1091,8 +1114,11 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
         <div class="row2">
           <div class="field" style="position:relative">
             <label>Species</label>
-            <input type="text" id="ae-species" placeholder="Nepenthes rajah"
-              oninput="_taxSuggest(this)" onkeydown="_taxDropdownKeyNav(event)" autocomplete="off">
+            <div style="display:flex;gap:4px;align-items:center">
+              <input type="text" id="ae-species" placeholder="Nepenthes rajah"
+                oninput="_taxSuggest(this)" onkeydown="_taxDropdownKeyNav(event)" autocomplete="off" style="flex:1">
+              <button type="button" class="browse-btn" onclick="openSpeciesPicker('ae-species')">🌿 Browse</button>
+            </div>
           </div>
           <div class="field">
             <label>Common Name</label>
@@ -1244,8 +1270,11 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
         </div>
         <div class="field" style="position:relative">
           <label>Target Organism / Use</label>
-          <input type="text" id="re-target" placeholder="e.g. Nepenthes spp. multiplication"
-            oninput="_taxSuggest(this)" onkeydown="_taxDropdownKeyNav(event)" autocomplete="off">
+          <div style="display:flex;gap:4px;align-items:center">
+            <input type="text" id="re-target" placeholder="e.g. Nepenthes spp. multiplication"
+              oninput="_taxSuggest(this)" onkeydown="_taxDropdownKeyNav(event)" autocomplete="off" style="flex:1">
+            <button type="button" class="browse-btn" onclick="openSpeciesPicker('re-target')">🌿 Browse</button>
+          </div>
         </div>
         <div class="field">
           <label>Preparation Notes <span style="font-weight:400;color:var(--mu)">(Markdown)</span></label>
@@ -1311,8 +1340,9 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
       <div class="row2">
         <div class="field">
           <label>Species</label>
-          <div style="position:relative">
-            <input type="text" id="bot-species" placeholder="e.g. Vanilla planifolia" autocomplete="off" oninput="_taxSuggest(this);_botPopulateAccessions(this.value)" onkeydown="_taxDropdownKeyNav(event)">
+          <div style="display:flex;gap:4px;align-items:center;position:relative">
+            <input type="text" id="bot-species" placeholder="e.g. Vanilla planifolia" autocomplete="off" oninput="_taxSuggest(this);_botPopulateAccessions(this.value)" onkeydown="_taxDropdownKeyNav(event)" style="flex:1">
+            <button type="button" class="browse-btn" onclick="openSpeciesPicker('bot-species')">🌿 Browse</button>
           </div>
         </div>
         <div class="field">
@@ -1903,6 +1933,20 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
   </div>
 
 </div><!-- /app -->
+
+<!-- ═══════════ SPECIES PICKER MODAL ═══════════ -->
+<div id="species-picker-modal" onclick="if(event.target===this)closeSpeciesPicker()">
+  <div class="sp-box">
+    <div class="sp-head">
+      <h3>🌿 Choose Species</h3>
+      <button class="btn sm ghost" onclick="closeSpeciesPicker()">✕ Close</button>
+    </div>
+    <div class="sp-search-wrap">
+      <input type="text" id="sp-search" placeholder="Search species or common name…" oninput="_renderSpeciesPicker(this.value)" autocomplete="off">
+    </div>
+    <div class="sp-body" id="sp-body"></div>
+  </div>
+</div>
 
 <!-- ═══════════ CAMERA MODAL ═══════════ -->
 <div id="cam-modal" style="position:fixed;inset:0;z-index:450;background:rgba(0,0,0,.85);display:none;flex-direction:column;align-items:center;justify-content:center">
@@ -2719,7 +2763,7 @@ async function loadTaxonomy(){
 
   // Flatten genera[].species[] into S.taxSpecies
   S.taxSpecies=[];
-  fetched.forEach((res)=>{
+  fetched.forEach((res, idx)=>{
     if(res.status!=='fulfilled'||!res.value) return;
     const raw=res.value;
     let pack;
@@ -2728,12 +2772,16 @@ async function loadTaxonomy(){
         ?JSON.parse(ghDec(raw.content))
         :raw;
     }catch(e){ return; }
+    const packFolder=TAX_PACKS[packIds[idx]]||'';
+    const packLabel=pack.name||pack.title||(packFolder.charAt(0).toUpperCase()+packFolder.slice(1))||'Pack';
     for(const genus of (pack.genera||[])){
       for(const sp of (genus.species||[])){
         S.taxSpecies.push({
           full_name: sp.full_name||'',
           common_name: sp.common_name||'',
           conservation_status: sp.conservation_status||'',
+          genus: genus.name||'',
+          pack_name: packLabel,
           is_custom: false
         });
       }
@@ -2761,7 +2809,7 @@ async function loadTaxonomy(){
 
   // Append custom species
   for(const sp of S.taxCustom.species){
-    S.taxSpecies.push({...sp, is_custom:true});
+    S.taxSpecies.push({...sp, is_custom:true, pack_name:'Custom'});
   }
   S.taxFlairs=S.taxCustom.flairs;
 }
@@ -2783,6 +2831,89 @@ function _taxConBadge(status){
   };
   const code=map[status]; if(!code) return '';
   return `<span class="tax-badge ${cls[status]}">${code}</span>`;
+}
+
+// ════════════════════════════════════════════════════════════
+// SPECIES PICKER MODAL
+// ════════════════════════════════════════════════════════════
+let _spTargetId=null;
+
+function openSpeciesPicker(inputId){
+  _spTargetId=inputId;
+  document.getElementById('sp-search').value='';
+  _renderSpeciesPicker('');
+  document.getElementById('species-picker-modal').classList.add('on');
+  setTimeout(()=>document.getElementById('sp-search').focus(),50);
+}
+
+function closeSpeciesPicker(){
+  document.getElementById('species-picker-modal').classList.remove('on');
+  _spTargetId=null;
+}
+
+function _selectSpecies(name){
+  if(_spTargetId){
+    const el=document.getElementById(_spTargetId);
+    if(el){
+      el.value=name;
+      el.dispatchEvent(new Event('input',{bubbles:true}));
+      // If it's the bottle species, also refresh the accession dropdown
+      if(_spTargetId==='bot-species') _botPopulateAccessions(name);
+    }
+  }
+  closeSpeciesPicker();
+}
+
+function _renderSpeciesPicker(q){
+  const body=document.getElementById('sp-body');
+  const query=(q||'').toLowerCase().trim();
+
+  // Build grouped list from taxonomy packs + custom
+  const groups=[];
+
+  // Load from taxonomy pack files (S.taxSpecies has everything flattened)
+  // Group by pack name using the pack property if present, else 'Custom'
+  const packMap={};
+  for(const sp of (S.taxSpecies||[])){
+    const pack=sp.pack_name||sp.pack||(sp.is_custom?'Custom':'Other');
+    if(!packMap[pack]) packMap[pack]=[];
+    packMap[pack].push(sp);
+  }
+
+  // Filter by query
+  const filtered={};
+  for(const [pack,sps] of Object.entries(packMap)){
+    const matches=query
+      ? sps.filter(sp=>
+          (sp.full_name||'').toLowerCase().includes(query)||
+          (sp.common_name||'').toLowerCase().includes(query)||
+          (sp.genus||'').toLowerCase().includes(query)
+        )
+      : sps;
+    if(matches.length) filtered[pack]=matches;
+  }
+
+  if(!Object.keys(filtered).length){
+    body.innerHTML=`<div class="sp-empty">${query?'No species match "'+esc(q)+'"':'No species loaded — check taxonomy packs in Settings.'}</div>`;
+    return;
+  }
+
+  let html='';
+  for(const [pack,sps] of Object.entries(filtered)){
+    const sorted=[...sps].sort((a,b)=>(a.full_name||'').localeCompare(b.full_name||''));
+    html+=`<div class="sp-group-head">${esc(pack)} <span style="font-weight:400">(${sorted.length})</span></div>`;
+    html+=sorted.map(sp=>{
+      const flairs=(sp.flairs||[]).map(f=>f.emoji||f.name||'').join(' ');
+      return `<div class="sp-row" onclick="_selectSpecies(${JSON.stringify(sp.full_name)})">
+        <div>
+          <div class="sp-row-name">${esc(sp.full_name)}</div>
+          ${sp.common_name?`<div class="sp-row-common">${esc(sp.common_name)}</div>`:''}
+        </div>
+        ${flairs?`<div class="sp-row-flair">${esc(flairs)}</div>`:''}
+      </div>`;
+    }).join('');
+  }
+  body.innerHTML=html;
 }
 
 let _taxActiveInput=null;
@@ -2825,8 +2956,14 @@ function _taxSuggest(input){
 }
 
 function _taxDropdownSelect(name){
-  if(_taxActiveInput) _taxActiveInput.value=name;
+  if(_taxActiveInput){
+    _taxActiveInput.value=name;
+    _taxActiveInput.dispatchEvent(new Event('input',{bubbles:true}));
+    // If bottle species field, refresh accession dropdown
+    if(_taxActiveInput.id==='bot-species') _botPopulateAccessions(name);
+  }
   document.getElementById('tax-dropdown').classList.remove('on');
+  _taxFocusIdx=-1;
   _taxActiveInput=null;
 }
 
@@ -2844,7 +2981,7 @@ function _taxDropdownKeyNav(e){
 
 // Close dropdown on outside click
 document.addEventListener('click',function(e){
-  if(!e.target.closest('#tax-dropdown')&&!e.target.matches('#ne-species,#ae-species,#re-target')){
+  if(!e.target.closest('#tax-dropdown')&&!e.target.matches('#ne-species,#ae-species,#re-target,#bot-species')){
     document.getElementById('tax-dropdown')?.classList.remove('on');
     _taxFocusIdx=-1;
   }
