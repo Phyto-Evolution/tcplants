@@ -9,6 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3/dist/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.19.3/umd/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -622,6 +623,7 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 .cal-dot.blue{background:var(--ac)}
 .cal-dot.orange{background:var(--yw)}
 .cal-dot.red{background:var(--rd)}
+.cal-dot.teal{background:#1abc9c}
 .cal-dot-more{font-size:9px;color:var(--mu);line-height:1}
 #cal-day-panel{
   position:absolute;top:0;right:0;bottom:0;width:320px;
@@ -767,6 +769,64 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 .article-doi a{color:var(--pu);text-decoration:none}
 .article-doi a:hover{text-decoration:underline}
 .news-status{font-size:13px;color:var(--mu);padding:12px 0}
+
+/* ── BOTTLES ── */
+.bot-list-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;cursor:pointer;transition:background .12s}
+.bot-list-item:hover{background:var(--sf2)}
+.bot-list-item.active{background:var(--sf3)}
+.bot-status-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.bot-status-dot.prepared{background:var(--mu)}
+.bot-status-dot.inoculated{background:var(--ac)}
+.bot-status-dot.growing{background:var(--gn)}
+.bot-status-dot.subcultured{background:var(--pu)}
+.bot-status-dot.contaminated{background:var(--rd)}
+.bot-status-dot.discarded{background:var(--bd);border:1px solid var(--mu)}
+.bot-list-code{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--tx);flex-shrink:0}
+.bot-list-info{flex:1;min-width:0}
+.bot-list-sp{font-size:12px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bot-list-stage{font-size:11px;color:var(--mu)}
+.bot-filter-row{display:flex;gap:5px;flex-wrap:wrap;padding:6px 10px;border-bottom:1px solid var(--bd)}
+.bot-filter-pill{background:transparent;border:1px solid var(--bd);border-radius:12px;color:var(--mu);cursor:pointer;font-family:var(--font);font-size:11px;padding:2px 9px;transition:all .12s}
+.bot-filter-pill:hover{border-color:var(--ac);color:var(--tx)}
+.bot-filter-pill.active{background:var(--ac);border-color:var(--ac);color:#0d1117}
+.bot-detail-header{padding:16px;border-bottom:1px solid var(--bd)}
+.bot-code-big{font-family:var(--mono);font-size:22px;font-weight:700;letter-spacing:.5px;line-height:1}
+.bot-status-badge{display:inline-block;border-radius:4px;font-size:12px;font-weight:600;padding:2px 8px;margin-top:5px}
+.bot-status-badge.prepared{background:rgba(139,148,158,.18);color:var(--mu)}
+.bot-status-badge.inoculated{background:rgba(88,166,255,.18);color:var(--ac)}
+.bot-status-badge.growing{background:rgba(63,185,80,.18);color:var(--gn)}
+.bot-status-badge.subcultured{background:rgba(188,140,255,.18);color:var(--pu)}
+.bot-status-badge.contaminated{background:rgba(248,81,73,.18);color:var(--rd)}
+.bot-status-badge.discarded{background:rgba(48,54,61,.4);color:var(--mu)}
+.bot-qr-wrap{padding:14px 16px;display:flex;align-items:flex-start;gap:16px;border-bottom:1px solid var(--bd)}
+.bot-qr-wrap canvas{border-radius:6px;background:#fff;padding:6px}
+.bot-spec-table{width:100%;border-collapse:collapse;font-size:13px}
+.bot-spec-table td{padding:5px 0;vertical-align:top}
+.bot-spec-table td:first-child{color:var(--mu);width:120px;padding-right:12px}
+.bot-stepper-row{padding:12px 16px;border-top:1px solid var(--bd);display:flex;gap:8px;flex-wrap:wrap}
+.bot-notes-body{padding:12px 16px;border-top:1px solid var(--bd);font-size:13px;line-height:1.6;color:var(--tx)}
+.bot-notes-body h1,.bot-notes-body h2,.bot-notes-body h3{font-size:14px;margin:8px 0 4px}
+.bot-batch-row{padding:8px 16px;border-top:1px solid var(--bd);font-size:12px;color:var(--mu)}
+.bot-batch-row a{color:var(--ac);cursor:pointer;text-decoration:none}
+.bot-batch-row a:hover{text-decoration:underline}
+.bot-mode-toggle{display:flex;gap:0;border:1px solid var(--bd);border-radius:6px;overflow:hidden;margin-bottom:14px}
+.bot-mode-btn{background:transparent;border:none;color:var(--mu);cursor:pointer;font-family:var(--font);font-size:13px;padding:6px 18px;transition:all .12s;flex:1}
+.bot-mode-btn:hover{background:var(--sf2);color:var(--tx)}
+.bot-mode-btn.active{background:var(--ac);color:#0d1117;font-weight:600}
+.bot-batch-preview{font-size:12px;color:var(--ac);margin-top:4px;font-style:italic}
+
+/* ── BOTTLE PRINT LABEL ── */
+@media print{
+  .bot-label-page{margin:0;padding:0}
+  .bot-label{width:58mm;box-sizing:border-box;padding:3mm 2mm;border-bottom:1px dashed #000;display:flex;align-items:flex-start;gap:3mm;page-break-inside:avoid}
+  .bot-label canvas{width:22mm!important;height:22mm!important;flex-shrink:0}
+  .bot-label-right{font-family:Arial,sans-serif;font-size:0;min-width:0;flex:1}
+  .bot-lbl-code{font-size:11pt;font-weight:700;display:block;line-height:1.2}
+  .bot-lbl-sp{font-size:9pt;display:block;line-height:1.3}
+  .bot-lbl-flair{font-size:8pt;display:block;color:#333}
+  .bot-lbl-stage{font-size:8pt;display:block;color:#333}
+  .bot-lbl-ts{font-size:8pt;font-family:monospace;display:block;color:#555}
+}
 </style>
 <script>(function(){var t=localStorage.getItem('tcplants_theme')||'dark';document.documentElement.dataset.theme=t;}());</script>
 </head>
@@ -838,6 +898,7 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
             <button class="btn sm" id="edit-note-btn">✏️ Edit</button>
             <button class="btn sm ghost" id="print-btn">🖨 Print / PDF</button>
             <button class="btn sm ghost" id="history-btn">📜 History</button>
+            <button class="btn sm ghost" id="note-bottles-btn" style="display:none" onclick="navTo('bottles');S.bottleSearch='';setBotFilter('all');renderBottleList()">🫙 <span id="note-bottles-count">0</span> Bottles</button>
             <button class="btn sm danger" id="del-note-btn">🗑 Delete</button>
           </div>
         </div>
@@ -1223,6 +1284,112 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
     <h2 style="font-size:20px;font-weight:700;margin-bottom:6px">⏰ Subculture Reminders</h2>
     <p style="font-size:13px;color:var(--mu);margin-bottom:24px">Entries with a Next Review Date set. Click any card to open the note.</p>
     <div id="reminders-body"></div>
+  </div>
+
+  <!-- ── BOTTLES ── -->
+  <div class="section" id="sec-bottles">
+    <div id="bot-empty" style="padding:40px 20px;text-align:center;color:var(--mu)">
+      <div style="font-size:48px;margin-bottom:12px">🫙</div>
+      <div style="font-size:16px;font-weight:600;margin-bottom:8px">No bottle selected</div>
+      <div style="font-size:13px">Choose a bottle from the list, or create one.</div>
+    </div>
+    <div id="bot-detail" style="display:none;height:100%;overflow-y:auto"></div>
+    <div id="bot-editor" style="display:none;padding:16px;overflow-y:auto;height:100%">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <h2 id="bot-editor-title" style="font-size:16px;font-weight:700;flex:1">New Bottle</h2>
+        <button class="btn sm ghost" onclick="cancelBotEdit()">Cancel</button>
+        <button class="btn sm green" id="bot-save-btn" onclick="saveBottleAction()" style="position:sticky;top:0">Save</button>
+      </div>
+      <div class="bot-mode-toggle" id="bot-mode-toggle">
+        <button class="bot-mode-btn active" id="bot-mode-single" onclick="setBotMode('single')">Single bottle</button>
+        <button class="bot-mode-btn" id="bot-mode-batch" onclick="setBotMode('batch')">Batch</button>
+      </div>
+      <div class="field">
+        <label>Recipe</label>
+        <select id="bot-recipe"></select>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Species</label>
+          <div style="position:relative">
+            <input type="text" id="bot-species" placeholder="e.g. Vanilla planifolia" autocomplete="off" oninput="_taxSuggest(this);_botPopulateAccessions(this.value)" onkeydown="_taxDropdownKeyNav(event)">
+          </div>
+        </div>
+        <div class="field">
+          <label>Accession (optional)</label>
+          <select id="bot-accession"><option value="">— none —</option></select>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Stage</label>
+          <select id="bot-stage">
+            <option value="">— select —</option>
+            <option>Stage I — Initiation</option>
+            <option>Stage II — Multiplication</option>
+            <option>Stage III — Rooting</option>
+            <option>Stage IV — Acclimatization</option>
+            <option>Mother Block</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Status</label>
+          <select id="bot-status">
+            <option value="prepared">Prepared</option>
+            <option value="inoculated">Inoculated</option>
+            <option value="growing">Growing</option>
+            <option value="subcultured">Subcultured</option>
+            <option value="contaminated">Contaminated</option>
+            <option value="discarded">Discarded</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Date prepared</label>
+          <input type="datetime-local" id="bot-date-prepared">
+        </div>
+        <div class="field">
+          <label>Date inoculated (optional)</label>
+          <input type="datetime-local" id="bot-date-inoculated">
+        </div>
+      </div>
+      <div class="row3">
+        <div class="field">
+          <label>Media volume (mL)</label>
+          <input type="number" id="bot-volume" value="25" min="1">
+        </div>
+        <div class="field">
+          <label>Explants per bottle</label>
+          <input type="number" id="bot-explants" min="0" placeholder="optional">
+        </div>
+        <div class="field bot-batch-qty-field" id="bot-batch-qty-field" style="display:none">
+          <label>Quantity</label>
+          <input type="number" id="bot-qty" value="1" min="1" max="200" oninput="_updateBatchPreview()">
+        </div>
+      </div>
+      <div id="bot-batch-preview" class="bot-batch-preview" style="display:none"></div>
+      <div class="field">
+        <label>Next review date (optional)</label>
+        <input type="date" id="bot-next-review">
+      </div>
+      <div class="field">
+        <label>Linked note (optional)</label>
+        <select id="bot-note-link"><option value="">— none —</option></select>
+      </div>
+      <div class="field">
+        <label>Flairs</label>
+        <div id="bot-flair-pills" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:4px"></div>
+      </div>
+      <div class="field">
+        <label>Flair note (provenance)</label>
+        <input type="text" id="bot-flair-note" placeholder="e.g. Borneo clone, wild collected 2024">
+      </div>
+      <div class="field">
+        <label>Notes</label>
+        <textarea id="bot-notes-text" rows="4" placeholder="Any extra notes (markdown supported)…"></textarea>
+      </div>
+    </div>
   </div>
 
   <!-- ── CONTAMINATION ── -->
@@ -1647,6 +1814,7 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
       <button class="ndtab active" data-sec="notes" onclick="navTo('notes')"><span class="nd-icon">📋</span>Notes</button>
       <button class="ndtab" data-sec="registry" onclick="navTo('registry')"><span class="nd-icon">🌿</span>Registry</button>
       <button class="ndtab" data-sec="recipes" onclick="navTo('recipes')"><span class="nd-icon">🧪</span>Recipes</button>
+      <button class="ndtab" data-sec="bottles" onclick="navTo('bottles')"><span class="nd-icon">🫙</span>Bottles</button>
       <button class="ndtab" data-sec="reminders" onclick="navTo('reminders')"><span class="nd-icon">⏰</span>Reminders<span class="nd-badge" id="nd-rbadge" style="display:none">0</span></button>
       <button class="ndtab" data-sec="contam" onclick="navTo('contam')"><span class="nd-icon">☣️</span>Contam</button>
       <div class="nd-divider"></div>
@@ -1696,6 +1864,28 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
           <div class="aside-stats" id="acc-stats"></div>
         </div>
         <div id="acc-list"></div>
+      </div>
+      <!-- Bottles list panel -->
+      <div class="nd-list-area" id="nd-bottles">
+        <div class="aside-top">
+          <div style="display:flex;gap:6px">
+            <button class="btn sm" style="flex:1" id="new-bot-btn" onclick="startNewBottle('single')">＋ Single</button>
+            <button class="btn sm ghost" style="flex:1" id="new-bot-batch-btn" onclick="startNewBottle('batch')">⊞ Batch</button>
+          </div>
+          <div class="search-wrap" style="margin-top:8px">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="bot-search" placeholder="Search code, species…" oninput="S.bottleSearch=this.value;renderBottleList()">
+          </div>
+          <div class="aside-stats" id="bot-stats"></div>
+        </div>
+        <div class="bot-filter-row" id="bot-filter-row">
+          <button class="bot-filter-pill active" data-bf="all" onclick="setBotFilter('all')">All</button>
+          <button class="bot-filter-pill" data-bf="prepared" onclick="setBotFilter('prepared')">Prepared</button>
+          <button class="bot-filter-pill" data-bf="inoculated" onclick="setBotFilter('inoculated')">Inoculated</button>
+          <button class="bot-filter-pill" data-bf="growing" onclick="setBotFilter('growing')">Growing</button>
+          <button class="bot-filter-pill" data-bf="contaminated" onclick="setBotFilter('contaminated')">Contam</button>
+        </div>
+        <div id="bot-list"></div>
       </div>
       <!-- Recipes list panel -->
       <div class="nd-list-area" id="nd-recipes">
@@ -1841,6 +2031,7 @@ const DIR    = 'notes';
 const IDX    = `${DIR}/index.enc`;
 const ACC_F  = 'accessions/data.enc';
 const REC_F  = 'recipes/data.enc';
+const BOT_F  = 'bottles/data.enc';
 const API    = 'https://api.github.com';
 
 // ════════════════════════════════════════════════════════════
@@ -1859,6 +2050,9 @@ const S = {
   section:'notes',
   weather:{lab:null,gh:null,updatedAt:null},
   bodyCache:{},
+  bottles: [], bottlesSha: null,
+  bottleFilter: 'all', bottleSearch: '',
+  curBot: null, editingBot: null,
   taxSpecies: [],
   taxFlairs: [],
   taxCustom: {species:[], flairs:[]},
@@ -1990,6 +2184,17 @@ async function saveRecipes(recs,sha){
   return res.content.sha;
 }
 
+async function loadBottles(){
+  const f=await ghGet(BOT_F);
+  if(!f) return {bottles:[],sha:null};
+  const bottles=JSON.parse(await dec(ghDec(f.content)));
+  return {bottles, sha:f.sha};
+}
+async function saveBottles(bottles,sha){
+  const res=await ghPut(BOT_F, await enc(JSON.stringify(bottles)), sha, `lab: bottles — ${bottles.length} bottles`);
+  return res.content.sha;
+}
+
 // ════════════════════════════════════════════════════════════
 // UTILS
 // ════════════════════════════════════════════════════════════
@@ -2037,11 +2242,17 @@ function showRec(name){
 // REMINDER BADGE
 // ════════════════════════════════════════════════════════════
 function updateReminderBadge(){
-  const count = S.notes.filter(n=>{
+  const noteCount = S.notes.filter(n=>{
     if(!n.next_review) return false;
     const d = daysFrom(n.next_review);
     return d !== null && d <= 7;
   }).length;
+  const botCount = (S.bottles||[]).filter(b=>{
+    if(!b.next_review||!['inoculated','growing'].includes(b.status)) return false;
+    const d = daysFrom(b.next_review);
+    return d !== null && d <= 7;
+  }).length;
+  const count=noteCount+botCount;
   const nb=document.getElementById('nd-rbadge');
   if(nb){ nb.textContent=count; nb.style.display=count>0?'':'none'; }
 }
@@ -2128,6 +2339,11 @@ async function openNote(id){
     S.bodyCache[id]=body;
     document.getElementById('nv-body').innerHTML=marked.parse(_wikiPreprocess(body));
     _renderBacklinks(id);
+    // Bottle cross-link
+    const noteBottles=S.bottles.filter(b=>b.note_id===id);
+    const nbBtn=document.getElementById('note-bottles-btn');
+    if(noteBottles.length){ nbBtn.style.display=''; document.getElementById('note-bottles-count').textContent=noteBottles.length; nbBtn.onclick=()=>{navTo('bottles');S.bottleSearch='';setBotFilter('all');renderBottleList();}; }
+    else { nbBtn.style.display='none'; }
     switchSection('notes'); showNote('view');
   }catch(e){toast('Decrypt failed: '+e.message,'fail');}
   unload();
@@ -2648,12 +2864,20 @@ function _buildCalMap(){
   for(const n of S.notes){
     add(n.date,{
       id:n.id, title:n.title, type:n.type||'', stage:n.stage||'', species:n.species||'',
-      dotType: n.type==='Contamination Log'?'red':'blue', isReview:false
+      dotType: n.type==='Contamination Log'?'red':'blue', isReview:false, isBottle:false
     });
     if(n.next_review){
       add(n.next_review,{
         id:n.id, title:n.title, type:n.type||'', stage:n.stage||'', species:n.species||'',
-        dotType:'orange', isReview:true
+        dotType:'orange', isReview:true, isBottle:false
+      });
+    }
+  }
+  for(const b of (S.bottles||[])){
+    if(b.date_prepared){
+      add(b.date_prepared,{
+        id:b.id, title:b.code, type:_botStatusLabel(b.status), stage:b.stage||'', species:b.species||'',
+        dotType:'teal', isReview:false, isBottle:true
       });
     }
   }
@@ -2772,6 +2996,16 @@ function openCalendarDay(dateStr){
     html='<p style="font-size:13px;color:var(--mu);padding:8px 2px">No entries for this day.</p>';
   } else {
     for(const e of entries){
+      if(e.isBottle){
+        const species=e.species?`<span class="cdp-badge">${esc(e.species)}</span>`:'';
+        const type=e.type?`<span class="cdp-badge">${esc(e.type)}</span>`:'';
+        const stage=e.stage?`<span class="cdp-badge">${esc(e.stage)}</span>`:'';
+        html+=`<div class="cdp-card teal" onclick="navTo('bottles');openBottle('${e.id}')">
+          <div class="cdp-card-title">🫙 ${esc(e.title)}</div>
+          <div class="cdp-card-meta">${type}${stage}${species}</div>
+        </div>`;
+        continue;
+      }
       const reviewLabel=e.isReview?`<span class="cdp-review-label">⏰ Review due</span>`:'';
       const species=e.species?`<span class="cdp-badge">${esc(e.species)}</span>`:'';
       const type=e.type?`<span class="cdp-badge">${esc(e.type)}</span>`:'';
@@ -4031,6 +4265,8 @@ function openAccession(id){
     return f?`<span class="flair-pill ${f.color}">${esc(f.name)}</span>`:'';
   }).join('');
   const flairNote=a.flair_note?`<p style="font-size:12px;color:var(--mu);margin-top:6px">📝 ${esc(a.flair_note)}</p>`:'';
+  const accBottles=S.bottles.filter(b=>b.accession_id===id||(b.species&&a.species&&b.species.toLowerCase()===a.species.toLowerCase()));
+  if(accBottles.length) badges.push(`<span class="sbadge type" style="cursor:pointer;text-decoration:underline dotted" title="View bottles" onclick="navTo('bottles');S.bottleSearch='';setBotFilter('all');renderBottleList()">🫙 ${accBottles.length} bottle${accBottles.length!==1?'s':''}</span>`);
   document.getElementById('av-badges').innerHTML=badges.join('')+(flairPills?`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">${flairPills}</div>`:'')+flairNote;
   document.getElementById('av-body').innerHTML=a.notes_md?marked.parse(a.notes_md):'';
   // linked notes
@@ -4160,6 +4396,401 @@ function renderRecList(){
   el.querySelectorAll('.n-item').forEach(el=>el.addEventListener('click',()=>openRecipe(el.dataset.id)));
 }
 
+// ════════════════════════════════════════════════════════════
+// BOTTLES
+// ════════════════════════════════════════════════════════════
+const BOT_STATUSES=['prepared','inoculated','growing','subcultured','contaminated','discarded'];
+const BOT_STATUS_NEXT={prepared:'inoculated',inoculated:'growing',growing:'subcultured'};
+
+function _botStatusLabel(s){return s?s.charAt(0).toUpperCase()+s.slice(1):'Prepared';}
+
+function _botNextSeq(){
+  if(!S.bottles.length) return 1;
+  return Math.max(0,...S.bottles.map(b=>parseInt((b.code||'').split('-')[2])||0))+1;
+}
+
+function _botCode(){
+  const y=new Date().getFullYear();
+  return `FSL-${y}-${String(_botNextSeq()).padStart(4,'0')}`;
+}
+
+function setBotFilter(f){
+  S.bottleFilter=f;
+  document.querySelectorAll('.bot-filter-pill').forEach(p=>p.classList.toggle('active',p.dataset.bf===f));
+  renderBottleList();
+}
+
+function renderBottleList(){
+  const el=document.getElementById('bot-list'); if(!el) return;
+  const q=(S.bottleSearch||'').toLowerCase();
+  let list=S.bottles;
+  if(S.bottleFilter && S.bottleFilter!=='all') list=list.filter(b=>b.status===S.bottleFilter);
+  if(q) list=list.filter(b=>(b.code||'').toLowerCase().includes(q)||(b.species||'').toLowerCase().includes(q)||(b.notes||'').toLowerCase().includes(q));
+  list=[...list].sort((a,b)=>new Date(b.date_prepared||0)-new Date(a.date_prepared||0));
+  const total=S.bottles.length;
+  const active=S.bottles.filter(b=>['inoculated','growing'].includes(b.status)).length;
+  document.getElementById('bot-stats').textContent=`${total} bottle${total!==1?'s':''} · ${active} active`;
+  if(!list.length){el.innerHTML=`<div style="padding:18px;font-size:13px;color:var(--mu);text-align:center">${q||S.bottleFilter!=='all'?'No matches':'No bottles yet. Create one!'}</div>`;return;}
+  el.innerHTML=list.map(b=>`
+    <div class="bot-list-item${S.curBot===b.id?' active':''}" data-id="${b.id}" onclick="openBottle('${b.id}')">
+      <div class="bot-status-dot ${b.status||'prepared'}"></div>
+      <div class="bot-list-info">
+        <div class="bot-list-code">${esc(b.code)}</div>
+        <div class="bot-list-sp">${esc(b.species||'—')}</div>
+        ${b.stage?`<div class="bot-list-stage">${esc(b.stage)}</div>`:''}
+      </div>
+      ${(b.flair_ids&&b.flair_ids.length)?`<div style="font-size:10px;color:var(--mu);flex-shrink:0">${b.flair_ids.length}🏷</div>`:''}
+    </div>`).join('');
+}
+
+function showBotEmpty(){
+  document.getElementById('bot-empty').style.display='';
+  document.getElementById('bot-detail').style.display='none';
+  document.getElementById('bot-editor').style.display='none';
+}
+function showBotDetail(){
+  document.getElementById('bot-empty').style.display='none';
+  document.getElementById('bot-detail').style.display='';
+  document.getElementById('bot-editor').style.display='none';
+}
+function showBotEditor(){
+  document.getElementById('bot-empty').style.display='none';
+  document.getElementById('bot-detail').style.display='none';
+  document.getElementById('bot-editor').style.display='';
+}
+
+function _botFlairHtml(flair_ids){
+  if(!flair_ids||!flair_ids.length) return '';
+  return flair_ids.map(fid=>{
+    const f=(S.taxFlairs||[]).find(x=>x.id===fid)||(S.taxCustom?.flairs||[]).find(x=>x.id===fid);
+    return f?`<span class="flair-pill">${esc(f.emoji||'')} ${esc(f.name)}</span>`:'' ;
+  }).join('');
+}
+
+function _fmtTs(iso){
+  if(!iso) return '';
+  const d=new Date(iso);
+  return d.toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'2-digit'})+' '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false});
+}
+
+function openBottle(id){
+  S.curBot=id; renderBottleList();
+  const b=S.bottles.find(x=>x.id===id); if(!b) return;
+  const rec=S.recs.find(r=>r.id===b.recipe_id);
+  const acc=S.accs.find(a=>a.id===b.accession_id);
+  const note=S.notes.find(n=>n.id===b.note_id);
+  const batchMates=S.bottles.filter(x=>x.batch_id&&x.batch_id===b.batch_id&&x.id!==id);
+  const flairsHtml=_botFlairHtml(b.flair_ids);
+
+  // Stepper: what can be advanced?
+  const nextStatus=BOT_STATUS_NEXT[b.status];
+  const terminalBtns=['subcultured','contaminated','discarded'].filter(s=>s!==b.status)
+    .map(s=>`<button class="btn sm${s==='contaminated'?' danger':s==='discarded'?' ghost':''}" onclick="updateBottleStatus('${id}','${s}')">${_botStatusLabel(s)}</button>`)
+    .join('');
+  const stepperHtml=(nextStatus?`<button class="btn sm green" onclick="updateBottleStatus('${id}','${nextStatus}')">▶ Mark as ${_botStatusLabel(nextStatus)}</button>`:'')
+    + (terminalBtns?`<span style="color:var(--mu);font-size:12px;margin:0 6px">or</span>${terminalBtns}`:'');
+
+  const rows=[
+    ['Species', b.species?`<span>${esc(b.species)}</span>`:'—'],
+    ['Accession', acc?`<a style="color:var(--ac);cursor:pointer" onclick="navTo('registry');openAccession('${acc.id}')">${esc(acc.accession||acc.species)}</a>`:(b.accession_id?b.accession_id:'—')],
+    ['Recipe', rec?`<a style="color:var(--ac);cursor:pointer" onclick="navTo('recipes');openRecipe('${rec.id}')">${esc(rec.name)}</a>`:( b.recipe_id?'(deleted)':'—')],
+    ['Stage', b.stage||'—'],
+    ['Media volume', b.media_volume?(b.media_volume+' mL'):'—'],
+    ['Explants', b.explants||'—'],
+    ['Date prepared', b.date_prepared?_fmtTs(b.date_prepared):'—'],
+    ['Date inoculated', b.date_inoculated?_fmtTs(b.date_inoculated):'—'],
+    ['Next review', b.next_review?fmtDateShort(b.next_review):'—'],
+    ['Linked note', note?`<a style="color:var(--ac);cursor:pointer" onclick="navTo('notes');openNote('${note.id}')">${esc(note.title)}</a>`:(b.note_id?'(deleted)':'—')],
+    ['Batch', b.batch_id?`<span id="bot-batch-count-${id}">${batchMates.length+1} bottles</span>`:'Single'],
+  ].filter(([,v])=>v&&v!=='—');
+
+  document.getElementById('bot-detail').innerHTML=`
+    <div class="bot-detail-header">
+      <div style="display:flex;align-items:flex-start;gap:10px">
+        <div style="flex:1">
+          <div class="bot-code-big">${esc(b.code)}</div>
+          <span class="bot-status-badge ${b.status||'prepared'}">${_botStatusLabel(b.status)}</span>
+          ${flairsHtml?`<div style="margin-top:6px">${flairsHtml}</div>`:''}
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <button class="btn sm ghost" onclick="startEditBottle('${id}')">✏️ Edit</button>
+          <button class="btn sm danger" onclick="deleteBottle('${id}')">🗑</button>
+        </div>
+      </div>
+    </div>
+    <div class="bot-qr-wrap">
+      <canvas id="bot-qr-${id}"></canvas>
+      <div>
+        <div style="font-size:12px;color:var(--mu);margin-bottom:6px">Scan to open this bottle record</div>
+        <button class="btn sm ghost" onclick="printBottleLabel('${id}')">🖨 Print label</button>
+        ${b.batch_id?`<br><button class="btn sm ghost" style="margin-top:6px" onclick="printBatchLabels('${b.batch_id}')">🖨 Print batch</button>`:''}
+      </div>
+    </div>
+    <div style="padding:12px 16px">
+      <table class="bot-spec-table">
+        ${rows.map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('')}
+      </table>
+    </div>
+    ${b.flair_note?`<div style="padding:4px 16px 8px;font-size:12px;color:var(--mu);font-style:italic">${esc(b.flair_note)}</div>`:''}
+    ${stepperHtml?`<div class="bot-stepper-row">${stepperHtml}</div>`:''}
+    ${b.notes?`<div class="bot-notes-body">${marked.parse(b.notes)}</div>`:''}
+    ${(b.batch_id&&batchMates.length)?`<div class="bot-batch-row">Batch: <a onclick="setBotFilter('all');S.bottleSearch='';renderBottleList()">View all ${batchMates.length+1} bottles in this batch</a></div>`:''}
+  `;
+  showBotDetail();
+  // Generate QR code
+  const url=`https://notes.tcplants.in?bottle=${id}`;
+  const canvas=document.getElementById(`bot-qr-${id}`);
+  if(canvas && typeof QRCode!=='undefined'){
+    QRCode.toCanvas(canvas, url, {width:130, margin:1, color:{dark:'#000000',light:'#ffffff'}}, err=>{if(err) console.warn('QR err',err);});
+  }
+}
+
+function _populateBotEditor(b){
+  // Recipe dropdown
+  const rSel=document.getElementById('bot-recipe');
+  rSel.innerHTML='<option value="">— no recipe —</option>'+S.recs.map(r=>`<option value="${r.id}">${esc(r.name)}</option>`).join('');
+  if(b) rSel.value=b.recipe_id||'';
+  // Accession dropdown (populated on species change too)
+  _botPopulateAccessions(b?b.species:'');
+  if(b) document.getElementById('bot-accession').value=b.accession_id||'';
+  // Note link dropdown
+  const nSel=document.getElementById('bot-note-link');
+  nSel.innerHTML='<option value="">— none —</option>'+[...S.notes].sort((a,c)=>new Date(c.date)-new Date(a.date)).map(n=>`<option value="${n.id}">${esc(n.title)}</option>`).join('');
+  if(b) nSel.value=b.note_id||'';
+  // Other fields
+  document.getElementById('bot-species').value=b?b.species||'':'';
+  document.getElementById('bot-stage').value=b?b.stage||'':'';
+  document.getElementById('bot-status').value=b?b.status||'prepared':'prepared';
+  document.getElementById('bot-volume').value=b?b.media_volume||25:25;
+  document.getElementById('bot-explants').value=b?b.explants||'':'';
+  document.getElementById('bot-next-review').value=b?b.next_review||'':'';
+  document.getElementById('bot-flair-note').value=b?b.flair_note||'':'';
+  document.getElementById('bot-notes-text').value=b?b.notes||'':'';
+  // Date fields
+  const now=new Date(); now.setSeconds(0,0);
+  const toLocal=iso=>iso?new Date(new Date(iso)-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16):'';
+  document.getElementById('bot-date-prepared').value=b?toLocal(b.date_prepared):now.toISOString().slice(0,16);
+  document.getElementById('bot-date-inoculated').value=b?toLocal(b.date_inoculated):'';
+  // Flairs
+  const allFlairs=[...(S.taxFlairs||[]),...(S.taxCustom?.flairs||[])];
+  const selIds=new Set(b?b.flair_ids||[]:[]);
+  document.getElementById('bot-flair-pills').innerHTML=allFlairs.map(f=>
+    `<span class="flair-pill${selIds.has(f.id)?' selected':''}" style="cursor:pointer${selIds.has(f.id)?';background:var(--ac);color:#0d1117':''}" onclick="_toggleBotFlair('${f.id}',this)">${esc(f.emoji||'')} ${esc(f.name)}</span>`
+  ).join('');
+}
+
+function _botPopulateAccessions(sp){
+  const sel=document.getElementById('bot-accession'); if(!sel) return;
+  const cur=sel.value;
+  const filtered=sp?S.accs.filter(a=>(a.species||'').toLowerCase().includes(sp.toLowerCase())):S.accs;
+  sel.innerHTML='<option value="">— none —</option>'+filtered.map(a=>`<option value="${a.id}">${esc(a.species)} — ${esc(a.accession||a.id.slice(0,6))}</option>`).join('');
+  sel.value=cur;
+}
+
+function _toggleBotFlair(fid, el){
+  el.classList.toggle('selected');
+  const on=el.classList.contains('selected');
+  el.style.background=on?'var(--ac)':'';
+  el.style.color=on?'#0d1117':'';
+}
+
+function _getBotFlairIds(){
+  return [...document.querySelectorAll('#bot-flair-pills .flair-pill.selected')].map(el=>{
+    const m=el.getAttribute('onclick').match(/'([^']+)'/);
+    return m?m[1]:null;
+  }).filter(Boolean);
+}
+
+function _updateBatchPreview(){
+  const qty=parseInt(document.getElementById('bot-qty').value)||1;
+  const vol=parseInt(document.getElementById('bot-volume').value)||25;
+  const prev=document.getElementById('bot-batch-preview');
+  prev.textContent=`${qty} × ${vol} mL = ${qty*vol} mL total`;
+  prev.style.display='';
+}
+
+function setBotMode(mode){
+  S._botMode=mode;
+  document.getElementById('bot-mode-single').classList.toggle('active',mode==='single');
+  document.getElementById('bot-mode-batch').classList.toggle('active',mode==='batch');
+  const qf=document.getElementById('bot-batch-qty-field');
+  const prev=document.getElementById('bot-batch-preview');
+  if(mode==='batch'){
+    qf.style.display='';
+    _updateBatchPreview();
+  } else {
+    qf.style.display='none';
+    prev.style.display='none';
+  }
+}
+
+function startNewBottle(mode){
+  S.editingBot=null; S._botMode=mode||'single';
+  navTo('bottles');
+  document.getElementById('bot-editor-title').textContent='New Bottle';
+  const modeToggle=document.getElementById('bot-mode-toggle');
+  modeToggle.style.display='';
+  _populateBotEditor(null);
+  setBotMode(S._botMode);
+  showBotEditor();
+}
+
+function startEditBottle(id){
+  const b=S.bottles.find(x=>x.id===id); if(!b) return;
+  S.editingBot=id; S._botMode='single';
+  document.getElementById('bot-editor-title').textContent=`Edit ${b.code}`;
+  document.getElementById('bot-mode-toggle').style.display='none';
+  document.getElementById('bot-batch-qty-field').style.display='none';
+  document.getElementById('bot-batch-preview').style.display='none';
+  _populateBotEditor(b);
+  showBotEditor();
+}
+
+function cancelBotEdit(){
+  if(S.curBot){ openBottle(S.curBot); }
+  else { showBotEmpty(); }
+}
+
+async function saveBottleAction(){
+  const sp=document.getElementById('bot-species').value.trim();
+  const stage=document.getElementById('bot-stage').value;
+  const status=document.getElementById('bot-status').value||'prepared';
+  const recipe_id=document.getElementById('bot-recipe').value||null;
+  const accession_id=document.getElementById('bot-accession').value||null;
+  const note_id=document.getElementById('bot-note-link').value||null;
+  const media_volume=parseFloat(document.getElementById('bot-volume').value)||25;
+  const explants=parseInt(document.getElementById('bot-explants').value)||null;
+  const next_review=document.getElementById('bot-next-review').value||null;
+  const flair_note=document.getElementById('bot-flair-note').value.trim()||null;
+  const notes=document.getElementById('bot-notes-text').value.trim()||null;
+  const flair_ids=_getBotFlairIds();
+  const date_prepared=document.getElementById('bot-date-prepared').value?new Date(document.getElementById('bot-date-prepared').value).toISOString():new Date().toISOString();
+  const date_inoculated=document.getElementById('bot-date-inoculated').value?new Date(document.getElementById('bot-date-inoculated').value).toISOString():null;
+
+  const base={recipe_id,species:sp,accession_id,stage,status,date_prepared,date_inoculated,next_review,media_volume,explants,note_id,flair_ids,flair_note,notes};
+
+  const btn=document.getElementById('bot-save-btn');
+  btn.disabled=true; btn.textContent='Saving…';
+  try{
+    let newBots;
+    if(S.editingBot){
+      // Update existing
+      const idx=S.bottles.findIndex(x=>x.id===S.editingBot);
+      if(idx===-1) throw new Error('Bottle not found');
+      S.bottles[idx]={...S.bottles[idx],...base};
+      newBots=S.bottles;
+      S.bottlesSha=await saveBottles(newBots, S.bottlesSha);
+      S.curBot=S.editingBot; S.editingBot=null;
+      renderBottleList(); openBottle(S.curBot);
+    } else {
+      // Create new
+      const qty=(S._botMode==='batch')?(parseInt(document.getElementById('bot-qty').value)||1):1;
+      const batch_id=qty>1?uid():null;
+      const newBottles=[];
+      for(let i=0;i<qty;i++){
+        const code=`FSL-${new Date().getFullYear()}-${String(_botNextSeq()+newBottles.length).padStart(4,'0')}`;
+        newBottles.push({id:uid(),code,batch_id,...base});
+      }
+      newBots=[...S.bottles,...newBottles];
+      S.bottles=newBots;
+      S.bottlesSha=await saveBottles(newBots, S.bottlesSha);
+      S.curBot=newBottles[0].id;
+      renderBottleList(); openBottle(S.curBot);
+    }
+    toast(S.editingBot===null?`🫙 Bottle${base.species?' for '+base.species:''} saved`:'Saved','ok');
+  } catch(e){ toast('Save failed: '+e.message,'fail'); }
+  btn.disabled=false; btn.textContent='Save';
+}
+
+async function updateBottleStatus(id, newStatus){
+  const idx=S.bottles.findIndex(x=>x.id===id); if(idx===-1) return;
+  const prev=S.bottles[idx].status;
+  S.bottles[idx].status=newStatus;
+  if(newStatus==='inoculated'&&!S.bottles[idx].date_inoculated){
+    S.bottles[idx].date_inoculated=new Date().toISOString();
+  }
+  try{
+    S.bottlesSha=await saveBottles(S.bottles, S.bottlesSha);
+    renderBottleList(); openBottle(id);
+    toast(`🫙 ${S.bottles[idx].code} → ${_botStatusLabel(newStatus)}`);
+  }catch(e){ S.bottles[idx].status=prev; toast('Update failed: '+e.message,'fail'); }
+}
+
+function _botLabelHtml(b){
+  const rec=S.recs.find(r=>r.id===b.recipe_id);
+  const flairNames=(b.flair_ids||[]).map(fid=>{
+    const f=(S.taxFlairs||[]).find(x=>x.id===fid)||(S.taxCustom?.flairs||[]).find(x=>x.id===fid);
+    return f?(f.emoji?f.emoji+' ':'')+f.name:'';
+  }).filter(Boolean).join(', ');
+  const label=b.flair_note||(flairNames?`[${flairNames}]`:'');
+  const url=`https://notes.tcplants.in?bottle=${b.id}`;
+  return `
+    <div class="bot-label">
+      <canvas id="print-qr-${b.id}"></canvas>
+      <div class="bot-label-right">
+        <span class="bot-lbl-code">${esc(b.code)}</span>
+        <span class="bot-lbl-sp">${esc(b.species||'Unknown species')}</span>
+        ${label?`<span class="bot-lbl-flair">${esc(label)}</span>`:''}
+        <span class="bot-lbl-stage">${esc([b.stage,rec?rec.name:''].filter(Boolean).join(' · '))}</span>
+        <span class="bot-lbl-ts">${_fmtTs(b.date_prepared)}</span>
+      </div>
+    </div>`;
+}
+
+function printBottleLabel(id){
+  const b=S.bottles.find(x=>x.id===id); if(!b) return;
+  _openPrintWindow([b]);
+}
+
+function printBatchLabels(batchId){
+  const bottles=S.bottles.filter(b=>b.batch_id===batchId);
+  if(!bottles.length){ toast('No bottles in this batch','fail'); return; }
+  _openPrintWindow(bottles);
+}
+
+function _openPrintWindow(bottles){
+  const w=window.open('','_blank','width=300,height=600');
+  const labelsHtml=bottles.map(b=>_botLabelHtml(b)).join('');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Bottle Labels</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#fff;font-family:Arial,sans-serif}
+.bot-label{width:58mm;padding:3mm 2mm;border-bottom:1px dashed #000;display:flex;align-items:flex-start;gap:3mm;page-break-inside:avoid}
+.bot-label canvas{width:22mm!important;height:22mm!important;flex-shrink:0}
+.bot-label-right{font-family:Arial,sans-serif;flex:1;min-width:0}
+.bot-lbl-code{font-size:11pt;font-weight:700;display:block;line-height:1.2}
+.bot-lbl-sp{font-size:9pt;display:block;line-height:1.3}
+.bot-lbl-flair{font-size:8pt;display:block;color:#333}
+.bot-lbl-stage{font-size:8pt;display:block;color:#333}
+.bot-lbl-ts{font-size:8pt;font-family:monospace;display:block;color:#555}
+@page{size:58mm auto;margin:0}
+@media print{body{width:58mm}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"><\/script>
+</head><body class="bot-label-page">${labelsHtml}<\/body><\/html>`);
+  w.document.close();
+  w.addEventListener('load',()=>{
+    bottles.forEach(b=>{
+      const canvas=w.document.getElementById(`print-qr-${b.id}`);
+      if(canvas && w.QRCode){
+        w.QRCode.toCanvas(canvas, `https://notes.tcplants.in?bottle=${b.id}`, {width:88,margin:0,color:{dark:'#000000',light:'#ffffff'}});
+      }
+    });
+    setTimeout(()=>{ w.focus(); w.print(); }, 600);
+  });
+}
+
+async function deleteBottle(id){
+  const b=S.bottles.find(x=>x.id===id); if(!b) return;
+  if(!confirm(`Delete bottle ${b.code}? This cannot be undone.`)) return;
+  S.bottles=S.bottles.filter(x=>x.id!==id);
+  try{
+    S.bottlesSha=await saveBottles(S.bottles, S.bottlesSha);
+    S.curBot=null; renderBottleList(); showBotEmpty();
+    toast('Bottle deleted');
+  }catch(e){ S.bottles.push(b); toast('Delete failed: '+e.message,'fail'); }
+}
+
 function openRecipe(id){
   S.curRec=id; renderRecList();
   const r=S.recs.find(x=>x.id===id); if(!r) return;
@@ -4183,7 +4814,9 @@ function openRecipe(id){
     ['Agar / Gelrite', r.agar?(r.agar+' g/L'):''],['pH (before autoclave)', r.ph],
     ['Growth Regulators', r.pgr],['Autoclave', r.autoclave],['Target', r.target],
   ].filter(([,v])=>v);
-  document.getElementById('rv-spec').innerHTML=rows.map(([k,v])=>`<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join('');
+  const recBottles=S.bottles.filter(b=>b.recipe_id===id);
+  if(recBottles.length) rows.push([`🫙 Bottles`, `<a style="color:var(--ac);cursor:pointer" onclick="navTo('bottles');S.bottleSearch='';setBotFilter('all');renderBottleList()">${recBottles.length} bottle${recBottles.length!==1?'s':''} use this recipe</a>`]);
+  document.getElementById('rv-spec').innerHTML=rows.map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('');
   document.getElementById('rv-body').innerHTML=r.notes_md?marked.parse(r.notes_md):'';
   showRec('view');
 }
@@ -4312,18 +4945,24 @@ document.getElementById('rec-search').addEventListener('input',renderRecList);
 // REMINDERS
 // ════════════════════════════════════════════════════════════
 function renderReminders(){
-  const notes=S.notes.filter(n=>n.next_review).map(n=>({...n, days:daysFrom(n.next_review)}));
-  const overdue=notes.filter(n=>n.days<=0).sort((a,b)=>a.days-b.days);
-  const week=notes.filter(n=>n.days>0&&n.days<=7).sort((a,b)=>a.days-b.days);
-  const month=notes.filter(n=>n.days>7&&n.days<=30).sort((a,b)=>a.days-b.days);
-  const later=notes.filter(n=>n.days>30).sort((a,b)=>a.days-b.days);
+  const notes=S.notes.filter(n=>n.next_review).map(n=>({...n, days:daysFrom(n.next_review), isBottle:false}));
+  // Bottles with next_review in active states
+  const botItems=S.bottles.filter(b=>b.next_review&&['inoculated','growing'].includes(b.status))
+    .map(b=>({...b, title:b.code, type:_botStatusLabel(b.status), days:daysFrom(b.next_review), isBottle:true}));
+  const all=[...notes,...botItems];
+  const overdue=all.filter(n=>n.days<=0).sort((a,b)=>a.days-b.days);
+  const week=all.filter(n=>n.days>0&&n.days<=7).sort((a,b)=>a.days-b.days);
+  const month=all.filter(n=>n.days>7&&n.days<=30).sort((a,b)=>a.days-b.days);
+  const later=all.filter(n=>n.days>30).sort((a,b)=>a.days-b.days);
 
   const card=(n)=>{
     const cls=n.days<=0?'overdue':'soon';
     const dlabel=n.days<0?`${Math.abs(n.days)}d overdue`:n.days===0?'Due today':`In ${n.days}d`;
-    return `<div class="rem-card ${cls}" data-id="${n.id}">
+    const icon=n.isBottle?'🫙 ':'';
+    const action=n.isBottle?`onclick="navTo('bottles');openBottle('${n.id}')"`:``;
+    return `<div class="rem-card ${cls}" data-id="${n.id}" data-is-bottle="${n.isBottle?'1':'0'}" ${action}>
       <div class="rem-info">
-        <div class="rem-title">${esc(n.title)}</div>
+        <div class="rem-title">${icon}${esc(n.title)}</div>
         <div class="rem-sub">${n.species?`<em>${esc(n.species)}</em> · `:''}${n.type?esc(n.type):''}</div>
       </div>
       <div class="rem-date ${cls}">${dlabel}<br><span style="font-size:11px;font-weight:400">${fmtDateShort(n.next_review)}</span></div>
@@ -4335,11 +4974,14 @@ function renderReminders(){
   </div>`:'';
 
   const body=document.getElementById('reminders-body');
-  body.innerHTML= !notes.length
-    ? '<div class="empty-state"><h2>No reminders set</h2><p>Add a "Next Review Date" to any lab entry to see reminders here.</p></div>'
+  body.innerHTML= !all.length
+    ? '<div class="empty-state"><h2>No reminders set</h2><p>Add a "Next Review Date" to any lab entry or bottle to see reminders here.</p></div>'
     : section('🔴 Overdue',overdue,'overdue')+section('🟡 This week',week,'soon')+section('📅 This month',month)+section('🗓 Later',later);
 
-  body.querySelectorAll('.rem-card').forEach(el=>el.addEventListener('click',()=>openNote(el.dataset.id)));
+  body.querySelectorAll('.rem-card').forEach(el=>{
+    if(el.dataset.isBottle==='1') return; // already has onclick
+    el.addEventListener('click',()=>openNote(el.dataset.id));
+  });
 }
 
 // ════════════════════════════════════════════════════════════
@@ -4456,6 +5098,7 @@ function switchSection(name){
   if(name==='species') renderSpecies();
   if(name==='news' && document.getElementById('news-toggle').checked && !_newsData) handleNewsToggle(true);
   if(name==='calendar') renderCalendar();
+  if(name==='bottles'){ renderBottleList(); showBotEmpty(); }
 }
 function toggleNavDrawer(){
   const open=document.getElementById('nav-drawer').classList.contains('open');
@@ -4472,11 +5115,12 @@ function closeNavDrawer(){
 function navTo(sec){
   switchSection(sec);
   // For list sections: show the panel but keep drawer open
-  const listSecs=['notes','registry','recipes'];
+  const listSecs=['notes','registry','recipes','bottles'];
   if(listSecs.includes(sec)){
     document.getElementById('nd-notes').classList.toggle('on',sec==='notes');
     document.getElementById('nd-registry').classList.toggle('on',sec==='registry');
     document.getElementById('nd-recipes').classList.toggle('on',sec==='recipes');
+    document.getElementById('nd-bottles').classList.toggle('on',sec==='bottles');
     // Don't close drawer for list sections — it becomes the sidebar
   } else {
     // For non-list sections: close the drawer
@@ -4540,18 +5184,20 @@ async function login(){
       S.accs=cached.accs; S.accSha=cached.accSha;
       S.recs=cached.recs; S.recSha=cached.recSha;
       if(cached.taxCustom){ S.taxCustom=cached.taxCustom; S.taxCustomSha=cached.taxCustomSha; }
+      if(cached.bottles){ S.bottles=cached.bottles; S.bottlesSha=cached.bottlesSha; }
       toast('⚡ Loaded from cache');
     }else{
       load('Loading all data…');
-      const [{notes,sha:nSha},{accs,sha:aSha},{recs,sha:rSha}]=await Promise.all([loadNotesIndex(),loadAccessions(),loadRecipes()]);
+      const [{notes,sha:nSha},{accs,sha:aSha},{recs,sha:rSha},{bottles,sha:bSha}]=await Promise.all([loadNotesIndex(),loadAccessions(),loadRecipes(),loadBottles()]);
       S.notes=notes; S.notesSha=nSha;
       S.accs=accs; S.accSha=aSha;
       S.recs=recs; S.recSha=rSha;
+      S.bottles=bottles||[]; S.bottlesSha=bSha;
       _writeCache();
     }
     document.getElementById('login').style.display='none';
     document.getElementById('app').classList.add('on');
-    renderNoteList(); renderAccList(); renderRecList();
+    renderNoteList(); renderAccList(); renderRecList(); renderBottleList();
     populateTagsDatalist();
     updateReminderBadge();
     switchSection('notes'); showNote('empty');
@@ -4565,6 +5211,7 @@ async function login(){
       document.getElementById('trust-banner').classList.add('on');
     }
     loadTaxonomy();
+    if(window._pendingBottle){ const pid=window._pendingBottle; window._pendingBottle=null; navTo('bottles'); setTimeout(()=>openBottle(pid),50); }
     fetchWeather();
     if(window._wxInterval) clearInterval(window._wxInterval);
     window._wxInterval = setInterval(fetchWeather, 60000);
@@ -4579,7 +5226,7 @@ async function login(){
 
 function lock(){
   if(window._wxInterval){ clearInterval(window._wxInterval); window._wxInterval=null; }
-  Object.assign(S,{pw:null,tok:null,notes:[],cur:null,editing:null,notesSha:null,accs:[],curAcc:null,editingAcc:null,accSha:null,recs:[],curRec:null,editingRec:null,recSha:null});
+  Object.assign(S,{pw:null,tok:null,notes:[],cur:null,editing:null,notesSha:null,accs:[],curAcc:null,editingAcc:null,accSha:null,recs:[],curRec:null,editingRec:null,recSha:null,bottles:[],bottlesSha:null,curBot:null,editingBot:null});
   document.getElementById('ql-fab').classList.remove('on');
   document.getElementById('ai-btn').classList.remove('on');
   document.getElementById('ai-panel').classList.remove('on');
@@ -4596,8 +5243,8 @@ function lock(){
 function _writeCache(){
   try{
     sessionStorage.setItem('tcplants_cache', JSON.stringify({
-      notes:S.notes, accs:S.accs, recs:S.recs,
-      notesSha:S.notesSha, accSha:S.accSha, recSha:S.recSha,
+      notes:S.notes, accs:S.accs, recs:S.recs, bottles:S.bottles,
+      notesSha:S.notesSha, accSha:S.accSha, recSha:S.recSha, bottlesSha:S.bottlesSha,
       taxCustom:S.taxCustom, taxCustomSha:S.taxCustomSha,
       cachedAt:Date.now()
     }));
@@ -5169,6 +5816,13 @@ function scaleMedia(){
   });
   out.textContent=`— Scaled to ${target} mL (×${ratio.toFixed(4)}) —\n`+lines.join('\n');
 }
+
+// ── URL ROUTING: ?bottle=ID ───────────────────────────────────
+(function(){
+  const params=new URLSearchParams(window.location.search);
+  const bid=params.get('bottle');
+  if(bid) window._pendingBottle=bid;
+})();
 
 // Restore token from session
 const _st=sessionStorage.getItem('_lt');
