@@ -161,7 +161,7 @@ aside{display:none}
 
 /* Note list */
 #note-list,#acc-list,#rec-list{flex:1;overflow-y:auto}
-.n-item{padding:11px 14px;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .1s;position:relative}
+.n-item{padding:11px 14px;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .1s;position:relative;touch-action:manipulation;-webkit-tap-highlight-color:rgba(88,166,255,.15)}
 .n-item:hover{background:rgba(255,255,255,.04)}
 .n-item.active{background:rgba(88,166,255,.1);border-left:2px solid var(--ac);padding-left:12px}
 .n-title{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:16px}
@@ -261,6 +261,7 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 .rem-section h3{font-size:14px;font-weight:700;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--bd)}
 .rem-section h3.overdue{color:var(--rd)}
 .rem-section h3.soon{color:var(--yw)}
+.rem-card,.sr-item,.cdp-card,.tax-row{touch-action:manipulation;-webkit-tap-highlight-color:rgba(88,166,255,.12)}
 .rem-card{
   background:var(--sf);border:1px solid var(--bd);border-radius:8px;
   padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:border-color .15s;display:flex;gap:14px;align-items:center
@@ -2426,7 +2427,7 @@ function renderNoteList(){
       ${n.tags?.length?`<div class="n-tags-row">${n.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>`:''}
     </div>`;
   }).join('');
-  el.querySelectorAll('.n-item').forEach(el=>el.addEventListener('click',()=>openNote(el.dataset.id)));
+  // Tap handled by _setupTap('note-list') delegation
 }
 
 // ════════════════════════════════════════════════════════════
@@ -3029,21 +3030,7 @@ function _renderSpeciesPicker(q){
     }).join('');
   }
   body.innerHTML=html;
-  // Use pointerdown + preventDefault so tap fires immediately in scroll container
-  // (click events in overflow:auto containers have a 300ms delay on mobile
-  //  and may not fire at all if the OS decides the touch was a scroll gesture)
-  body.querySelectorAll('.sp-row').forEach(row=>{
-    row.addEventListener('pointerdown', e=>{
-      e.preventDefault();
-      e.stopPropagation();
-      _selectSpecies(row.dataset.spname);
-    });
-    // Fallback for non-pointer devices
-    row.addEventListener('click', e=>{
-      if(e.pointerType) return; // already handled by pointerdown
-      _selectSpecies(row.dataset.spname);
-    });
-  });
+  // Tap handled by _setupTap('sp-body') delegation (set up once at startup)
 }
 
 let _taxActiveInput=null;
@@ -3075,7 +3062,7 @@ function _taxSuggest(input){
       return `<span style="font-size:11px;color:var(--mu)">${esc(a.number||a.species)}</span> ${pills}`;
     }).join(' · ');
 
-    return `<div class="tax-row" data-idx="${i}" data-name="${esc(sp.full_name)}" onpointerdown="event.preventDefault();_taxDropdownSelect(this.dataset.name)">
+    return `<div class="tax-row" data-idx="${i}" data-name="${esc(sp.full_name)}">
       <div class="tax-row-name">${esc(sp.full_name)}</div>
       <div class="tax-row-common">${esc(sp.common_name)}</div>
       ${_taxConBadge(sp.conservation_status)}
@@ -3267,7 +3254,7 @@ function openCalendarDay(dateStr){
         const species=e.species?`<span class="cdp-badge">${esc(e.species)}</span>`:'';
         const type=e.type?`<span class="cdp-badge">${esc(e.type)}</span>`:'';
         const stage=e.stage?`<span class="cdp-badge">${esc(e.stage)}</span>`:'';
-        html+=`<div class="cdp-card teal" onclick="navTo('bottles');openBottle('${e.id}')">
+        html+=`<div class="cdp-card teal" data-id="${e.id}" data-is-bottle="1">
           <div class="cdp-card-title">🫙 ${esc(e.title)}</div>
           <div class="cdp-card-meta">${type}${stage}${species}</div>
         </div>`;
@@ -3277,7 +3264,7 @@ function openCalendarDay(dateStr){
       const species=e.species?`<span class="cdp-badge">${esc(e.species)}</span>`:'';
       const type=e.type?`<span class="cdp-badge">${esc(e.type)}</span>`:'';
       const stage=e.stage?`<span class="cdp-badge">${esc(e.stage)}</span>`:'';
-      html+=`<div class="cdp-card ${e.dotType}" onclick="openNote('${e.id}')">
+      html+=`<div class="cdp-card ${e.dotType}" data-id="${e.id}" data-is-bottle="0">
         <div class="cdp-card-title">${esc(e.title)}</div>
         <div class="cdp-card-meta">${reviewLabel}${type}${stage}${species}</div>
       </div>`;
@@ -4412,7 +4399,7 @@ async function deepSearch(query){
       <div class="sr-excerpt">…${excerpt}…</div>
     </div>
   `).join('');
-  document.querySelectorAll('.sr-item').forEach(el=>el.addEventListener('click',()=>openNote(el.dataset.id)));
+  // Tap handled by delegation
 }
 
 // Search input: instant metadata search on typing, Enter = deep search
@@ -4562,7 +4549,7 @@ function renderAccList(){
       ${(a.flair_ids||[]).length?`<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:3px">${(a.flair_ids||[]).map(fid=>{const f=(S.taxFlairs||[]).find(x=>x.id===fid);return f?`<span class="flair-pill ${f.color}" style="font-size:10px;padding:1px 5px">${esc(f.name)}</span>`:'';}).join('')}</div>`:''}
     </div>`;
   }).join('');
-  el.querySelectorAll('.n-item').forEach(el=>el.addEventListener('click',()=>openAccession(el.dataset.id)));
+  // Tap handled by delegation
 }
 
 function openAccession(id){
@@ -4595,7 +4582,7 @@ function openAccession(id){
         <div class="sr-title">${esc(n.title)}</div>
         <div style="font-size:12px;color:var(--mu)">${fmtDateShort(n.date)} ${n.type?'· '+esc(n.type):''}</div>
       </div>`).join('');
-    lEl.querySelectorAll('.sr-item').forEach(el=>el.addEventListener('click',()=>openNote(el.dataset.id)));
+    // Tap handled by delegation (acc-linked uses sr-item inside acc-view, handled by accLinked delegation)
   } else { lEl.innerHTML=''; }
   switchAccTab('details');
   showReg('view');
@@ -4709,7 +4696,7 @@ function renderRecList(){
     <div class="n-meta"><span>${esc(r.base||'')}</span>${r.pgr?`<span class="ntype">PGR</span>`:''}</div>
     ${r.target?`<div style="font-size:11px;color:var(--mu)">${esc(r.target)}</div>`:''}
   </div>`).join('');
-  el.querySelectorAll('.n-item').forEach(el=>el.addEventListener('click',()=>openRecipe(el.dataset.id)));
+  // Tap handled by delegation
 }
 
 // ════════════════════════════════════════════════════════════
@@ -5275,8 +5262,7 @@ function renderReminders(){
     const cls=n.days<=0?'overdue':'soon';
     const dlabel=n.days<0?`${Math.abs(n.days)}d overdue`:n.days===0?'Due today':`In ${n.days}d`;
     const icon=n.isBottle?'🫙 ':'';
-    const action=n.isBottle?`onclick="navTo('bottles');openBottle('${n.id}')"`:``;
-    return `<div class="rem-card ${cls}" data-id="${n.id}" data-is-bottle="${n.isBottle?'1':'0'}" ${action}>
+    return `<div class="rem-card ${cls}" data-id="${n.id}" data-is-bottle="${n.isBottle?'1':'0'}">`+`
       <div class="rem-info">
         <div class="rem-title">${icon}${esc(n.title)}</div>
         <div class="rem-sub">${n.species?`<em>${esc(n.species)}</em> · `:''}${n.type?esc(n.type):''}</div>
@@ -5294,10 +5280,7 @@ function renderReminders(){
     ? '<div class="empty-state"><h2>No reminders set</h2><p>Add a "Next Review Date" to any lab entry or bottle to see reminders here.</p></div>'
     : section('🔴 Overdue',overdue,'overdue')+section('🟡 This week',week,'soon')+section('📅 This month',month)+section('🗓 Later',later);
 
-  body.querySelectorAll('.rem-card').forEach(el=>{
-    if(el.dataset.isBottle==='1') return; // already has onclick
-    el.addEventListener('click',()=>openNote(el.dataset.id));
-  });
+  // Tap handled by _setupTap('reminders-body') delegation
 }
 
 // ════════════════════════════════════════════════════════════
@@ -5327,7 +5310,7 @@ function renderContamDashboard(){
         <div style="font-size:12px;color:var(--mu);text-align:right;flex-shrink:0">${fmtDateShort(n.date)}</div>
       </div>
     </div>`).join('');
-  document.getElementById('contam-list').querySelectorAll('.sr-item').forEach(el=>el.addEventListener('click',()=>openNote(el.dataset.id)));
+  // Tap handled by delegation
 }
 
 // ════════════════════════════════════════════════════════════
@@ -5550,6 +5533,53 @@ async function login(){
   document.getElementById('lbtn').disabled=false;
   document.getElementById('lbtn').textContent='Unlock Lab →';
   unload();
+}
+
+// ════════════════════════════════════════════════════════════
+// UNIVERSAL TAP HANDLER
+// Fixes click/touch on all dynamically-rendered list items.
+// Uses event delegation on containers (set up once at startup)
+// with touchend-based detection to avoid 300ms click delay and
+// scroll-gesture conflicts in overflow:auto containers.
+// ════════════════════════════════════════════════════════════
+function _setupTap(containerId, selector, handler){
+  const container=document.getElementById(containerId); if(!container) return;
+  let _moved=false;
+  container.addEventListener('touchstart',()=>{ _moved=false; },{passive:true});
+  container.addEventListener('touchmove', ()=>{ _moved=true;  },{passive:true});
+  container.addEventListener('touchend', e=>{
+    if(_moved) return;
+    const item=e.target.closest(selector); if(!item) return;
+    e.preventDefault();
+    handler(item);
+  });
+  container.addEventListener('click', e=>{
+    // Skip if this is a touch device tap (touchend already handled it)
+    if(e.detail===0 && e.pointerType==='') return; // synthetic click — skip
+    const item=e.target.closest(selector); if(!item) return;
+    handler(item);
+  });
+}
+
+function _initTapHandlers(){
+  // Note list
+  _setupTap('note-list',   '.n-item',        el=>openNote(el.dataset.id));
+  // Accession list
+  _setupTap('acc-list',    '.n-item',        el=>openAccession(el.dataset.id));
+  // Recipe list
+  _setupTap('rec-list',    '.n-item',        el=>openRecipe(el.dataset.id));
+  // Bottle list
+  _setupTap('bot-list',    '.bot-list-item', el=>openBottle(el.dataset.id));
+  // Reminders
+  _setupTap('reminders-body', '.rem-card',   el=>{ if(el.dataset.isBottle==='1') openBottle(el.dataset.id); else openNote(el.dataset.id); });
+  // Contamination list
+  _setupTap('contam-list', '.sr-item',       el=>openNote(el.dataset.id));
+  // Calendar day panel
+  _setupTap('cdp-list',    '.cdp-card',      el=>{ if(el.dataset.isBottle==='1') openBottle(el.dataset.id); else openNote(el.dataset.id); });
+  // Autocomplete dropdown (tax-dropdown)
+  _setupTap('tax-dropdown','.tax-row',       el=>_taxDropdownSelect(el.dataset.name));
+  // Species picker modal body
+  _setupTap('sp-body',     '.sp-row',        el=>_selectSpecies(el.dataset.spname));
 }
 
 function lock(){
@@ -6151,6 +6181,11 @@ function scaleMedia(){
   const bid=params.get('bottle');
   if(bid) window._pendingBottle=bid;
 })();
+
+// Set up universal tap handlers (event delegation on all list containers)
+_initTapHandlers();
+_setupTap('av-linked',  '.sr-item', el=>openNote(el.dataset.id));
+_setupTap('search-results-list', '.sr-item', el=>openNote(el.dataset.id));
 
 // Restore token from session
 const _st=sessionStorage.getItem('_lt');
