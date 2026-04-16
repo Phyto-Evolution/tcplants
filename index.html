@@ -190,6 +190,8 @@ aside{display:none}
 
 /* ── MAIN CONTENT ── */
 main{flex:1;overflow-y:auto;padding:28px 36px}
+main > .dview, main > .editor{ margin:0 auto; }
+#notes-empty{ margin:0 auto; }
 
 /* Empty state */
 .empty-state{text-align:center;padding:70px 20px;color:var(--mu)}
@@ -325,6 +327,107 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 ::-webkit-scrollbar{width:5px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
+
+/* ── SPECIES DETAIL PANEL ── */
+#sp-detail-panel{
+  position:fixed;top:48px;right:0;bottom:0;width:360px;z-index:190;
+  background:var(--sf);border-left:1px solid var(--bd);
+  display:flex;flex-direction:column;
+  transform:translateX(100%);transition:transform .25s ease;
+  box-shadow:-4px 0 24px rgba(0,0,0,.3)
+}
+#sp-detail-panel.open{transform:translateX(0)}
+.spd-head{padding:12px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px;flex-shrink:0;min-height:52px}
+.spd-name{font-size:14px;font-weight:700;flex:1;font-style:italic;overflow:hidden;text-overflow:ellipsis}
+.spd-body{flex:1;overflow-y:auto;padding:14px}
+.spd-section{margin-bottom:20px}
+.spd-section-title{font-size:10px;font-weight:700;color:var(--mu);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--sf2)}
+.spd-stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px}
+.spd-stat{background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:10px 8px;text-align:center}
+.spd-stat .sv{font-size:20px;font-weight:700;color:var(--ac)}
+.spd-stat.rd .sv{color:var(--rd)}
+.spd-stat.gn .sv{color:var(--gn)}
+.spd-stat .sl{font-size:10px;color:var(--mu);margin-top:2px}
+.spd-entry{border:1px solid var(--bd);border-radius:6px;padding:8px 11px;margin-bottom:6px;cursor:pointer;transition:border-color .12s}
+.spd-entry:hover{border-color:var(--ac);background:var(--sf2)}
+.spd-entry-title{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.spd-entry-meta{font-size:11px;color:var(--mu);margin-top:2px;display:flex;gap:6px;flex-wrap:wrap}
+.spd-empty{font-size:13px;color:var(--mu);font-style:italic;padding:6px 0}
+.spd-stage-bar{display:flex;flex-direction:column;gap:5px;margin-top:4px}
+.spd-stage-row{display:flex;align-items:center;gap:8px;font-size:12px}
+.spd-stage-label{width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0;color:var(--mu)}
+.spd-stage-track{flex:1;background:var(--sf2);border-radius:3px;height:8px;overflow:hidden}
+.spd-stage-fill{height:100%;background:var(--ac);border-radius:3px}
+.spd-stage-count{width:20px;text-align:right;color:var(--mu);font-size:11px}
+.sp-table tr{cursor:pointer;transition:background .12s}
+.sp-table tr:hover td{background:rgba(88,166,255,.07)!important;cursor:pointer}
+.sp-table .sp-row-active{border-left:2px solid var(--ac)}
+
+/* ── SETTINGS PANEL ── */
+#settings-panel{
+  position:fixed;top:0;right:0;bottom:0;width:320px;z-index:501;
+  background:var(--sf);border-left:1px solid var(--bd);
+  display:flex;flex-direction:column;
+  transform:translateX(100%);transition:transform .25s ease;
+  box-shadow:-4px 0 24px rgba(0,0,0,.3)
+}
+#settings-panel.open{transform:translateX(0)}
+#settings-backdrop{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.35);
+  display:none;opacity:0;transition:opacity .25s;pointer-events:none}
+#settings-backdrop.on{display:block;opacity:1;pointer-events:auto}
+.set-head{padding:12px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px;flex-shrink:0;height:48px}
+.set-head h3{flex:1;font-size:15px;font-weight:700}
+.set-body{flex:1;overflow-y:auto;padding:0}
+.set-section{padding:14px 16px;border-bottom:1px solid var(--bd)}
+.set-section-title{font-size:10px;font-weight:700;color:var(--mu);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+.set-row{display:flex;align-items:center;gap:10px;padding:6px 0}
+.set-row-info{flex:1}
+.set-row-label{font-size:13px;font-weight:500}
+.set-row-sub{font-size:11px;color:var(--mu);margin-top:1px}
+.set-row input[type="text"],.set-row input[type="password"]{width:100%;margin-top:6px;font-size:13px}
+.set-row-full{flex-direction:column;align-items:flex-start}
+.set-divider{height:1px;background:var(--sf2);margin:2px 0}
+.set-about{padding:14px 16px;text-align:center;color:var(--mu);font-size:12px}
+
+/* ── ACTLOG BACKDROP ── */
+#actlog-backdrop{position:fixed;inset:0;z-index:189;display:none}
+#actlog-backdrop.on{display:block}
+
+/* ── HOME BUTTON ── */
+.nav-home-btn{background:transparent;border:none;color:var(--mu);cursor:pointer;
+  font-size:16px;padding:4px 7px;border-radius:6px;line-height:1;transition:all .12s}
+.nav-home-btn:hover{background:var(--sf2);color:var(--tx)}
+
+/* ── DASHBOARD IMPROVEMENTS ── */
+.dash-quick-actions{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:20px}
+.dqa-btn{background:var(--sf);border:1px solid var(--bd);border-radius:8px;cursor:pointer;
+  font-family:var(--font);font-size:13px;font-weight:500;padding:8px 14px;
+  transition:all .15s;display:flex;align-items:center;gap:5px;color:var(--tx)}
+.dqa-btn:hover{border-color:var(--ac);background:rgba(88,166,255,.06)}
+.dqa-btn.primary{background:var(--ac);color:#0d1117;border-color:var(--ac)}
+.dqa-btn.primary:hover{opacity:.88}
+.dash-activity-bar{display:flex;align-items:flex-end;gap:3px;height:36px;margin:4px 0 8px}
+.dab-col{flex:1;background:var(--ac);border-radius:2px 2px 0 0;opacity:.7;min-height:3px;cursor:default;position:relative;transition:opacity .15s}
+.dab-col:hover{opacity:1}
+.dab-col[title]:hover::after{content:attr(title);position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);background:var(--sf3);border:1px solid var(--bd);border-radius:4px;padding:2px 7px;font-size:10px;white-space:nowrap;pointer-events:none;z-index:10}
+.dash-section-label{font-size:10px;font-weight:700;color:var(--mu);letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.dash-section-label span{flex:1}
+
+/* ── QR SCAN OVERLAY ── */
+#qr-nav-result{
+  position:fixed;bottom:80px;right:14px;z-index:460;
+  background:var(--sf);border:1px solid var(--gn);border-radius:10px;
+  padding:14px 16px;width:280px;display:none;box-shadow:0 8px 24px rgba(0,0,0,.25)
+}
+#qr-nav-result.on{display:block}
+.cam-contrast-bar{display:flex;align-items:center;gap:8px;margin-top:10px}
+.cam-contrast-bar label{font-size:12px;color:rgba(255,255,255,.7);flex-shrink:0}
+.cam-contrast-bar input{flex:1;accent-color:var(--ac)}
+
+@media(max-width:700px){
+  #sp-detail-panel{top:0;width:100%;z-index:201}
+  #settings-panel{width:100%;z-index:502}
+}
 
 /* ── MOBILE ── */
 #sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:40}
@@ -893,13 +996,16 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
 <div id="app">
   <nav>
     <button id="nav-hamburger" title="Menu" onclick="toggleNavDrawer()">☰</button>
+    <button class="nav-home-btn" title="Home" onclick="goHome()">🏠</button>
     <div class="brand">🌿 TC Plants <span>/ Lab</span></div>
     <span class="nav-spacer"></span>
     <button id="weather-chip" title="Lab &amp; Greenhouse weather">🌡️ —</button>
     <span id="offline-pill">● Offline</span>
+    <button class="nav-icon-btn" title="Scan QR / Barcode" onclick="openQRScan()" style="font-size:15px">📷</button>
     <button class="nav-icon-btn" id="export-all-btn" title="Export ZIP">⬇</button>
     <button class="nav-icon-btn" id="export-csv-btn" title="Export CSV">CSV</button>
     <button class="nav-icon-btn" id="lock-btn" title="Lock" style="display:flex;align-items:center;gap:4px;font-size:13px;color:var(--mu);padding:4px 9px;border:1px solid var(--bd);border-radius:6px">🔒 <span class="lock-label">Lock</span></button>
+    <button class="nav-icon-btn" title="Settings" onclick="openSettings()" style="font-size:16px">⚙️</button>
     <button id="theme-btn" title="Toggle theme">☀️</button>
   </nav>
 
@@ -914,23 +1020,24 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
             <div style="font-size:13px;color:var(--mu)" id="dash-last-sync">Encrypted · GitHub-backed</div>
           </div>
         </div>
+        <!-- Quick Actions -->
+        <div class="dash-quick-actions" style="margin-bottom:16px">
+          <button class="dqa-btn primary" onclick="startNewNote()">＋ New Entry</button>
+          <button class="dqa-btn" onclick="navTo('bottles');startNewBottle('single')">🫙 New Bottle</button>
+          <button class="dqa-btn" onclick="openQRScan()">📷 Scan QR</button>
+          <button class="dqa-btn" onclick="navTo('calendar')">📅 Calendar</button>
+          <button class="dqa-btn" onclick="navTo('analytics')">📊 Analytics</button>
+        </div>
         <!-- Quick Stats -->
         <div id="dash-stats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px"></div>
-        <!-- Recent activity & reminders split -->
+        <!-- Dynamic panels rendered by _renderDashboard() -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" id="dash-panels">
           <div>
-            <div style="font-size:11px;font-weight:700;color:var(--mu);letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px">Recent Entries</div>
             <div id="dash-recent"></div>
           </div>
           <div>
-            <div style="font-size:11px;font-weight:700;color:var(--mu);letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px">Upcoming Reviews</div>
             <div id="dash-upcoming"></div>
           </div>
-        </div>
-        <div style="margin-top:18px;display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn" onclick="startNewNote()">＋ New Entry</button>
-          <button class="btn ghost" onclick="navTo('bottles');startNewBottle('single')">🫙 New Bottle</button>
-          <button class="btn ghost" onclick="navTo('analytics')">📊 Analytics</button>
         </div>
       </div>
       <div class="dview" id="note-view">
@@ -1988,9 +2095,15 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
     <video id="cam-video" autoplay playsinline style="width:100%;border-radius:10px;background:#000;max-height:60vh;object-fit:cover"></video>
     <canvas id="cam-canvas" style="display:none"></canvas>
     <div id="cam-barcode-result" style="display:none;background:rgba(63,185,80,.2);border:1px solid var(--gn);border-radius:6px;padding:10px;margin-top:8px;color:#fff;font-size:14px;word-break:break-all"></div>
-    <div style="display:flex;gap:8px;margin-top:12px;justify-content:center">
+    <div style="display:flex;gap:8px;margin-top:12px;justify-content:center;flex-wrap:wrap">
       <button class="btn" id="cam-capture-btn" onclick="capturePhoto()">📸 Capture Photo</button>
-      <button class="btn ghost" id="cam-scan-btn" onclick="toggleBarcodeMode()" style="color:#fff;border-color:rgba(255,255,255,.3)">🔍 Scan Barcode</button>
+      <button class="btn ghost" id="cam-scan-btn" onclick="toggleBarcodeMode()" style="color:#fff;border-color:rgba(255,255,255,.3)">🔍 Scan QR / Barcode</button>
+    </div>
+    <div class="cam-contrast-bar" id="cam-enhance-row" style="display:none">
+      <label>Contrast</label>
+      <input type="range" min="80" max="250" value="130" id="cam-contrast-slider" oninput="_updateCamFilter()">
+      <label>Bright</label>
+      <input type="range" min="80" max="200" value="110" id="cam-bright-slider" oninput="_updateCamFilter()">
     </div>
   </div>
 </div>
@@ -2078,6 +2191,122 @@ main{flex:1;overflow-y:auto;padding:28px 36px}
   <div class="wx-updated" id="wx-updated"></div>
 </div>
 <!-- Activity log -->
+<!-- ═══════════ SPECIES DETAIL PANEL ═══════════ -->
+<div id="sp-detail-panel">
+  <div class="spd-head">
+    <div class="spd-name" id="spd-name">—</div>
+    <a id="spd-taxonomy-link" href="#" target="_blank" rel="noopener" class="btn xs ghost" style="flex-shrink:0">🌿 Taxonomy ↗</a>
+    <button class="al-hbtn" onclick="closeSpDetail()" title="Close">✕</button>
+  </div>
+  <div class="spd-body" id="spd-body">
+    <p style="color:var(--mu);font-size:13px">Loading…</p>
+  </div>
+</div>
+
+<!-- ═══════════ SETTINGS PANEL ═══════════ -->
+<div id="settings-backdrop" onclick="closeSettings()"></div>
+<div id="settings-panel">
+  <div class="set-head">
+    <h3>⚙️ Settings</h3>
+    <button class="al-hbtn" onclick="closeSettings()">✕</button>
+  </div>
+  <div class="set-body">
+    <div class="set-section">
+      <div class="set-section-title">Appearance</div>
+      <div class="set-row">
+        <div class="set-row-info">
+          <div class="set-row-label">Theme</div>
+          <div class="set-row-sub">Dark or light mode</div>
+        </div>
+        <button class="btn xs ghost" id="set-theme-btn" onclick="_setToggleTheme()">☀️ Light</button>
+      </div>
+    </div>
+    <div class="set-section">
+      <div class="set-section-title">Lab Identity</div>
+      <div class="set-row set-row-full">
+        <div class="set-row-label">Lab Name</div>
+        <div class="set-row-sub">Shown on dashboard header</div>
+        <input type="text" id="set-lab-name" placeholder="e.g. PhytoLabs TC Room 1" style="margin-top:6px">
+        <button class="btn xs ghost" onclick="_setLabName()" style="margin-top:6px;width:100%">Save Lab Name</button>
+      </div>
+      <div class="set-row set-row-full" style="margin-top:10px">
+        <div class="set-row-label">Weather Location</div>
+        <div class="set-row-sub">City for lab environment monitoring</div>
+        <input type="text" id="set-weather-city" placeholder="e.g. Bengaluru" style="margin-top:6px">
+        <button class="btn xs ghost" onclick="_setWeatherCity()" style="margin-top:6px;width:100%">Save City</button>
+      </div>
+    </div>
+    <div class="set-section">
+      <div class="set-section-title">AI Assistant</div>
+      <div class="set-row set-row-full">
+        <div class="set-row-label">Gemini API Key</div>
+        <div class="set-row-sub">For AI note summaries and advice</div>
+        <input type="password" id="set-gemini-key" placeholder="Paste Gemini API key…" style="margin-top:6px">
+        <div style="display:flex;gap:6px;margin-top:6px">
+          <button class="btn xs ghost" onclick="_setGeminiKey()" style="flex:1">Save Key</button>
+          <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
+        </div>
+      </div>
+    </div>
+    <div class="set-section">
+      <div class="set-section-title">Camera &amp; QR</div>
+      <div class="set-row">
+        <div class="set-row-info">
+          <div class="set-row-label">Scan Enhancement</div>
+          <div class="set-row-sub">Boost contrast for low-light QR scans</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="set-qr-enhance" onchange="_setScanEnhance(this.checked)">
+          <div class="toggle-track"></div>
+        </label>
+      </div>
+      <div class="set-row">
+        <div class="set-row-info">
+          <div class="set-row-label">Try Harder Mode</div>
+          <div class="set-row-sub">Slower but more thorough QR detection</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="set-qr-harder" onchange="_setScanHarder(this.checked)">
+          <div class="toggle-track"></div>
+        </label>
+      </div>
+    </div>
+    <div class="set-section">
+      <div class="set-section-title">Data &amp; Privacy</div>
+      <div class="set-row">
+        <div class="set-row-info">
+          <div class="set-row-label">Clear Local Cache</div>
+          <div class="set-row-sub">Force reload from GitHub on next login</div>
+        </div>
+        <button class="btn xs ghost" onclick="_clearCache()">Clear</button>
+      </div>
+      <div class="set-row">
+        <div class="set-row-info">
+          <div class="set-row-label">Forget Trusted Device</div>
+          <div class="set-row-sub">Remove saved encrypted token</div>
+        </div>
+        <button class="btn xs danger" onclick="forgetDevice()">Forget</button>
+      </div>
+      <div class="set-row">
+        <div class="set-row-info">
+          <div class="set-row-label">Reset Usage Stats</div>
+          <div class="set-row-sub">Clear feature usage metrics</div>
+        </div>
+        <button class="btn xs ghost" onclick="_resetUsageStats()">Reset</button>
+      </div>
+    </div>
+    <div class="set-about">
+      <div style="font-size:22px;margin-bottom:6px">🌿</div>
+      <div style="font-weight:700;margin-bottom:2px">TC Plants Lab Notes</div>
+      <div style="color:var(--mu)">v2.0 · AES-256-GCM encrypted · GitHub-backed</div>
+      <div style="margin-top:8px;color:var(--mu)">Built for plant tissue culture labs.<br>Data never leaves your browser unencrypted.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ ACTLOG BACKDROP ═══════════ -->
+<div id="actlog-backdrop" onclick="closeActLog()"></div>
+
 <div id="actlog-tab" title="Activity log" onclick="openActLog()">⚡ Activity</div>
 <div id="actlog-panel">
   <div id="actlog-header">
@@ -2303,6 +2532,11 @@ function showNote(name){
 }
 
 function _renderDashboard(){
+  const labName=localStorage.getItem('tcplants_lab_name')||'';
+  // Update header
+  const syncEl=document.getElementById('dash-last-sync');
+  if(syncEl) syncEl.textContent=labName||'Encrypted · GitHub-backed';
+
   // Stats row
   const activeBot=(S.bottles||[]).filter(b=>['inoculated','growing'].includes(b.status)).length;
   const overdueCount=[...S.notes.filter(n=>n.next_review&&daysFrom(n.next_review)<=0),
@@ -2311,44 +2545,104 @@ function _renderDashboard(){
     ...(S.bottles||[]).filter(b=>b.next_review&&['inoculated','growing'].includes(b.status)&&daysFrom(b.next_review)>0&&daysFrom(b.next_review)<=7)].length;
   const stats=[
     {icon:'📋',val:S.notes.length,label:'Notes',color:'var(--ac)',action:"navTo('notes');"},
-    {icon:'🫙',val:(S.bottles||[]).length,label:`Bottles · ${activeBot} active`,color:'#1abc9c',action:"navTo('bottles');"},
+    {icon:'🫙',val:(S.bottles||[]).length,label:`${activeBot} active`,color:'#1abc9c',action:"navTo('bottles');"},
     {icon:'🌿',val:S.accs.length,label:'Accessions',color:'var(--gn)',action:"navTo('registry');"},
-    {icon:'⏰',val:overdueCount+thisWeek,label:`Reviews · ${overdueCount} overdue`,color:overdueCount?'var(--rd)':'var(--yw)',action:"navTo('reminders');"},
+    {icon:'⏰',val:overdueCount+thisWeek,label:`${overdueCount} overdue`,color:overdueCount?'var(--rd)':'var(--yw)',action:"navTo('reminders');"},
   ];
   const el=document.getElementById('dash-stats'); if(!el) return;
-  el.innerHTML=stats.map(s=>`<div onclick="${s.action}" style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:14px 16px;cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='${s.color}'" onmouseout="this.style.borderColor='var(--bd)'">
-    <div style="font-size:22px;margin-bottom:4px">${s.icon}</div>
-    <div style="font-size:22px;font-weight:700;color:${s.color}">${s.val}</div>
-    <div style="font-size:12px;color:var(--mu);margin-top:2px">${s.label}</div>
+  el.innerHTML=stats.map(s=>`<div onclick="${s.action}" style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:12px 14px;cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='${s.color}'" onmouseout="this.style.borderColor='var(--bd)'">
+    <div style="font-size:20px;margin-bottom:4px">${s.icon}</div>
+    <div style="font-size:24px;font-weight:700;color:${s.color}">${s.val}</div>
+    <div style="font-size:11px;color:var(--mu);margin-top:2px">${s.label}</div>
   </div>`).join('');
 
-  // Recent entries
-  const recent=[...S.notes].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5);
-  const rEl=document.getElementById('dash-recent'); if(rEl){
-    rEl.innerHTML=recent.length?recent.map(n=>`<div onclick="openNote('${n.id}')" style="padding:7px 10px;border-radius:6px;cursor:pointer;background:var(--sf);border:1px solid var(--bd);margin-bottom:6px;transition:border-color .15s" onmouseover="this.style.borderColor='var(--ac)'" onmouseout="this.style.borderColor='var(--bd)'">
+  // 7-day activity bar
+  const now=new Date(); const days7=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date(now); d.setDate(d.getDate()-i);
+    const ds=d.toISOString().slice(0,10);
+    const cnt=S.notes.filter(n=>n.date&&n.date.slice(0,10)===ds).length;
+    days7.push({ds,cnt,label:d.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'})});
+  }
+  const maxCnt=Math.max(...days7.map(d=>d.cnt),1);
+  const totalLast7=days7.reduce((s,d)=>s+d.cnt,0);
+
+  // Quick actions
+  const pEl=document.getElementById('dash-panels');
+  if(pEl){
+    pEl.innerHTML=`
+    <div style="grid-column:1/-1;margin-bottom:4px">
+      <div class="dash-section-label"><span>7-day Activity</span><span style="color:var(--ac);font-weight:700">${totalLast7} entries</span></div>
+      <div class="dash-activity-bar">
+        ${days7.map(d=>`<div class="dab-col" title="${esc(d.label)}: ${d.cnt} entries" style="height:${Math.max(8,Math.round(d.cnt/maxCnt*100))}%;${d.cnt===0?'opacity:.2':'opacity:.75'}"></div>`).join('')}
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--mu)"><span>${days7[0].ds.slice(5)}</span><span>Today</span></div>
+    </div>
+    <div>
+      <div class="dash-section-label"><span>Recent Entries</span></div>
+      <div id="dash-recent"></div>
+    </div>
+    <div>
+      <div class="dash-section-label"><span>Reviews Due</span>${overdueCount?`<span style="color:var(--rd)">${overdueCount} overdue</span>`:''}</div>
+      <div id="dash-upcoming"></div>
+    </div>`;
+
+    // Recent entries
+    const recent=[...S.notes].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5);
+    const rEl=document.getElementById('dash-recent');
+    if(rEl) rEl.innerHTML=recent.length?recent.map(n=>`<div onclick="openNote('${n.id}')" style="padding:7px 10px;border-radius:6px;cursor:pointer;background:var(--sf);border:1px solid var(--bd);margin-bottom:6px;transition:border-color .15s" onmouseover="this.style.borderColor='var(--ac)'" onmouseout="this.style.borderColor='var(--bd)'">
       <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(n.title)}</div>
       <div style="font-size:11px;color:var(--mu);margin-top:2px">${fmtDateShort(n.date)}${n.species?` · <em>${esc(n.species)}</em>`:''}</div>
     </div>`).join(''):'<div style="font-size:13px;color:var(--mu)">No notes yet.</div>';
-  }
 
-  // Upcoming reviews (all sources, next 14 days)
-  const upcoming=[
-    ...S.notes.filter(n=>n.next_review&&daysFrom(n.next_review)<=14).map(n=>({title:n.title,days:daysFrom(n.next_review),icon:'📋',id:n.id,isBot:false})),
-    ...(S.bottles||[]).filter(b=>b.next_review&&['inoculated','growing'].includes(b.status)&&daysFrom(b.next_review)<=14).map(b=>({title:b.code,days:daysFrom(b.next_review),icon:'🫙',id:b.id,isBot:true})),
-  ].sort((a,b)=>a.days-b.days).slice(0,5);
-  const uEl=document.getElementById('dash-upcoming'); if(uEl){
-    uEl.innerHTML=upcoming.length?upcoming.map(r=>{
+    // Upcoming reviews (all sources, next 14 days)
+    const upcoming=[
+      ...S.notes.filter(n=>n.next_review&&daysFrom(n.next_review)<=14).map(n=>({title:n.title,days:daysFrom(n.next_review),icon:'📋',id:n.id,isBot:false})),
+      ...(S.bottles||[]).filter(b=>b.next_review&&['inoculated','growing'].includes(b.status)&&daysFrom(b.next_review)<=14).map(b=>({title:b.code,days:daysFrom(b.next_review),icon:'🫙',id:b.id,isBot:true})),
+    ].sort((a,b)=>a.days-b.days).slice(0,5);
+    const uEl=document.getElementById('dash-upcoming');
+    if(uEl) uEl.innerHTML=upcoming.length?upcoming.map(r=>{
       const cls=r.days<=0?'var(--rd)':r.days<=3?'var(--yw)':'var(--mu)';
       const dlabel=r.days<0?`${Math.abs(r.days)}d overdue`:r.days===0?'Today':`In ${r.days}d`;
       const action=r.isBot?`navTo('bottles');openBottle('${r.id}')`:`openNote('${r.id}')`;
       return `<div onclick="${action}" style="padding:7px 10px;border-radius:6px;cursor:pointer;background:var(--sf);border:1px solid var(--bd);margin-bottom:6px;display:flex;align-items:center;gap:8px;transition:border-color .15s" onmouseover="this.style.borderColor='${cls}'" onmouseout="this.style.borderColor='var(--bd)'">
-        <span style="font-size:16px">${r.icon}</span>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.title)}</div>
-        </div>
+        <span style="font-size:15px">${r.icon}</span>
+        <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.title)}</div></div>
         <div style="font-size:11px;font-weight:700;color:${cls};flex-shrink:0">${dlabel}</div>
       </div>`;
     }).join(''):'<div style="font-size:13px;color:var(--mu)">All clear! 🎉</div>';
+
+    // Active bottles section
+    const bots=(S.bottles||[]).filter(b=>['inoculated','growing'].includes(b.status));
+    if(bots.length){
+      const stageCounts={};
+      bots.forEach(b=>{const s=b.status||'unknown';stageCounts[s]=(stageCounts[s]||0)+1;});
+      const overdueBots=bots.filter(b=>b.next_review&&daysFrom(b.next_review)<=0);
+      pEl.innerHTML+=`<div style="grid-column:1/-1;margin-top:12px;padding-top:14px;border-top:1px solid var(--bd)">
+        <div class="dash-section-label"><span>🫙 Active Bottles — ${bots.length} vessels</span>
+          ${overdueBots.length?`<span style="color:var(--rd)">${overdueBots.length} overdue</span>`:''}
+          <a onclick="navTo('bottles')" style="color:var(--ac);font-size:11px;cursor:pointer;font-weight:600">View all →</a>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+          ${Object.entries(stageCounts).map(([s,c])=>`<div style="background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:6px 12px;font-size:12px">
+            <span class="bot-status-dot ${s}" style="display:inline-block;margin-right:6px;vertical-align:middle"></span><strong>${c}</strong> ${s}
+          </div>`).join('')}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          ${bots.sort((a,b)=>{ const da=a.next_review?daysFrom(a.next_review):999,db=b.next_review?daysFrom(b.next_review):999; return da-db; }).slice(0,4).map(b=>{
+            const d=b.next_review?daysFrom(b.next_review):null;
+            const col=d!==null&&d<=0?'var(--rd)':d!==null&&d<=3?'var(--yw)':'transparent';
+            return`<div onclick="navTo('bottles');openBottle('${b.id}')" style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--sf);border:1px solid var(--bd);border-radius:6px;cursor:pointer;border-left:3px solid ${col};transition:border-color .12s" onmouseover="this.style.background='var(--sf2)'" onmouseout="this.style.background='var(--sf)'">
+              <span class="bot-status-dot ${b.status}"></span>
+              <span style="font-family:var(--mono);font-size:12px;font-weight:700;flex-shrink:0">${esc(b.code)}</span>
+              <span style="font-size:12px;color:var(--mu);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(b.species||'')}</span>
+              ${d!==null?`<span style="font-size:11px;font-weight:600;color:${col};flex-shrink:0">${d<=0?Math.abs(d)+'d overdue':d===0?'Today':'In '+d+'d'}</span>`:''}
+            </div>`;
+          }).join('')}
+          ${bots.length>4?`<div onclick="navTo('bottles')" style="text-align:center;font-size:12px;color:var(--ac);cursor:pointer;padding:4px">+${bots.length-4} more bottles →</div>`:''}
+        </div>
+      </div>`;
+    }
   }
 }
 function showReg(name){
@@ -2692,7 +2986,12 @@ function closeCamera(){
   if(_camStream){ _camStream.getTracks().forEach(t=>t.stop()); _camStream=null; }
   if(_barcodeReader){ try{_barcodeReader.reset();}catch(e){} _barcodeReader=null; }
   document.getElementById('cam-modal').style.display='none';
+  document.getElementById('cam-video').style.filter='';
+  document.getElementById('cam-enhance-row').style.display='none';
   _barcodeMode=false;
+  // Restore capture button for note editor
+  document.getElementById('cam-capture-btn').style.display='';
+  _camNavMode=false;
 }
 async function capturePhoto(){
   const video=document.getElementById('cam-video');
@@ -2714,27 +3013,47 @@ async function toggleBarcodeMode(){
   _barcodeMode=!_barcodeMode;
   const btn=document.getElementById('cam-scan-btn');
   const result=document.getElementById('cam-barcode-result');
+  const enhRow=document.getElementById('cam-enhance-row');
+  const enhance=localStorage.getItem('tcplants_qr_enhance')==='1';
+  const harder=localStorage.getItem('tcplants_qr_harder')==='1';
   if(_barcodeMode){
     document.getElementById('cam-mode-label').textContent='🔍 Scanning…';
     btn.textContent='❌ Stop scan';
     result.style.display='none';
-    // Use QR-specific reader for best mobile performance
-    _barcodeReader=ZXing.BrowserQRCodeReader
-      ? new ZXing.BrowserQRCodeReader()
-      : new ZXing.BrowserMultiFormatReader();
+    if(enhance){ enhRow.style.display='flex'; _updateCamFilter(); }
+    // Build hints for ZXing
+    let hints;
+    if(harder && ZXing.DecodeHintType){
+      hints=new Map();
+      hints.set(ZXing.DecodeHintType.TRY_HARDER,true);
+    }
+    // Use MultiFormat for broadest decode support
+    _barcodeReader=ZXing.BrowserMultiFormatReader
+      ? new ZXing.BrowserMultiFormatReader(hints)
+      : (ZXing.BrowserQRCodeReader ? new ZXing.BrowserQRCodeReader() : null);
+    if(!_barcodeReader){ toast('Barcode library unavailable','fail'); return; }
     try{
+      let _lastScan='';
       await _barcodeReader.decodeFromVideoDevice(null,'cam-video',(res,err)=>{
         if(res){
           const text=res.getText();
-          result.style.display='block';
-          result.innerHTML=`<strong>Barcode detected:</strong><br>${esc(text)}<br><br><button class="btn xs" onclick="insertBarcodeResult('${esc(text).replace(/'/g,"\\'")}')">Insert into note</button> <button class="btn xs ghost" onclick="navigator.clipboard.writeText('${esc(text).replace(/'/g,"\\'")}').then(()=>toast('Copied'))">Copy</button>`;
+          if(text===_lastScan) return; // debounce duplicates
+          _lastScan=text;
           playBeep(1);
+          if(_camNavMode){
+            _handleNavQRResult(text);
+          } else {
+            result.style.display='block';
+            result.innerHTML=`<strong>✓ Scanned:</strong><br>${esc(text)}<br><br><button class="btn xs" onclick="insertBarcodeResult('${esc(text).replace(/'/g,"\\'")}')">Insert into note</button> <button class="btn xs ghost" onclick="navigator.clipboard.writeText('${esc(text).replace(/'/g,"\\'")}').then(()=>toast('Copied ✓'))">Copy</button>`;
+          }
         }
       });
     }catch(e){ toast('Scan error: '+e.message,'fail'); }
   }else{
     document.getElementById('cam-mode-label').textContent='📷 Camera';
-    btn.textContent='🔍 Scan Barcode';
+    btn.textContent='🔍 Scan QR / Barcode';
+    enhRow.style.display='none';
+    document.getElementById('cam-video').style.filter='';
     if(_barcodeReader){ try{_barcodeReader.reset();}catch(e){} _barcodeReader=null; }
   }
 }
@@ -3581,16 +3900,20 @@ function renderAnalytics(){
 
     // Assemble with bottle chart
     const intervalSection=intervalCards?`<div class="an-grid">${intervalCards}</div>`:'';
+    const usageCard=_buildUsageCard();
     document.getElementById('analytics-content').innerHTML=`
       <div class="an-grid">${notesChart}${stageDist}${contamChart}${recipeCard}</div>
       <div class="an-grid">${speciesCard}${tagCard}</div>
       ${intervalSection}
       <div class="an-grid">${funnelCard}</div>
       <div class="an-grid">${botChart}${bottleCard}</div>
-      <div class="an-grid">${effCard}</div>
+      <div class="an-grid">${effCard}${usageCard}</div>
     `;
     return;
   }
+
+  // ── Usage metrics card
+  const usageCard=_buildUsageCard();
 
   // ── Assemble (no bottles)
   const intervalSection=intervalCards?`<div class="an-grid">${intervalCards}</div>`:'';
@@ -3599,8 +3922,24 @@ function renderAnalytics(){
     <div class="an-grid">${speciesCard}${tagCard}</div>
     ${intervalSection}
     <div class="an-grid">${funnelCard}</div>
-    <div class="an-grid">${effCard}</div>
+    <div class="an-grid">${effCard}${usageCard}</div>
   `;
+}
+
+function _buildUsageCard(){
+  try{
+    const raw=JSON.parse(localStorage.getItem('tcplants_usage')||'{}');
+    const sections=Object.entries(raw).filter(([k])=>k.startsWith('section:')).map(([k,v])=>({name:k.replace('section:',''),count:v})).sort((a,b)=>b.count-a.count);
+    if(!sections.length) return `<div class="an-card"><div class="an-title">Feature Usage</div><div class="an-empty">No usage data yet. Navigate around to track.</div></div>`;
+    const maxCount=sections[0].count;
+    const lastUsed=raw._last?new Date(raw._last).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'—';
+    const bars=sections.map(s=>`<div class="an-bar-row">
+      <div class="an-bar-label">${esc(s.name)}</div>
+      <div class="an-bar-track"><div class="an-bar-fill" style="width:${Math.round(s.count/maxCount*100)}%;background:var(--ac)"></div></div>
+      <div class="an-bar-val">${s.count}</div>
+    </div>`).join('');
+    return `<div class="an-card"><div class="an-title">Feature Usage</div>${bars}<div style="font-size:11px;color:var(--mu);margin-top:10px">Last active: ${lastUsed}</div></div>`;
+  }catch(e){ return ''; }
 }
 
 // ── ACTIVITY LOG ─────────────────────────────────────────────
@@ -3966,6 +4305,14 @@ function renderSpecies(){
     if(!spMap[k]) spMap[k]={name:a.species,notes:0,stages:{},contam:0,culturesOut:[]};
     spMap[k].accStatus=a.status;
   });
+  // Merge bottle data
+  (S.bottles||[]).forEach(b=>{
+    if(!b.species) return;
+    const k=b.species.toLowerCase();
+    if(!spMap[k]) spMap[k]={name:b.species,notes:0,stages:{},contam:0,culturesOut:[]};
+    spMap[k].bottles=(spMap[k].bottles||0)+1;
+    if(['inoculated','growing'].includes(b.status)) spMap[k].activeBots=(spMap[k].activeBots||0)+1;
+  });
   const rows=Object.values(spMap).sort((a,b)=>b.notes-a.notes);
   const stageAbbr=s=>s.replace('Stage ','S').replace(/ — .*/,'');
   const statusBadge=s=>{
@@ -3973,22 +4320,24 @@ function renderSpecies(){
     const cls=s.includes('Active')?'sp-active':s==='Lost'?'sp-lost':'sp-dormant';
     return `<span class="sp-badge ${cls}">${s}</span>`;
   };
-  el.innerHTML=`<div style="overflow-x:auto"><table class="sp-table">
+  el.innerHTML=`<p style="font-size:12px;color:var(--mu);margin-bottom:12px">Click any species to see full details — notes, bottles, accessions and stages.</p>
+  <div style="overflow-x:auto"><table class="sp-table">
     <thead><tr>
-      <th>Species</th><th>Notes</th><th>Stages</th><th>Contam%</th><th>Avg Out</th><th>Status</th><th></th>
+      <th>Species</th><th>Notes</th><th>Bottles</th><th>Stages</th><th>Contam%</th><th>Avg Out</th><th>Status</th>
     </tr></thead>
     <tbody>${rows.map(sp=>{
       const contamPct=sp.notes?Math.round(sp.contam/sp.notes*100):0;
       const avgOut=sp.culturesOut.length?(sp.culturesOut.reduce((a,b)=>a+b,0)/sp.culturesOut.length).toFixed(1):'—';
       const stagesStr=Object.entries(sp.stages).map(([s,c])=>`${stageAbbr(s)}×${c}`).join(', ')||'—';
-      return`<tr>
-        <td style="font-weight:600">${esc(sp.name)}</td>
+      const botStr=sp.bottles?(sp.activeBots?`${sp.activeBots}/${sp.bottles} active`:`${sp.bottles}`):'—';
+      return`<tr data-spname="${esc(sp.name)}" onclick="openSpDetail(this.dataset.spname)" title="Click to view all data for ${esc(sp.name)}" style="cursor:pointer">
+        <td style="font-weight:600;font-style:italic">${esc(sp.name)}</td>
         <td>${sp.notes}</td>
+        <td style="${sp.activeBots?'color:var(--gn)':''}">${botStr}</td>
         <td style="font-size:12px;color:var(--mu)">${stagesStr}</td>
         <td style="${contamPct>20?'color:var(--rd)':''}">${contamPct}%</td>
         <td>${avgOut}</td>
         <td>${statusBadge(sp.accStatus||'')}</td>
-        <td><a href="https://phyto-evolution.github.io/PhytoCommerce/taxonomy/?q=${encodeURIComponent(sp.name)}" target="_blank" rel="noopener" style="font-size:11px;color:var(--ac)">Taxonomy ↗</a></td>
       </tr>`;
     }).join('')}</tbody>
   </table></div>`;
@@ -5410,6 +5759,10 @@ function switchSection(name){
   if(name==='news' && document.getElementById('news-toggle').checked && !_newsData) handleNewsToggle(true);
   if(name==='calendar') renderCalendar();
   if(name==='bottles'){ renderBottleList(); showBotEmpty(); }
+  // Close species detail panel when navigating away
+  if(name!=='species') document.getElementById('sp-detail-panel')?.classList.remove('open');
+  // Track usage
+  trackUsage('section:'+name);
 }
 function toggleNavDrawer(){
   const open=document.getElementById('nav-drawer').classList.contains('open');
@@ -6175,6 +6528,245 @@ function scaleMedia(){
   out.textContent=`— Scaled to ${target} mL (×${ratio.toFixed(4)}) —\n`+lines.join('\n');
 }
 
+// ════════════════════════════════════════════════════════════
+// HOME BUTTON
+// ════════════════════════════════════════════════════════════
+function goHome(){
+  // Close all side panels
+  document.getElementById('cal-day-panel')?.classList.remove('on');
+  document.getElementById('history-panel')?.classList.remove('on');
+  document.getElementById('sp-detail-panel')?.classList.remove('open');
+  closeActLog();
+  closeSettings();
+  // Navigate to notes home (dashboard)
+  document.querySelectorAll('.nd-list-area').forEach(el=>el.classList.remove('on'));
+  closeNavDrawer();
+  switchSection('notes');
+  S.cur=null;
+  showNote('empty');
+  renderNoteList();
+  _renderDashboard();
+}
+
+// ════════════════════════════════════════════════════════════
+// SETTINGS PANEL
+// ════════════════════════════════════════════════════════════
+function openSettings(){
+  // Populate fields from localStorage
+  const labName=localStorage.getItem('tcplants_lab_name')||'';
+  const city=localStorage.getItem('tcplants_weather_city')||'';
+  const gemKey=localStorage.getItem('tcplants_gemini_key')||'';
+  const enhance=localStorage.getItem('tcplants_qr_enhance')==='1';
+  const harder=localStorage.getItem('tcplants_qr_harder')==='1';
+  document.getElementById('set-lab-name').value=labName;
+  document.getElementById('set-weather-city').value=city;
+  document.getElementById('set-gemini-key').value=gemKey;
+  document.getElementById('set-qr-enhance').checked=enhance;
+  document.getElementById('set-qr-harder').checked=harder;
+  const isDark=document.documentElement.dataset.theme==='dark';
+  document.getElementById('set-theme-btn').textContent=isDark?'☀️ Switch Light':'🌙 Switch Dark';
+  document.getElementById('settings-panel').classList.add('open');
+  document.getElementById('settings-backdrop').classList.add('on');
+}
+function closeSettings(){
+  document.getElementById('settings-panel').classList.remove('open');
+  document.getElementById('settings-backdrop').classList.remove('on');
+}
+function _setToggleTheme(){
+  const next=document.documentElement.dataset.theme==='dark'?'light':'dark';
+  document.documentElement.dataset.theme=next;
+  localStorage.setItem('tcplants_theme',next);
+  document.getElementById('theme-btn').textContent=next==='dark'?'☀️':'🌙';
+  document.querySelector('meta[name="theme-color"]').setAttribute('content',next==='dark'?'#161b22':'#f6f8fa');
+  document.getElementById('set-theme-btn').textContent=next==='dark'?'☀️ Switch Light':'🌙 Switch Dark';
+}
+function _setLabName(){
+  const v=document.getElementById('set-lab-name').value.trim();
+  localStorage.setItem('tcplants_lab_name',v);
+  toast(v?`Lab name saved: ${v}`:'Lab name cleared');
+  _renderDashboard();
+}
+function _setWeatherCity(){
+  const v=document.getElementById('set-weather-city').value.trim();
+  if(v){ localStorage.setItem('tcplants_weather_city',v); toast('Weather city saved: '+v); fetchWeather(); }
+  else { localStorage.removeItem('tcplants_weather_city'); toast('Weather city cleared'); }
+}
+function _setGeminiKey(){
+  const v=document.getElementById('set-gemini-key').value.trim();
+  if(v){ localStorage.setItem('tcplants_gemini_key',v); document.getElementById('ai-key-input').value=v; _saveGeminiKey(); toast('Gemini key saved'); }
+  else { localStorage.removeItem('tcplants_gemini_key'); toast('Gemini key cleared'); }
+}
+function _setScanEnhance(on){ localStorage.setItem('tcplants_qr_enhance',on?'1':'0'); }
+function _setScanHarder(on){ localStorage.setItem('tcplants_qr_harder',on?'1':'0'); }
+function _clearCache(){
+  localStorage.removeItem('tcplants_cache');
+  toast('Cache cleared — will reload from GitHub on next login');
+}
+function _resetUsageStats(){
+  localStorage.removeItem('tcplants_usage');
+  toast('Usage stats reset');
+}
+
+// ════════════════════════════════════════════════════════════
+// USAGE TRACKING
+// ════════════════════════════════════════════════════════════
+function trackUsage(action){
+  try{
+    const key='tcplants_usage';
+    const data=JSON.parse(localStorage.getItem(key)||'{}');
+    data[action]=(data[action]||0)+1;
+    data._sessions=(data._sessions||0)+(action==='login'?1:0);
+    data._last=new Date().toISOString();
+    localStorage.setItem(key,JSON.stringify(data));
+  }catch(e){}
+}
+
+// ════════════════════════════════════════════════════════════
+// SPECIES DETAIL PANEL
+// ════════════════════════════════════════════════════════════
+function openSpDetail(spName){
+  const panel=document.getElementById('sp-detail-panel');
+  const nameEl=document.getElementById('spd-name');
+  const body=document.getElementById('spd-body');
+  const taxLink=document.getElementById('spd-taxonomy-link');
+  nameEl.textContent=spName;
+  taxLink.href=`https://phyto-evolution.github.io/PhytoCommerce/taxonomy/?q=${encodeURIComponent(spName)}`;
+  panel.classList.add('open');
+
+  // Gather all data for this species
+  const k=spName.toLowerCase();
+  const notes=S.notes.filter(n=>(n.species||'').toLowerCase()===k).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const accs=S.accs.filter(a=>(a.species||'').toLowerCase()===k);
+  const bottles=(S.bottles||[]).filter(b=>(b.species||'').toLowerCase()===k);
+  const activeBot=bottles.filter(b=>['inoculated','growing'].includes(b.status));
+  const contam=notes.filter(n=>n.type==='Contamination Log');
+  const culturesOut=notes.filter(n=>n.cultures_out!=null).map(n=>n.cultures_out);
+  const avgOut=culturesOut.length?(culturesOut.reduce((a,b)=>a+b,0)/culturesOut.length).toFixed(1):'—';
+  const contamPct=notes.length?Math.round(contam.length/notes.length*100):0;
+
+  // Stage breakdown
+  const stages={};
+  notes.forEach(n=>{ if(n.stage) stages[n.stage]=(stages[n.stage]||0)+1; });
+  const maxStage=Math.max(...Object.values(stages),1);
+
+  // Build HTML
+  body.innerHTML=`
+    <div class="spd-section">
+      <div class="spd-section-title">Summary</div>
+      <div class="spd-stat-row">
+        <div class="spd-stat"><div class="sv">${notes.length}</div><div class="sl">Notes</div></div>
+        <div class="spd-stat gn"><div class="sv">${activeBot.length}</div><div class="sl">Active Bottles</div></div>
+        <div class="spd-stat${contamPct>20?' rd':''}"><div class="sv">${contamPct}%</div><div class="sl">Contam Rate</div></div>
+      </div>
+      <div style="font-size:12px;color:var(--mu);margin-top:8px">Avg cultures out: <strong>${avgOut}</strong> · ${accs.length} accession${accs.length!==1?'s':''}</div>
+    </div>
+    ${Object.keys(stages).length?`
+    <div class="spd-section">
+      <div class="spd-section-title">TC Stage Activity</div>
+      <div class="spd-stage-bar">
+        ${Object.entries(stages).sort((a,b)=>b[1]-a[1]).map(([s,c])=>`
+          <div class="spd-stage-row">
+            <div class="spd-stage-label" title="${esc(s)}">${esc(s.replace('Stage ','S').replace(/ — .*/,''))}</div>
+            <div class="spd-stage-track"><div class="spd-stage-fill" style="width:${Math.round(c/maxStage*100)}%"></div></div>
+            <div class="spd-stage-count">${c}</div>
+          </div>`).join('')}
+      </div>
+    </div>`:''}
+    ${accs.length?`
+    <div class="spd-section">
+      <div class="spd-section-title">Accession Records</div>
+      ${accs.map(a=>`<div class="spd-entry" data-accid="${esc(a.id)}" onclick="closeSpDetail();navTo('registry');openAccession('${esc(a.id)}')">
+        <div class="spd-entry-title">${esc(a.accession||a.species)}</div>
+        <div class="spd-entry-meta">
+          <span>${a.status||'—'}</span>
+          ${a.origin?`<span>· ${esc(a.origin)}</span>`:''}
+          ${a.date?`<span>· ${fmtDateShort(a.date)}</span>`:''}
+        </div>
+      </div>`).join('')}
+    </div>`:''}
+    ${bottles.length?`
+    <div class="spd-section">
+      <div class="spd-section-title">Bottles (${bottles.length})</div>
+      ${bottles.slice(0,8).map(b=>`<div class="spd-entry" onclick="closeSpDetail();navTo('bottles');openBottle('${esc(b.id)}')">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="bot-status-dot ${esc(b.status||'prepared')}"></div>
+          <div class="spd-entry-title" style="flex:1">${esc(b.code)}</div>
+          <span class="bot-status-badge ${esc(b.status||'prepared')}" style="font-size:10px;padding:1px 6px">${esc(b.status||'prepared')}</span>
+        </div>
+        <div class="spd-entry-meta"><span>${esc(b.stage||'—')}</span>${b.inoculation_date?`<span>· ${fmtDateShort(b.inoculation_date)}</span>`:''}</div>
+      </div>`).join('')}
+      ${bottles.length>8?`<div style="font-size:12px;color:var(--mu);text-align:center;margin-top:4px">+${bottles.length-8} more — <a style="color:var(--ac);cursor:pointer" onclick="closeSpDetail();navTo('bottles');S.bottleSearch='${esc(spName)}';renderBottleList()">View all</a></div>`:''}
+    </div>`:''}
+    <div class="spd-section">
+      <div class="spd-section-title">Notes (${notes.length})</div>
+      ${notes.length?notes.slice(0,10).map(n=>`<div class="spd-entry" onclick="closeSpDetail();openNote('${esc(n.id)}')">
+        <div class="spd-entry-title">${esc(n.title)}</div>
+        <div class="spd-entry-meta">
+          <span>${fmtDateShort(n.date)}</span>
+          ${n.type?`<span>· ${esc(n.type)}</span>`:''}
+          ${n.stage?`<span>· ${esc(n.stage.replace('Stage ','S').replace(/ — .*/,''))}</span>`:''}
+        </div>
+      </div>`).join(''):`<div class="spd-empty">No notes for this species yet.</div>`}
+      ${notes.length>10?`<div style="font-size:12px;color:var(--mu);text-align:center;margin-top:4px">+${notes.length-10} more entries</div>`:''}
+    </div>
+  `;
+}
+function closeSpDetail(){
+  document.getElementById('sp-detail-panel').classList.remove('open');
+}
+
+// ════════════════════════════════════════════════════════════
+// QR — NAV SCAN (scan from top bar, auto-route to entity)
+// ════════════════════════════════════════════════════════════
+let _camNavMode=false;
+function openQRScan(){
+  _camNavMode=true;
+  document.getElementById('cam-capture-btn').style.display='none';
+  document.getElementById('cam-mode-label').textContent='📷 Scan QR Code';
+  document.getElementById('cam-barcode-result').style.display='none';
+  document.getElementById('cam-modal').style.display='flex';
+  _startCam().then(()=>{
+    // Auto-start scan in nav mode
+    toggleBarcodeMode();
+  });
+}
+function _handleNavQRResult(text){
+  // Try to route: bottle URL pattern
+  const bottleMatch=text.match(/[?&]bottle=([a-zA-Z0-9_-]+)/);
+  if(bottleMatch){
+    closeCamera();
+    navTo('bottles');
+    openBottle(bottleMatch[1]);
+    toast('Opening bottle: '+bottleMatch[1]);
+    return;
+  }
+  // Try note ID pattern (UUID-like)
+  const noteMatch=text.match(/[?&]note=([a-zA-Z0-9_-]+)/);
+  if(noteMatch){
+    closeCamera();
+    openNote(noteMatch[1]);
+    toast('Opening note');
+    return;
+  }
+  // Generic - show result
+  document.getElementById('cam-barcode-result').style.display='block';
+  document.getElementById('cam-barcode-result').innerHTML=`
+    <strong style="color:var(--gn)">✓ Scanned:</strong><br>
+    <span style="word-break:break-all">${esc(text)}</span><br><br>
+    <button class="btn xs" onclick="navigator.clipboard.writeText('${esc(text).replace(/'/g,"\\'")}').then(()=>toast('Copied ✓'))">📋 Copy</button>
+    ${text.startsWith('http')?`<a href="${esc(text)}" target="_blank" rel="noopener" class="btn xs ghost" style="color:#fff;border-color:rgba(255,255,255,.3);margin-left:6px">Open URL ↗</a>`:''}`;
+}
+
+// ════════════════════════════════════════════════════════════
+// CAMERA — CONTRAST ENHANCEMENT
+// ════════════════════════════════════════════════════════════
+function _updateCamFilter(){
+  const video=document.getElementById('cam-video');
+  const contrast=document.getElementById('cam-contrast-slider').value;
+  const bright=document.getElementById('cam-bright-slider').value;
+  video.style.filter=`contrast(${contrast}%) brightness(${bright}%) saturate(0%)`;
+}
+
 // ── URL ROUTING: ?bottle=ID ───────────────────────────────────
 (function(){
   const params=new URLSearchParams(window.location.search);
@@ -6186,6 +6778,43 @@ function scaleMedia(){
 _initTapHandlers();
 _setupTap('av-linked',  '.sr-item', el=>openNote(el.dataset.id));
 _setupTap('search-results-list', '.sr-item', el=>openNote(el.dataset.id));
+
+// ── OUTSIDE-CLICK DISMISS ────────────────────────────────────
+document.addEventListener('click', function(e){
+  // Close activity log when clicking outside panel + tab
+  const actPanel=document.getElementById('actlog-panel');
+  const actTab=document.getElementById('actlog-tab');
+  if(actPanel && actPanel.classList.contains('open')){
+    if(!actPanel.contains(e.target) && actTab && !actTab.contains(e.target)){
+      closeActLog();
+    }
+  }
+  // Close weather popup
+  const wxPop=document.getElementById('weather-pop');
+  const wxChip=document.getElementById('weather-chip');
+  if(wxPop && wxPop.classList.contains('on') && !wxPop.contains(e.target) && wxChip && !wxChip.contains(e.target)){
+    wxPop.classList.remove('on');
+  }
+  // Close cal export menu
+  const calMenu=document.getElementById('cal-export-menu');
+  const calBtn=document.getElementById('cal-export-btn');
+  if(calMenu && calMenu.classList.contains('on') && !calMenu.contains(e.target) && calBtn && !calBtn.contains(e.target)){
+    calMenu.classList.remove('on');
+  }
+});
+
+// ── SETTINGS INIT ────────────────────────────────────────────
+// Restore theme button label in settings
+(function(){
+  const gemKey=localStorage.getItem('tcplants_gemini_key');
+  if(gemKey) document.getElementById('ai-key-input').value=gemKey;
+  const enhance=localStorage.getItem('tcplants_qr_enhance')==='1';
+  const harder=localStorage.getItem('tcplants_qr_harder')==='1';
+  // Set defaults on first use
+  if(localStorage.getItem('tcplants_qr_enhance')===null){
+    localStorage.setItem('tcplants_qr_enhance','1'); // default on
+  }
+})();
 
 // Restore token from session
 const _st=sessionStorage.getItem('_lt');
