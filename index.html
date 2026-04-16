@@ -2904,8 +2904,8 @@ function _renderSpeciesPicker(q){
     html+=`<div class="sp-group-head">${esc(pack)} <span style="font-weight:400">(${sorted.length})</span></div>`;
     html+=sorted.map(sp=>{
       const flairs=(sp.flairs||[]).map(f=>f.emoji||f.name||'').join(' ');
-      return `<div class="sp-row" onclick="_selectSpecies(${JSON.stringify(sp.full_name)})">
-        <div>
+      return `<div class="sp-row" data-spname="${esc(sp.full_name)}">
+        <div style="flex:1;min-width:0">
           <div class="sp-row-name">${esc(sp.full_name)}</div>
           ${sp.common_name?`<div class="sp-row-common">${esc(sp.common_name)}</div>`:''}
         </div>
@@ -2914,6 +2914,10 @@ function _renderSpeciesPicker(q){
     }).join('');
   }
   body.innerHTML=html;
+  // Event delegation — safe for species names with quotes/special chars
+  body.querySelectorAll('.sp-row').forEach(row=>{
+    row.addEventListener('click',()=>_selectSpecies(row.dataset.spname));
+  });
 }
 
 let _taxActiveInput=null;
@@ -2945,7 +2949,7 @@ function _taxSuggest(input){
       return `<span style="font-size:11px;color:var(--mu)">${esc(a.number||a.species)}</span> ${pills}`;
     }).join(' · ');
 
-    return `<div class="tax-row" data-idx="${i}" onpointerdown="event.preventDefault();_taxDropdownSelect(${JSON.stringify(sp.full_name)})">
+    return `<div class="tax-row" data-idx="${i}" data-name="${esc(sp.full_name)}" onpointerdown="event.preventDefault();_taxDropdownSelect(this.dataset.name)">
       <div class="tax-row-name">${esc(sp.full_name)}</div>
       <div class="tax-row-common">${esc(sp.common_name)}</div>
       ${_taxConBadge(sp.conservation_status)}
