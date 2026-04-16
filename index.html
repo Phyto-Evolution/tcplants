@@ -607,6 +607,16 @@ main > .dview, main > .editor{ margin:0 auto; }
 .help-body table{border-collapse:collapse;width:100%;margin:10px 0;font-size:13px}
 .help-body th,.help-body td{border:1px solid var(--bd);padding:7px 10px;text-align:left}
 .help-body th{background:var(--sf2)}
+.help-flow{background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;margin:12px 0;display:flex;flex-wrap:wrap;align-items:center;gap:6px;justify-content:center}
+.flow-step{background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:5px 12px;font-size:12px;white-space:nowrap;font-weight:600}
+.flow-arrow{color:var(--ac);font-weight:700;font-size:16px}
+.help-version-badge{display:inline-block;background:linear-gradient(135deg,var(--ac),var(--gn));color:#0d1117;border-radius:12px;font-size:11px;font-weight:800;padding:2px 9px;margin-left:8px;vertical-align:middle;letter-spacing:.04em}
+.help-toc{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
+.help-toc a{font-size:12px;padding:4px 10px;border-radius:14px;border:1px solid var(--bd);color:var(--mu);text-decoration:none;background:var(--sf)}
+.help-toc a:hover{border-color:var(--ac);color:var(--ac)}
+.help-note{background:rgba(88,166,255,.08);border-left:3px solid var(--ac);border-radius:0 6px 6px 0;padding:8px 12px;margin:8px 0;font-size:13px}
+.help-warn{background:rgba(248,81,73,.08);border-left:3px solid var(--rd);border-radius:0 6px 6px 0;padding:8px 12px;margin:8px 0;font-size:13px}
+.help-tip{background:rgba(63,185,80,.08);border-left:3px solid var(--gn);border-radius:0 6px 6px 0;padding:8px 12px;margin:8px 0;font-size:13px}
 .help-section-card{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:16px;margin-bottom:14px}
 
 /* ── WEATHER ── */
@@ -1927,355 +1937,559 @@ main > .dview, main > .editor{ margin:0 auto; }
   <div class="section fullpage" id="sec-help">
     <div class="help-body">
 
-      <!-- WHAT'S NEW -->
+      <!-- VERSION HEADER -->
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+        <h1 style="font-size:22px;font-weight:800;margin:0">🌿 TC Plants Lab Notes</h1>
+        <span class="help-version-badge">v3.0</span>
+      </div>
+      <p style="color:var(--mu);font-size:13px;margin-bottom:20px">April 2026 · Encrypted · GitHub-backed · Single-file PWA</p>
+
+      <!-- WHAT'S NEW v3.0 -->
       <div style="background:linear-gradient(135deg,rgba(63,185,80,.1),rgba(88,166,255,.08));border:1px solid rgba(63,185,80,.3);border-radius:10px;padding:18px 20px;margin-bottom:24px">
-        <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v2.0</div>
+        <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v3.0</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
           <div style="font-size:13px;line-height:1.6"><strong>🏠 Home Button</strong> — returns to dashboard from anywhere</div>
-          <div style="font-size:13px;line-height:1.6"><strong>⚙️ Settings Panel</strong> — lab name, city, AI key, QR options</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🌱 Species Detail Panel</strong> — click any species to see all linked data</div>
-          <div style="font-size:13px;line-height:1.6"><strong>📊 Dashboard Activity Bars</strong> — 7-day entry chart + active bottles</div>
-          <div style="font-size:13px;line-height:1.6"><strong>📷 QR Scan in Nav</strong> — scan bottle labels from any screen</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🎛 Camera Contrast Sliders</strong> — improve dim-light QR scans</div>
-          <div style="font-size:13px;line-height:1.6"><strong>⚡ Activity Log Auto-Close</strong> — click outside to dismiss</div>
-          <div style="font-size:13px;line-height:1.6"><strong>📈 Feature Usage Metrics</strong> — in Analytics, tracks section visits</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🌿 Welcome Splash</strong> — smooth animated loading screen on first open</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🫙 Bottle Inventory</strong> — FSL-coded vessels, QR labels, lifecycle tracking</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🌿 Species Picker Modal</strong> — Browse button on all species fields</div>
-          <div style="font-size:13px;line-height:1.6"><strong>☀️ Login Theme Toggle</strong> — switch dark/light before signing in</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🏡 Greenhouse List</strong> — stock plant tracking with full lab integration</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🔥 Autoclave Session</strong> — plan one autoclave run with multiple media batches</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🌿 Take Explant flow</strong> — GH plant → Bottle/Session with one tap</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🏡 Send to GH</strong> — subcultured bottles → greenhouse plant records</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🙏 Vanakkam greeting</strong> — animated glass welcome modal on login</div>
+          <div style="font-size:13px;line-height:1.6"><strong>✨ Glass tint UI</strong> — backdrop-blur on login box, toasts &amp; modals</div>
+          <div style="font-size:13px;line-height:1.6"><strong>📊 Dashboard GH strip</strong> — healthy stock plants &amp; lab output alerts</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🌱 Species → GH plants</strong> — detail panel now shows greenhouse entries</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🫙 Source plant link</strong> — every bottle can reference its GH origin</div>
+          <div style="font-size:13px;line-height:1.6"><strong>5 dashboard stat cards</strong> — Notes / Bottles / Accessions / GH / Reminders</div>
+          <div style="font-size:13px;line-height:1.6"><strong>⊞ Batch mode</strong> — create N identical bottles in one action</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🌿 Species Picker</strong> — Browse button on all species fields</div>
         </div>
       </div>
 
-      <h2>Getting Started</h2>
+      <!-- TABLE OF CONTENTS -->
+      <div class="help-toc">
+        <a href="#h-start">Getting Started</a>
+        <a href="#h-notes">Lab Notes</a>
+        <a href="#h-registry">Accession Registry</a>
+        <a href="#h-recipes">Media Recipes</a>
+        <a href="#h-bottles">Bottle Inventory</a>
+        <a href="#h-greenhouse">Greenhouse</a>
+        <a href="#h-dashboard">Dashboard</a>
+        <a href="#h-species">Species</a>
+        <a href="#h-reminders">Reminders</a>
+        <a href="#h-contam">Contamination</a>
+        <a href="#h-analytics">Analytics</a>
+        <a href="#h-calendar">Calendar</a>
+        <a href="#h-tools">Tools</a>
+        <a href="#h-qr">QR Scan</a>
+        <a href="#h-ai">AI Assistant</a>
+        <a href="#h-news">News</a>
+        <a href="#h-actlog">Activity Log</a>
+        <a href="#h-settings">Settings</a>
+        <a href="#h-export">Export</a>
+        <a href="#h-weather">Weather</a>
+        <a href="#h-security">Security</a>
+      </div>
+
+      <h2 id="h-start">Getting Started</h2>
       <div class="help-section-card">
         <h3>Signing In</h3>
         <p>Enter your <strong>Username</strong> (your encryption passphrase — chosen by you, never leaves your browser) and <strong>Password</strong> (your GitHub Personal Access Token with <code>repo</code> scope).</p>
         <p>Create a token: <code>github.com → Settings → Developer settings → Personal access tokens → Classic → New token → tick repo → Generate</code></p>
-        <p>⚠️ <strong>Never lose your passphrase.</strong> There is no recovery — all content is AES-256-GCM encrypted client-side. The GitHub repo stores only ciphertext that is unreadable without your passphrase.</p>
-        <h3>Navigation</h3>
-        <p>Tap <strong>☰</strong> (top-left) to open the navigation drawer. For Notes, Registry, Recipes, and Bottles, the drawer stays open as a sidebar — the main panel shows the selected entry or editor. For all other sections the drawer closes after navigating.</p>
-        <p>The top bar contains: <strong>🏠 Home</strong> · <strong>🌡️ Weather</strong> · <strong>📷 QR Scan</strong> · <strong>⬇ ZIP Export</strong> · <strong>CSV Export</strong> · <strong>🔒 Lock</strong> · <strong>⚙️ Settings</strong> · <strong>☀️/🌙 Theme</strong></p>
-        <h3>Session Behaviour</h3>
-        <p>Your token is stored in <code>sessionStorage</code> only — cleared on tab close. Your passphrase is in memory only. Lock or tab-close wipes both. After first login, data is cached for 10 minutes so re-unlocking is near-instant (⚡ Loaded from cache).</p>
-        <h3>Trusted Device</h3>
-        <p>After signing in, tap <strong>Yes, save</strong> on the trust banner. Your token is saved encrypted in <code>localStorage</code> — next visit just enter your passphrase. Tap <strong>Forget this device</strong> in Settings or on the login screen to remove it.</p>
-        <h3>Theme Toggle</h3>
-        <p>Click <strong>☀️ / 🌙</strong> in the top bar or on the login screen. Preference persists across visits. You can also switch theme from <strong>⚙️ Settings</strong> while in the app.</p>
-      </div>
-
-      <h2>Lab Notes</h2>
-      <div class="help-section-card">
-        <h3>Creating an Entry</h3>
-        <p>Click <strong>＋ New Entry</strong> or tap the blue <strong>＋ FAB</strong> (floating button, bottom-right) for a quick two-field entry. The full editor has:</p>
-        <table><tr><th>Field</th><th>Purpose</th></tr>
-          <tr><td>Title</td><td>Required. Shown in the drawer note list and search results.</td></tr>
-          <tr><td>Experiment Type</td><td>Categorises the entry; auto-loads a Markdown template when body is empty.</td></tr>
-          <tr><td>TC Stage</td><td>Stage 0 – IV, Self Notes / Unclassified, or N/A.</td></tr>
-          <tr><td>Species / Accession</td><td>Links this entry to Registry accessions automatically.</td></tr>
-          <tr><td>Recipe Used</td><td>Pick a saved recipe; shows as a clickable purple badge on the note.</td></tr>
-          <tr><td>Next Review Date</td><td>Sets a reminder shown in the ⏰ Reminders tab with nav badge count.</td></tr>
-          <tr><td>Tags</td><td>Comma-separated. Start typing to see autocomplete suggestions from your existing tags.</td></tr>
-          <tr><td>Cultures Out</td><td>Optional integer — number of propagules / cultures produced. Powers media efficiency analytics.</td></tr>
+        <div class="help-warn">⚠️ <strong>Never lose your passphrase.</strong> There is no recovery — all data is AES-256-GCM encrypted client-side. The GitHub repo stores only ciphertext.</div>
+        <h3>Login Screen</h3>
+        <table><tr><th>Element</th><th>What it does</th></tr>
+          <tr><td>Username field</td><td>Your encryption passphrase. Stays in memory only — never sent anywhere.</td></tr>
+          <tr><td>Password field</td><td>Your GitHub Personal Access Token. Used to read/write encrypted files to the repo.</td></tr>
+          <tr><td>☀️ / 🌙 button (top-right)</td><td>Toggle dark/light theme before signing in. Preference is saved.</td></tr>
+          <tr><td>Trust banner (after login)</td><td>Tap <strong>Yes, save</strong> to encrypt and store the token in <code>localStorage</code> — next visit only needs the passphrase.</td></tr>
+          <tr><td>⚡ Loaded from cache</td><td>If session cache is fresh (&lt;10 min), data loads instantly without re-fetching from GitHub.</td></tr>
         </table>
-        <h3>Auto-Save Draft</h3>
-        <p>Every keystroke is debounced and saved to <code>sessionStorage</code> after 1.5 s. If you accidentally refresh or navigate away, reopen the editor and a <strong>yellow banner</strong> appears: "Draft restored from Xm ago". Click <strong>Discard</strong> to clear it.</p>
-        <h3>Split-Pane Preview</h3>
-        <p>Above the note body, three buttons toggle the view: <strong>✏️ Edit</strong> (textarea only), <strong>⬛ Split</strong> (editor left, live Markdown preview right), <strong>👁 Preview</strong> (rendered only). On mobile, Split stacks vertically.</p>
-        <h3>Wiki-Links</h3>
-        <p>Type <code>[[Note Title]]</code> anywhere in the body to create a link to another note. In the rendered view, it becomes a <span style="color:var(--pu);border-bottom:1px dashed var(--pu)">purple link</span> — click to navigate. If the title doesn't match any note, it shows greyed out.</p>
-        <p>Use the <strong>[[]]</strong> toolbar button to open a searchable note picker instead of typing manually.</p>
-        <p>Below the note body, a <strong>Linked from</strong> section lists notes whose body contains <code>[[this note's title]]</code> — populated from notes you've opened in this session.</p>
-        <h3>Edit History</h3>
-        <p>On any note's view panel, click <strong>📜 History</strong>. A slide-in panel shows every GitHub commit for that note file, newest first. The current version is labelled. Click <strong>↩ Restore this version</strong> to load an old body into the editor for review — you must explicitly Save to overwrite.</p>
-        <h3>Quick Log (FAB)</h3>
-        <p>The blue <strong>＋</strong> button in the bottom-right corner opens a minimal modal: just Title and Body. Saves immediately as a <em>Self Notes / Brainstorming</em> entry. Disappears while the full editor is open.</p>
+        <h3>Top Navigation Bar</h3>
+        <table><tr><th>Button</th><th>Action</th></tr>
+          <tr><td>☰ Menu</td><td>Open/close the navigation drawer</td></tr>
+          <tr><td>🏠 Home</td><td>Return to the dashboard from anywhere</td></tr>
+          <tr><td>🌡️ Weather chip</td><td>Current feel-like temp at lab &amp; greenhouse. Click to expand details.</td></tr>
+          <tr><td>📷 QR Scan</td><td>Open camera scanner — auto-routes to bottle or note on match</td></tr>
+          <tr><td>⬇ ZIP</td><td>Export all notes as decrypted Markdown + accessions &amp; recipes as JSON</td></tr>
+          <tr><td>CSV</td><td>Export notes and accessions as spreadsheet files</td></tr>
+          <tr><td>🔒 Lock</td><td>Wipe token &amp; passphrase from memory, return to login</td></tr>
+          <tr><td>⚙️ Settings</td><td>Lab name, weather city, AI key, scan options, cache &amp; device management</td></tr>
+          <tr><td>☀️/🌙 Theme</td><td>Toggle dark/light mode</td></tr>
+        </table>
+        <h3>Navigation Drawer</h3>
+        <p>Tap <strong>☰</strong> to open the drawer. Sections with a left-panel list (Notes, Registry, Recipes, Bottles, Greenhouse) keep the drawer open as a sidebar. All other sections close the drawer and show full-page content.</p>
+        <h3>Vanakkam Greeting</h3>
+        <p>After successful login a centred glass-blur greeting appears for ~2.5 seconds, showing your lab name if configured in Settings. It fades automatically — no tap needed.</p>
+      </div>
+
+      <h2 id="h-notes">Lab Notes</h2>
+      <div class="help-section-card">
+        <h3>Entry Fields</h3>
+        <table><tr><th>Field</th><th>Required</th><th>Purpose</th></tr>
+          <tr><td>Title</td><td>✓</td><td>Shown in the drawer list and search results</td></tr>
+          <tr><td>Experiment Type</td><td></td><td>Categorises the entry; auto-loads a Markdown template into the body when empty</td></tr>
+          <tr><td>TC Stage</td><td></td><td>Stage 0–IV, Self Notes, or N/A. Used in analytics, filters, and the stage funnel chart</td></tr>
+          <tr><td>Species / Accession</td><td></td><td>Links to Registry accessions automatically. Supports taxonomy autocomplete + Browse modal</td></tr>
+          <tr><td>Recipe Used</td><td></td><td>Pick a saved recipe — shows as a purple badge; powers recipe usage analytics</td></tr>
+          <tr><td>Next Review Date</td><td></td><td>Creates a reminder in ⏰ Reminders with nav badge count</td></tr>
+          <tr><td>Tags</td><td></td><td>Comma-separated. Autocomplete from existing tags. Powers the tag cloud in Analytics</td></tr>
+          <tr><td>Cultures Out</td><td></td><td>Number of propagules produced. Used in media efficiency score (Avg Out column in Analytics)</td></tr>
+          <tr><td>Body</td><td></td><td>Full Markdown — supports headings, lists, code blocks, tables, images, wiki-links</td></tr>
+        </table>
+        <h3>Editor Modes</h3>
+        <table><tr><th>Button</th><th>View</th></tr>
+          <tr><td>✏️ Edit</td><td>Textarea only — full width for writing</td></tr>
+          <tr><td>⬛ Split</td><td>Editor left + live Markdown preview right (stacks on mobile)</td></tr>
+          <tr><td>👁 Preview</td><td>Rendered view only — click any wiki-link to navigate</td></tr>
+        </table>
         <h3>Markdown Toolbar</h3>
-        <p>The toolbar wraps selected text or inserts at cursor. Buttons: H2, H3, Bold, Italic, Strikethrough, inline <code>code</code>, code block, blockquote, horizontal rule, bullet list, numbered list, task list, link, image embed, table, <strong>[[]]</strong> wiki-link, <strong>📷</strong> Camera/Barcode. Shortcuts: <span class="kbd">Ctrl+B</span> Bold, <span class="kbd">Ctrl+I</span> Italic, <span class="kbd">Ctrl+K</span> Link, <span class="kbd">Tab</span> = 2 spaces.</p>
-        <h3>Camera &amp; Barcode Scanner</h3>
-        <p>Click <strong>📷</strong> in the toolbar to open the camera. Tap <strong>📸 Capture Photo</strong> to insert a JPEG image directly into the note body (base64 encoded, encrypted with the note). Tap <strong>🔍 Scan QR / Barcode</strong> to activate the ZXing multi-format reader — supports QR codes, Code128, EAN, DataMatrix, and more. Once scanned, insert the result into the note or copy to clipboard. Use <strong>⇄ Switch</strong> to toggle between front and rear camera.</p>
-        <p>For scanning bottle labels outside the note editor, use the <strong>📷 button in the nav bar</strong> — it scans and auto-routes to the matching bottle without opening a note. Enable <strong>Scan Enhancement</strong> in ⚙️ Settings to get contrast/brightness sliders for difficult lighting conditions.</p>
-        <h3>Image Embeds</h3>
-        <p>Click <strong>🖼</strong> to pick an image. It is base64-encoded and inserted inline — encrypted inside the note. Keep under 1 MB.</p>
-        <h3>Search</h3>
-        <p>The search box in the left drawer instantly filters the note list by title, species, and tags. Pressing <span class="kbd">Enter</span> triggers a <strong>deep search</strong> — decrypts every note body and returns highlighted excerpts.</p>
-        <h3>Filters</h3>
-        <p>Filter pills in the drawer: All types, ☣️ Contamination only, ⏰ Overdue, and TC Stages I–IV.</p>
-      </div>
-
-      <h2>Taxonomy & Flairs</h2>
-      <div class="help-section-card">
-        <h3>Species Autocomplete</h3>
-        <p>Start typing in any <strong>Species</strong> field — a dropdown appears with matching species from the active taxonomy packs. Each suggestion shows the scientific name, common name, and conservation status badge (CR/EN/VU/NT/LC). Click to select, or ignore and type whatever you like. If you already have accessions of a species with flairs, those show as sub-rows in the dropdown.</p>
-        <h3>Taxonomy Packs</h3>
-        <p>Go to <strong>🌱 Species → Taxonomy Packs</strong> to browse all built-in species. Three packs are available: <em>Carnivorous Plants</em> (Nepenthes, Drosera, Sarracenia, etc.), <em>Orchids</em>, and <em>Banana &amp; Relatives</em>. Each pack can be toggled on/off — disabled packs are excluded from autocomplete (takes effect after next login). You can also add your own custom species at the bottom of the panel.</p>
-        <h3>Flairs</h3>
-        <p>Flairs are coloured labels you define in <strong>🌱 Species → Flairs</strong> (e.g. <em>Borneo clone</em>, <em>Highland form</em>, <em>SCV-01</em>). Once defined, assign them to any accession record in the Registry editor. You can assign multiple flairs and add a free-text provenance note. Assigned flairs appear as coloured pills in the accession list and detail view, and in the autocomplete dropdown when that species is typed.</p>
-      </div>
-
-      <h2>Calendar</h2>
-      <div class="help-section-card">
-        <h3>Navigating the Calendar</h3>
-        <p>Click <strong>📅 Calendar</strong> in the nav drawer. Use <strong>‹ ›</strong> to move between months and <strong>Today</strong> to snap back to the current month.</p>
-        <p>Each day shows colour-coded dots:</p>
-        <ul>
-          <li><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#58a6ff;vertical-align:middle;margin-right:4px"></span><strong>Blue</strong> — experiment logged on this day</li>
-          <li><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#d29922;vertical-align:middle;margin-right:4px"></span><strong>Orange</strong> — review due on this day</li>
-          <li><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f85149;vertical-align:middle;margin-right:4px"></span><strong>Red</strong> — contamination entry</li>
-        </ul>
-        <h3>Day Detail Panel</h3>
-        <p>Click any day to open the detail panel on the right. It lists all entries for that day with type, stage, and species. Click any entry to open the full note. On mobile the panel opens full-screen.</p>
-        <h3>Creating Notes from the Calendar</h3>
-        <p>Click a day, then click <strong>+ New note on this date</strong> (past dates) or <strong>+ Schedule note for this date</strong> (future dates). Past dates set the experiment date; future dates pre-fill the Next Review Date field.</p>
-        <h3>Exporting</h3>
-        <p>Click <strong>⬇ Export</strong> in the calendar header and choose <strong>This week</strong> or <strong>This month</strong>. A print-ready window opens with all entries expanded — full note bodies, badges, and flags for contamination and pending reviews. Use your browser's print dialog to save as PDF.</p>
-      </div>
-
-      <h2>Keyboard Shortcuts</h2>
-      <div class="help-section-card">
+        <p>Buttons wrap selected text or insert at cursor: H2, H3, Bold, Italic, Strikethrough, <code>inline code</code>, code block, blockquote, horizontal rule, bullet list, numbered list, task list, link, image, table, <strong>[[]]</strong> wiki-link picker, 📷 Camera/Barcode.</p>
         <table><tr><th>Shortcut</th><th>Action</th></tr>
-          <tr><td><span class="kbd">Ctrl+S</span></td><td>Save current note to GitHub</td></tr>
+          <tr><td><span class="kbd">Ctrl+S</span></td><td>Save note to GitHub</td></tr>
           <tr><td><span class="kbd">Ctrl+B</span></td><td>Bold selected text</td></tr>
           <tr><td><span class="kbd">Ctrl+I</span></td><td>Italic selected text</td></tr>
-          <tr><td><span class="kbd">Ctrl+K</span></td><td>Insert link</td></tr>
-          <tr><td><span class="kbd">Tab</span></td><td>Insert 2 spaces (inside editor)</td></tr>
-          <tr><td><span class="kbd">Enter</span> in search</td><td>Deep full-text search across all notes</td></tr>
-          <tr><td><span class="kbd">Escape</span></td><td>Close Quick Log modal / Wiki picker</td></tr>
+          <tr><td><span class="kbd">Ctrl+K</span></td><td>Insert markdown link</td></tr>
+          <tr><td><span class="kbd">Tab</span></td><td>Insert 2 spaces</td></tr>
+          <tr><td><span class="kbd">Enter</span> in search</td><td>Deep full-text search across all note bodies</td></tr>
+          <tr><td><span class="kbd">Escape</span></td><td>Close Quick Log / Wiki picker</td></tr>
+        </table>
+        <h3>Wiki-Links</h3>
+        <p>Type <code>[[Note Title]]</code> in the body to create a clickable link to another note. Use the <strong>[[]]</strong> toolbar button for a searchable picker. Below the rendered note, a <strong>Linked from</strong> section shows all notes that reference this one.</p>
+        <h3>Auto-Save Draft</h3>
+        <p>Keystrokes are debounced and saved to <code>sessionStorage</code> after 1.5 s. On re-opening the editor a yellow <em>"Draft restored from Xm ago"</em> banner appears — click <strong>Discard</strong> to clear it.</p>
+        <h3>Edit History</h3>
+        <p>Click <strong>📜 History</strong> on the note view. A panel shows every GitHub commit for that file, newest first. Click <strong>↩ Restore this version</strong> to load it into the editor — you must explicitly Save to overwrite.</p>
+        <h3>Quick Log (FAB)</h3>
+        <p>The blue <strong>＋</strong> bottom-right FAB opens a minimal modal (Title + Body only). Saves immediately as <em>Self Notes / Brainstorming</em>. Hidden while the full editor is open.</p>
+        <h3>Camera &amp; Barcode Scanner (in notes)</h3>
+        <p>Click <strong>📷</strong> in the toolbar: <strong>📸 Capture</strong> inserts a base64 JPEG (encrypted with the note, keep &lt;1 MB). <strong>🔍 Scan QR/Barcode</strong> activates the ZXing reader — supports QR, Code128, EAN, DataMatrix. Use <strong>⇄ Switch</strong> for front/rear camera.</p>
+        <h3>List Filters</h3>
+        <table><tr><th>Pill</th><th>Shows</th></tr>
+          <tr><td>All</td><td>Every entry</td></tr>
+          <tr><td>☣️</td><td>Contamination Log entries only</td></tr>
+          <tr><td>⏰</td><td>Entries with overdue review dates</td></tr>
+          <tr><td>I / II / III / IV</td><td>Entries at that TC Stage</td></tr>
         </table>
       </div>
 
-      <h2>Accession Registry</h2>
+      <h2 id="h-registry">Accession Registry</h2>
       <div class="help-section-card">
-        <p>Track every plant accession — species, accession number, origin, source, acquisition date, and status. Any note whose <em>Species/Accession</em> field matches the accession's species name is automatically linked.</p>
+        <p>Track every plant accession — its origin, status, and full lab history. Any note whose Species field matches the accession species is automatically linked.</p>
+        <h3>Fields</h3>
+        <table><tr><th>Field</th><th>Purpose</th></tr>
+          <tr><td>Species</td><td>Scientific name — links to taxonomy autocomplete</td></tr>
+          <tr><td>Accession No.</td><td>Your internal identifier (e.g. VAN-001, NEP-RAJ-2024)</td></tr>
+          <tr><td>Origin</td><td>Geographic or institutional source</td></tr>
+          <tr><td>Source</td><td>Wild / Nursery / Tissue culture / Trade</td></tr>
+          <tr><td>Date acquired</td><td>When you received or collected it</td></tr>
+          <tr><td>Status</td><td>See status table below</td></tr>
+          <tr><td>Flairs</td><td>Coloured provenance labels (clone, form, etc.)</td></tr>
+          <tr><td>Notes</td><td>Free markdown — phenotype, permits, contacts</td></tr>
+        </table>
+        <h3>Status Options</h3>
+        <table><tr><th>Status</th><th>Meaning</th></tr>
+          <tr><td>Active in culture</td><td>Currently propagating in vitro</td></tr>
+          <tr><td>In acclimatization</td><td>Stage IV — hardening off ex vitro</td></tr>
+          <tr><td>Dormant</td><td>Paused, not actively subcultured</td></tr>
+          <tr><td>Transferred out</td><td>Moved to another lab or collaborator</td></tr>
+          <tr><td>Lost</td><td>Culture failed or fully contaminated</td></tr>
+        </table>
         <h3>Timeline Tab</h3>
-        <p>Each accession view has two tabs: <strong>📋 Details</strong> (the accession record) and <strong>📅 Timeline</strong>. The Timeline tab shows all linked lab entries as a chronological vertical timeline with stage icons — click any entry title to open that note.</p>
-        <h3>Status options</h3>
-        <ul>
-          <li><strong>Active in culture</strong> — currently growing in vitro</li>
-          <li><strong>In acclimatization</strong> — Stage IV, being hardened off</li>
-          <li><strong>Dormant</strong> — paused, not actively subcultured</li>
-          <li><strong>Transferred out</strong> — moved to another lab or person</li>
-          <li><strong>Lost</strong> — culture failed or contaminated</li>
-        </ul>
+        <p>On any accession detail, switch to the <strong>📅 Timeline</strong> tab to see all linked lab notes as a chronological vertical timeline with stage icons — click any title to open that note.</p>
       </div>
 
-      <h2>Media Recipe Book</h2>
+      <h2 id="h-recipes">Media Recipe Book</h2>
       <div class="help-section-card">
-        <p>Store complete media formulations. Each recipe records base medium, sucrose, agar/gelrite, pH, growth regulators, autoclave parameters, and preparation notes.</p>
-        <h3>Base Medium</h3>
-        <p>Choose from the curated list: general (MS, LS), orchid-specific (Knudson C, VW, Pierik, New Dogashima), monocot/banana (B5, N6, MS-Musa), woody plants (WPM, DKW, Anderson's). Select <strong>✏️ Custom</strong> to type any name.</p>
-        <h3>Autoclave</h3>
-        <p>Presets: 121°C/15m, 121°C/20m, 121°C/45m, 115°C/20m, Filter sterile. Or type exact temperature and hold time manually.</p>
-        <h3>Linking to notes</h3>
-        <p>Pick a recipe in the <strong>Recipe Used</strong> dropdown when creating a note. It shows as a purple badge — clicking opens the recipe. Recipe links are used in the <strong>Analytics</strong> tab to compute usage frequency and media efficiency.</p>
-      </div>
-
-      <h2>Reminders</h2>
-      <div class="help-section-card">
-        <p>Any lab entry with a <strong>Next Review Date</strong> appears in the ⏰ Reminders tab, grouped by urgency:</p>
-        <ul>
-          <li><strong>🔴 Overdue</strong> — past the review date</li>
-          <li><strong>🟡 This week</strong> — due within 7 days</li>
-          <li><strong>📅 This month</strong> — due within 30 days</li>
-          <li><strong>🗓 Later</strong> — more than 30 days away</li>
-        </ul>
-        <p>The nav badge shows overdue + this-week count. Click any reminder card to open the note.</p>
-      </div>
-
-      <h2>Weather Widget</h2>
-      <div class="help-section-card">
-        <p>The <strong>🌡️ weather chip</strong> in the nav bar shows the current real-feel temperature at the lab (SARE, Thiruporur). Data is fetched from Open-Meteo every 60 seconds — no API key, always live.</p>
-        <p>Click the chip to expand a popover showing both locations side by side:</p>
-        <table><tr><th>Location</th><th>Metrics shown</th></tr>
-          <tr><td>🏛️ Lab — SARE, Thiruporur</td><td>Feels-like °C, 💧 Humidity %, ☀️ UV Index, 🌧️ Rain probability %</td></tr>
-          <tr><td>🌿 Greenhouse — Thaiyur, Kelambakkam</td><td>Same four metrics</td></tr>
+        <p>Store complete, reusable media formulations. Each recipe records enough detail to reproduce the exact medium at any time.</p>
+        <h3>Recipe Fields</h3>
+        <table><tr><th>Field</th><th>Details</th></tr>
+          <tr><td>Name</td><td>Free text — shown in all recipe dropdowns throughout the app</td></tr>
+          <tr><td>Base Medium</td><td>Curated list: MS, LS, Knudson C, VW, Pierik, New Dogashima, B5, N6, MS-Musa, WPM, DKW, Anderson's, or Custom</td></tr>
+          <tr><td>Sucrose</td><td>g/L</td></tr>
+          <tr><td>Agar / Gelrite</td><td>g/L</td></tr>
+          <tr><td>pH (before autoclave)</td><td>Numeric</td></tr>
+          <tr><td>Growth Regulators</td><td>Free text — e.g. "BAP 1 mg/L, NAA 0.1 mg/L"</td></tr>
+          <tr><td>Autoclave params</td><td>Presets: 121°C/15m, 121°C/20m, 121°C/45m, 115°C/20m, Filter sterile — or type manually</td></tr>
+          <tr><td>Target species</td><td>Optional — creates a clickable link to the matching accession</td></tr>
+          <tr><td>Preparation notes</td><td>Full Markdown — procedure steps, amendments, observations</td></tr>
         </table>
-        <p>Click anywhere outside the popover to close it.</p>
+        <div class="help-tip">💡 Filling in "Target species" and linking to a note via "Recipe Used" powers the media efficiency score in Analytics.</div>
+        <h3>Media Volume Scaler</h3>
+        <p>In the recipe detail view, click <strong>⚗️ Scale Media</strong>. Enter a target volume (e.g. 500 mL) and all ingredient quantities are recalculated proportionally. One-click copy for the bench.</p>
       </div>
 
-      <h2>📊 Lab Analytics</h2>
+      <h2 id="h-bottles">🫙 Bottle Inventory</h2>
       <div class="help-section-card">
-        <p>Click the <strong>📊 Analytics</strong> tab to see all metrics computed from your notes, accessions, and recipes in real time. No data is sent anywhere — everything runs in your browser from already-decrypted in-memory data.</p>
-
-        <h3>Notes / Month</h3>
-        <p>A line chart of how many lab entries you created in each of the last 6 calendar months. Useful for spotting quiet periods or high-activity sprints.</p>
-
-        <h3>Stage Distribution</h3>
-        <p>A donut chart showing what proportion of your notes are at each TC stage (Stage I–IV). Helps you see where most of your active work is concentrated. Each stage has a distinct colour: blue (I), green (II), yellow (III), purple (IV), red (Contamination).</p>
-
-        <h3>Species Success Rate</h3>
-        <p>Horizontal bars showing <em>success rate</em> for each species — the percentage of notes for that species that are <strong>not</strong> Contamination Log entries. Only species with 2 or more notes are shown. Colour-coded: green &gt;70%, yellow 40–70%, red &lt;40%.</p>
-
-        <h3>Contamination Trend</h3>
-        <p>A line chart of how many Contamination Log entries occurred per month over the last 6 months. An upward trend is a warning signal to investigate media, laminar flow, or explant source.</p>
-
-        <h3>Recipe Usage</h3>
-        <p>Horizontal bars for the top 6 most-used recipes — counted by how many notes reference each recipe. Shows which media formulations you rely on most.</p>
-
-        <h3>Tag Cloud</h3>
-        <p>Your top 30 tags displayed as sized pills — larger and more opaque tags are used more frequently. Gives a quick overview of recurring themes and topics in your lab journal.</p>
-
-        <h3>Stage Funnel by Species</h3>
-        <p>Stacked horizontal bars for your top 5 species (by note count), showing how their notes are distributed across Stage I → II → III → IV. A healthy progression should show entries at multiple stages. A species with only Stage I entries may have stalled.</p>
-
-        <h3>Average Days Between Entries</h3>
-        <p>Badge cards showing the average number of days between consecutive lab entries for each species with 3 or more notes. This approximates your <strong>subculture interval</strong> — useful for optimising transfer frequency.</p>
-
-        <h3>Media Efficiency</h3>
-        <p>A ranked table showing how well each combination of <strong>Recipe × Species × Stage</strong> performs. Requires at least 2 notes sharing the same recipe, species, and stage.</p>
-        <table><tr><th>Column</th><th>Meaning</th></tr>
-          <tr><td>Recipe</td><td>The saved media recipe used</td></tr>
-          <tr><td>Species</td><td>The plant species</td></tr>
-          <tr><td>Stage</td><td>TC Stage (I–IV, abbreviated)</td></tr>
-          <tr><td>Avg Out</td><td>Average value of the <strong>Cultures Out</strong> field across all matching notes. This is the number of propagules or cultures produced per transfer. Set "Cultures Out" on your notes to populate this.</td></tr>
-          <tr><td>Contam%</td><td>Percentage of matching notes that are Contamination Log entries</td></tr>
-          <tr><td>Score</td><td>Composite efficiency score (0–100). Formula: <code>(Avg Out ÷ global average) × (1 − contamination rate) × 100</code>, capped at 100. Higher is better. A recipe with high output but high contamination will score lower than a reliable medium with moderate output.</td></tr>
+        <h3>Creation Modes</h3>
+        <table><tr><th>Mode</th><th>When to use</th><th>Creates</th></tr>
+          <tr><td>＋ Single</td><td>One specific bottle with full detail</td><td>1 bottle</td></tr>
+          <tr><td>⊞ Batch</td><td>N identical bottles, same media, same species and stage</td><td>N bottles sharing one batch_id</td></tr>
+          <tr><td>🔥 Session</td><td>One autoclave run with multiple media batches for different species/stages</td><td>All bottles at once, linked by session_id</td></tr>
         </table>
-        <p>💡 <strong>Tip:</strong> Always fill in <strong>Cultures Out</strong> when saving a Multiplication or Rooting note to get meaningful efficiency data. Without it, the Avg Out and Score columns show "—".</p>
-        <h3>Feature Usage</h3>
-        <p>A bar chart showing how often you've visited each section of the app since you started tracking (stored in <code>localStorage</code>). Helps identify which tools you rely on most. Reset anytime in <strong>⚙️ Settings → Reset Usage Stats</strong>.</p>
-      </div>
-
-      <h2>🏠 Home Dashboard</h2>
-      <div class="help-section-card">
-        <p>The dashboard is the first screen after login — always accessible via the <strong>🏠 Home</strong> button in the top bar. It shows your lab at a glance:</p>
-        <ul>
-          <li><strong>Quick Actions</strong> — ＋ New Entry, 🫙 New Bottle, 📷 Scan QR, 📅 Calendar, 📊 Analytics</li>
-          <li><strong>4 Stat Cards</strong> — total notes, bottles (active count), accessions, and reviews due (overdue highlighted red)</li>
-          <li><strong>7-Day Activity Bar</strong> — column chart showing how many entries were created each of the last 7 days. Hover any bar to see the exact date and count</li>
-          <li><strong>Recent Entries</strong> — the 5 most recent lab notes, click to open</li>
-          <li><strong>Reviews Due</strong> — upcoming notes and bottles sorted by urgency, colour-coded red (overdue) / yellow (within 3 days) / grey (later)</li>
-          <li><strong>Active Bottles</strong> — stage breakdown pills + top bottles by review urgency, click any to open</li>
-        </ul>
-      </div>
-
-      <h2>🫙 Bottle Inventory</h2>
-      <div class="help-section-card">
-        <h3>Creating Bottles</h3>
-        <p>Click <strong>🫙 Bottles</strong> in the nav drawer, then <strong>＋ Single Bottle</strong> or <strong>⊞ Batch</strong>. Each bottle gets a unique FSL code (e.g. <code>NEP-RAJ-001</code>) generated from genus, species, and sequence. Fields: species, accession, recipe, stage, inoculation date, next review, vessel type, explant type, quantity, and notes (Markdown).</p>
+        <h3>Bottle Fields</h3>
+        <table><tr><th>Field</th><th>Purpose</th></tr>
+          <tr><td>Species</td><td>Taxonomy autocomplete + Browse modal</td></tr>
+          <tr><td>Accession</td><td>Link to the Registry record for this species</td></tr>
+          <tr><td>Recipe</td><td>The media formulation used — links to Recipe Book</td></tr>
+          <tr><td>Stage</td><td>Stage I – IV, Mother Block</td></tr>
+          <tr><td>Status</td><td>See lifecycle below</td></tr>
+          <tr><td>Date prepared / inoculated</td><td>Timestamps for preparation and inoculation events</td></tr>
+          <tr><td>Media volume</td><td>mL per vessel</td></tr>
+          <tr><td>Explants per bottle</td><td>Optional integer</td></tr>
+          <tr><td>Next review date</td><td>Creates a reminder in ⏰ Reminders</td></tr>
+          <tr><td>Linked note</td><td>Associate this bottle with a lab note entry</td></tr>
+          <tr><td>Source greenhouse plant</td><td>Link to the GH stock plant the explant came from</td></tr>
+          <tr><td>Flairs + provenance note</td><td>Clone/form labels and free text for traceability</td></tr>
+          <tr><td>Notes</td><td>Markdown observations</td></tr>
+        </table>
+        <h3>Bottle Lifecycle Flow</h3>
+        <div class="help-flow">
+          <span class="flow-step">🧫 Prepared</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">💉 Inoculated</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">🌱 Growing</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">✂️ Subcultured</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">🏡 Send to Greenhouse</span>
+        </div>
+        <div class="help-flow">
+          <span class="flow-step">🌱 Growing</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">☣️ Contaminated</span>
+          <span style="font-size:12px;color:var(--mu);padding:0 4px">or</span>
+          <span class="flow-step">🗑 Discarded</span>
+        </div>
+        <p>Active bottles (Inoculated + Growing) appear in the dashboard Active Bottles strip and in ⏰ Reminders. Status changes are stamped with the date and shown in bottle detail.</p>
+        <h3>FSL Code</h3>
+        <p>Each bottle gets a unique auto-generated code: <code>FSL-YYYY-NNNN</code> (e.g. <code>FSL-2026-0042</code>). This code appears on the QR label and is searchable in the bottle list.</p>
         <h3>QR Labels</h3>
-        <p>Every bottle detail view shows a QR code in the top section. This QR encodes the URL <code>https://notes.tcplants.in?bottle=ID</code>. Tap <strong>🖨 Print label</strong> to open a print-ready label with the QR, FSL code, species, and stage. For batches, print all labels at once with <strong>🖨 Print batch</strong>.</p>
-        <p>To scan a bottle label, tap <strong>📷</strong> in the nav bar and point at the QR — the app automatically navigates to that bottle record.</p>
-        <h3>Lifecycle Status</h3>
-        <p>Each bottle moves through: <strong>Prepared → Inoculated → Growing → Subcultured → Contaminated / Discarded</strong>. Status changes are tracked with timestamps. Active bottles (Inoculated + Growing) appear in the dashboard and reminders.</p>
-        <h3>Filters</h3>
-        <p>Filter the bottle list by status using the pill buttons at the top of the bottle drawer. Search by species, FSL code, or accession. Export all bottle data as CSV from the top bar.</p>
+        <p>Every bottle detail shows a QR code encoding <code>https://notes.tcplants.in?bottle=ID</code>. Tap <strong>🖨 Print label</strong> for a 58 mm thermal-printer-ready label with QR, FSL code, species, and stage. For batches or sessions, tap <strong>🖨 Print batch</strong> to print all labels at once.</p>
+        <p>To scan a bottle in the greenhouse or lab, tap <strong>📷</strong> in the nav bar — the app auto-routes to that bottle record.</p>
+        <h3>🔥 Autoclave Session (New)</h3>
+        <p>A Session models one complete autoclave run: you plan all your media batches for that run in one place, set the capacity (default 120 bottles), and save everything at once.</p>
+        <table><tr><th>Session Field</th><th>Purpose</th></tr>
+          <tr><td>Session date</td><td>Date of the autoclave run</td></tr>
+          <tr><td>Autoclave capacity</td><td>Total bottles your autoclave holds (default 120)</td></tr>
+          <tr><td>Temp / Time</td><td>Autoclave parameters, saved with every bottle in the session</td></tr>
+          <tr><td>Media batches (rows)</td><td>Each row: Species, Stage, Recipe, Quantity. Add as many rows as you need.</td></tr>
+          <tr><td>Capacity bar</td><td>Live bar turns yellow ≥90 %, red if over capacity</td></tr>
+          <tr><td>Session notes</td><td>Optional free text — e.g. "First run after equipment service"</td></tr>
+        </table>
+        <p>On Save, all bottles are created immediately. Each batch within the session gets its own <code>batch_id</code>; all share the <code>session_id</code>. A purple <strong>S</strong> badge appears in the list for session bottles. The bottle detail shows session date, batch count, and autoclave parameters.</p>
+        <h3>Send to Greenhouse</h3>
+        <p>Every bottle detail shows a <strong>🏡 Send to GH</strong> button. Tap it when a culture is subcultured and plants are ready to go back to the greenhouse. You choose how many plants, and the app merges them into an existing greenhouse entry for that species (or creates a new one). A transfer event is logged for traceability.</p>
+        <h3>List Filters</h3>
+        <table><tr><th>Filter pill</th><th>Shows</th></tr>
+          <tr><td>All</td><td>Every bottle</td></tr>
+          <tr><td>Prepared</td><td>Media made, not yet inoculated</td></tr>
+          <tr><td>Inoculated</td><td>Explants placed</td></tr>
+          <tr><td>Growing</td><td>Active cultures</td></tr>
+          <tr><td>Contam</td><td>Contaminated vessels</td></tr>
+        </table>
       </div>
 
-      <h2>🌱 Species in Culture</h2>
+      <h2 id="h-greenhouse">🏡 Greenhouse List</h2>
+      <div class="help-section-card">
+        <p>Track every stock plant in the greenhouse. This is the bridge between your field collection and your TC lab — recording what you have, where it is, and its history as both an explant source and a lab output destination.</p>
+
+        <h3>Core Concept — The Circular Flow</h3>
+        <div class="help-flow">
+          <span class="flow-step">🏡 GH Stock Plant</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">🌿 Take Explant</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">🫙 Bottle / 🔥 Session</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">✂️ Subcultured</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">🏡 Send to GH</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">🏡 GH Stock grows</span>
+        </div>
+
+        <h3>Plant Entry Fields</h3>
+        <table><tr><th>Field</th><th>Purpose</th></tr>
+          <tr><td>Species</td><td>Taxonomy autocomplete + Browse modal</td></tr>
+          <tr><td>Quantity</td><td>Number of individual plants of this species at this location</td></tr>
+          <tr><td>Health status</td><td>Healthy / Stressed / Dormant / Declined — colour-coded dot indicator</td></tr>
+          <tr><td>Source</td><td>Wild collected / Lab output / Nursery / Trade</td></tr>
+          <tr><td>Date added</td><td>When the plants entered the greenhouse</td></tr>
+          <tr><td>Greenhouse location</td><td>Bench, section, or area (e.g. "Bench 3A", "Shade house")</td></tr>
+          <tr><td>Linked accession</td><td>Optional link to the Accession Registry record</td></tr>
+          <tr><td>Notes</td><td>Markdown — phenotype observations, provenance, permit notes</td></tr>
+        </table>
+
+        <h3>Health Status Indicators</h3>
+        <table><tr><th>Status</th><th>Colour</th><th>Meaning</th></tr>
+          <tr><td>Healthy</td><td style="color:var(--gn)">● Green (glow)</td><td>Actively growing, good as explant source</td></tr>
+          <tr><td>Stressed</td><td style="color:var(--yw)">● Yellow</td><td>Heat, water, or pest stress — explants may have higher contam risk</td></tr>
+          <tr><td>Dormant</td><td style="color:var(--mu)">● Grey</td><td>Not actively growing — seasonal or induced dormancy</td></tr>
+          <tr><td>Declined</td><td style="color:var(--rd)">● Red</td><td>Poor condition, not a viable explant source</td></tr>
+        </table>
+
+        <h3>Explant → Lab Flow (Greenhouse to Culture)</h3>
+        <p>From a plant's detail view, tap one of:</p>
+        <table><tr><th>Button</th><th>What happens</th></tr>
+          <tr><td>🌿 Take Explant → Bottle</td><td>Prompts for quantity and a note. Logs the explant event. Opens the Single Bottle editor with species, accession, and source plant pre-filled and linked.</td></tr>
+          <tr><td>🔥 Take Explant → Session</td><td>Same logging, then opens the Autoclave Session builder with this species pre-filled in the first batch row. Useful when taking a large explant batch for a full autoclave run.</td></tr>
+        </table>
+        <p>Every event is saved in the <strong>Explant history</strong> table on the plant detail — date, quantity, and optional note. The total explants taken and number of culture events is shown in the plant detail.</p>
+
+        <h3>Lab → Greenhouse Flow (Subcultured bottles to GH)</h3>
+        <p>On any bottle detail, tap <strong>🏡 Send to GH</strong>. Enter how many plants you are transferring. The app then:</p>
+        <ol style="font-size:14px;line-height:1.75;padding-left:20px;margin:6px 0">
+          <li>If a GH entry for that species already exists: offers to merge (adds to the quantity count)</li>
+          <li>If not: creates a new GH entry tagged <strong>Source: Lab output</strong></li>
+          <li>Logs a transfer event (type: lab_output_in) with the bottle reference for full traceability</li>
+        </ol>
+
+        <h3>Connections Throughout the App</h3>
+        <table><tr><th>Where</th><th>What you see</th></tr>
+          <tr><td>Bottle editor</td><td>"Source greenhouse plant" dropdown — filtered by species when you type a species name</td></tr>
+          <tr><td>Bottle detail</td><td>"Source plant" row with a link back to the GH plant</td></tr>
+          <tr><td>Species detail panel</td><td>🏡 Greenhouse Plants section — all plants of that species with health dots + "+ Add plant" shortcut</td></tr>
+          <tr><td>Dashboard</td><td>Greenhouse strip shows healthy stock plants. A yellow alert appears when subcultured bottles exist for a species — lab output ready to send back to GH.</td></tr>
+          <tr><td>Dashboard stat card</td><td>🏡 Greenhouse: entry count / total plant count</td></tr>
+        </table>
+
+        <h3>List Panel Filters</h3>
+        <table><tr><th>Filter</th><th>Shows</th></tr>
+          <tr><td>All</td><td>Every plant entry</td></tr>
+          <tr><td>Healthy</td><td>Entries with health = Healthy</td></tr>
+          <tr><td>Stressed</td><td>Entries with health = Stressed</td></tr>
+          <tr><td>Lab origin</td><td>Plants sourced from lab output (source = lab)</td></tr>
+        </table>
+      </div>
+
+      <h2 id="h-dashboard">🏠 Home Dashboard</h2>
+      <div class="help-section-card">
+        <p>Always accessible via the <strong>🏠 Home</strong> button. Shows your whole lab at a glance.</p>
+        <h3>Quick Actions</h3>
+        <table><tr><th>Button</th><th>Action</th></tr>
+          <tr><td>＋ New Entry</td><td>Open full lab note editor</td></tr>
+          <tr><td>🫙 New Bottle</td><td>Open bottle editor (Single mode)</td></tr>
+          <tr><td>🏡 GH Plant</td><td>Open greenhouse plant editor</td></tr>
+          <tr><td>📷 Scan QR</td><td>Open QR scanner in route mode</td></tr>
+          <tr><td>📅 Calendar</td><td>Navigate to calendar view</td></tr>
+          <tr><td>📊 Analytics</td><td>Navigate to analytics</td></tr>
+        </table>
+        <h3>Stat Cards (5)</h3>
+        <table><tr><th>Card</th><th>Value</th><th>Sub-label</th></tr>
+          <tr><td>📋 Notes</td><td>Total note count</td><td>Click → Notes section</td></tr>
+          <tr><td>🫙 Bottles</td><td>Total bottle count</td><td>N active (inoculated + growing)</td></tr>
+          <tr><td>🌿 Accessions</td><td>Registry entry count</td><td>Click → Registry</td></tr>
+          <tr><td>🏡 Greenhouse</td><td>GH entry count</td><td>Total plant count</td></tr>
+          <tr><td>⏰ Reminders</td><td>Overdue + this-week count</td><td>N overdue (red if any)</td></tr>
+        </table>
+        <h3>Dashboard Panels</h3>
+        <table><tr><th>Panel</th><th>Contents</th></tr>
+          <tr><td>7-Day Activity Bar</td><td>Column chart of notes created each of the last 7 days. Hover for exact date + count.</td></tr>
+          <tr><td>Recent Entries</td><td>5 most recent lab notes — click to open</td></tr>
+          <tr><td>Reviews Due</td><td>Notes + bottles due in next 14 days, sorted by urgency. Red = overdue, yellow = ≤3 days, grey = later.</td></tr>
+          <tr><td>Active Bottles strip</td><td>Status pills + top bottles by review urgency, click to open. Shows only when ≥1 active bottle.</td></tr>
+          <tr><td>Greenhouse strip</td><td>Healthy stock plants as clickable chips + yellow alert when lab output ready for GH. Shows only when GH has entries.</td></tr>
+        </table>
+      </div>
+
+      <h2 id="h-species">🌱 Species in Culture</h2>
       <div class="help-section-card">
         <h3>Species Table</h3>
-        <p>Click <strong>Species</strong> in the nav drawer to see a live table of every species found in your notes, accessions, and bottles. Columns: note count, active bottles, TC stage breakdown, contamination rate, average Cultures Out, accession status.</p>
+        <p>Click <strong>🌱 Species</strong> in the nav drawer. A live table lists every species found in your notes, accessions, and bottles.</p>
+        <table><tr><th>Column</th><th>Meaning</th></tr>
+          <tr><td>Species</td><td>Scientific name (bold if taxonomy pack has data)</td></tr>
+          <tr><td>Notes</td><td>Total lab notes for this species</td></tr>
+          <tr><td>Active bottles</td><td>Inoculated + growing bottles</td></tr>
+          <tr><td>Stage spread</td><td>Mini stage pills showing active work distribution</td></tr>
+          <tr><td>Contam rate</td><td>% of notes that are contamination logs</td></tr>
+          <tr><td>Avg out</td><td>Average "Cultures Out" across notes — proxy for multiplication rate</td></tr>
+        </table>
         <h3>Species Detail Panel</h3>
-        <p><strong>Click any species row</strong> to open a full detail panel on the right — showing:</p>
-        <ul>
-          <li>Summary stats: notes, active bottles, contamination rate</li>
-          <li>TC Stage Activity: horizontal bar chart showing distribution across stages</li>
-          <li>Accession records (click to navigate)</li>
-          <li>Bottle inventory for this species (click to navigate)</li>
-          <li>All linked notes, most recent first (click to open)</li>
-        </ul>
-        <p>Tap <strong>🌿 Taxonomy ↗</strong> in the panel header to look up the species in the PhytoCommerce taxonomy database.</p>
-        <h3>Taxonomy Packs &amp; Flairs</h3>
-        <p>Switch to the <strong>Taxonomy Packs</strong> tab to enable/disable built-in species packs (Carnivorous Plants, Orchids, Banana &amp; Relatives). The <strong>Flairs</strong> tab lets you define coloured labels (e.g. <em>Borneo clone</em>, <em>Highland form</em>) to assign to accession records.</p>
+        <p>Click any species row to open the detail panel showing:</p>
+        <table><tr><th>Section</th><th>Contents</th></tr>
+          <tr><td>Summary</td><td>Notes, active bottles, contam rate, avg cultures out</td></tr>
+          <tr><td>TC Stage Activity</td><td>Horizontal bar chart across Stage I–IV</td></tr>
+          <tr><td>🏡 Greenhouse Plants</td><td>All GH entries for this species with health dots, quantity, and source. "+ Add plant" shortcut.</td></tr>
+          <tr><td>Accession Records</td><td>Registry entries — click to navigate</td></tr>
+          <tr><td>Bottles</td><td>Up to 8 bottles with status dots — click to open. "View all" link.</td></tr>
+          <tr><td>Notes</td><td>Most recent 10 lab notes — click to open</td></tr>
+        </table>
+        <h3>Taxonomy Packs</h3>
+        <p>Switch to the <strong>Taxonomy Packs</strong> tab to toggle built-in species packs: <em>Carnivorous Plants</em> (Nepenthes, Drosera, Sarracenia…), <em>Orchids</em>, <em>Banana &amp; Relatives</em>. Disabled packs are excluded from autocomplete on next login. Add your own custom species at the bottom.</p>
+        <h3>Flairs</h3>
+        <p>Define coloured labels in the <strong>Flairs</strong> tab — e.g. <em>Borneo clone</em>, <em>Highland form</em>, <em>SCV-01</em>. Assign to accessions in the Registry editor. Appear as pills in the accession list and in the species autocomplete dropdown for that accession.</p>
       </div>
 
-      <h2>⚙️ Settings</h2>
+      <h2 id="h-reminders">⏰ Reminders</h2>
       <div class="help-section-card">
-        <p>Click <strong>⚙️</strong> in the top bar to open the Settings panel. Changes take effect immediately and persist in <code>localStorage</code>.</p>
-        <table><tr><th>Setting</th><th>What it does</th></tr>
-          <tr><td>Theme</td><td>Switch between dark and light mode</td></tr>
-          <tr><td>Lab Name</td><td>Shown in the dashboard header subtitle</td></tr>
-          <tr><td>Weather Location</td><td>City used for the weather widget</td></tr>
-          <tr><td>Gemini API Key</td><td>Powers the ✦ AI assistant. Get a free key at aistudio.google.com</td></tr>
-          <tr><td>Scan Enhancement</td><td>Adds contrast/brightness sliders in camera scan mode for dim lighting</td></tr>
-          <tr><td>Try Harder Mode</td><td>Slower but more thorough QR/barcode detection</td></tr>
-          <tr><td>Clear Local Cache</td><td>Forces a full reload from GitHub on next login</td></tr>
-          <tr><td>Forget Trusted Device</td><td>Removes the encrypted saved token from this device</td></tr>
-          <tr><td>Reset Usage Stats</td><td>Clears the feature usage data shown in Analytics</td></tr>
+        <p>Any note or bottle with a <strong>Next Review Date</strong> appears here, grouped by urgency. The nav drawer badge shows overdue + this-week count.</p>
+        <table><tr><th>Group</th><th>Condition</th><th>Colour</th></tr>
+          <tr><td>🔴 Overdue</td><td>Review date has passed</td><td>Red</td></tr>
+          <tr><td>🟡 This week</td><td>Due within 7 days</td><td>Yellow</td></tr>
+          <tr><td>📅 This month</td><td>Due within 30 days</td><td>—</td></tr>
+          <tr><td>🗓 Later</td><td>More than 30 days away</td><td>—</td></tr>
+        </table>
+        <p>Click any reminder card to jump directly to the note or bottle.</p>
+      </div>
+
+      <h2 id="h-contam">☣️ Contamination Dashboard</h2>
+      <div class="help-section-card">
+        <p>All notes of type <strong>Contamination Log</strong> are aggregated here. Shows a summary (total events, most affected species, most common stage) and a chronological list of every contamination event. Click any entry to open the full note.</p>
+        <div class="help-tip">💡 Use the <strong>Contamination Trend</strong> chart in Analytics to spot monthly spikes. If contamination suddenly rises, check laminar flow maintenance, media pH, and explant surface sterilisation protocol.</div>
+      </div>
+
+      <h2 id="h-analytics">📊 Lab Analytics</h2>
+      <div class="help-section-card">
+        <p>All metrics are computed in-browser from your already-decrypted data. Nothing is sent anywhere.</p>
+        <table><tr><th>Chart / Card</th><th>What it shows</th></tr>
+          <tr><td>Notes / Month</td><td>Line chart — entries created per calendar month (last 6 months)</td></tr>
+          <tr><td>Stage Distribution</td><td>Donut — proportion of notes at each TC stage (I–IV, Contam, Unclassified)</td></tr>
+          <tr><td>Species Success Rate</td><td>Horizontal bars — % of non-contamination notes per species (≥2 notes required). Green &gt;70 %, yellow 40–70 %, red &lt;40 %</td></tr>
+          <tr><td>Contamination Trend</td><td>Line chart — contamination entries per month (last 6 months)</td></tr>
+          <tr><td>Recipe Usage</td><td>Bars — how many notes reference each recipe (top 6)</td></tr>
+          <tr><td>Tag Cloud</td><td>30 most-used tags as sized pills — larger = more frequent</td></tr>
+          <tr><td>Stage Funnel by Species</td><td>Stacked bars for top 5 species — Stage I → II → III → IV distribution</td></tr>
+          <tr><td>Avg Days Between Entries</td><td>Badge cards per species (≥3 notes) — approximate subculture interval</td></tr>
+          <tr><td>Media Efficiency</td><td>Ranked table: Recipe × Species × Stage. Score = (Avg Out / global avg) × (1 − contam rate) × 100</td></tr>
+          <tr><td>Feature Usage</td><td>Bars — section visit frequency since tracking began (reset in Settings)</td></tr>
+        </table>
+        <div class="help-tip">💡 Always fill <strong>Cultures Out</strong> on Multiplication and Rooting notes to get meaningful Avg Out and Score data in the Media Efficiency table.</div>
+      </div>
+
+      <h2 id="h-calendar">📅 Calendar</h2>
+      <div class="help-section-card">
+        <p>Monthly view of all lab activity. Navigate with <strong>‹ ›</strong> or <strong>Today</strong>.</p>
+        <h3>Calendar Dots</h3>
+        <table><tr><th>Dot colour</th><th>Meaning</th></tr>
+          <tr><td><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ac);vertical-align:middle"></span> Blue</td><td>Lab entry created on this day</td></tr>
+          <tr><td><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--yw);vertical-align:middle"></span> Yellow</td><td>Review due on this day</td></tr>
+          <tr><td><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--rd);vertical-align:middle"></span> Red</td><td>Contamination entry on this day</td></tr>
+        </table>
+        <h3>Day Panel</h3>
+        <p>Click any day → a panel lists all entries with type, stage, and species. Click any entry to open it. On mobile the panel is full-screen.</p>
+        <h3>Creating Notes from the Calendar</h3>
+        <p>Click a day → <strong>+ New note on this date</strong> (past) or <strong>+ Schedule note for this date</strong> (future). Past dates set the experiment date; future dates pre-fill the Next Review Date.</p>
+        <h3>Exporting</h3>
+        <p>Click <strong>⬇ Export → This week / This month</strong>. A print-ready window opens with all entries expanded — note bodies, badges, and contamination/review flags. Save as PDF via the browser print dialog.</p>
+      </div>
+
+      <h2 id="h-tools">⏱ Lab Tools</h2>
+      <div class="help-section-card">
+        <table><tr><th>Tool</th><th>How to use</th></tr>
+          <tr><td>Countdown Timers</td><td>＋ Add Timer → enter h/m/s + name → ▶ Start. Up to 5 simultaneous. Beeps on zero. ↺ Reset.</td></tr>
+          <tr><td>Stopwatches</td><td>Up to 4 simultaneous. ⏱ Lap records a split without stopping. ↺ resets.</td></tr>
+          <tr><td>Sterilisation Stepper</td><td>Pick sterilisation protocol → app walks you through each step with a per-step countdown timer, temperature field, and notes field. Great for surface sterilisation workflows.</td></tr>
+          <tr><td>Media Volume Scaler</td><td>Enter base volume + target volume + ingredients (one per line: "name: amount unit"). Click Scale → proportional quantities shown immediately.</td></tr>
+          <tr><td>BioChemistry Calculator</td><td>Molarity (MW/mass/volume), Dilution (C₁V₁=C₂V₂), % Solution (w/v), pH from [H⁺] or pOH, PGR converter (mg/L ↔ μM using molecular weight)</td></tr>
         </table>
       </div>
 
-      <h2>📷 QR Scan</h2>
+      <h2 id="h-qr">📷 QR Scan</h2>
       <div class="help-section-card">
-        <p>Tap <strong>📷</strong> in the top nav bar from any screen to open the QR / barcode scanner in <em>route mode</em>:</p>
-        <ul>
-          <li>Scan a <strong>bottle label QR</strong> → automatically navigates to that bottle record</li>
-          <li>Scan any other QR or barcode → shows the decoded text with Copy and Open URL options</li>
-        </ul>
-        <p>The scanner also opens from <strong>📷</strong> in the note editor toolbar for inserting barcodes into notes.</p>
-        <h3>Low-Light Scanning</h3>
-        <p>If QR codes aren't scanning reliably, turn on <strong>Scan Enhancement</strong> in ⚙️ Settings. When active, contrast and brightness sliders appear during scanning — drag them to boost image clarity before the decoder runs.</p>
+        <p>Tap <strong>📷</strong> in the top nav bar from any screen — opens the scanner in <em>route mode</em>.</p>
+        <table><tr><th>Scanned content</th><th>Result</th></tr>
+          <tr><td>Bottle label QR (<code>?bottle=ID</code>)</td><td>Automatically navigates to that bottle's detail view</td></tr>
+          <tr><td>Note QR (<code>?note=ID</code>)</td><td>Automatically opens that note</td></tr>
+          <tr><td>Any other QR or barcode</td><td>Shows decoded text with Copy and Open URL options</td></tr>
+        </table>
+        <p>The same scanner opens from the <strong>📷 toolbar button</strong> inside the note editor for inserting barcodes inline.</p>
+        <h3>Low-Light Tips</h3>
+        <p>Enable <strong>Scan Enhancement</strong> in ⚙️ Settings. When active, contrast and brightness sliders appear during scanning — drag to boost image clarity. Enable <strong>Try Harder Mode</strong> for a slower but more thorough decoder pass.</p>
       </div>
 
-      <h2>✦ Gemini AI Assistant</h2>
+      <h2 id="h-ai">✦ Gemini AI Assistant</h2>
       <div class="help-section-card">
-        <p>Tap <strong>✦</strong> (bottom-right, above the quick log FAB) to open the AI assistant powered by Google Gemini. When you ask a question, the assistant automatically sends rich context about your current session:</p>
-        <ul>
-          <li><strong>Open note</strong> — title, type, stage, species, date, and the <em>full decrypted note body</em> (fetched on demand if not already loaded)</li>
-          <li><strong>Linked recipe</strong> — base medium, PGRs, pH, sucrose, agar</li>
-          <li><strong>Accession record</strong> — status, source, origin for the note's species</li>
-          <li><strong>Species summary</strong> — top 10 species by note count, with stage distribution, contamination rate, and average cultures per transfer</li>
-        </ul>
-        <p>Pre-built chips: <em>Summarise note</em> (bullet-point summary of the open note body), <em>PGR advice</em> (recommendations based on species + media context), <em>Contam analysis</em> (likely causes + prevention), <em>Lab overview</em> (status across all species). Press <strong>Enter</strong> to send free-text questions.</p>
+        <p>Tap <strong>✦</strong> (bottom-right, above the Quick Log FAB) to open the assistant powered by Google Gemini (free Gemini API key required — set in ⚙️ Settings).</p>
+        <h3>Context Automatically Sent</h3>
+        <table><tr><th>Context</th><th>Detail</th></tr>
+          <tr><td>Open note</td><td>Title, type, stage, species, date, full decrypted body</td></tr>
+          <tr><td>Linked recipe</td><td>Base medium, PGRs, pH, sucrose, agar</td></tr>
+          <tr><td>Accession record</td><td>Status, source, origin for the note's species</td></tr>
+          <tr><td>Species summary</td><td>Top 10 species — stage distribution, contam rate, avg cultures per transfer</td></tr>
+        </table>
+        <h3>Pre-Built Chips</h3>
+        <table><tr><th>Chip</th><th>What it asks</th></tr>
+          <tr><td>Summarise note</td><td>Bullet-point summary of the open note body</td></tr>
+          <tr><td>PGR advice</td><td>Growth regulator recommendations based on species + media context</td></tr>
+          <tr><td>Contam analysis</td><td>Likely contamination causes and prevention steps</td></tr>
+          <tr><td>Lab overview</td><td>Status summary across all species in culture</td></tr>
+        </table>
+        <p>Press <span class="kbd">Enter</span> to send free-text questions. The assistant has full context of your lab data for every question.</p>
       </div>
 
-      <h2>📰 TC Research News</h2>
+      <h2 id="h-news">📰 TC Research News</h2>
       <div class="help-section-card">
-        <p>Click <strong>News</strong> in the nav drawer to see the latest 100 plant tissue culture publications from <strong>PubMed</strong>. Toggle the switch to <strong>load</strong> articles as individual cards — each shows title (linked to DOI), authors, journal, and year. Toggle off to <strong>clear</strong> from memory.</p>
-        <p>When loaded, results are automatically <strong>archived to your GitHub repo</strong> at <code>news/YYYY-MM-DD.json</code> with the date stamp. These files accumulate over time as a research archive you can reference later.</p>
+        <p>Click <strong>News</strong> in the nav drawer. Toggle the switch to load the latest 100 plant tissue culture publications from <strong>PubMed</strong>. Each card shows title (DOI link), authors, journal, and year. Toggle off to clear from memory.</p>
+        <p>Results are automatically <strong>archived to your repo</strong> at <code>news/YYYY-MM-DD.json</code> — these files accumulate as a permanent research archive you can reference later.</p>
       </div>
 
-      <h2>⚡ Activity Log</h2>
+      <h2 id="h-actlog">⚡ Activity Log</h2>
       <div class="help-section-card">
-        <p>The <strong>⚡ Activity</strong> tab on the right edge of the screen opens a live panel showing the last 30 GitHub commits on your lab repo — a real-time record of every action saved to the cloud.</p>
-        <p>Icons indicate the type of activity:</p>
-        <table><tr><th>Icon</th><th>Meaning</th></tr>
-          <tr><td>🌱</td><td>New note added or Quick Log</td></tr>
+        <p>The <strong>⚡ Activity</strong> tab (right edge) shows the last 30 GitHub commits on your lab repo — a real-time record of every save to the cloud.</p>
+        <table><tr><th>Icon</th><th>Commit type</th></tr>
+          <tr><td>🌱</td><td>New note or Quick Log entry</td></tr>
           <tr><td>✏️</td><td>Note updated</td></tr>
           <tr><td>🗑</td><td>Note deleted</td></tr>
-          <tr><td>🌿</td><td>Accession registry updated</td></tr>
-          <tr><td>🧪</td><td>Recipe saved or updated</td></tr>
+          <tr><td>🌿</td><td>Accession registry saved</td></tr>
+          <tr><td>🧪</td><td>Recipe saved</td></tr>
           <tr><td>🫙</td><td>Bottle inventory updated</td></tr>
-          <tr><td>📋</td><td>Index updated</td></tr>
-          <tr><td>✨</td><td>App feature added</td></tr>
+          <tr><td>🏡</td><td>Greenhouse data saved</td></tr>
+          <tr><td>📋</td><td>Note index updated</td></tr>
+          <tr><td>✨</td><td>App code updated</td></tr>
         </table>
-        <p>Click any note-related commit (🌱 or ✏️) to jump directly to that note. Click <strong>↻</strong> to refresh. Click <strong>✕</strong>, tap the <strong>⚡ Activity</strong> tab again, or <strong>click anywhere outside the panel</strong> to close it.</p>
+        <p>Click any 🌱 or ✏️ commit to jump directly to that note. <strong>↻</strong> refreshes. Click <strong>✕</strong>, the Activity tab again, or anywhere outside the panel to close it.</p>
       </div>
 
-      <h2>⏱ Tools</h2>
+      <h2 id="h-settings">⚙️ Settings</h2>
       <div class="help-section-card">
-        <h3>Countdown Timers</h3>
-        <p>Click <strong>＋ Add Timer</strong>. Enter hours, minutes, seconds, and a name (e.g. "Autoclave", "Surface sterilisation"). Press ▶ to start. Up to 5 simultaneous timers. A repeating beep plays when a timer reaches zero. Press ↺ to reset.</p>
-        <h3>Stopwatches</h3>
-        <p>Up to 4 stopwatches with lap recording. Press <strong>⏱ Lap</strong> to record a split without stopping. Press ↺ to clear laps and reset.</p>
-        <h3>Sterilisation Stepper</h3>
-        <p>A step-by-step sterilisation protocol guide. Select your surface sterilisation method and the stepper walks you through each stage with a built-in countdown timer per step. Each step supports a <strong>temperature</strong> field (e.g. 55 °C water bath) and a <strong>notes</strong> field for lot-specific reminders or observations. The old general-purpose calculator has been removed — use the BioChemistry Calculator below for numeric calculations.</p>
-        <h3>Media Volume Scaler</h3>
-        <p>Scale any saved recipe up or down. Enter a target volume (e.g. 500 mL) and the scaler recalculates all ingredient quantities proportionally. Useful when preparing a partial batch or scaling an existing formulation to a new vessel size.</p>
-        <h3>BioChemistry Calculator</h3>
-        <ul>
-          <li><strong>Molarity</strong> — molar concentration from MW, mass, and volume</li>
-          <li><strong>Dilution</strong> — C₁V₁ = C₂V₂; leave V₁ blank to solve for it</li>
-          <li><strong>% Solution</strong> — w/v percentage from mass and volume</li>
-          <li><strong>pH</strong> — pH from [H⁺] or from pOH</li>
-          <li><strong>PGR Convert</strong> — growth regulator concentrations between mg/L and μM using molecular weight</li>
-        </ul>
+        <p>Click <strong>⚙️</strong> in the top bar. All changes persist in <code>localStorage</code>.</p>
+        <table><tr><th>Setting</th><th>Effect</th></tr>
+          <tr><td>Theme</td><td>Dark / Light mode toggle</td></tr>
+          <tr><td>Lab Name</td><td>Shown in the dashboard header and Vanakkam greeting</td></tr>
+          <tr><td>Weather Location</td><td>City name for the weather widget</td></tr>
+          <tr><td>Gemini API Key</td><td>Powers the ✦ AI assistant. Free key at aistudio.google.com</td></tr>
+          <tr><td>Scan Enhancement</td><td>Adds contrast/brightness sliders in camera scan mode</td></tr>
+          <tr><td>Try Harder Mode</td><td>Slower but more thorough QR/barcode decoder</td></tr>
+          <tr><td>Clear Local Cache</td><td>Forces a full reload from GitHub on next login</td></tr>
+          <tr><td>Forget Trusted Device</td><td>Removes the encrypted saved token from this device</td></tr>
+          <tr><td>Reset Usage Stats</td><td>Clears section-visit counts shown in Analytics</td></tr>
+        </table>
       </div>
 
-      <h2>Export &amp; Backup</h2>
+      <h2 id="h-export">Export &amp; Backup</h2>
       <div class="help-section-card">
-        <p>Click <strong>⬇</strong> (ZIP) or <strong>CSV</strong> in the top bar to export your data. ZIP downloads all notes as decrypted Markdown files plus accessions and recipes as JSON. CSV downloads two spreadsheet files: one for all note metadata (id, title, date, type, stage, species, tags, next review, recipe, cultures out), one for all accessions.</p>
-        <p>Each ZIP note file includes YAML front matter with all metadata.</p>
-        <p>Your data is always in the GitHub repo as encrypted <code>.enc</code> files — every save is a git commit, so you have full version history at <code>github.com/Phyto-Evolution/tcplants</code>. The repo is your backup.</p>
-        <h3>Print / PDF</h3>
-        <p>Open any note or recipe, then click <strong>🖨 Print / PDF</strong>. A clean print-optimised window opens. Use your browser's print dialog → <em>Save as PDF</em>.</p>
+        <table><tr><th>Export</th><th>Contents</th></tr>
+          <tr><td>⬇ ZIP</td><td>All notes as decrypted Markdown (with YAML front matter) + accessions &amp; recipes as JSON</td></tr>
+          <tr><td>CSV</td><td>Two files: all note metadata (id, title, date, type, stage, species, tags, next review, recipe, cultures out) + all accessions</td></tr>
+          <tr><td>🖨 Print / PDF</td><td>Open any note or recipe → Print / PDF → browser print dialog → Save as PDF</td></tr>
+          <tr><td>📅 Calendar export</td><td>This week / This month → print-ready HTML with all entries and note bodies</td></tr>
+        </table>
+        <p>Your data is always in the GitHub repo as encrypted <code>.enc</code> files — every save is a git commit, giving you complete version history at <code>github.com/Phyto-Evolution/tcplants</code>.</p>
       </div>
 
-      <h2>Privacy &amp; Security</h2>
+      <h2 id="h-weather">🌡️ Weather Widget</h2>
       <div class="help-section-card">
-        <p>All note content is encrypted client-side with <strong>AES-256-GCM</strong> using a key derived from your password via PBKDF2 (600,000 iterations, SHA-256). The GitHub repo contains only ciphertext — even repo admins cannot read your notes without your password.</p>
-        <p>Your password never leaves your browser. The GitHub token is stored only in <code>sessionStorage</code> (cleared on tab close). The session data cache in <code>sessionStorage</code> contains decrypted data but is cleared on lock and on tab close.</p>
+        <p>The weather chip in the nav bar shows current real-feel temperature at the lab. Data is fetched from Open-Meteo every 60 seconds — no API key needed.</p>
+        <table><tr><th>Location</th><th>Metrics</th></tr>
+          <tr><td>🏛️ Lab — SARE, Thiruporur</td><td>Feels-like °C · 💧 Humidity % · ☀️ UV Index · 🌧️ Rain probability %</td></tr>
+          <tr><td>🌿 Greenhouse — Thaiyur, Kelambakkam</td><td>Same four metrics</td></tr>
+        </table>
+        <p>Click the chip to expand the two-location popover. Click anywhere outside to close.</p>
       </div>
+
+      <h2 id="h-security">🔒 Privacy &amp; Security</h2>
+      <div class="help-section-card">
+        <table><tr><th>What</th><th>How it works</th></tr>
+          <tr><td>Encryption</td><td>AES-256-GCM. Key derived via PBKDF2 (SHA-256, 600,000 iterations). Unique salt per save.</td></tr>
+          <tr><td>Where data lives</td><td>Only in your GitHub repo as <code>.enc</code> ciphertext. Even repo admins cannot read it without your passphrase.</td></tr>
+          <tr><td>Passphrase</td><td>In-memory only. Never sent to any server. Lost on lock or tab close.</td></tr>
+          <tr><td>GitHub token</td><td><code>sessionStorage</code> only (cleared on tab close) unless Trusted Device is enabled — then stored in <code>localStorage</code> as token encrypted with your passphrase.</td></tr>
+          <tr><td>Session cache</td><td>Decrypted data cached in <code>sessionStorage</code> for 10 minutes for fast re-unlock. Cleared on lock and tab close.</td></tr>
+          <tr><td>Trusted Device</td><td>Token encrypted with your passphrase and stored in <code>localStorage</code>. Remove via Settings → Forget this device.</td></tr>
+        </table>
+        <div class="help-warn">⚠️ If you lose your passphrase, all data is permanently unrecoverable. There is no password reset. Keep a secure backup of your passphrase.</div>
+      </div>
+
     </div>
   </div>
 
