@@ -1764,16 +1764,19 @@ main > .dview, main > .editor{ margin:0 auto; }
     <div id="gh-empty" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--mu);padding:40px 20px;text-align:center">
       <div style="font-size:52px;margin-bottom:14px;opacity:.5">🏡</div>
       <div style="font-size:16px;font-weight:600;margin-bottom:6px;color:var(--tx)">Greenhouse Plants</div>
-      <div style="font-size:13px;margin-bottom:20px">Track your stock plants — source of explants for new culture lines, and destination for lab output.</div>
-      <button class="btn sm" onclick="startNewGHPlant()">＋ Add Plant</button>
+      <div style="font-size:13px;margin-bottom:24px;max-width:340px;line-height:1.6">Track your stock plants — source of explants for new culture lines, and destination for lab output.</div>
+      <button class="btn" onclick="startNewGHPlant()" style="margin-bottom:10px;min-width:180px">＋ Add Single Plant</button>
+      <button class="btn ghost" onclick="openGHImport()" style="min-width:180px;border-color:#52b788;color:#52b788">⬆ Import from CSV</button>
+      <div style="margin-top:12px;font-size:11px;color:var(--mu);line-height:1.6">Bulk import · supports unregistered hybrids · all entries get 🏡 GH flair automatically</div>
     </div>
     <div id="gh-detail" style="display:none;height:100%;overflow-y:auto;max-width:680px;margin:0 auto;width:100%"></div>
     <div id="gh-editor" style="display:none;overflow-y:auto;height:100%;padding:20px 32px"><div style="max-width:680px;margin:0 auto">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
         <h2 id="gh-editor-title" style="font-size:16px;font-weight:700;flex:1">New Plant</h2>
         <button class="btn sm ghost" onclick="cancelGHEdit()">Cancel</button>
         <button class="btn sm green" id="gh-save-btn" onclick="saveGHPlantAction()">Save</button>
       </div>
+      <div id="gh-editor-import-hint" style="margin-bottom:14px;font-size:12px;color:var(--mu)">Adding multiple plants? <a onclick="openGHImport()" style="color:#52b788;cursor:pointer;font-weight:600">Import from CSV instead →</a></div>
       <div class="row2">
         <div class="field">
           <label>Species</label>
@@ -1988,24 +1991,32 @@ main > .dview, main > .editor{ margin:0 auto; }
       <!-- VERSION HEADER -->
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
         <h1 style="font-size:22px;font-weight:800;margin:0">🌿 TC Plants Lab Notes</h1>
-        <span class="help-version-badge">v3.1</span>
+        <span class="help-version-badge">v3.2</span>
       </div>
       <p style="color:var(--mu);font-size:13px;margin-bottom:20px">April 2026 · Encrypted · GitHub-backed · Single-file PWA</p>
 
-      <!-- WHAT'S NEW v3.1 -->
+      <!-- WHAT'S NEW v3.2 -->
       <div style="background:linear-gradient(135deg,rgba(63,185,80,.1),rgba(88,166,255,.08));border:1px solid rgba(63,185,80,.3);border-radius:10px;padding:18px 20px;margin-bottom:14px">
-        <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v3.1</div>
+        <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v3.2</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
-          <div style="font-size:13px;line-height:1.6"><strong>📦 Quantity Ledger</strong> — every stock change logged with delta, reason, type &amp; running balance</div>
-          <div style="font-size:13px;line-height:1.6"><strong>⊞ Bench View</strong> — toggle list ↔ bench grid; plants grouped by greenhouse location</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🩺 Condition History</strong> — timestamped health log per plant, inline log form in Health tab</div>
-          <div style="font-size:13px;line-height:1.6"><strong>⚗️ Output Plan tab</strong> — harvest estimates, pipeline view &amp; "ready for GH" subcultured alert</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🔔 Inspection reminders</strong> — next inspection date field; due plants appear in ⏰ Reminders</div>
-          <div style="font-size:13px;line-height:1.6"><strong>⬆ CSV Import</strong> — bulk-upload plants from spreadsheet; hybrids &amp; unregistered species fully supported</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🏡 GH System Flair</strong> — auto-created, auto-assigned when taking explants or choosing Greenhouse source</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🌱 Expanded sources</strong> — Seeds, Greenhouse, Other lab, Custom… with auto GH flair in accessions</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🌱 Taxonomy source field</strong> — custom species now record Seeds / Greenhouse / Other lab / Custom; hybrids auto-badged HYBRID</div>
+          <div style="font-size:13px;line-height:1.6"><strong>⬆ CSV Import — right place</strong> — import is now in the Greenhouse empty state &amp; New Plant editor, not buried in the list header</div>
+          <div style="font-size:13px;line-height:1.6"><strong>📋 CSV format table</strong> — full column reference always visible in the import modal with prominent template download</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🏡 GH flair in taxonomy</strong> — adding a custom species with source = Greenhouse auto-ensures the GH flair</div>
         </div>
       </div>
+      <!-- v3.1 release notes (collapsed) -->
+      <details style="margin-bottom:8px">
+        <summary style="cursor:pointer;font-size:12px;color:var(--mu);padding:6px 0;font-weight:600;letter-spacing:.04em">▸ v3.1 release notes</summary>
+        <div style="background:var(--sf2);border-radius:8px;padding:12px;margin-top:6px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px">
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">📦 Quantity Ledger</strong> — running balance stock history</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">⊞ Bench View</strong> — plants grouped by location</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">🩺 Condition History</strong> — health timeline per plant</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">⚗️ Output Plan</strong> — harvest estimates &amp; pipeline</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">🔔 Inspection reminders</strong> — next inspection in ⏰</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">🏡 GH flair &amp; sources</strong> — GH flair auto-created, expanded accession sources</div>
+        </div>
+      </details>
       <!-- v3.0 release notes (collapsed) -->
       <details style="margin-bottom:16px">
         <summary style="cursor:pointer;font-size:12px;color:var(--mu);padding:6px 0;font-weight:600;letter-spacing:.04em">▸ v3.0 release notes</summary>
@@ -2424,21 +2435,34 @@ main > .dview, main > .editor{ margin:0 auto; }
           <tr><td>Notes</td><td>Most recent 10 lab notes — click to open</td></tr>
         </table>
         <h3>Taxonomy Packs</h3>
-        <p>Switch to the <strong>Taxonomy Packs</strong> tab to toggle built-in species packs: <em>Carnivorous Plants</em> (Nepenthes, Drosera, Sarracenia…), <em>Orchids</em>, <em>Banana &amp; Relatives</em>. Disabled packs are excluded from autocomplete on next login. Add your own custom species at the bottom.</p>
+        <p>Switch to the <strong>Taxonomy Packs</strong> tab to toggle built-in species packs: <em>Carnivorous Plants</em> (Nepenthes, Drosera, Sarracenia…), <em>Orchids</em>, <em>Banana &amp; Relatives</em>. Disabled packs are excluded from autocomplete on next login.</p>
+        <h3>Custom Species (+ Add custom species)</h3>
+        <p>At the bottom of the Taxonomy Packs tab, add any species not in the built-in packs — including <strong>unregistered hybrids</strong> (type × in the name, e.g. <code>Nepenthes × (rajah × lowii)</code>). A HYBRID badge appears automatically on the entry.</p>
+        <table><tr><th>Field</th><th>Purpose</th></tr>
+          <tr><td>Scientific Name</td><td>Required. Any format — species, hybrid name, working name. Names with × are auto-detected as hybrids.</td></tr>
+          <tr><td>Common Name</td><td>Optional display name</td></tr>
+          <tr><td>Source / Origin</td><td>🏡 Greenhouse (own plants) · 🌱 Seeds · Wild collection · Other lab / Exchange · Custom… (free text). Choosing <strong>Greenhouse</strong> auto-creates the 🏡 GH flair.</td></tr>
+          <tr><td>Conservation Status</td><td>LC · NT · VU · EN · CR · DD — shows as a coloured badge in autocomplete</td></tr>
+        </table>
+        <p>Once saved, the species appears immediately in the autocomplete dropdown for all Species fields across the app (notes, bottles, accessions, greenhouse).</p>
         <h3>Flairs</h3>
-        <p>Define coloured labels in the <strong>Flairs</strong> tab — e.g. <em>Borneo clone</em>, <em>Highland form</em>, <em>SCV-01</em>. Assign to accessions in the Registry editor. Appear as pills in the accession list and in the species autocomplete dropdown for that accession.</p>
+        <p>Define coloured labels in the <strong>Flairs</strong> tab — e.g. <em>Borneo clone</em>, <em>Highland form</em>, <em>SCV-01</em>. The <strong>🏡 GH</strong> flair is a system flair created automatically the first time you use a Greenhouse source. Assign flairs to accessions in the Registry editor. They appear as pills in the accession list and as sub-rows in the species autocomplete dropdown.</p>
       </div>
 
       <h2 id="h-reminders">⏰ Reminders</h2>
       <div class="help-section-card">
-        <p>Any note or bottle with a <strong>Next Review Date</strong> appears here, grouped by urgency. The nav drawer badge shows overdue + this-week count.</p>
+        <p>Notes, active bottles, and greenhouse plants with a review / inspection date appear here, grouped by urgency. The nav badge shows combined overdue + this-week count across all three types.</p>
         <table><tr><th>Group</th><th>Condition</th><th>Colour</th></tr>
-          <tr><td>🔴 Overdue</td><td>Review date has passed</td><td>Red</td></tr>
+          <tr><td>🔴 Overdue</td><td>Date has passed</td><td>Red</td></tr>
           <tr><td>🟡 This week</td><td>Due within 7 days</td><td>Yellow</td></tr>
           <tr><td>📅 This month</td><td>Due within 30 days</td><td>—</td></tr>
           <tr><td>🗓 Later</td><td>More than 30 days away</td><td>—</td></tr>
         </table>
-        <p>Click any reminder card to jump directly to the note or bottle.</p>
+        <table><tr><th>Icon</th><th>Type</th><th>On tap</th></tr>
+          <tr><td>📋</td><td>Lab note</td><td>Opens the note</td></tr>
+          <tr><td>🫙</td><td>Bottle (active only)</td><td>Opens the bottle detail</td></tr>
+          <tr><td>🏡</td><td>Greenhouse plant inspection</td><td>Navigates to Greenhouse → opens that plant</td></tr>
+        </table>
       </div>
 
       <h2 id="h-contam">☣️ Contamination Dashboard</h2>
@@ -2703,10 +2727,7 @@ main > .dview, main > .editor{ margin:0 auto; }
       <!-- Greenhouse list panel -->
       <div class="nd-list-area" id="nd-greenhouse">
         <div class="aside-top">
-          <div style="display:flex;gap:6px">
-            <button class="btn sm" style="flex:1;background:#2d6a4f;color:#d8f3dc" id="new-gh-btn" onclick="startNewGHPlant()">＋ Add Plant</button>
-            <button class="btn sm ghost" onclick="openGHImport()" title="Import from CSV" style="flex-shrink:0;border-color:#52b788;color:#52b788">⬆ CSV</button>
-          </div>
+          <button class="btn sm" style="width:100%;background:#2d6a4f;color:#d8f3dc" id="new-gh-btn" onclick="startNewGHPlant()">＋ Add Plant</button>
           <div class="search-wrap" style="margin-top:6px">
             <span class="search-icon">🔍</span>
             <input type="text" id="gh-search" placeholder="Search species, location…" oninput="S.ghSearch=this.value;renderGHList()">
@@ -2744,27 +2765,36 @@ main > .dview, main > .editor{ margin:0 auto; }
       <button class="btn sm ghost" onclick="closeGHImport()">✕</button>
     </div>
     <div style="padding:18px 20px;flex:1;overflow-y:auto">
-      <!-- Step 1: Input -->
+      <!-- Step 1: Format + Input -->
       <div id="ghi-step1">
-        <div style="display:flex;gap:10px;margin-bottom:12px">
-          <div style="flex:1">
-            <label style="font-size:12px;font-weight:600;display:block;margin-bottom:5px">Upload CSV file</label>
-            <input type="file" id="ghi-file" accept=".csv,.txt" onchange="handleGHCsvFile(this)" style="font-size:13px">
+        <!-- Format table always visible -->
+        <div style="margin-bottom:14px">
+          <div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--tx)">📋 CSV column format</div>
+          <table style="width:100%;border-collapse:collapse;font-size:12px">
+            <tr style="background:var(--sf2)"><th style="padding:5px 8px;text-align:left;border:1px solid var(--bd)">Column</th><th style="padding:5px 8px;text-align:left;border:1px solid var(--bd)">Required</th><th style="padding:5px 8px;text-align:left;border:1px solid var(--bd)">Allowed values / notes</th></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--bd);font-family:var(--mono);font-weight:700">species</td><td style="padding:5px 8px;border:1px solid var(--bd);color:var(--gn)">✓ required</td><td style="padding:5px 8px;border:1px solid var(--bd)">Any name. Hybrids with commas: wrap in quotes — <code>"Nep × (rajah × lowii)"</code></td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--bd);font-family:var(--mono)">quantity</td><td style="padding:5px 8px;border:1px solid var(--bd);color:var(--mu)">optional</td><td style="padding:5px 8px;border:1px solid var(--bd)">Integer (default: 1)</td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--bd);font-family:var(--mono)">health</td><td style="padding:5px 8px;border:1px solid var(--bd);color:var(--mu)">optional</td><td style="padding:5px 8px;border:1px solid var(--bd)"><code>healthy</code> · <code>stressed</code> · <code>dormant</code> · <code>declined</code> (default: healthy)</td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--bd);font-family:var(--mono)">source</td><td style="padding:5px 8px;border:1px solid var(--bd);color:var(--mu)">optional</td><td style="padding:5px 8px;border:1px solid var(--bd)"><code>greenhouse</code> · <code>seeds</code> · <code>wild</code> · <code>other-lab</code> · <code>nursery</code> (default: greenhouse)</td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--bd);font-family:var(--mono)">location</td><td style="padding:5px 8px;border:1px solid var(--bd);color:var(--mu)">optional</td><td style="padding:5px 8px;border:1px solid var(--bd)">Bench / section label — used for ⊞ Bench view grouping</td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--bd);font-family:var(--mono)">next_inspection</td><td style="padding:5px 8px;border:1px solid var(--bd);color:var(--mu)">optional</td><td style="padding:5px 8px;border:1px solid var(--bd)">Date: <code>YYYY-MM-DD</code></td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--bd);font-family:var(--mono)">accession_number</td><td style="padding:5px 8px;border:1px solid var(--bd);color:var(--mu)">optional</td><td style="padding:5px 8px;border:1px solid var(--bd)">Stored as a reference note on the plant</td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--bd);font-family:var(--mono)">notes</td><td style="padding:5px 8px;border:1px solid var(--bd);color:var(--mu)">optional</td><td style="padding:5px 8px;border:1px solid var(--bd)">Free text observations</td></tr>
+          </table>
+          <div style="margin-top:8px;font-size:11px;color:var(--mu);line-height:1.6">
+            The first row must be the header. Column order must match exactly. Download the template for a ready-to-fill file.
           </div>
         </div>
-        <label style="font-size:12px;font-weight:600;display:block;margin-bottom:5px">Or paste CSV here</label>
-        <textarea id="ghi-paste" rows="7" placeholder="species,quantity,health,source,location,next_inspection,accession_number,notes&#10;Vanilla planifolia,3,healthy,greenhouse,Bench 3A,,,&#10;Nepenthes × (rajah × lowii),2,healthy,greenhouse,Shade house,,,Unregistered hybrid" style="width:100%;font-family:var(--mono);font-size:12px;margin-bottom:10px"></textarea>
-        <div style="background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:12px;font-size:11px;font-family:var(--mono);color:var(--mu);margin-bottom:14px;overflow-x:auto">
-          <div style="font-weight:700;color:var(--tx);margin-bottom:4px">CSV column format:</div>
-          species (required) · quantity · health · source · location · next_inspection (YYYY-MM-DD) · accession_number · notes<br>
-          <span style="color:var(--pu)">Hybrids:</span> wrap in quotes if the name has commas — e.g. <em>"Nepenthes × (rajah × lowii)"</em><br>
-          <span style="color:var(--gn)">health values:</span> healthy · stressed · dormant · declined (defaults to healthy)<br>
-          <span style="color:var(--ac)">source values:</span> greenhouse · wild · lab · nursery · trade (defaults to greenhouse)
+        <div style="display:flex;gap:8px;margin-bottom:14px">
+          <button class="btn sm ghost" onclick="downloadGHCsvTemplate()" style="border-color:#52b788;color:#52b788">⬇ Download template CSV</button>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+            <input type="file" id="ghi-file" accept=".csv,.txt" onchange="handleGHCsvFile(this)" style="display:none">
+            <span class="btn sm ghost" onclick="document.getElementById('ghi-file').click()">📂 Upload file</span>
+          </label>
         </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn sm" onclick="parseGHCsv()">Preview →</button>
-          <button class="btn sm ghost" onclick="downloadGHCsvTemplate()">⬇ Download template</button>
-        </div>
+        <label style="font-size:12px;font-weight:600;display:block;margin-bottom:5px">Paste CSV content here</label>
+        <textarea id="ghi-paste" rows="6" placeholder="species,quantity,health,source,location,next_inspection,accession_number,notes&#10;Vanilla planifolia,3,healthy,greenhouse,Bench 3A,2026-06-01,,Main mother plant&#10;Nepenthes rajah,1,healthy,wild,Shade house,,,Highland form&#10;&quot;Nepenthes × (rajah × lowii)&quot;,2,stressed,greenhouse,Bench 2,,,Unregistered hybrid" style="width:100%;font-family:var(--mono);font-size:12px;margin-bottom:12px"></textarea>
+        <button class="btn sm" onclick="parseGHCsv()">Preview import →</button>
       </div>
       <!-- Step 2: Preview -->
       <div id="ghi-step2" style="display:none">
@@ -4859,33 +4889,62 @@ function _renderTaxonomyPanel(){
       <span class="tax-section-count">${customs.length} entries</span>
     </div>
     <div class="tax-section-body">
-      ${customs.map(sp=>`
-        <div class="tax-custom-row">
-          <span class="tax-sp-sci" style="flex:1">${esc(sp.full_name)}</span>
-          <span class="tax-sp-com" style="flex:1">${esc(sp.common_name||'')}</span>
+      ${customs.map(sp=>{
+        const srcLabel={greenhouse:'🏡 GH',seeds:'🌱 Seeds',wild:'Wild','other-lab':'Other lab'}[sp.source]||sp.source||'';
+        const isHybrid=sp.full_name&&(sp.full_name.includes('×')||sp.full_name.toLowerCase().includes(' x '));
+        return `<div class="tax-custom-row">
+          <span class="tax-sp-sci" style="flex:1">${esc(sp.full_name)}${isHybrid?'<span style="color:var(--pu);font-size:10px;margin-left:5px;border:1px solid var(--pu);border-radius:3px;padding:0 3px">HYBRID</span>':''}</span>
+          <span class="tax-sp-com" style="flex:1;color:var(--mu)">${esc(sp.common_name||'')}</span>
+          ${srcLabel?`<span style="font-size:10px;font-weight:600;padding:1px 7px;border-radius:10px;border:1px solid var(--bd);color:var(--mu);flex-shrink:0">${esc(srcLabel)}</span>`:''}
           ${_taxConBadge(sp.conservation_status)}
           <button class="btn xs ghost" onclick="_taxDeleteCustomSpecies(${JSON.stringify(sp.id)})">✕</button>
-        </div>`).join('')}
-      <div id="tax-custom-form" style="display:none;margin-top:10px;padding:12px;background:var(--sf2);border-radius:8px">
-        <div class="row3" style="margin-bottom:8px">
-          <div class="field"><label>Scientific Name *</label><input type="text" id="tc-fullname" placeholder="Genus species"></div>
-          <div class="field"><label>Common Name</label><input type="text" id="tc-common" placeholder="Optional"></div>
-          <div class="field"><label>Status</label>
+        </div>`;
+      }).join('')}
+      <div id="tax-custom-form" style="display:none;margin-top:10px;padding:14px;background:var(--sf2);border-radius:8px;border:1px solid var(--bd)">
+        <div class="row2" style="margin-bottom:8px">
+          <div class="field" style="margin:0">
+            <label>Scientific Name *</label>
+            <input type="text" id="tc-fullname" placeholder="Genus species  or  Genus × species (hybrid)">
+          </div>
+          <div class="field" style="margin:0">
+            <label>Common Name</label>
+            <input type="text" id="tc-common" placeholder="Optional">
+          </div>
+        </div>
+        <div class="row2" style="margin-bottom:10px">
+          <div class="field" style="margin:0">
+            <label>Source / Origin</label>
+            <select id="tc-source" onchange="_tcSourceChange(this.value)">
+              <option value="">— select —</option>
+              <option value="greenhouse">🏡 Greenhouse (own plants)</option>
+              <option value="seeds">🌱 Seeds</option>
+              <option value="wild">Wild collection</option>
+              <option value="other-lab">Other lab / Exchange</option>
+              <option value="custom">Custom…</option>
+            </select>
+            <div id="tc-source-custom-wrap" style="display:none;margin-top:5px">
+              <input type="text" id="tc-source-custom" placeholder="Enter source name">
+            </div>
+          </div>
+          <div class="field" style="margin:0">
+            <label>Conservation Status</label>
             <select id="tc-status">
               <option value="">Unknown</option>
-              <option value="least_concern">Least Concern</option>
-              <option value="near_threatened">Near Threatened</option>
-              <option value="vulnerable">Vulnerable</option>
-              <option value="endangered">Endangered</option>
-              <option value="critically_endangered">Critically Endangered</option>
-              <option value="data_deficient">Data Deficient</option>
+              <option value="least_concern">Least Concern (LC)</option>
+              <option value="near_threatened">Near Threatened (NT)</option>
+              <option value="vulnerable">Vulnerable (VU)</option>
+              <option value="endangered">Endangered (EN)</option>
+              <option value="critically_endangered">Critically Endangered (CR)</option>
+              <option value="data_deficient">Data Deficient (DD)</option>
             </select>
           </div>
         </div>
-        <button class="btn sm green" onclick="_taxSaveCustomSpecies()">Add Species</button>
-        <button class="btn sm ghost" onclick="document.getElementById('tax-custom-form').style.display='none'">Cancel</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn sm green" onclick="_taxSaveCustomSpecies()">Add Species</button>
+          <button class="btn sm ghost" onclick="document.getElementById('tax-custom-form').style.display='none'">Cancel</button>
+        </div>
       </div>
-      <button class="btn ghost sm" style="margin-top:10px" onclick="document.getElementById('tax-custom-form').style.display='block'">+ Add species</button>
+      <button class="btn ghost sm" style="margin-top:10px" onclick="document.getElementById('tax-custom-form').style.display='block';document.getElementById('tc-fullname').focus()">+ Add custom species</button>
     </div>
   </div>`;
 
@@ -4952,21 +5011,39 @@ function _taxToggleCat(catId,enabled){
   toast(enabled?'Pack enabled — reload to update autocomplete':'Pack disabled — reload to update autocomplete','info');
 }
 
+function _tcSourceChange(val){
+  document.getElementById('tc-source-custom-wrap').style.display=val==='custom'?'':'none';
+}
+
 async function _taxSaveCustomSpecies(){
   const fn=document.getElementById('tc-fullname').value.trim();
   if(!fn){toast('Scientific name required','fail');return;}
-  const sp={id:uid(),full_name:fn,common_name:document.getElementById('tc-common').value.trim(),conservation_status:document.getElementById('tc-status').value};
+  const srcSel=document.getElementById('tc-source').value;
+  const source=srcSel==='custom'
+    ?(document.getElementById('tc-source-custom').value.trim()||'Custom')
+    :srcSel||null;
+  const sp={
+    id:uid(),
+    full_name:fn,
+    common_name:document.getElementById('tc-common').value.trim(),
+    conservation_status:document.getElementById('tc-status').value,
+    source,
+  };
   S.taxCustom.species.push(sp);
   S.taxSpecies.push({...sp,is_custom:true});
   try{
     await saveCustomTaxonomy();
     _writeCache();
-    document.getElementById('tax-custom-form').style.display='none';
-    document.getElementById('tc-fullname').value='';
-    document.getElementById('tc-common').value='';
+    // Reset form
+    ['tc-fullname','tc-common','tc-source-custom'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('tc-status').value='';
+    document.getElementById('tc-source').value='';
+    document.getElementById('tc-source-custom-wrap').style.display='none';
+    document.getElementById('tax-custom-form').style.display='none';
     _renderTaxonomyPanel();
-    toast('Species added');
+    // Auto-assign GH flair if greenhouse source
+    if(source==='greenhouse') _ensureGHFlair();
+    toast(`Species added${source?' · source: '+source:''}`);
   }catch(e){ S.taxCustom.species.pop(); S.taxSpecies.pop(); toast('Save failed: '+e.message,'fail'); }
 }
 
@@ -6433,6 +6510,7 @@ function startNewGHPlant(prefillSpecies){
   S.editingGH=null;
   navTo('greenhouse');
   document.getElementById('gh-editor-title').textContent='New Greenhouse Plant';
+  document.getElementById('gh-editor-import-hint').style.display='';
   _populateGHEditor(null);
   if(prefillSpecies) document.getElementById('gh-species').value=prefillSpecies;
   showGHEditor();
@@ -6442,6 +6520,7 @@ function startEditGHPlant(id){
   const p=(S.greenhouse||[]).find(x=>x.id===id); if(!p) return;
   S.editingGH=id;
   document.getElementById('gh-editor-title').textContent='Edit Plant';
+  document.getElementById('gh-editor-import-hint').style.display='none';
   _populateGHEditor(p);
   showGHEditor();
 }
