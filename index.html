@@ -26,13 +26,43 @@
 }
 body{background:var(--bg);color:var(--tx);font-family:var(--font);height:100vh;overflow:hidden}
 
+/* ── WELCOME SPLASH ── */
+#welcome-splash{
+  position:fixed;inset:0;z-index:9999;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:18px;
+  background:var(--bg);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  transition:opacity .55s ease, transform .55s ease;
+  pointer-events:none
+}
+#welcome-splash.fade-out{opacity:0;transform:scale(1.04)}
+.ws-leaf{font-size:64px;animation:ws-float 1.8s ease-in-out infinite alternate}
+@keyframes ws-float{from{transform:translateY(0) rotate(-3deg)}to{transform:translateY(-10px) rotate(3deg)}}
+.ws-title{font-size:26px;font-weight:800;letter-spacing:-.3px;
+  background:linear-gradient(135deg,var(--ac),var(--gn));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ws-sub{font-size:14px;color:var(--mu);letter-spacing:.02em}
+.ws-bar{width:160px;height:3px;background:var(--sf2);border-radius:2px;overflow:hidden;margin-top:6px}
+.ws-bar-fill{height:100%;background:linear-gradient(90deg,var(--ac),var(--gn));border-radius:2px;
+  animation:ws-bar-anim .9s ease forwards}
+@keyframes ws-bar-anim{from{width:0}to{width:100%}}
+
 /* ── LOGIN ── */
-#login{display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column}
-.lbox{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:32px;width:390px}
+#login{display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;position:relative}
+.lbox{background:var(--sf);border:1px solid var(--bd);border-radius:14px;padding:32px;width:400px;max-width:96vw;box-shadow:0 8px 40px rgba(0,0,0,.18)}
 .llogo{text-align:center;margin-bottom:24px}
 .llogo .ic{font-size:42px;display:block;margin-bottom:8px}
 .llogo h1{font-size:20px;font-weight:700}
 .llogo p{font-size:13px;color:var(--mu);margin-top:6px;line-height:1.6}
+/* login theme toggle */
+#login-theme-btn{
+  position:absolute;top:20px;right:20px;
+  background:var(--sf);border:1px solid var(--bd);border-radius:50%;
+  width:38px;height:38px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:17px;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.12)
+}
+#login-theme-btn:hover{background:var(--sf2);transform:scale(1.08)}
 label{display:block;font-size:13px;font-weight:600;margin-bottom:5px}
 input,select,textarea{
   width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:6px;
@@ -960,31 +990,42 @@ main > .dview, main > .editor{ margin:0 auto; }
 <div id="toast"></div>
 
 <!-- ═══════════ LOGIN ═══════════ -->
+<!-- ═══════════ WELCOME SPLASH ═══════════ -->
+<div id="welcome-splash">
+  <div class="ws-leaf">🌿</div>
+  <div class="ws-title">TC Plants Lab Notes</div>
+  <div class="ws-sub">End-to-end encrypted · GitHub-backed</div>
+  <div class="ws-bar"><div class="ws-bar-fill"></div></div>
+</div>
+
 <div id="login">
+  <!-- Theme toggle for login screen -->
+  <button id="login-theme-btn" title="Toggle theme" onclick="_loginToggleTheme()">☀️</button>
+
   <div class="lbox">
     <div class="llogo">
       <span class="ic">🌿</span>
       <h1>TC Plants Lab Notes</h1>
-      <p>End-to-end encrypted. Notes are unreadable without your password — including in the GitHub repo.</p>
+      <p>Encrypted plant tissue culture lab. Sign in with your credentials to continue.</p>
     </div>
     <div class="field">
-      <label>Encryption Password</label>
-      <input type="password" id="lpw" placeholder="Your secret passphrase" autocomplete="off">
+      <label>Username</label>
+      <input type="password" id="lpw" placeholder="Enter your passphrase" autocomplete="off">
     </div>
     <div class="field">
-      <label>GitHub Personal Access Token</label>
-      <input type="password" id="ltok" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
-      <div class="hint">Needs <strong>repo</strong> scope. Cleared on tab close. <a href="https://github.com/settings/tokens/new?scopes=repo&description=TC+Plants+Lab+Notes" target="_blank" rel="noopener">Create token →</a></div>
+      <label>Password</label>
+      <input type="password" id="ltok" placeholder="Your access token" autocomplete="off">
+      <div class="hint"><a href="https://github.com/settings/tokens/new?scopes=repo&description=TC+Plants+Lab+Notes" target="_blank" rel="noopener">Create access token →</a></div>
     </div>
     <div id="saved-device-banner">
-      <div style="font-size:12px;color:var(--mu);margin-bottom:6px">🔐 Saved device — token auto-filled</div>
-      <div style="font-size:11px;color:var(--mu)">Enter your encryption password to unlock.</div>
+      <div style="font-size:12px;color:var(--mu);margin-bottom:6px">🔐 Saved device — password auto-filled</div>
+      <div style="font-size:11px;color:var(--mu)">Enter your username to unlock.</div>
       <button class="btn xs ghost" onclick="forgetDevice()" style="margin-top:8px">Forget this device</button>
     </div>
     <div id="lerr"></div>
-    <button class="btn" id="lbtn">Unlock Lab →</button>
+    <button class="btn" id="lbtn" style="width:100%;padding:11px;font-size:15px;margin-top:4px;border-radius:8px">Sign In →</button>
     <div id="trust-banner">
-      <span>Trust this device? Your token will be saved encrypted.</span>
+      <span>Trust this device? Your password will be saved encrypted.</span>
       <button class="btn xs green" id="trust-yes-btn">Yes, save</button>
       <button class="btn xs ghost" id="trust-no-btn">No thanks</button>
     </div>
@@ -6826,10 +6867,25 @@ if(_st) document.getElementById('ltok').value=_st;
     document.getElementById('ltok').style.display='none'; // hide token field, will be auto-filled
   }
 })();
+// ── WELCOME SPLASH ───────────────────────────────────────────
+(function(){
+  const splash=document.getElementById('welcome-splash');
+  if(!splash) return;
+  // Start fade-out after 950ms
+  setTimeout(()=>{
+    splash.classList.add('fade-out');
+    // Remove from DOM after transition ends
+    setTimeout(()=>{ splash.style.display='none'; }, 600);
+  }, 950);
+})();
+
 // ── THEME ────────────────────────────────────────────────────
 (function(){
   const saved = localStorage.getItem('tcplants_theme') || 'dark';
   document.getElementById('theme-btn').textContent = saved === 'dark' ? '☀️' : '🌙';
+  // Sync login theme button
+  const lb = document.getElementById('login-theme-btn');
+  if(lb) lb.textContent = saved === 'dark' ? '☀️' : '🌙';
 })();
 document.getElementById('theme-btn').addEventListener('click', function(){
   const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
@@ -6838,6 +6894,15 @@ document.getElementById('theme-btn').addEventListener('click', function(){
   this.textContent = next === 'dark' ? '☀️' : '🌙';
   document.querySelector('meta[name="theme-color"]').setAttribute('content', next === 'dark' ? '#161b22' : '#f6f8fa');
 });
+function _loginToggleTheme(){
+  const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = next;
+  localStorage.setItem('tcplants_theme', next);
+  const icon = next === 'dark' ? '☀️' : '🌙';
+  document.getElementById('theme-btn').textContent = icon;
+  document.getElementById('login-theme-btn').textContent = icon;
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', next === 'dark' ? '#161b22' : '#f6f8fa');
+}
 </script>
 </body>
 </html>
