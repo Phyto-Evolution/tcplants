@@ -18,11 +18,13 @@
   --ac:#58a6ff;--gn:#3fb950;--rd:#f85149;--yw:#d29922;--pu:#bc8cff;
   --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
   --mono:ui-monospace,SFMono-Regular,"SF Mono",Consolas,monospace;
+  --glass:rgba(22,27,34,.78);--glass-bd:rgba(48,54,61,.9);
 }
 [data-theme="light"]{
   --bg:#faf9f7;--sf:#ffffff;--sf2:#f2f1ee;--sf3:#e8e6e1;
   --bd:#d4d0c8;--tx:#1c1a17;--mu:#706e68;
   --ac:#0969da;--gn:#1a7f37;--rd:#d1242f;--yw:#9a6700;--pu:#8250df;
+  --glass:rgba(255,255,255,.78);--glass-bd:rgba(212,208,200,.9);
 }
 body{background:var(--bg);color:var(--tx);font-family:var(--font);height:100vh;overflow:hidden}
 
@@ -50,7 +52,7 @@ body{background:var(--bg);color:var(--tx);font-family:var(--font);height:100vh;o
 
 /* ── LOGIN ── */
 #login{display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;position:relative}
-.lbox{background:var(--sf);border:1px solid var(--bd);border-radius:14px;padding:32px;width:400px;max-width:96vw;box-shadow:0 8px 40px rgba(0,0,0,.18)}
+.lbox{background:var(--glass);border:1px solid var(--glass-bd);border-radius:14px;padding:32px;width:400px;max-width:96vw;box-shadow:0 8px 40px rgba(0,0,0,.22);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
 .llogo{text-align:center;margin-bottom:24px}
 .llogo .ic{font-size:42px;display:block;margin-bottom:8px}
 .llogo h1{font-size:20px;font-weight:700}
@@ -332,10 +334,51 @@ main > .dview, main > .editor{ margin:0 auto; }
 .spin{border:2px solid var(--bd);border-top-color:var(--ac);border-radius:50%;width:28px;height:28px;animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 #overlay p{font-size:14px;color:var(--mu)}
-#toast{position:fixed;bottom:22px;right:22px;background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:10px 15px;font-size:13px;transform:translateY(70px);transition:transform .25s;z-index:200;max-width:320px}
+#toast{position:fixed;bottom:22px;right:22px;background:var(--glass);border:1px solid var(--glass-bd);border-radius:10px;padding:10px 15px;font-size:13px;transform:translateY(70px);transition:transform .25s;z-index:200;max-width:320px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 #toast.on{transform:translateY(0)}
 #toast.ok{border-color:var(--gn)}
 #toast.fail{border-color:var(--rd)}
+
+/* ── VANAKKAM GREETING ── */
+#vanakkam-greeting{
+  position:fixed;inset:0;z-index:9500;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(13,17,23,.5);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  opacity:0;transition:opacity .4s ease;
+  pointer-events:none
+}
+[data-theme="light"] #vanakkam-greeting{background:rgba(250,249,247,.5)}
+#vanakkam-greeting.on{opacity:1}
+.vk-card{
+  background:var(--glass);border:1px solid var(--glass-bd);
+  border-radius:20px;padding:32px 48px;text-align:center;
+  box-shadow:0 12px 48px rgba(0,0,0,.28);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  transform:scale(.96);transition:transform .4s ease
+}
+#vanakkam-greeting.on .vk-card{transform:scale(1)}
+.vk-icon{font-size:44px;margin-bottom:10px;line-height:1}
+.vk-text{font-size:30px;font-weight:800;letter-spacing:-.4px;
+  background:linear-gradient(135deg,var(--ac),var(--gn));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.vk-lab{font-size:13px;color:var(--mu);margin-top:6px;font-weight:500}
+
+/* ── AUTOCLAVE SESSION BUILDER ── */
+#bot-session-area{display:none}
+#bot-editor.bot-mode-session > div > .field,
+#bot-editor.bot-mode-session > div > .row2,
+#bot-editor.bot-mode-session > div > .row3,
+#bot-editor.bot-mode-session > div > .bot-batch-preview{display:none!important}
+#bot-editor.bot-mode-session #bot-session-area{display:block!important}
+.sess-batch-row{background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;margin-bottom:8px;transition:border-color .15s}
+.sess-batch-row:hover{border-color:var(--ac)}
+.sess-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px}
+.sess-field label{font-size:11px;font-weight:600;color:var(--mu);display:block;margin-bottom:3px}
+.sess-cap-bar-wrap{margin:10px 0 4px}
+.sess-cap-text{display:flex;justify-content:space-between;font-size:12px;color:var(--mu);margin-bottom:4px}
+.sess-cap-track{height:5px;background:var(--sf2);border-radius:3px;overflow:hidden}
+#sess-cap-fill{height:100%;background:var(--gn);border-radius:3px;width:0;transition:width .2s,background .2s}
 
 /* ── PRINT ── */
 @media print{
@@ -988,6 +1031,13 @@ main > .dview, main > .editor{ margin:0 auto; }
 
 <div id="overlay" aria-live="polite"><div class="spin"></div><p id="ovmsg">Working…</p></div>
 <div id="toast"></div>
+<div id="vanakkam-greeting">
+  <div class="vk-card">
+    <div class="vk-icon">🌿🙏</div>
+    <div class="vk-text">Vanakkam</div>
+    <div class="vk-lab" id="vk-lab-name"></div>
+  </div>
+</div>
 
 <!-- ═══════════ LOGIN ═══════════ -->
 <!-- ═══════════ WELCOME SPLASH ═══════════ -->
@@ -1493,9 +1543,10 @@ main > .dview, main > .editor{ margin:0 auto; }
       <div style="font-size:52px;margin-bottom:14px;opacity:.5">🫙</div>
       <div style="font-size:16px;font-weight:600;margin-bottom:6px;color:var(--tx)">No bottle selected</div>
       <div style="font-size:13px;margin-bottom:20px">Choose a bottle from the list, or create one.</div>
-      <div style="display:flex;gap:8px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
         <button class="btn sm" onclick="startNewBottle('single')">＋ Single</button>
         <button class="btn sm ghost" onclick="startNewBottle('batch')">⊞ Batch</button>
+        <button class="btn sm ghost" onclick="startNewBottle('session')" style="border-color:var(--pu);color:var(--pu)">🔥 Session</button>
       </div>
     </div>
     <div id="bot-detail" style="display:none;height:100%;overflow-y:auto;max-width:680px;margin:0 auto;width:100%"></div>
@@ -1506,8 +1557,9 @@ main > .dview, main > .editor{ margin:0 auto; }
         <button class="btn sm green" id="bot-save-btn" onclick="saveBottleAction()" style="position:sticky;top:0">Save</button>
       </div>
       <div class="bot-mode-toggle" id="bot-mode-toggle">
-        <button class="bot-mode-btn active" id="bot-mode-single" onclick="setBotMode('single')">Single bottle</button>
+        <button class="bot-mode-btn active" id="bot-mode-single" onclick="setBotMode('single')">Single</button>
         <button class="bot-mode-btn" id="bot-mode-batch" onclick="setBotMode('batch')">Batch</button>
+        <button class="bot-mode-btn" id="bot-mode-session" onclick="setBotMode('session')" style="color:var(--pu)">🔥 Session</button>
       </div>
       <div class="field">
         <label>Recipe</label>
@@ -1575,6 +1627,43 @@ main > .dview, main > .editor{ margin:0 auto; }
         </div>
       </div>
       <div id="bot-batch-preview" class="bot-batch-preview" style="display:none"></div>
+
+      <!-- ── SESSION BUILDER ── -->
+      <div id="bot-session-area">
+        <div style="font-size:13px;color:var(--mu);margin-bottom:10px;line-height:1.5">One autoclave run → multiple media batches for different species &amp; stages.</div>
+        <div class="sess-grid" style="margin-bottom:12px">
+          <div class="sess-field">
+            <label>Session date</label>
+            <input type="date" id="sess-date">
+          </div>
+          <div class="sess-field">
+            <label>Autoclave capacity (bottles)</label>
+            <input type="number" id="sess-capacity" value="120" min="1" max="500" oninput="_updateSessionCap()">
+          </div>
+          <div class="sess-field">
+            <label>Autoclave temp (°C)</label>
+            <input type="number" id="sess-temp" value="121" min="100" max="135">
+          </div>
+          <div class="sess-field">
+            <label>Autoclave time (min)</label>
+            <input type="number" id="sess-time" value="20" min="1">
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:13px;font-weight:600">Media batches</div>
+          <button class="btn xs ghost" onclick="addSessionBatch()" style="border-color:var(--ac);color:var(--ac)">＋ Add batch</button>
+        </div>
+        <div id="sess-batch-rows"></div>
+        <div class="sess-cap-bar-wrap">
+          <div class="sess-cap-text"><span>Bottles planned</span><span id="sess-cap-label">0 / 120</span></div>
+          <div class="sess-cap-track"><div id="sess-cap-fill"></div></div>
+        </div>
+        <div class="sess-field" style="margin-top:10px">
+          <label>Session notes (optional)</label>
+          <textarea id="sess-notes" rows="2" placeholder="e.g. First run after equipment service" style="width:100%;margin-top:2px"></textarea>
+        </div>
+      </div>
+
       <div class="field">
         <label>Next review date (optional)</label>
         <input type="date" id="bot-next-review">
@@ -2170,6 +2259,7 @@ main > .dview, main > .editor{ margin:0 auto; }
           <div style="display:flex;gap:6px">
             <button class="btn sm" style="flex:1" id="new-bot-btn" onclick="startNewBottle('single')">＋ Single</button>
             <button class="btn sm ghost" style="flex:1" id="new-bot-batch-btn" onclick="startNewBottle('batch')">⊞ Batch</button>
+            <button class="btn sm ghost" style="flex:1;border-color:var(--pu);color:var(--pu)" id="new-bot-session-btn" onclick="startNewBottle('session')">🔥 Session</button>
           </div>
           <div class="search-wrap" style="margin-top:8px">
             <span class="search-icon">🔍</span>
@@ -2485,7 +2575,7 @@ const S = {
   section:'notes',
   weather:{lab:null,gh:null,updatedAt:null},
   bodyCache:{},
-  bottles: [], bottlesSha: null,
+  bottles: [], sessions: [], bottlesSha: null,
   bottleFilter: 'all', bottleSearch: '',
   curBot: null, editingBot: null,
   taxSpecies: [],
@@ -2621,12 +2711,15 @@ async function saveRecipes(recs,sha){
 
 async function loadBottles(){
   const f=await ghGet(BOT_F);
-  if(!f) return {bottles:[],sha:null};
-  const bottles=JSON.parse(await dec(ghDec(f.content)));
-  return {bottles, sha:f.sha};
+  if(!f) return {bottles:[],sessions:[],sha:null};
+  const raw=JSON.parse(await dec(ghDec(f.content)));
+  // Backward compat: old format was a plain array of bottles
+  if(Array.isArray(raw)) return {bottles:raw, sessions:[], sha:f.sha};
+  return {bottles:raw.bottles||[], sessions:raw.sessions||[], sha:f.sha};
 }
-async function saveBottles(bottles,sha){
-  const res=await ghPut(BOT_F, await enc(JSON.stringify(bottles)), sha, `lab: bottles — ${bottles.length} bottles`);
+async function saveBottles(bottles, sha, sessions){
+  const data={bottles, sessions:sessions!==undefined?sessions:(S.sessions||[])};
+  const res=await ghPut(BOT_F, await enc(JSON.stringify(data)), sha, `lab: bottles — ${bottles.length} bottles`);
   return res.content.sha;
 }
 
@@ -2656,14 +2749,20 @@ let _tt;
 function toast(msg,type='ok',dur=3200){
   const t=document.getElementById('toast');
   t.textContent=msg;t.className=`on ${type}`;
-  // Vanakkam gets a warmer, slightly larger greeting style
-  if(msg.startsWith('Vanakkam')){
-    t.style.cssText='font-size:15px;font-weight:600;padding:13px 20px;border-color:var(--gn);background:var(--sf)';
-    dur=3800;
-  } else {
-    t.style.cssText='';
-  }
-  clearTimeout(_tt);_tt=setTimeout(()=>{t.className='';t.style.cssText='';},dur);
+  t.style.cssText='';
+  clearTimeout(_tt);_tt=setTimeout(()=>{t.className='';},dur);
+}
+
+function showVanakkam(labName){
+  const el=document.getElementById('vanakkam-greeting');
+  const labEl=document.getElementById('vk-lab-name');
+  if(labEl) labEl.textContent=labName||'';
+  el.style.display='flex';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('on')));
+  setTimeout(()=>{
+    el.classList.remove('on');
+    setTimeout(()=>{ el.style.display='none'; },420);
+  }, 2500);
 }
 
 function showNote(name){
@@ -5231,7 +5330,7 @@ function renderBottleList(){
     <div class="bot-list-item${S.curBot===b.id?' active':''}" data-id="${b.id}" onclick="openBottle('${b.id}')">
       <div class="bot-status-dot ${b.status||'prepared'}"></div>
       <div class="bot-list-info">
-        <div class="bot-list-code">${esc(b.code)}</div>
+        <div class="bot-list-code">${esc(b.code)}${b.session_id?'<span style="font-size:9px;background:var(--pu);color:#fff;padding:1px 5px;border-radius:3px;margin-left:5px;vertical-align:middle;opacity:.85">S</span>':''}</div>
         <div class="bot-list-sp">${esc(b.species||'—')}</div>
         ${b.stage?`<div class="bot-list-stage">${esc(b.stage)}</div>`:''}
       </div>
@@ -5276,6 +5375,7 @@ function openBottle(id){
   const acc=S.accs.find(a=>a.id===b.accession_id);
   const note=S.notes.find(n=>n.id===b.note_id);
   const batchMates=S.bottles.filter(x=>x.batch_id&&x.batch_id===b.batch_id&&x.id!==id);
+  const sessRec=b.session_id?(S.sessions||[]).find(s=>s.id===b.session_id):null;
   const flairsHtml=_botFlairHtml(b.flair_ids);
 
   // Stepper: what can be advanced?
@@ -5297,8 +5397,9 @@ function openBottle(id){
     ['Date inoculated', b.date_inoculated?_fmtTs(b.date_inoculated):'—'],
     ['Next review', b.next_review?fmtDateShort(b.next_review):'—'],
     ['Linked note', note?`<a style="color:var(--ac);cursor:pointer" onclick="navTo('notes');openNote('${note.id}')">${esc(note.title)}</a>`:(b.note_id?'(deleted)':'—')],
-    ['Batch', b.batch_id?`<span id="bot-batch-count-${id}">${batchMates.length+1} bottles</span>`:'Single'],
-  ].filter(([,v])=>v&&v!=='—');
+    ['Batch', b.batch_id?`<span id="bot-batch-count-${id}">${batchMates.length+1} bottles in batch</span>`:(b.session_id?'Part of session':'Single')],
+    ['Session', sessRec?`🔥 ${sessRec.date} — ${sessRec.batches.length} media batch${sessRec.batches.length!==1?'es':''}, ${S.bottles.filter(x=>x.session_id===sessRec.id).length} bottles${sessRec.autoclave?' · '+sessRec.autoclave:''}`:null],
+  ].filter(([,v])=>v&&v!=='—'&&v!==null);
 
   document.getElementById('bot-detail').innerHTML=`
     <div class="bot-detail-header">
@@ -5405,29 +5506,157 @@ function _updateBatchPreview(){
   prev.style.display='';
 }
 
+// ── AUTOCLAVE SESSION BUILDER ──────────────────────────────────
+function _initSessionBuilder(){
+  const today=new Date().toISOString().slice(0,10);
+  document.getElementById('sess-date').value=today;
+  document.getElementById('sess-capacity').value='120';
+  document.getElementById('sess-temp').value='121';
+  document.getElementById('sess-time').value='20';
+  document.getElementById('sess-notes').value='';
+  document.getElementById('sess-batch-rows').innerHTML='';
+  addSessionBatch();
+  _updateSessionCap();
+}
+
+function _sessRecOptions(){
+  return '<option value="">— no recipe —</option>'+S.recs.map(r=>`<option value="${r.id}">${esc(r.name)}</option>`).join('');
+}
+
+function addSessionBatch(){
+  const wrap=document.getElementById('sess-batch-rows');
+  const div=document.createElement('div');
+  div.className='sess-batch-row';
+  div.innerHTML=`
+    <div class="sess-grid">
+      <div class="sess-field">
+        <label>Species</label>
+        <input type="text" class="sb-species" placeholder="e.g. Vanilla planifolia">
+      </div>
+      <div class="sess-field">
+        <label>Stage</label>
+        <select class="sb-stage">
+          <option value="">— select —</option>
+          <option>Stage I — Initiation</option>
+          <option>Stage II — Multiplication</option>
+          <option>Stage III — Rooting</option>
+          <option>Stage IV — Acclimatization</option>
+          <option>Mother Block</option>
+        </select>
+      </div>
+      <div class="sess-field">
+        <label>Recipe</label>
+        <select class="sb-recipe">${_sessRecOptions()}</select>
+      </div>
+      <div class="sess-field">
+        <label>Quantity</label>
+        <div style="display:flex;gap:6px;align-items:center">
+          <input type="number" class="sb-qty" value="10" min="1" max="500" oninput="_updateSessionCap()" style="flex:1">
+          <button class="btn xs ghost" onclick="this.closest('.sess-batch-row').remove();_updateSessionCap()" style="flex-shrink:0;padding:3px 8px" title="Remove batch">✕</button>
+        </div>
+      </div>
+    </div>`;
+  wrap.appendChild(div);
+  _updateSessionCap();
+}
+
+function _updateSessionCap(){
+  const cap=parseInt(document.getElementById('sess-capacity').value)||120;
+  const total=[...document.querySelectorAll('.sb-qty')].reduce((s,el)=>s+(parseInt(el.value)||0),0);
+  const pct=Math.min(100,Math.round(total/cap*100));
+  document.getElementById('sess-cap-label').textContent=`${total} / ${cap}`;
+  const fill=document.getElementById('sess-cap-fill');
+  fill.style.width=pct+'%';
+  fill.style.background=total>cap?'var(--rd)':pct>=90?'var(--yw)':'var(--gn)';
+}
+
+async function saveSessionAction(){
+  const date=document.getElementById('sess-date').value||new Date().toISOString().slice(0,10);
+  const capacity=parseInt(document.getElementById('sess-capacity').value)||120;
+  const temp=document.getElementById('sess-temp').value.trim();
+  const time=document.getElementById('sess-time').value.trim();
+  const autoclave=temp&&time?`${temp}°C / ${time} min`:temp?`${temp}°C`:time?`${time} min`:null;
+  const sessNotes=document.getElementById('sess-notes').value.trim()||null;
+
+  const batchRows=[...document.querySelectorAll('.sess-batch-row')];
+  if(!batchRows.length){ toast('Add at least one batch','fail'); return; }
+
+  const batches=batchRows.map(row=>({
+    species:row.querySelector('.sb-species').value.trim(),
+    stage:row.querySelector('.sb-stage').value,
+    recipe_id:row.querySelector('.sb-recipe').value||null,
+    qty:parseInt(row.querySelector('.sb-qty').value)||1,
+  }));
+
+  const total=batches.reduce((s,b)=>s+b.qty,0);
+  if(total>capacity){ if(!confirm(`Total (${total}) exceeds capacity (${capacity}). Continue?`)) return; }
+
+  const sessionId=uid();
+  const session={id:sessionId,date,capacity,autoclave,notes:sessNotes,batches,created_at:new Date().toISOString()};
+
+  const newBottles=[];
+  let seq=_botNextSeq();
+  const yr=new Date().getFullYear();
+  for(const batch of batches){
+    const batchId=uid();
+    for(let i=0;i<batch.qty;i++){
+      const code=`FSL-${yr}-${String(seq++).padStart(4,'0')}`;
+      newBottles.push({
+        id:uid(), code,
+        batch_id:batchId,
+        session_id:sessionId,
+        species:batch.species||'',
+        stage:batch.stage||'',
+        recipe_id:batch.recipe_id||null,
+        status:'prepared',
+        date_prepared:new Date().toISOString(),
+        media_volume:25,
+      });
+    }
+  }
+
+  const allBottles=[...S.bottles,...newBottles];
+  const allSessions=[...(S.sessions||[]),session];
+
+  const btn=document.getElementById('bot-save-btn');
+  btn.disabled=true; btn.textContent='Saving…';
+  try{
+    S.bottlesSha=await saveBottles(allBottles, S.bottlesSha, allSessions);
+    S.bottles=allBottles; S.sessions=allSessions;
+    renderBottleList();
+    S.curBot=newBottles[0]?.id;
+    if(S.curBot) openBottle(S.curBot);
+    toast(`🔥 Session saved — ${newBottles.length} bottles across ${batches.length} batch${batches.length!==1?'es':''}`, 'ok');
+  }catch(e){ toast('Save failed: '+e.message,'fail'); }
+  btn.disabled=false; btn.textContent='Save';
+}
+
 function setBotMode(mode){
   S._botMode=mode;
   document.getElementById('bot-mode-single').classList.toggle('active',mode==='single');
   document.getElementById('bot-mode-batch').classList.toggle('active',mode==='batch');
+  document.getElementById('bot-mode-session').classList.toggle('active',mode==='session');
   const qf=document.getElementById('bot-batch-qty-field');
   const prev=document.getElementById('bot-batch-preview');
-  if(mode==='batch'){
-    qf.style.display='';
-    _updateBatchPreview();
+  const editor=document.getElementById('bot-editor');
+  if(mode==='session'){
+    qf.style.display='none'; prev.style.display='none';
+    editor.classList.add('bot-mode-session');
   } else {
-    qf.style.display='none';
-    prev.style.display='none';
+    editor.classList.remove('bot-mode-session');
+    if(mode==='batch'){ qf.style.display=''; _updateBatchPreview(); }
+    else { qf.style.display='none'; prev.style.display='none'; }
   }
 }
 
 function startNewBottle(mode){
   S.editingBot=null; S._botMode=mode||'single';
   navTo('bottles');
-  document.getElementById('bot-editor-title').textContent='New Bottle';
-  const modeToggle=document.getElementById('bot-mode-toggle');
-  modeToggle.style.display='';
+  document.getElementById('bot-editor-title').textContent=mode==='session'?'New Autoclave Session':'New Bottle';
+  document.getElementById('bot-mode-toggle').style.display='';
   _populateBotEditor(null);
   setBotMode(S._botMode);
+  if(mode==='session') _initSessionBuilder();
   showBotEditor();
 }
 
@@ -5448,6 +5677,7 @@ function cancelBotEdit(){
 }
 
 async function saveBottleAction(){
+  if(S._botMode==='session'){ await saveSessionAction(); return; }
   const sp=document.getElementById('bot-species').value.trim();
   const stage=document.getElementById('bot-stage').value;
   const status=document.getElementById('bot-status').value||'prepared';
@@ -5992,15 +6222,15 @@ async function login(){
       S.accs=cached.accs; S.accSha=cached.accSha;
       S.recs=cached.recs; S.recSha=cached.recSha;
       if(cached.taxCustom){ S.taxCustom=cached.taxCustom; S.taxCustomSha=cached.taxCustomSha; }
-      if(cached.bottles){ S.bottles=cached.bottles; S.bottlesSha=cached.bottlesSha; }
+      if(cached.bottles){ S.bottles=cached.bottles; S.bottlesSha=cached.bottlesSha; S.sessions=cached.sessions||[]; }
       toast('⚡ Loaded from cache');
     }else{
       load('Loading all data…');
-      const [{notes,sha:nSha},{accs,sha:aSha},{recs,sha:rSha},{bottles,sha:bSha}]=await Promise.all([loadNotesIndex(),loadAccessions(),loadRecipes(),loadBottles()]);
+      const [{notes,sha:nSha},{accs,sha:aSha},{recs,sha:rSha},{bottles,sessions:bSess,sha:bSha}]=await Promise.all([loadNotesIndex(),loadAccessions(),loadRecipes(),loadBottles()]);
       S.notes=notes; S.notesSha=nSha;
       S.accs=accs; S.accSha=aSha;
       S.recs=recs; S.recSha=rSha;
-      S.bottles=bottles||[]; S.bottlesSha=bSha;
+      S.bottles=bottles||[]; S.sessions=bSess||[]; S.bottlesSha=bSha;
       _writeCache();
     }
     document.getElementById('login').style.display='none';
@@ -6011,7 +6241,7 @@ async function login(){
     switchSection('notes'); showNote('empty');
     // Vanakkam greeting after login
     const _labN=localStorage.getItem('tcplants_lab_name');
-    setTimeout(()=>toast(`Vanakkam 🌿🙏${_labN?' — '+_labN:''}`, 'ok'), 400);
+    setTimeout(()=>showVanakkam(_labN||''), 350);
     document.getElementById('ql-fab').classList.add('on');
     document.getElementById('ai-btn').classList.add('on');
     _initAIKeyHint();
@@ -6101,7 +6331,7 @@ function lock(){
 function _writeCache(){
   try{
     sessionStorage.setItem('tcplants_cache', JSON.stringify({
-      notes:S.notes, accs:S.accs, recs:S.recs, bottles:S.bottles,
+      notes:S.notes, accs:S.accs, recs:S.recs, bottles:S.bottles, sessions:S.sessions,
       notesSha:S.notesSha, accSha:S.accSha, recSha:S.recSha, bottlesSha:S.bottlesSha,
       taxCustom:S.taxCustom, taxCustomSha:S.taxCustomSha,
       cachedAt:Date.now()
