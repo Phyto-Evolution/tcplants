@@ -394,6 +394,40 @@ main > .dview, main > .editor{ margin:0 auto; }
 .gh-source-badge.lab{background:rgba(63,185,80,.12);color:var(--gn);border-color:rgba(63,185,80,.3)}
 .gh-source-badge.wild{background:rgba(188,140,255,.12);color:var(--pu);border-color:rgba(188,140,255,.3)}
 .gh-source-badge.nursery,.gh-source-badge.trade{background:rgba(88,166,255,.12);color:var(--ac);border-color:rgba(88,166,255,.3)}
+/* GH detail tab bar */
+.gh-tab-bar{display:flex;border-bottom:1px solid var(--bd);flex-shrink:0;background:var(--sf);padding:0 16px;position:sticky;top:0;z-index:2}
+.gh-tab{background:none;border:none;border-bottom:2px solid transparent;color:var(--mu);cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;padding:10px 12px;transition:all .12s;white-space:nowrap}
+.gh-tab:hover{color:var(--tx)}
+.gh-tab.active{color:var(--gn);border-bottom-color:var(--gn)}
+.gh-tab-panel{padding:14px 16px}
+/* Bench view */
+.gh-bench-wrap{padding:10px 10px 20px;overflow-y:auto;flex:1}
+.gh-bench-section{margin-bottom:18px}
+.gh-bench-label{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--mu);padding-bottom:6px;border-bottom:1px solid var(--bd);margin-bottom:8px}
+.gh-bench-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.gh-plant-card{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:11px 10px;cursor:pointer;transition:all .15s;position:relative;min-height:80px}
+.gh-plant-card:hover{border-color:var(--gn);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.gh-plant-card.active-card{border-color:var(--gn);background:rgba(63,185,80,.06)}
+.gh-plant-name{font-size:11px;font-weight:700;line-height:1.35;margin-bottom:4px;color:var(--tx)}
+.gh-plant-qty{font-size:11px;font-weight:600}
+.gh-inspect-badge{position:absolute;top:5px;right:5px;font-size:9px;padding:1px 5px;border-radius:3px;font-weight:700;letter-spacing:.02em}
+/* View toggle */
+.gh-view-toggle{display:flex;border:1px solid var(--bd);border-radius:6px;overflow:hidden;flex-shrink:0}
+.gh-view-btn{background:none;border:none;color:var(--mu);cursor:pointer;font-size:13px;padding:3px 9px;transition:all .12s;line-height:1}
+.gh-view-btn.active{background:var(--gn);color:#0d1117}
+/* Inline form */
+.gh-inline-form{background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:12px;margin-bottom:12px}
+/* Condition timeline */
+.gh-cond-timeline{border-left:2px solid var(--bd);margin-left:6px;padding-left:14px}
+.gh-cond-entry{position:relative;padding:7px 0;border-bottom:1px solid rgba(128,128,128,.08)}
+.gh-cond-entry::before{content:'';position:absolute;left:-20px;top:13px;width:10px;height:10px;border-radius:50%;border:2px solid var(--bg);background:var(--bd)}
+/* Ledger */
+.gh-ledger-table{width:100%;border-collapse:collapse;font-size:12px}
+.gh-ledger-table th{color:var(--mu);font-weight:600;text-align:left;padding:4px 8px;border-bottom:1px solid var(--bd)}
+.gh-ledger-table td{padding:5px 8px;border-bottom:1px solid rgba(128,128,128,.07)}
+.gh-type-badge{font-size:9px;font-weight:700;border:1px solid currentColor;border-radius:3px;padding:0 4px;margin-right:4px}
+/* Plan mini-cards */
+.gh-plan-stat{background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:10px;text-align:center}
 
 /* ── PRINT ── */
 @media print{
@@ -1778,6 +1812,11 @@ main > .dview, main > .editor{ margin:0 auto; }
         </div>
       </div>
       <div class="field">
+        <label>Next inspection date</label>
+        <input type="date" id="gh-next-inspection">
+        <div class="hint">Appears in ⏰ Reminders when due</div>
+      </div>
+      <div class="field">
         <label>Linked accession (optional)</label>
         <select id="gh-accession"><option value="">— none —</option></select>
       </div>
@@ -2602,7 +2641,13 @@ main > .dview, main > .editor{ margin:0 auto; }
             <span class="search-icon">🔍</span>
             <input type="text" id="gh-search" placeholder="Search species, location…" oninput="S.ghSearch=this.value;renderGHList()">
           </div>
-          <div class="aside-stats" id="gh-stats"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">
+            <div class="aside-stats" id="gh-stats" style="margin:0"></div>
+            <div class="gh-view-toggle">
+              <button class="gh-view-btn active" id="ghv-list" onclick="setGHView('list')" title="List view">≡</button>
+              <button class="gh-view-btn" id="ghv-bench" onclick="setGHView('bench')" title="Bench view">⊞</button>
+            </div>
+          </div>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:4px;padding:6px 10px;border-bottom:1px solid var(--bd)">
           <button class="bot-filter-pill active" data-ghf="all" onclick="setGHFilter('all')">All</button>
@@ -2610,7 +2655,8 @@ main > .dview, main > .editor{ margin:0 auto; }
           <button class="bot-filter-pill" data-ghf="stressed" onclick="setGHFilter('stressed')">Stressed</button>
           <button class="bot-filter-pill" data-ghf="lab" onclick="setGHFilter('lab')">Lab origin</button>
         </div>
-        <div id="gh-list"></div>
+        <div id="gh-list" style="overflow-y:auto;flex:1"></div>
+        <div id="gh-bench" class="gh-bench-wrap" style="display:none"></div>
       </div>
     </div>
   </div>
@@ -2904,7 +2950,7 @@ const S = {
   bottleFilter: 'all', bottleSearch: '',
   curBot: null, editingBot: null,
   greenhouse: [], ghTransfers: [], greenhouseSha: null,
-  ghFilter: 'all', ghSearch: '',
+  ghFilter: 'all', ghSearch: '', ghView: 'list',
   curGH: null, editingGH: null,
   taxSpecies: [],
   taxFlairs: [],
@@ -3282,7 +3328,12 @@ function updateReminderBadge(){
     const d = daysFrom(b.next_review);
     return d !== null && d <= 7;
   }).length;
-  const count=noteCount+botCount;
+  const ghCount=(S.greenhouse||[]).filter(p=>{
+    if(!p.next_inspection) return false;
+    const d=daysFrom(p.next_inspection);
+    return d!==null && d<=7;
+  }).length;
+  const count=noteCount+botCount+ghCount;
   const nb=document.getElementById('nd-rbadge');
   if(nb){ nb.textContent=count; nb.style.display=count>0?'':'none'; }
 }
@@ -5685,6 +5736,138 @@ const GH_HEALTH_COLOR={healthy:'var(--gn)',stressed:'var(--yw)',dormant:'var(--m
 const GH_HEALTH_LABEL={healthy:'Healthy',stressed:'Stressed',dormant:'Dormant',declined:'Declined'};
 const GH_SOURCE_LABEL={lab:'Lab output',wild:'Wild',nursery:'Nursery',trade:'Trade'};
 
+function setGHView(v){
+  S.ghView=v;
+  document.getElementById('ghv-list').classList.toggle('active',v==='list');
+  document.getElementById('ghv-bench').classList.toggle('active',v==='bench');
+  document.getElementById('gh-list').style.display=v==='list'?'':'none';
+  document.getElementById('gh-bench').style.display=v==='bench'?'':'none';
+  v==='bench'?renderGHBench():renderGHList();
+}
+
+function renderGHBench(){
+  const el=document.getElementById('gh-bench'); if(!el) return;
+  const q=(S.ghSearch||'').toLowerCase();
+  let list=S.greenhouse||[];
+  if(S.ghFilter&&S.ghFilter!=='all'){
+    if(S.ghFilter==='lab') list=list.filter(p=>p.source==='lab');
+    else list=list.filter(p=>p.health===S.ghFilter);
+  }
+  if(q) list=list.filter(p=>(p.species||'').toLowerCase().includes(q)||(p.location||'').toLowerCase().includes(q));
+  const total=(S.greenhouse||[]).length;
+  const totalPlants=(S.greenhouse||[]).reduce((s,p)=>s+(p.quantity||1),0);
+  const healthy=(S.greenhouse||[]).filter(p=>p.health==='healthy').length;
+  const statsEl=document.getElementById('gh-stats');
+  if(statsEl) statsEl.textContent=`${total} entr${total!==1?'ies':'y'} · ${totalPlants} plant${totalPlants!==1?'s':''} · ${healthy} healthy`;
+  if(!list.length){el.innerHTML=`<div style="padding:20px;font-size:13px;color:var(--mu);text-align:center">No plants to display</div>`;return;}
+  const groups={};
+  list.forEach(p=>{const loc=p.location||'Unassigned';if(!groups[loc])groups[loc]=[];groups[loc].push(p);});
+  el.innerHTML=Object.entries(groups).sort(([a],[b])=>a.localeCompare(b)).map(([loc,plants])=>`
+    <div class="gh-bench-section">
+      <div class="gh-bench-label">📍 ${esc(loc)} <span style="font-weight:400">(${plants.length})</span></div>
+      <div class="gh-bench-grid">
+        ${plants.map(p=>{
+          const col=GH_HEALTH_COLOR[p.health]||'var(--gn)';
+          const inspDays=p.next_inspection?daysFrom(p.next_inspection):null;
+          const badge=inspDays!==null&&inspDays<=7?`<span class="gh-inspect-badge" style="background:${inspDays<=0?'var(--rd)':'var(--yw)'};color:#0d1117">${inspDays<=0?'OVERDUE':'DUE'}</span>`:'';
+          return `<div class="gh-plant-card${S.curGH===p.id?' active-card':''}" onclick="openGHPlant('${p.id}')">
+            ${badge}
+            <div style="display:flex;align-items:center;gap:5px;margin-bottom:5px">
+              <div class="gh-health-dot ${p.health||'healthy'}"></div>
+              <span style="font-size:9px;color:${col};font-weight:600">${GH_HEALTH_LABEL[p.health]||'OK'}</span>
+            </div>
+            <div class="gh-plant-name">${esc(p.species||'Unknown')}</div>
+            <div class="gh-plant-qty" style="color:${col}">${p.quantity||1} plant${(p.quantity||1)!==1?'s':''}</div>
+            ${p.source==='lab'?'<div style="font-size:9px;color:var(--gn);margin-top:4px;font-weight:700">LAB</div>':''}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function adjustQuantityGH(plantId){
+  const el=document.getElementById(`gh-adjust-form-${plantId}`); if(!el) return;
+  if(el.innerHTML){el.innerHTML='';return;}
+  el.innerHTML=`<div class="gh-inline-form">
+    <div style="font-size:12px;font-weight:600;margin-bottom:8px;color:var(--tx)">Adjust stock</div>
+    <div class="row2" style="margin-bottom:8px">
+      <div><label style="font-size:11px;font-weight:600;display:block;margin-bottom:3px">Change (+ or –)</label>
+        <input type="number" id="gha-delta" placeholder="e.g. 2 or -1" style="width:100%"></div>
+      <div><label style="font-size:11px;font-weight:600;display:block;margin-bottom:3px">Type</label>
+        <select id="gha-type" style="width:100%">
+          <option value="in">Received / arrived</option>
+          <option value="loss" selected>Loss (died / damaged)</option>
+          <option value="out">Sent out</option>
+          <option value="propagated">Natural propagation</option>
+          <option value="lab_in">From lab output</option>
+        </select></div>
+    </div>
+    <div style="margin-bottom:10px"><label style="font-size:11px;font-weight:600;display:block;margin-bottom:3px">Reason</label>
+      <input type="text" id="gha-reason" placeholder="e.g. 1 plant lost to overwatering" style="width:100%"></div>
+    <div style="display:flex;gap:6px">
+      <button class="btn xs green" onclick="_saveQtyAdjust('${plantId}')">Save</button>
+      <button class="btn xs ghost" onclick="document.getElementById('gh-adjust-form-${plantId}').innerHTML=''">Cancel</button>
+    </div>
+  </div>`;
+}
+
+async function _saveQtyAdjust(plantId){
+  const delta=parseInt(document.getElementById('gha-delta').value);
+  if(!delta||delta===0){toast('Enter a non-zero change','fail');return;}
+  const type=document.getElementById('gha-type').value;
+  const reason=document.getElementById('gha-reason').value.trim()||type;
+  const idx=(S.greenhouse||[]).findIndex(x=>x.id===plantId); if(idx===-1) return;
+  const p=S.greenhouse[idx];
+  const newQty=Math.max(0,(p.quantity||0)+delta);
+  const entry={id:uid(),date:new Date().toISOString().slice(0,10),delta,reason,type,created_at:new Date().toISOString()};
+  S.greenhouse[idx]={...p,quantity:newQty,quantity_log:[...(p.quantity_log||[]),entry],updated_at:new Date().toISOString()};
+  try{
+    S.greenhouseSha=await saveGreenhouse(S.greenhouse,S.greenhouseSha);
+    _writeCache(); renderGHList(); openGHPlant(plantId); setTimeout(()=>ghTab('ledger'),60);
+    toast(`📦 Stock updated: ${delta>0?'+':''}${delta} → ${newQty} plant${newQty!==1?'s':''}`);
+  }catch(e){toast('Save failed: '+e.message,'fail');S.greenhouse[idx]=p;}
+}
+
+function logConditionGH(plantId){
+  const el=document.getElementById(`gh-condition-form-${plantId}`); if(!el) return;
+  if(el.innerHTML){el.innerHTML='';return;}
+  el.innerHTML=`<div class="gh-inline-form">
+    <div style="font-size:12px;font-weight:600;margin-bottom:8px;color:var(--tx)">Log condition</div>
+    <div class="row2" style="margin-bottom:8px">
+      <div><label style="font-size:11px;font-weight:600;display:block;margin-bottom:3px">Health status</label>
+        <select id="ghc-health" style="width:100%">
+          <option value="healthy">🟢 Healthy</option>
+          <option value="stressed">🟡 Stressed</option>
+          <option value="dormant">⚪ Dormant</option>
+          <option value="declined">🔴 Declined</option>
+        </select></div>
+      <div><label style="font-size:11px;font-weight:600;display:block;margin-bottom:3px">Date</label>
+        <input type="date" id="ghc-date" value="${new Date().toISOString().slice(0,10)}" style="width:100%"></div>
+    </div>
+    <div style="margin-bottom:10px"><label style="font-size:11px;font-weight:600;display:block;margin-bottom:3px">Observation</label>
+      <textarea id="ghc-note" rows="2" placeholder="e.g. Aphid infestation on lower leaves — treated with neem" style="width:100%"></textarea></div>
+    <div style="display:flex;gap:6px">
+      <button class="btn xs green" onclick="_saveCondLog('${plantId}')">Save</button>
+      <button class="btn xs ghost" onclick="document.getElementById('gh-condition-form-${plantId}').innerHTML=''">Cancel</button>
+    </div>
+  </div>`;
+}
+
+async function _saveCondLog(plantId){
+  const health=document.getElementById('ghc-health').value;
+  const note=document.getElementById('ghc-note').value.trim()||null;
+  const date=document.getElementById('ghc-date').value||new Date().toISOString().slice(0,10);
+  const idx=(S.greenhouse||[]).findIndex(x=>x.id===plantId); if(idx===-1) return;
+  const p=S.greenhouse[idx];
+  const entry={id:uid(),date,health,note,created_at:new Date().toISOString()};
+  S.greenhouse[idx]={...p,health,condition_log:[...(p.condition_log||[]),entry],updated_at:new Date().toISOString()};
+  try{
+    S.greenhouseSha=await saveGreenhouse(S.greenhouse,S.greenhouseSha);
+    _writeCache(); renderGHList(); openGHPlant(plantId); setTimeout(()=>ghTab('health'),60);
+    toast(`🩺 Condition logged: ${GH_HEALTH_LABEL[health]||health}`);
+  }catch(e){toast('Save failed: '+e.message,'fail');S.greenhouse[idx]=p;}
+}
+
 function setGHFilter(f){
   S.ghFilter=f;
   document.querySelectorAll('[data-ghf]').forEach(p=>p.classList.toggle('active',p.dataset.ghf===f));
@@ -5707,16 +5890,23 @@ function renderGHList(){
   const statsEl=document.getElementById('gh-stats');
   if(statsEl) statsEl.textContent=`${total} entr${total!==1?'ies':'y'} · ${totalPlants} plant${totalPlants!==1?'s':''} · ${healthy} healthy`;
   if(!list.length){el.innerHTML=`<div style="padding:18px;font-size:13px;color:var(--mu);text-align:center">${q||S.ghFilter!=='all'?'No matches':'No plants yet. Add one!'}</div>`;return;}
-  el.innerHTML=list.map(p=>`
-    <div class="bot-list-item${S.curGH===p.id?' active':''}" data-id="${p.id}" onclick="openGHPlant('${p.id}')">
+  el.innerHTML=list.map(p=>{
+    const inspDays=p.next_inspection?daysFrom(p.next_inspection):null;
+    const inspBadge=inspDays!==null&&inspDays<=7
+      ?`<span style="font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;flex-shrink:0;background:${inspDays<=0?'var(--rd)':'var(--yw)'};color:#0d1117">${inspDays<=0?'OVERDUE':'INSPECT'}</span>`:'';
+    return `<div class="bot-list-item${S.curGH===p.id?' active':''}" data-id="${p.id}" onclick="openGHPlant('${p.id}')">
       <div class="gh-health-dot ${p.health||'healthy'}"></div>
       <div class="bot-list-info">
         <div class="bot-list-code" style="font-size:13px">${esc(p.species||'Unknown species')}</div>
         <div class="bot-list-sp">${p.quantity||1} plant${(p.quantity||1)!==1?'s':''}${p.location?` · ${esc(p.location)}`:''}</div>
-        ${p.date_added?`<div class="bot-list-stage">Added ${fmtDateShort(p.date_added)}</div>`:''}
+        ${p.next_inspection?`<div class="bot-list-stage">🔔 Inspect ${fmtDateShort(p.next_inspection)}</div>`:''}
       </div>
-      ${p.source==='lab'?`<span class="gh-source-badge lab" style="flex-shrink:0">LAB</span>`:(p.source==='wild'?`<span class="gh-source-badge wild" style="flex-shrink:0">WILD</span>`:'')}
-    </div>`).join('');
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+        ${inspBadge}
+        ${p.source==='lab'?`<span class="gh-source-badge lab">LAB</span>`:(p.source==='wild'?`<span class="gh-source-badge wild">WILD</span>`:'')}
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function showGHEmpty(){
@@ -5736,29 +5926,14 @@ function showGHEditor(){
 }
 
 function openGHPlant(id){
-  S.curGH=id; renderGHList();
+  S.curGH=id;
+  if(S.ghView==='bench') renderGHBench(); else renderGHList();
   const p=(S.greenhouse||[]).find(x=>x.id===id); if(!p) return;
-  const acc=S.accs.find(a=>a.id===p.accession_id);
-  const sourcedBottles=(S.bottles||[]).filter(b=>b.greenhouse_plant_id===id);
-  const labOutputCount=(S.ghTransfers||[]).filter(t=>t.plant_id===id&&t.type==='lab_output_in').reduce((s,t)=>s+(t.quantity||1),0);
-  const explantEvents=(S.ghTransfers||[]).filter(t=>t.plant_id===id&&t.type==='explant_out').sort((a,b)=>new Date(b.date)-new Date(a.date));
-  const explantTotal=explantEvents.reduce((s,t)=>s+(t.quantity||1),0);
   const healthCol=GH_HEALTH_COLOR[p.health]||'var(--gn)';
   const healthLabel=GH_HEALTH_LABEL[p.health]||'Healthy';
   const sourceLabel=GH_SOURCE_LABEL[p.source]||p.source||'—';
-
-  const rows=[
-    ['Species', `<strong>${esc(p.species||'Unknown')}</strong>`],
-    ['Quantity', `${p.quantity||1} plant${(p.quantity||1)!==1?'s':''}`],
-    ['Health', `<span style="color:${healthCol};font-weight:600">${healthLabel}</span>`],
-    ['Source', sourceLabel],
-    ['Location', p.location||null],
-    ['Date added', p.date_added?fmtDateShort(p.date_added):null],
-    ['Accession', acc?`<a style="color:var(--ac);cursor:pointer" onclick="navTo('registry');openAccession('${acc.id}')">${esc(acc.accession||acc.species)}</a>`:p.accession_id?'(deleted)':null],
-    ['Explants taken', explantTotal>0?`${explantTotal} explants across ${explantEvents.length} event${explantEvents.length!==1?'s':''}`:null],
-    ['Lab output in', labOutputCount>0?`${labOutputCount} plant${labOutputCount!==1?'s':''} received from lab`:null],
-    ['Cultures started', sourcedBottles.length>0?`${sourcedBottles.length} bottle${sourcedBottles.length!==1?'s':''} sourced from here`:null],
-  ].filter(([,v])=>v&&v!==null);
+  const inspDays=p.next_inspection?daysFrom(p.next_inspection):null;
+  const inspChip=inspDays!==null?`<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:${inspDays<=0?'rgba(248,81,73,.15)':inspDays<=7?'rgba(210,153,34,.15)':'var(--sf2)'};color:${inspDays<=0?'var(--rd)':inspDays<=7?'var(--yw)':'var(--mu)'};border:1px solid ${inspDays<=0?'rgba(248,81,73,.3)':inspDays<=7?'rgba(210,153,34,.3)':'var(--bd)'}">🔔 ${inspDays<=0?`${Math.abs(inspDays)}d overdue`:inspDays===0?'Inspect today':`Inspect in ${inspDays}d`}</span>`:'';
 
   document.getElementById('gh-detail').innerHTML=`
     <div class="gh-detail-header">
@@ -5769,6 +5944,7 @@ function openGHPlant(id){
             <span style="padding:2px 10px;border-radius:12px;font-size:12px;font-weight:600;background:${healthCol}22;color:${healthCol};border:1px solid ${healthCol}44">${healthLabel}</span>
             <span class="gh-source-badge ${p.source||'wild'}">${sourceLabel}</span>
             ${p.location?`<span style="font-size:12px;color:var(--mu)">📍 ${esc(p.location)}</span>`:''}
+            ${inspChip}
           </div>
         </div>
         <div style="display:flex;gap:6px;flex-shrink:0">
@@ -5777,37 +5953,159 @@ function openGHPlant(id){
         </div>
       </div>
     </div>
-    <div style="padding:12px 16px">
-      <table class="bot-spec-table">
-        ${rows.map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('')}
-      </table>
+    <div class="gh-tab-bar">
+      <button class="gh-tab active" data-tab="overview" onclick="ghTab('overview')">📋 Overview</button>
+      <button class="gh-tab" data-tab="ledger" onclick="ghTab('ledger')">📦 Ledger</button>
+      <button class="gh-tab" data-tab="health" onclick="ghTab('health')">🩺 Health</button>
+      <button class="gh-tab" data-tab="plan" onclick="ghTab('plan')">⚗️ Plan</button>
     </div>
-    <div class="bot-stepper-row" style="gap:8px;flex-wrap:wrap">
-      <button class="btn sm green" onclick="takeExplantFromGH('${id}')">🌿 Take Explant → Bottle</button>
-      <button class="btn sm ghost" onclick="takeExplantFromGH('${id}',true)" style="border-color:var(--pu);color:var(--pu)">🔥 Take Explant → Session</button>
+    <div id="ght-overview" class="gh-tab-panel">${_ghOverviewHtml(p)}</div>
+    <div id="ght-ledger"   class="gh-tab-panel" style="display:none">${_ghLedgerHtml(p)}</div>
+    <div id="ght-health"   class="gh-tab-panel" style="display:none">${_ghHealthHtml(p)}</div>
+    <div id="ght-plan"     class="gh-tab-panel" style="display:none">${_ghPlanHtml(p)}</div>
+  `;
+  showGHDetail();
+}
+
+function ghTab(name){
+  document.querySelectorAll('.gh-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===name));
+  ['overview','ledger','health','plan'].forEach(n=>{
+    const el=document.getElementById('ght-'+n);
+    if(el) el.style.display=n===name?'':'none';
+  });
+}
+
+function _ghOverviewHtml(p){
+  const acc=S.accs.find(a=>a.id===p.accession_id);
+  const sourcedBottles=(S.bottles||[]).filter(b=>b.greenhouse_plant_id===p.id);
+  const transfers=(S.ghTransfers||[]).filter(t=>t.plant_id===p.id);
+  const explantEvents=transfers.filter(t=>t.type==='explant_out').sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const labOutputCount=transfers.filter(t=>t.type==='lab_output_in').reduce((s,t)=>s+(t.quantity||1),0);
+  const explantTotal=explantEvents.reduce((s,t)=>s+(t.quantity||1),0);
+  const healthCol=GH_HEALTH_COLOR[p.health]||'var(--gn)';
+  const rows=[
+    ['Quantity',`${p.quantity||1} plant${(p.quantity||1)!==1?'s':''}`],
+    ['Location',p.location||null],
+    ['Date added',p.date_added?fmtDateShort(p.date_added):null],
+    ['Next inspection',p.next_inspection?fmtDateShort(p.next_inspection):null],
+    ['Accession',acc?`<a style="color:var(--ac);cursor:pointer" onclick="navTo('registry');openAccession('${acc.id}')">${esc(acc.accession||acc.species)}</a>`:null],
+    ['Explants taken',explantTotal>0?`${explantTotal} total · ${explantEvents.length} event${explantEvents.length!==1?'s':''}`:null],
+    ['Lab plants received',labOutputCount>0?`${labOutputCount} plant${labOutputCount!==1?'s':''}`:null],
+    ['Cultures started',sourcedBottles.length?`${sourcedBottles.length} bottle${sourcedBottles.length!==1?'s':''}`:null],
+  ].filter(([,v])=>v);
+  return `
+    <table class="bot-spec-table" style="margin-bottom:12px">${rows.map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('')}</table>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+      <button class="btn sm green" onclick="takeExplantFromGH('${p.id}')">🌿 Take Explant → Bottle</button>
+      <button class="btn sm ghost" onclick="takeExplantFromGH('${p.id}',true)" style="border-color:var(--pu);color:var(--pu)">🔥 Take Explant → Session</button>
     </div>
     ${sourcedBottles.length?`
-    <div style="padding:0 16px 12px">
-      <div class="dash-section-label" style="margin-top:8px"><span>🫙 Cultures sourced here (${sourcedBottles.length})</span><a onclick="navTo('bottles')" style="color:var(--ac);font-size:11px;cursor:pointer;font-weight:600">View all →</a></div>
-      ${sourcedBottles.slice(0,6).map(b=>`<div onclick="navTo('bottles');openBottle('${b.id}')" style="display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer;font-size:13px;border-bottom:1px solid var(--bd)">
+      <div class="dash-section-label"><span>🫙 Cultures sourced here (${sourcedBottles.length})</span><a onclick="navTo('bottles')" style="color:var(--ac);font-size:11px;cursor:pointer;font-weight:600">View →</a></div>
+      ${sourcedBottles.slice(0,5).map(b=>`<div onclick="navTo('bottles');openBottle('${b.id}')" style="display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer;font-size:13px;border-bottom:1px solid var(--bd)">
         <div class="bot-status-dot ${b.status||'prepared'}"></div>
         <span style="flex:1;color:var(--ac);font-family:var(--mono);font-size:12px">${esc(b.code)}</span>
         <span style="color:var(--mu);font-size:11px">${esc((b.stage||'').replace('Stage ','S').replace(/ — .*/,''))}</span>
         <span class="bot-status-badge ${b.status||'prepared'}" style="font-size:10px;padding:1px 6px">${esc(b.status||'prepared')}</span>
-      </div>`).join('')}
-    </div>`:''}
-    ${explantEvents.length?`
-    <div style="padding:0 16px 16px">
-      <div class="dash-section-label" style="margin-top:8px"><span>🌿 Explant history</span></div>
-      ${explantEvents.slice(0,8).map(t=>`<div style="display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px;border-bottom:1px solid var(--bd)">
-        <span style="color:var(--mu);flex-shrink:0">${fmtDateShort(t.date)}</span>
-        <span style="flex:1">${t.quantity||1} explant${(t.quantity||1)!==1?'s':''} taken</span>
-        ${t.note?`<span style="color:var(--mu);font-size:11px;font-style:italic">${esc(t.note)}</span>`:''}
-      </div>`).join('')}
-    </div>`:''}
-    ${p.notes?`<div class="bot-notes-body">${marked.parse(p.notes)}</div>`:''}
+      </div>`).join('')}`:''}
+    ${p.notes?`<div class="bot-notes-body" style="margin-top:12px">${marked.parse(p.notes)}</div>`:''}
   `;
-  showGHDetail();
+}
+
+function _ghLedgerHtml(p){
+  const qLog=p.quantity_log||[];
+  const transfers=(S.ghTransfers||[]).filter(t=>t.plant_id===p.id);
+  // Merge transfer events not already in qLog (legacy data)
+  const extraRows=[];
+  transfers.filter(t=>t.type==='explant_out'&&!qLog.find(q=>q.transfer_id===t.id)).forEach(t=>{
+    extraRows.push({date:t.date,delta:-(t.quantity||1),reason:`Explant taken${t.note?' — '+t.note:''}`,type:'explant'});
+  });
+  transfers.filter(t=>t.type==='lab_output_in'&&!qLog.find(q=>q.transfer_id===t.id)).forEach(t=>{
+    extraRows.push({date:t.date,delta:t.quantity||1,reason:'Lab output received',type:'lab_in'});
+  });
+  const allRows=[...qLog,...extraRows].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  // Running balance forward
+  let bal=p.quantity||0;
+  const withBal=[];
+  for(let i=allRows.length-1;i>=0;i--){withBal.unshift({...allRows[i],balance:bal});bal-=allRows[i].delta;}
+  const typeColor={in:'var(--gn)',out:'var(--yw)',loss:'var(--rd)',lab_in:'#52b788',propagated:'var(--ac)',explant:'var(--pu)'};
+  const typeLabel={in:'Received',out:'Sent out',loss:'Loss',lab_in:'Lab output',propagated:'Propagated',explant:'Explant'};
+  return `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="font-size:13px;font-weight:600">Stock ledger <span style="color:var(--mu);font-weight:400;font-size:12px">— current: <strong style="color:var(--tx)">${p.quantity||0}</strong> plants</span></div>
+      <button class="btn xs ghost" onclick="adjustQuantityGH('${p.id}')" style="border-color:var(--gn);color:var(--gn)">＋ Adjust</button>
+    </div>
+    <div id="gh-adjust-form-${p.id}"></div>
+    ${withBal.length?`<table class="gh-ledger-table">
+      <tr><th>Date</th><th>Event</th><th style="text-align:right">Δ</th><th style="text-align:right">Balance</th></tr>
+      ${withBal.map(e=>`<tr>
+        <td style="color:var(--mu);white-space:nowrap">${fmtDateShort(e.date)}</td>
+        <td><span class="gh-type-badge" style="color:${typeColor[e.type]||'var(--mu)'}">${typeLabel[e.type]||e.type}</span>${esc(e.reason||'')}</td>
+        <td style="text-align:right;font-family:var(--mono);font-weight:700;color:${e.delta>0?'var(--gn)':'var(--rd)'}">${e.delta>0?'+':''}${e.delta}</td>
+        <td style="text-align:right;font-family:var(--mono);color:var(--mu)">${e.balance}</td>
+      </tr>`).join('')}
+    </table>`:`<div style="color:var(--mu);font-size:13px;text-align:center;padding:20px">No stock movements yet. Use "Adjust" to log changes.</div>`}
+  `;
+}
+
+function _ghHealthHtml(p){
+  const cLog=[...(p.condition_log||[])].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  return `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="font-size:13px;font-weight:600">Condition history</div>
+      <button class="btn xs ghost" onclick="logConditionGH('${p.id}')" style="border-color:var(--yw);color:var(--yw)">＋ Log</button>
+    </div>
+    <div id="gh-condition-form-${p.id}"></div>
+    ${cLog.length?`<div class="gh-cond-timeline">
+      ${cLog.map((e,i)=>{
+        const col=GH_HEALTH_COLOR[e.health]||'var(--mu)';
+        return `<div class="gh-cond-entry" style="--dot-col:${col}">
+          <style>#ght-health .gh-cond-entry:nth-child(${i+1})::before{background:${col}}</style>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+            <span style="font-weight:700;color:${col};font-size:13px">${GH_HEALTH_LABEL[e.health]||e.health}</span>
+            <span style="color:var(--mu);font-size:11px">${fmtDateShort(e.date)}</span>
+            ${i===0?'<span style="font-size:10px;background:var(--gn);color:#0d1117;padding:1px 5px;border-radius:3px;font-weight:700">Current</span>':''}
+          </div>
+          ${e.note?`<div style="font-size:12px;color:var(--tx);line-height:1.55">${esc(e.note)}</div>`:''}
+        </div>`;
+      }).join('')}
+    </div>`:`<div style="color:var(--mu);font-size:13px;text-align:center;padding:20px">No condition history yet. Log a condition entry to start tracking.</div>`}
+  `;
+}
+
+function _ghPlanHtml(p){
+  const transfers=(S.ghTransfers||[]).filter(t=>t.plant_id===p.id&&t.type==='explant_out').sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const avg=transfers.length?Math.round(transfers.reduce((s,t)=>s+(t.quantity||1),0)/transfers.length):null;
+  const potential=avg?p.quantity*avg:null;
+  const spBottles=(S.bottles||[]).filter(b=>b.species&&p.species&&b.species.toLowerCase()===p.species.toLowerCase());
+  const spActive=spBottles.filter(b=>['inoculated','growing'].includes(b.status));
+  const spSubcultured=spBottles.filter(b=>b.status==='subcultured');
+  const lastHarvest=transfers[0];
+  return `
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin-bottom:12px">${esc(p.species||'this species')} — production overview</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+      <div class="gh-plan-stat"><div style="font-size:24px;font-weight:800;color:var(--gn)">${p.quantity||0}</div><div style="font-size:11px;color:var(--mu);margin-top:2px">GH stock</div></div>
+      <div class="gh-plan-stat"><div style="font-size:24px;font-weight:800;color:var(--ac)">${spActive.length}</div><div style="font-size:11px;color:var(--mu);margin-top:2px">In culture</div></div>
+      <div class="gh-plan-stat"><div style="font-size:24px;font-weight:800;color:#52b788">${spSubcultured.length}</div><div style="font-size:11px;color:var(--mu);margin-top:2px">Ready for GH</div></div>
+    </div>
+    <div style="background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:12px;margin-bottom:12px">
+      <div style="font-size:12px;font-weight:700;margin-bottom:8px">📊 Harvest estimate</div>
+      ${lastHarvest?`<div style="font-size:12px;color:var(--mu);margin-bottom:4px">Last harvest: ${fmtDateShort(lastHarvest.date)} · ${lastHarvest.quantity||1} explant${(lastHarvest.quantity||1)!==1?'s':''}</div>`:''}
+      ${avg?`<div style="font-size:12px;color:var(--mu);margin-bottom:10px">Avg per harvest: <strong style="color:var(--tx)">${avg} explants / event</strong></div>`:'<div style="font-size:12px;color:var(--mu);margin-bottom:10px">Take explants a few times to build harvest history.</div>'}
+      ${potential?`<div style="border-top:1px solid var(--bd);padding-top:10px">
+        <div style="font-size:12px;color:var(--mu);margin-bottom:6px">If all ${p.quantity} plants harvested at avg yield:</div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap">
+          <div><span style="font-size:20px;font-weight:800;color:var(--pu)">${potential}</span> <span style="font-size:11px;color:var(--mu)">explants</span></div>
+          <div><span style="font-size:20px;font-weight:800;color:var(--ac)">${potential}</span> <span style="font-size:11px;color:var(--mu)">bottles</span></div>
+          <div><span style="font-size:20px;font-weight:800;color:var(--yw)">${Math.ceil(potential/120)}</span> <span style="font-size:11px;color:var(--mu)">session${Math.ceil(potential/120)!==1?'s':''} @ 120</span></div>
+        </div>
+      </div>`:''}
+    </div>
+    ${spSubcultured.length?`<div style="background:rgba(82,183,136,.08);border:1px solid rgba(82,183,136,.3);border-radius:8px;padding:10px;margin-bottom:12px;font-size:12px">
+      <strong style="color:#52b788">⚠️ ${spSubcultured.length} subcultured bottle${spSubcultured.length!==1?'s':''} ready to send back to greenhouse.</strong>
+      <div style="margin-top:6px"><button class="btn xs ghost" style="border-color:#52b788;color:#52b788" onclick="navTo('bottles');setBotFilter('subcultured');S.bottleSearch='${esc(p.species||'')}';renderBottleList()">View subcultured →</button></div>
+    </div>`:''}
+    <div style="font-size:11px;color:var(--mu);line-height:1.6">💡 Fill <strong>Cultures Out</strong> on your notes to refine harvest estimates. The more explant events logged, the more accurate the avg yield.</div>
+  `;
 }
 
 function _populateGHEditor(p){
@@ -5821,6 +6119,7 @@ function _populateGHEditor(p){
   document.getElementById('gh-location').value=p?p.location||'':'';
   document.getElementById('gh-notes-text').value=p?p.notes||'':'';
   document.getElementById('gh-date-added').value=p?p.date_added||new Date().toISOString().slice(0,10):new Date().toISOString().slice(0,10);
+  document.getElementById('gh-next-inspection').value=p?p.next_inspection||'':'';
 }
 
 function startNewGHPlant(prefillSpecies){
@@ -5852,28 +6151,47 @@ async function saveGHPlantAction(){
   const source=document.getElementById('gh-source').value||'wild';
   const location=document.getElementById('gh-location').value.trim()||null;
   const date_added=document.getElementById('gh-date-added').value||new Date().toISOString().slice(0,10);
+  const next_inspection=document.getElementById('gh-next-inspection').value||null;
   const accession_id=document.getElementById('gh-accession').value||null;
   const notes=document.getElementById('gh-notes-text').value.trim()||null;
   const btn=document.getElementById('gh-save-btn');
   btn.disabled=true; btn.textContent='Saving…';
   try{
     const now=new Date().toISOString();
+    const today=now.slice(0,10);
     if(S.editingGH){
       const idx=(S.greenhouse||[]).findIndex(x=>x.id===S.editingGH);
       if(idx===-1) throw new Error('Plant not found');
-      S.greenhouse[idx]={...S.greenhouse[idx],species:sp,quantity,health,source,location,date_added,accession_id,notes,updated_at:now};
+      const prev=S.greenhouse[idx];
+      // Auto-log health change to condition_log
+      let condition_log=prev.condition_log||[];
+      if(prev.health!==health){
+        condition_log=[...condition_log,{id:uid(),date:today,health,note:`Updated via editor (was ${GH_HEALTH_LABEL[prev.health]||prev.health})`,created_at:now}];
+      }
+      // Auto-log quantity change to quantity_log
+      let quantity_log=prev.quantity_log||[];
+      if((prev.quantity||1)!==quantity){
+        const delta=quantity-(prev.quantity||0);
+        quantity_log=[...quantity_log,{id:uid(),date:today,delta,reason:`Manual edit (${delta>0?'+':''}${delta})`,type:delta>0?'in':'out',created_at:now}];
+      }
+      S.greenhouse[idx]={...prev,species:sp,quantity,health,source,location,date_added,next_inspection,accession_id,notes,condition_log,quantity_log,updated_at:now};
       S.greenhouseSha=await saveGreenhouse(S.greenhouse,S.greenhouseSha);
       S.curGH=S.editingGH; S.editingGH=null;
       renderGHList(); openGHPlant(S.curGH);
       toast(`🌱 ${sp} updated`);
     } else {
-      const plant={id:uid(),species:sp,quantity,health,source,location,date_added,accession_id,notes,created_at:now,updated_at:now};
+      const plant={
+        id:uid(),species:sp,quantity,health,source,location,date_added,next_inspection,accession_id,notes,
+        condition_log:[{id:uid(),date:today,health,note:'Initial entry',created_at:now}],
+        quantity_log:[{id:uid(),date:today,delta:quantity,reason:'Initial entry',type:'in',created_at:now}],
+        created_at:now,updated_at:now
+      };
       S.greenhouse=[...(S.greenhouse||[]),plant];
       S.greenhouseSha=await saveGreenhouse(S.greenhouse,S.greenhouseSha);
       S.curGH=plant.id; renderGHList(); openGHPlant(S.curGH);
       toast(`🌱 ${sp} added to greenhouse`);
     }
-    _writeCache();
+    _writeCache(); updateReminderBadge();
   }catch(e){ toast('Save failed: '+e.message,'fail'); }
   btn.disabled=false; btn.textContent='Save';
 }
@@ -6618,11 +6936,12 @@ document.getElementById('rec-search').addEventListener('input',renderRecList);
 // REMINDERS
 // ════════════════════════════════════════════════════════════
 function renderReminders(){
-  const notes=S.notes.filter(n=>n.next_review).map(n=>({...n, days:daysFrom(n.next_review), isBottle:false}));
-  // Bottles with next_review in active states
-  const botItems=S.bottles.filter(b=>b.next_review&&['inoculated','growing'].includes(b.status))
-    .map(b=>({...b, title:b.code, type:_botStatusLabel(b.status), days:daysFrom(b.next_review), isBottle:true}));
-  const all=[...notes,...botItems];
+  const notes=S.notes.filter(n=>n.next_review).map(n=>({...n, days:daysFrom(n.next_review), isBottle:false, isGH:false}));
+  const botItems=(S.bottles||[]).filter(b=>b.next_review&&['inoculated','growing'].includes(b.status))
+    .map(b=>({...b, title:b.code, type:_botStatusLabel(b.status), days:daysFrom(b.next_review), isBottle:true, isGH:false}));
+  const ghItems=(S.greenhouse||[]).filter(p=>p.next_inspection)
+    .map(p=>({...p, title:p.species||'Unknown plant', type:`Inspect · ${GH_HEALTH_LABEL[p.health]||'Healthy'}`, days:daysFrom(p.next_inspection), next_review:p.next_inspection, isBottle:false, isGH:true}));
+  const all=[...notes,...botItems,...ghItems];
   const overdue=all.filter(n=>n.days<=0).sort((a,b)=>a.days-b.days);
   const week=all.filter(n=>n.days>0&&n.days<=7).sort((a,b)=>a.days-b.days);
   const month=all.filter(n=>n.days>7&&n.days<=30).sort((a,b)=>a.days-b.days);
@@ -6631,11 +6950,11 @@ function renderReminders(){
   const card=(n)=>{
     const cls=n.days<=0?'overdue':'soon';
     const dlabel=n.days<0?`${Math.abs(n.days)}d overdue`:n.days===0?'Due today':`In ${n.days}d`;
-    const icon=n.isBottle?'🫙 ':'';
-    return `<div class="rem-card ${cls}" data-id="${n.id}" data-is-bottle="${n.isBottle?'1':'0'}">`+`
+    const icon=n.isGH?'🏡 ':n.isBottle?'🫙 ':'';
+    return `<div class="rem-card ${cls}" data-id="${n.id}" data-is-bottle="${n.isBottle?'1':'0'}" data-is-gh="${n.isGH?'1':'0'}">
       <div class="rem-info">
         <div class="rem-title">${icon}${esc(n.title)}</div>
-        <div class="rem-sub">${n.species?`<em>${esc(n.species)}</em> · `:''}${n.type?esc(n.type):''}</div>
+        <div class="rem-sub">${n.species&&!n.isGH?`<em>${esc(n.species)}</em> · `:''}${n.type?esc(n.type):''}</div>
       </div>
       <div class="rem-date ${cls}">${dlabel}<br><span style="font-size:11px;font-weight:400">${fmtDateShort(n.next_review)}</span></div>
     </div>`;
@@ -6647,10 +6966,8 @@ function renderReminders(){
 
   const body=document.getElementById('reminders-body');
   body.innerHTML= !all.length
-    ? '<div class="empty-state"><h2>No reminders set</h2><p>Add a "Next Review Date" to any lab entry or bottle to see reminders here.</p></div>'
+    ? '<div class="empty-state"><h2>No reminders set</h2><p>Add a "Next Review Date" to any lab entry or bottle, or a "Next inspection date" to a greenhouse plant, to see reminders here.</p></div>'
     : section('🔴 Overdue',overdue,'overdue')+section('🟡 This week',week,'soon')+section('📅 This month',month)+section('🗓 Later',later);
-
-  // Tap handled by _setupTap('reminders-body') delegation
 }
 
 // ════════════════════════════════════════════════════════════
@@ -6952,7 +7269,7 @@ function _initTapHandlers(){
   // Bottle list
   _setupTap('bot-list',    '.bot-list-item', el=>openBottle(el.dataset.id));
   // Reminders
-  _setupTap('reminders-body', '.rem-card',   el=>{ if(el.dataset.isBottle==='1') openBottle(el.dataset.id); else openNote(el.dataset.id); });
+  _setupTap('reminders-body', '.rem-card',   el=>{ if(el.dataset.isGh==='1'){ navTo('greenhouse');openGHPlant(el.dataset.id); } else if(el.dataset.isBottle==='1') openBottle(el.dataset.id); else openNote(el.dataset.id); });
   // Contamination list
   _setupTap('contam-list', '.sr-item',       el=>openNote(el.dataset.id));
   // Calendar day panel
