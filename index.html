@@ -797,6 +797,7 @@ main > .dview, main > .editor{ margin:0 auto; }
 .tax-badge.vu,.tax-badge.nt{background:rgba(210,153,34,.15);color:var(--yw);border-color:rgba(210,153,34,.3)}
 .tax-badge.lc{background:rgba(63,185,80,.15);color:var(--gn);border-color:rgba(63,185,80,.3)}
 .tax-badge.dd{background:var(--sf2);color:var(--mu)}
+.tax-badge.cv{background:rgba(188,140,255,.15);color:var(--pu);border-color:rgba(188,140,255,.3)}
 .tax-accs{padding:4px 12px 6px 28px;display:flex;flex-wrap:wrap;gap:4px}
 .flair-pill{display:inline-flex;align-items:center;gap:4px;border-radius:12px;font-size:11px;font-weight:600;padding:2px 8px;border:1px solid transparent;cursor:default}
 .flair-pill.blue{background:rgba(88,166,255,.15);color:var(--ac);border-color:rgba(88,166,255,.3)}
@@ -1991,20 +1992,28 @@ main > .dview, main > .editor{ margin:0 auto; }
       <!-- VERSION HEADER -->
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
         <h1 style="font-size:22px;font-weight:800;margin:0">🌿 TC Plants Lab Notes</h1>
-        <span class="help-version-badge">v3.2</span>
+        <span class="help-version-badge">v3.3</span>
       </div>
       <p style="color:var(--mu);font-size:13px;margin-bottom:20px">April 2026 · Encrypted · GitHub-backed · Single-file PWA</p>
 
       <!-- WHAT'S NEW v3.2 -->
       <div style="background:linear-gradient(135deg,rgba(63,185,80,.1),rgba(88,166,255,.08));border:1px solid rgba(63,185,80,.3);border-radius:10px;padding:18px 20px;margin-bottom:14px">
-        <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v3.2</div>
+        <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v3.3</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
-          <div style="font-size:13px;line-height:1.6"><strong>🌱 Taxonomy source field</strong> — custom species now record Seeds / Greenhouse / Other lab / Custom; hybrids auto-badged HYBRID</div>
-          <div style="font-size:13px;line-height:1.6"><strong>⬆ CSV Import — right place</strong> — import is now in the Greenhouse empty state &amp; New Plant editor, not buried in the list header</div>
-          <div style="font-size:13px;line-height:1.6"><strong>📋 CSV format table</strong> — full column reference always visible in the import modal with prominent template download</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🏡 GH flair in taxonomy</strong> — adding a custom species with source = Greenhouse auto-ensures the GH flair</div>
+          <div style="font-size:13px;line-height:1.6"><strong>✏️ Edit custom species</strong> — each custom species row now has an Edit button; all fields editable in place, button changes to "Update Species"</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🟣 Cultivar (CV)</strong> — new Conservation Status option; shows as a purple CV badge in autocomplete dropdowns and species lists</div>
         </div>
       </div>
+      <!-- v3.2 release notes (collapsed) -->
+      <details style="margin-bottom:8px">
+        <summary style="cursor:pointer;font-size:12px;color:var(--mu);padding:6px 0;font-weight:600;letter-spacing:.04em">▸ v3.2 release notes</summary>
+        <div style="background:var(--sf2);border-radius:8px;padding:12px;margin-top:6px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px">
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">🌱 Taxonomy source field</strong> — Seeds / Greenhouse / Other lab / Custom; HYBRID badge</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">⬆ CSV in right place</strong> — import in GH empty state &amp; New Plant editor</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">📋 CSV format table</strong> — always-visible column reference with template</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">🏡 GH flair in taxonomy</strong> — Greenhouse source auto-creates GH flair</div>
+        </div>
+      </details>
       <!-- v3.1 release notes (collapsed) -->
       <details style="margin-bottom:8px">
         <summary style="cursor:pointer;font-size:12px;color:var(--mu);padding:6px 0;font-weight:600;letter-spacing:.04em">▸ v3.1 release notes</summary>
@@ -2442,9 +2451,10 @@ main > .dview, main > .editor{ margin:0 auto; }
           <tr><td>Scientific Name</td><td>Required. Any format — species, hybrid name, working name. Names with × are auto-detected as hybrids.</td></tr>
           <tr><td>Common Name</td><td>Optional display name</td></tr>
           <tr><td>Source / Origin</td><td>🏡 Greenhouse (own plants) · 🌱 Seeds · Wild collection · Other lab / Exchange · Custom… (free text). Choosing <strong>Greenhouse</strong> auto-creates the 🏡 GH flair.</td></tr>
-          <tr><td>Conservation Status</td><td>LC · NT · VU · EN · CR · DD — shows as a coloured badge in autocomplete</td></tr>
+          <tr><td>Conservation Status</td><td>LC · NT · VU · EN · CR · DD · <strong>CV (Cultivar)</strong> — shows as a coloured badge in autocomplete. CV appears purple.</td></tr>
         </table>
         <p>Once saved, the species appears immediately in the autocomplete dropdown for all Species fields across the app (notes, bottles, accessions, greenhouse).</p>
+        <p>Each row in the Custom Species list has two action buttons: <strong>✏️ Edit</strong> (opens the form pre-filled with that species' data, button changes to "Update Species") and <strong>✕ Delete</strong>. Editing does not affect existing notes, bottles, or accessions that already reference that name — only the autocomplete entry is updated.</p>
         <h3>Flairs</h3>
         <p>Define coloured labels in the <strong>Flairs</strong> tab — e.g. <em>Borneo clone</em>, <em>Highland form</em>, <em>SCV-01</em>. The <strong>🏡 GH</strong> flair is a system flair created automatically the first time you use a Greenhouse source. Assign flairs to accessions in the Registry editor. They appear as pills in the accession list and as sub-rows in the species autocomplete dropdown.</p>
       </div>
@@ -4031,11 +4041,11 @@ async function saveCustomTaxonomy(){
 function _taxConBadge(status){
   const map={
     critically_endangered:'CR',endangered:'EN',vulnerable:'VU',
-    near_threatened:'NT',least_concern:'LC',data_deficient:'DD'
+    near_threatened:'NT',least_concern:'LC',data_deficient:'DD',cultivar:'CV'
   };
   const cls={
     critically_endangered:'cr',endangered:'en',vulnerable:'vu',
-    near_threatened:'nt',least_concern:'lc',data_deficient:'dd'
+    near_threatened:'nt',least_concern:'lc',data_deficient:'dd',cultivar:'cv'
   };
   const code=map[status]; if(!code) return '';
   return `<span class="tax-badge ${cls[status]}">${code}</span>`;
@@ -4897,7 +4907,8 @@ function _renderTaxonomyPanel(){
           <span class="tax-sp-com" style="flex:1;color:var(--mu)">${esc(sp.common_name||'')}</span>
           ${srcLabel?`<span style="font-size:10px;font-weight:600;padding:1px 7px;border-radius:10px;border:1px solid var(--bd);color:var(--mu);flex-shrink:0">${esc(srcLabel)}</span>`:''}
           ${_taxConBadge(sp.conservation_status)}
-          <button class="btn xs ghost" onclick="_taxDeleteCustomSpecies(${JSON.stringify(sp.id)})">✕</button>
+          <button class="btn xs ghost" onclick="_taxEditCustomSpecies(${JSON.stringify(sp.id)})" title="Edit">✏️</button>
+          <button class="btn xs ghost" onclick="_taxDeleteCustomSpecies(${JSON.stringify(sp.id)})" title="Delete">✕</button>
         </div>`;
       }).join('')}
       <div id="tax-custom-form" style="display:none;margin-top:10px;padding:14px;background:var(--sf2);border-radius:8px;border:1px solid var(--bd)">
@@ -4936,15 +4947,16 @@ function _renderTaxonomyPanel(){
               <option value="endangered">Endangered (EN)</option>
               <option value="critically_endangered">Critically Endangered (CR)</option>
               <option value="data_deficient">Data Deficient (DD)</option>
+              <option value="cultivar">Cultivar (CV)</option>
             </select>
           </div>
         </div>
         <div style="display:flex;gap:8px">
-          <button class="btn sm green" onclick="_taxSaveCustomSpecies()">Add Species</button>
-          <button class="btn sm ghost" onclick="document.getElementById('tax-custom-form').style.display='none'">Cancel</button>
+          <button class="btn sm green" id="tc-save-btn" onclick="_taxSaveCustomSpecies()">Add Species</button>
+          <button class="btn sm ghost" onclick="_taxResetForm()">Cancel</button>
         </div>
       </div>
-      <button class="btn ghost sm" style="margin-top:10px" onclick="document.getElementById('tax-custom-form').style.display='block';document.getElementById('tc-fullname').focus()">+ Add custom species</button>
+      <button class="btn ghost sm" style="margin-top:10px" onclick="_taxOpenAddForm()">+ Add custom species</button>
     </div>
   </div>`;
 
@@ -5011,8 +5023,54 @@ function _taxToggleCat(catId,enabled){
   toast(enabled?'Pack enabled — reload to update autocomplete':'Pack disabled — reload to update autocomplete','info');
 }
 
+let _taxEditingSpeciesId=null;
+
 function _tcSourceChange(val){
   document.getElementById('tc-source-custom-wrap').style.display=val==='custom'?'':'none';
+}
+
+function _taxOpenAddForm(){
+  _taxEditingSpeciesId=null;
+  const form=document.getElementById('tax-custom-form');
+  form.style.display='block';
+  document.getElementById('tc-save-btn').textContent='Add Species';
+  document.getElementById('tc-fullname').focus();
+}
+
+function _taxResetForm(){
+  _taxEditingSpeciesId=null;
+  ['tc-fullname','tc-common','tc-source-custom'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('tc-status').value='';
+  document.getElementById('tc-source').value='';
+  document.getElementById('tc-source-custom-wrap').style.display='none';
+  document.getElementById('tax-custom-form').style.display='none';
+  const btn=document.getElementById('tc-save-btn');
+  if(btn) btn.textContent='Add Species';
+}
+
+function _taxEditCustomSpecies(id){
+  const sp=(S.taxCustom.species||[]).find(x=>x.id===id); if(!sp) return;
+  _taxEditingSpeciesId=id;
+  const form=document.getElementById('tax-custom-form');
+  form.style.display='block';
+  document.getElementById('tc-fullname').value=sp.full_name||'';
+  document.getElementById('tc-common').value=sp.common_name||'';
+  document.getElementById('tc-status').value=sp.conservation_status||'';
+  // Restore source
+  const knownSrc=['greenhouse','seeds','wild','other-lab'];
+  if(knownSrc.includes(sp.source||'')){
+    document.getElementById('tc-source').value=sp.source;
+    document.getElementById('tc-source-custom-wrap').style.display='none';
+  } else if(sp.source){
+    document.getElementById('tc-source').value='custom';
+    document.getElementById('tc-source-custom').value=sp.source;
+    document.getElementById('tc-source-custom-wrap').style.display='';
+  } else {
+    document.getElementById('tc-source').value='';
+    document.getElementById('tc-source-custom-wrap').style.display='none';
+  }
+  document.getElementById('tc-save-btn').textContent='Update Species';
+  form.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
 async function _taxSaveCustomSpecies(){
@@ -5022,29 +5080,42 @@ async function _taxSaveCustomSpecies(){
   const source=srcSel==='custom'
     ?(document.getElementById('tc-source-custom').value.trim()||'Custom')
     :srcSel||null;
-  const sp={
-    id:uid(),
+  const newData={
     full_name:fn,
     common_name:document.getElementById('tc-common').value.trim(),
     conservation_status:document.getElementById('tc-status').value,
     source,
   };
-  S.taxCustom.species.push(sp);
-  S.taxSpecies.push({...sp,is_custom:true});
-  try{
-    await saveCustomTaxonomy();
-    _writeCache();
-    // Reset form
-    ['tc-fullname','tc-common','tc-source-custom'].forEach(id=>document.getElementById(id).value='');
-    document.getElementById('tc-status').value='';
-    document.getElementById('tc-source').value='';
-    document.getElementById('tc-source-custom-wrap').style.display='none';
-    document.getElementById('tax-custom-form').style.display='none';
-    _renderTaxonomyPanel();
-    // Auto-assign GH flair if greenhouse source
-    if(source==='greenhouse') _ensureGHFlair();
-    toast(`Species added${source?' · source: '+source:''}`);
-  }catch(e){ S.taxCustom.species.pop(); S.taxSpecies.pop(); toast('Save failed: '+e.message,'fail'); }
+
+  if(_taxEditingSpeciesId){
+    // Edit existing
+    const idx=S.taxCustom.species.findIndex(x=>x.id===_taxEditingSpeciesId);
+    if(idx===-1){toast('Species not found','fail');return;}
+    const prev=S.taxCustom.species[idx];
+    S.taxCustom.species[idx]={...prev,...newData};
+    // Update in taxSpecies array (matched by id since we spread sp.id when pushing)
+    const sidx=S.taxSpecies.findIndex(s=>s.is_custom&&s.id===_taxEditingSpeciesId);
+    if(sidx!==-1) S.taxSpecies[sidx]={...S.taxSpecies[sidx],...newData};
+    try{
+      await saveCustomTaxonomy(); _writeCache();
+      _taxEditingSpeciesId=null;
+      _renderTaxonomyPanel();
+      if(source==='greenhouse') _ensureGHFlair();
+      toast(`Species updated`);
+    }catch(e){ S.taxCustom.species[idx]=prev; toast('Save failed: '+e.message,'fail'); }
+  } else {
+    // Create new
+    const sp={id:uid(),...newData};
+    S.taxCustom.species.push(sp);
+    S.taxSpecies.push({...sp,is_custom:true});
+    try{
+      await saveCustomTaxonomy(); _writeCache();
+      _taxEditingSpeciesId=null;
+      _renderTaxonomyPanel();
+      if(source==='greenhouse') _ensureGHFlair();
+      toast(`Species added${source?' · '+source:''}`);
+    }catch(e){ S.taxCustom.species.pop(); S.taxSpecies.pop(); toast('Save failed: '+e.message,'fail'); }
+  }
 }
 
 async function _taxDeleteCustomSpecies(id){
