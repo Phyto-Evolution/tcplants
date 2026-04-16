@@ -1749,20 +1749,41 @@ main > .dview, main > .editor{ margin:0 auto; }
   <!-- ── HELP ── -->
   <div class="section fullpage" id="sec-help">
     <div class="help-body">
+
+      <!-- WHAT'S NEW -->
+      <div style="background:linear-gradient(135deg,rgba(63,185,80,.1),rgba(88,166,255,.08));border:1px solid rgba(63,185,80,.3);border-radius:10px;padding:18px 20px;margin-bottom:24px">
+        <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v2.0</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
+          <div style="font-size:13px;line-height:1.6"><strong>🏠 Home Button</strong> — returns to dashboard from anywhere</div>
+          <div style="font-size:13px;line-height:1.6"><strong>⚙️ Settings Panel</strong> — lab name, city, AI key, QR options</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🌱 Species Detail Panel</strong> — click any species to see all linked data</div>
+          <div style="font-size:13px;line-height:1.6"><strong>📊 Dashboard Activity Bars</strong> — 7-day entry chart + active bottles</div>
+          <div style="font-size:13px;line-height:1.6"><strong>📷 QR Scan in Nav</strong> — scan bottle labels from any screen</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🎛 Camera Contrast Sliders</strong> — improve dim-light QR scans</div>
+          <div style="font-size:13px;line-height:1.6"><strong>⚡ Activity Log Auto-Close</strong> — click outside to dismiss</div>
+          <div style="font-size:13px;line-height:1.6"><strong>📈 Feature Usage Metrics</strong> — in Analytics, tracks section visits</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🌿 Welcome Splash</strong> — smooth animated loading screen on first open</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🫙 Bottle Inventory</strong> — FSL-coded vessels, QR labels, lifecycle tracking</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🌿 Species Picker Modal</strong> — Browse button on all species fields</div>
+          <div style="font-size:13px;line-height:1.6"><strong>☀️ Login Theme Toggle</strong> — switch dark/light before signing in</div>
+        </div>
+      </div>
+
       <h2>Getting Started</h2>
       <div class="help-section-card">
-        <h3>First Login</h3>
-        <p>You need two things: your <strong>Encryption Password</strong> (chosen by you — never leaves your browser) and a <strong>GitHub Personal Access Token</strong> with <code>repo</code> scope.</p>
+        <h3>Signing In</h3>
+        <p>Enter your <strong>Username</strong> (your encryption passphrase — chosen by you, never leaves your browser) and <strong>Password</strong> (your GitHub Personal Access Token with <code>repo</code> scope).</p>
         <p>Create a token: <code>github.com → Settings → Developer settings → Personal access tokens → Classic → New token → tick repo → Generate</code></p>
-        <p>⚠️ <strong>Never lose your encryption password.</strong> There is no recovery — all note content is AES-256-GCM encrypted client-side. The GitHub repo stores only ciphertext.</p>
+        <p>⚠️ <strong>Never lose your passphrase.</strong> There is no recovery — all content is AES-256-GCM encrypted client-side. The GitHub repo stores only ciphertext that is unreadable without your passphrase.</p>
         <h3>Navigation</h3>
-        <p>Tap <strong>☰</strong> (top-left) to open the <strong>left navigation drawer</strong>. For Notes, Registry, and Recipes, the drawer stays open and shows the search, filters, and list — the main panel on the right shows the selected entry or editor. For all other sections (Analytics, Tools, Help, etc.) the drawer closes after navigating. The top bar contains: weather, export, lock, and theme toggle.</p>
+        <p>Tap <strong>☰</strong> (top-left) to open the navigation drawer. For Notes, Registry, Recipes, and Bottles, the drawer stays open as a sidebar — the main panel shows the selected entry or editor. For all other sections the drawer closes after navigating.</p>
+        <p>The top bar contains: <strong>🏠 Home</strong> · <strong>🌡️ Weather</strong> · <strong>📷 QR Scan</strong> · <strong>⬇ ZIP Export</strong> · <strong>CSV Export</strong> · <strong>🔒 Lock</strong> · <strong>⚙️ Settings</strong> · <strong>☀️/🌙 Theme</strong></p>
         <h3>Session Behaviour</h3>
-        <p>Your token is stored in <code>sessionStorage</code> only — cleared on tab close. Your password is in memory only. Lock or tab-close wipes both. After first login, data is cached for 10 minutes so re-unlocking is near-instant (⚡ Loaded from cache).</p>
+        <p>Your token is stored in <code>sessionStorage</code> only — cleared on tab close. Your passphrase is in memory only. Lock or tab-close wipes both. After first login, data is cached for 10 minutes so re-unlocking is near-instant (⚡ Loaded from cache).</p>
         <h3>Trusted Device</h3>
-        <p>After logging in, tap <strong>Yes, save</strong> on the trust banner. Your GitHub token is saved encrypted in <code>localStorage</code> — next visit just enter your password, no token needed. Tap <strong>Forget this device</strong> on the login screen to remove it.</p>
-        <h3>Light / Dark Mode</h3>
-        <p>Click <strong>☀️ / 🌙</strong> in the top bar to toggle themes. Preference persists across visits.</p>
+        <p>After signing in, tap <strong>Yes, save</strong> on the trust banner. Your token is saved encrypted in <code>localStorage</code> — next visit just enter your passphrase. Tap <strong>Forget this device</strong> in Settings or on the login screen to remove it.</p>
+        <h3>Theme Toggle</h3>
+        <p>Click <strong>☀️ / 🌙</strong> in the top bar or on the login screen. Preference persists across visits. You can also switch theme from <strong>⚙️ Settings</strong> while in the app.</p>
       </div>
 
       <h2>Lab Notes</h2>
@@ -1794,7 +1815,8 @@ main > .dview, main > .editor{ margin:0 auto; }
         <h3>Markdown Toolbar</h3>
         <p>The toolbar wraps selected text or inserts at cursor. Buttons: H2, H3, Bold, Italic, Strikethrough, inline <code>code</code>, code block, blockquote, horizontal rule, bullet list, numbered list, task list, link, image embed, table, <strong>[[]]</strong> wiki-link, <strong>📷</strong> Camera/Barcode. Shortcuts: <span class="kbd">Ctrl+B</span> Bold, <span class="kbd">Ctrl+I</span> Italic, <span class="kbd">Ctrl+K</span> Link, <span class="kbd">Tab</span> = 2 spaces.</p>
         <h3>Camera &amp; Barcode Scanner</h3>
-        <p>Click <strong>📷</strong> in the toolbar to open the camera. Tap <strong>📸 Capture Photo</strong> to insert a JPEG image directly into the note body (base64 encoded, encrypted with the note). Tap <strong>🔍 Scan Barcode</strong> to activate the ZXing barcode reader — supports QR codes, Code128, EAN, DataMatrix, and more. Once scanned, insert the result into the note or copy to clipboard. Use <strong>⇄ Switch</strong> to toggle between front and rear camera.</p>
+        <p>Click <strong>📷</strong> in the toolbar to open the camera. Tap <strong>📸 Capture Photo</strong> to insert a JPEG image directly into the note body (base64 encoded, encrypted with the note). Tap <strong>🔍 Scan QR / Barcode</strong> to activate the ZXing multi-format reader — supports QR codes, Code128, EAN, DataMatrix, and more. Once scanned, insert the result into the note or copy to clipboard. Use <strong>⇄ Switch</strong> to toggle between front and rear camera.</p>
+        <p>For scanning bottle labels outside the note editor, use the <strong>📷 button in the nav bar</strong> — it scans and auto-routes to the matching bottle without opening a note. Enable <strong>Scan Enhancement</strong> in ⚙️ Settings to get contrast/brightness sliders for difficult lighting conditions.</p>
         <h3>Image Embeds</h3>
         <p>Click <strong>🖼</strong> to pick an image. It is base64-encoded and inserted inline — encrypted inside the note. Keep under 1 MB.</p>
         <h3>Search</h3>
@@ -1932,11 +1954,80 @@ main > .dview, main > .editor{ margin:0 auto; }
           <tr><td>Score</td><td>Composite efficiency score (0–100). Formula: <code>(Avg Out ÷ global average) × (1 − contamination rate) × 100</code>, capped at 100. Higher is better. A recipe with high output but high contamination will score lower than a reliable medium with moderate output.</td></tr>
         </table>
         <p>💡 <strong>Tip:</strong> Always fill in <strong>Cultures Out</strong> when saving a Multiplication or Rooting note to get meaningful efficiency data. Without it, the Avg Out and Score columns show "—".</p>
+        <h3>Feature Usage</h3>
+        <p>A bar chart showing how often you've visited each section of the app since you started tracking (stored in <code>localStorage</code>). Helps identify which tools you rely on most. Reset anytime in <strong>⚙️ Settings → Reset Usage Stats</strong>.</p>
+      </div>
+
+      <h2>🏠 Home Dashboard</h2>
+      <div class="help-section-card">
+        <p>The dashboard is the first screen after login — always accessible via the <strong>🏠 Home</strong> button in the top bar. It shows your lab at a glance:</p>
+        <ul>
+          <li><strong>Quick Actions</strong> — ＋ New Entry, 🫙 New Bottle, 📷 Scan QR, 📅 Calendar, 📊 Analytics</li>
+          <li><strong>4 Stat Cards</strong> — total notes, bottles (active count), accessions, and reviews due (overdue highlighted red)</li>
+          <li><strong>7-Day Activity Bar</strong> — column chart showing how many entries were created each of the last 7 days. Hover any bar to see the exact date and count</li>
+          <li><strong>Recent Entries</strong> — the 5 most recent lab notes, click to open</li>
+          <li><strong>Reviews Due</strong> — upcoming notes and bottles sorted by urgency, colour-coded red (overdue) / yellow (within 3 days) / grey (later)</li>
+          <li><strong>Active Bottles</strong> — stage breakdown pills + top bottles by review urgency, click any to open</li>
+        </ul>
+      </div>
+
+      <h2>🫙 Bottle Inventory</h2>
+      <div class="help-section-card">
+        <h3>Creating Bottles</h3>
+        <p>Click <strong>🫙 Bottles</strong> in the nav drawer, then <strong>＋ Single Bottle</strong> or <strong>⊞ Batch</strong>. Each bottle gets a unique FSL code (e.g. <code>NEP-RAJ-001</code>) generated from genus, species, and sequence. Fields: species, accession, recipe, stage, inoculation date, next review, vessel type, explant type, quantity, and notes (Markdown).</p>
+        <h3>QR Labels</h3>
+        <p>Every bottle detail view shows a QR code in the top section. This QR encodes the URL <code>https://notes.tcplants.in?bottle=ID</code>. Tap <strong>🖨 Print label</strong> to open a print-ready label with the QR, FSL code, species, and stage. For batches, print all labels at once with <strong>🖨 Print batch</strong>.</p>
+        <p>To scan a bottle label, tap <strong>📷</strong> in the nav bar and point at the QR — the app automatically navigates to that bottle record.</p>
+        <h3>Lifecycle Status</h3>
+        <p>Each bottle moves through: <strong>Prepared → Inoculated → Growing → Subcultured → Contaminated / Discarded</strong>. Status changes are tracked with timestamps. Active bottles (Inoculated + Growing) appear in the dashboard and reminders.</p>
+        <h3>Filters</h3>
+        <p>Filter the bottle list by status using the pill buttons at the top of the bottle drawer. Search by species, FSL code, or accession. Export all bottle data as CSV from the top bar.</p>
       </div>
 
       <h2>🌱 Species in Culture</h2>
       <div class="help-section-card">
-        <p>Click <strong>Species</strong> in the nav drawer to see a live table of all species derived from your notes and accession registry. Shows: note count, TC stages distribution, contamination rate, average Cultures Out, and accession status. Click <strong>Taxonomy ↗</strong> next to any species to look it up in the PhytoCommerce taxonomy database.</p>
+        <h3>Species Table</h3>
+        <p>Click <strong>Species</strong> in the nav drawer to see a live table of every species found in your notes, accessions, and bottles. Columns: note count, active bottles, TC stage breakdown, contamination rate, average Cultures Out, accession status.</p>
+        <h3>Species Detail Panel</h3>
+        <p><strong>Click any species row</strong> to open a full detail panel on the right — showing:</p>
+        <ul>
+          <li>Summary stats: notes, active bottles, contamination rate</li>
+          <li>TC Stage Activity: horizontal bar chart showing distribution across stages</li>
+          <li>Accession records (click to navigate)</li>
+          <li>Bottle inventory for this species (click to navigate)</li>
+          <li>All linked notes, most recent first (click to open)</li>
+        </ul>
+        <p>Tap <strong>🌿 Taxonomy ↗</strong> in the panel header to look up the species in the PhytoCommerce taxonomy database.</p>
+        <h3>Taxonomy Packs &amp; Flairs</h3>
+        <p>Switch to the <strong>Taxonomy Packs</strong> tab to enable/disable built-in species packs (Carnivorous Plants, Orchids, Banana &amp; Relatives). The <strong>Flairs</strong> tab lets you define coloured labels (e.g. <em>Borneo clone</em>, <em>Highland form</em>) to assign to accession records.</p>
+      </div>
+
+      <h2>⚙️ Settings</h2>
+      <div class="help-section-card">
+        <p>Click <strong>⚙️</strong> in the top bar to open the Settings panel. Changes take effect immediately and persist in <code>localStorage</code>.</p>
+        <table><tr><th>Setting</th><th>What it does</th></tr>
+          <tr><td>Theme</td><td>Switch between dark and light mode</td></tr>
+          <tr><td>Lab Name</td><td>Shown in the dashboard header subtitle</td></tr>
+          <tr><td>Weather Location</td><td>City used for the weather widget</td></tr>
+          <tr><td>Gemini API Key</td><td>Powers the ✦ AI assistant. Get a free key at aistudio.google.com</td></tr>
+          <tr><td>Scan Enhancement</td><td>Adds contrast/brightness sliders in camera scan mode for dim lighting</td></tr>
+          <tr><td>Try Harder Mode</td><td>Slower but more thorough QR/barcode detection</td></tr>
+          <tr><td>Clear Local Cache</td><td>Forces a full reload from GitHub on next login</td></tr>
+          <tr><td>Forget Trusted Device</td><td>Removes the encrypted saved token from this device</td></tr>
+          <tr><td>Reset Usage Stats</td><td>Clears the feature usage data shown in Analytics</td></tr>
+        </table>
+      </div>
+
+      <h2>📷 QR Scan</h2>
+      <div class="help-section-card">
+        <p>Tap <strong>📷</strong> in the top nav bar from any screen to open the QR / barcode scanner in <em>route mode</em>:</p>
+        <ul>
+          <li>Scan a <strong>bottle label QR</strong> → automatically navigates to that bottle record</li>
+          <li>Scan any other QR or barcode → shows the decoded text with Copy and Open URL options</li>
+        </ul>
+        <p>The scanner also opens from <strong>📷</strong> in the note editor toolbar for inserting barcodes into notes.</p>
+        <h3>Low-Light Scanning</h3>
+        <p>If QR codes aren't scanning reliably, turn on <strong>Scan Enhancement</strong> in ⚙️ Settings. When active, contrast and brightness sliders appear during scanning — drag them to boost image clarity before the decoder runs.</p>
       </div>
 
       <h2>✦ Gemini AI Assistant</h2>
@@ -1957,9 +2048,9 @@ main > .dview, main > .editor{ margin:0 auto; }
         <p>When loaded, results are automatically <strong>archived to your GitHub repo</strong> at <code>news/YYYY-MM-DD.json</code> with the date stamp. These files accumulate over time as a research archive you can reference later.</p>
       </div>
 
-      <h2>Activity Log</h2>
+      <h2>⚡ Activity Log</h2>
       <div class="help-section-card">
-        <p>The <strong>⚡ Activity</strong> tab on the right edge of the screen opens a live panel showing the last 30 GitHub commits on your lab repo. Each entry shows the commit message, time ago, and date.</p>
+        <p>The <strong>⚡ Activity</strong> tab on the right edge of the screen opens a live panel showing the last 30 GitHub commits on your lab repo — a real-time record of every action saved to the cloud.</p>
         <p>Icons indicate the type of activity:</p>
         <table><tr><th>Icon</th><th>Meaning</th></tr>
           <tr><td>🌱</td><td>New note added or Quick Log</td></tr>
@@ -1967,10 +2058,11 @@ main > .dview, main > .editor{ margin:0 auto; }
           <tr><td>🗑</td><td>Note deleted</td></tr>
           <tr><td>🌿</td><td>Accession registry updated</td></tr>
           <tr><td>🧪</td><td>Recipe saved or updated</td></tr>
+          <tr><td>🫙</td><td>Bottle inventory updated</td></tr>
           <tr><td>📋</td><td>Index updated</td></tr>
           <tr><td>✨</td><td>App feature added</td></tr>
         </table>
-        <p>Click any <strong>note-related commit</strong> (🌱 or ✏️) in the list to jump directly to that note. Click <strong>↻</strong> to refresh. Click <strong>✕</strong> or click the <strong>⚡ Activity</strong> tab again to close. The panel is minimised by default — just a small tab on the right edge.</p>
+        <p>Click any note-related commit (🌱 or ✏️) to jump directly to that note. Click <strong>↻</strong> to refresh. Click <strong>✕</strong>, tap the <strong>⚡ Activity</strong> tab again, or <strong>click anywhere outside the panel</strong> to close it.</p>
       </div>
 
       <h2>⏱ Tools</h2>
@@ -2561,7 +2653,18 @@ let _ov;
 function load(msg='Working…'){document.getElementById('ovmsg').textContent=msg;document.getElementById('overlay').classList.add('on');}
 function unload(){document.getElementById('overlay').classList.remove('on');}
 let _tt;
-function toast(msg,type='ok'){const t=document.getElementById('toast');t.textContent=msg;t.className=`on ${type}`;clearTimeout(_tt);_tt=setTimeout(()=>t.className='',3200);}
+function toast(msg,type='ok',dur=3200){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className=`on ${type}`;
+  // Vanakkam gets a warmer, slightly larger greeting style
+  if(msg.startsWith('Vanakkam')){
+    t.style.cssText='font-size:15px;font-weight:600;padding:13px 20px;border-color:var(--gn);background:var(--sf)';
+    dur=3800;
+  } else {
+    t.style.cssText='';
+  }
+  clearTimeout(_tt);_tt=setTimeout(()=>{t.className='';t.style.cssText='';},dur);
+}
 
 function showNote(name){
   document.getElementById('ql-fab').style.display = name==='editor' ? 'none' : '';
@@ -5906,6 +6009,9 @@ async function login(){
     populateTagsDatalist();
     updateReminderBadge();
     switchSection('notes'); showNote('empty');
+    // Vanakkam greeting after login
+    const _labN=localStorage.getItem('tcplants_lab_name');
+    setTimeout(()=>toast(`Vanakkam 🌿🙏${_labN?' — '+_labN:''}`, 'ok'), 400);
     document.getElementById('ql-fab').classList.add('on');
     document.getElementById('ai-btn').classList.add('on');
     _initAIKeyHint();
