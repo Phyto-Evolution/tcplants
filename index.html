@@ -1988,29 +1988,36 @@ main > .dview, main > .editor{ margin:0 auto; }
       <!-- VERSION HEADER -->
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
         <h1 style="font-size:22px;font-weight:800;margin:0">🌿 TC Plants Lab Notes</h1>
-        <span class="help-version-badge">v3.0</span>
+        <span class="help-version-badge">v3.1</span>
       </div>
       <p style="color:var(--mu);font-size:13px;margin-bottom:20px">April 2026 · Encrypted · GitHub-backed · Single-file PWA</p>
 
-      <!-- WHAT'S NEW v3.0 -->
-      <div style="background:linear-gradient(135deg,rgba(63,185,80,.1),rgba(88,166,255,.08));border:1px solid rgba(63,185,80,.3);border-radius:10px;padding:18px 20px;margin-bottom:24px">
-        <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v3.0</div>
+      <!-- WHAT'S NEW v3.1 -->
+      <div style="background:linear-gradient(135deg,rgba(63,185,80,.1),rgba(88,166,255,.08));border:1px solid rgba(63,185,80,.3);border-radius:10px;padding:18px 20px;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v3.1</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
-          <div style="font-size:13px;line-height:1.6"><strong>🏠 Home Button</strong> — returns to dashboard from anywhere</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🏡 Greenhouse List</strong> — stock plant tracking with full lab integration</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🔥 Autoclave Session</strong> — plan one autoclave run with multiple media batches</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🌿 Take Explant flow</strong> — GH plant → Bottle/Session with one tap</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🏡 Send to GH</strong> — subcultured bottles → greenhouse plant records</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🙏 Vanakkam greeting</strong> — animated glass welcome modal on login</div>
-          <div style="font-size:13px;line-height:1.6"><strong>✨ Glass tint UI</strong> — backdrop-blur on login box, toasts &amp; modals</div>
-          <div style="font-size:13px;line-height:1.6"><strong>📊 Dashboard GH strip</strong> — healthy stock plants &amp; lab output alerts</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🌱 Species → GH plants</strong> — detail panel now shows greenhouse entries</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🫙 Source plant link</strong> — every bottle can reference its GH origin</div>
-          <div style="font-size:13px;line-height:1.6"><strong>5 dashboard stat cards</strong> — Notes / Bottles / Accessions / GH / Reminders</div>
-          <div style="font-size:13px;line-height:1.6"><strong>⊞ Batch mode</strong> — create N identical bottles in one action</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🌿 Species Picker</strong> — Browse button on all species fields</div>
+          <div style="font-size:13px;line-height:1.6"><strong>📦 Quantity Ledger</strong> — every stock change logged with delta, reason, type &amp; running balance</div>
+          <div style="font-size:13px;line-height:1.6"><strong>⊞ Bench View</strong> — toggle list ↔ bench grid; plants grouped by greenhouse location</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🩺 Condition History</strong> — timestamped health log per plant, inline log form in Health tab</div>
+          <div style="font-size:13px;line-height:1.6"><strong>⚗️ Output Plan tab</strong> — harvest estimates, pipeline view &amp; "ready for GH" subcultured alert</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🔔 Inspection reminders</strong> — next inspection date field; due plants appear in ⏰ Reminders</div>
+          <div style="font-size:13px;line-height:1.6"><strong>⬆ CSV Import</strong> — bulk-upload plants from spreadsheet; hybrids &amp; unregistered species fully supported</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🏡 GH System Flair</strong> — auto-created, auto-assigned when taking explants or choosing Greenhouse source</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🌱 Expanded sources</strong> — Seeds, Greenhouse, Other lab, Custom… with auto GH flair in accessions</div>
         </div>
       </div>
+      <!-- v3.0 release notes (collapsed) -->
+      <details style="margin-bottom:16px">
+        <summary style="cursor:pointer;font-size:12px;color:var(--mu);padding:6px 0;font-weight:600;letter-spacing:.04em">▸ v3.0 release notes</summary>
+        <div style="background:var(--sf2);border-radius:8px;padding:12px;margin-top:6px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px">
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">🏡 Greenhouse</strong> — stock plant tracking, explant flow, Send to GH</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">🔥 Autoclave Session</strong> — multi-batch autoclave run planning</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">🙏 Vanakkam greeting</strong> — glass welcome modal on login</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">✨ Glass tint UI</strong> — backdrop-blur on login, toasts, nav bar</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">5 stat cards</strong> — Notes / Bottles / Accessions / GH / Reminders</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">Species panel</strong> — GH plants section, stage bars, accession links</div>
+        </div>
+      </details>
 
       <!-- TABLE OF CONTENTS -->
       <div class="help-toc">
@@ -2127,7 +2134,7 @@ main > .dview, main > .editor{ margin:0 auto; }
           <tr><td>Species</td><td>Scientific name — links to taxonomy autocomplete</td></tr>
           <tr><td>Accession No.</td><td>Your internal identifier (e.g. VAN-001, NEP-RAJ-2024)</td></tr>
           <tr><td>Origin</td><td>Geographic or institutional source</td></tr>
-          <tr><td>Source</td><td>Wild / Nursery / Tissue culture / Trade</td></tr>
+          <tr><td>Source</td><td>🏡 Greenhouse · 🌱 Seeds · Wild · Lab-propagated · Other lab / Exchange · Nursery · Purchased · Donated · Custom… (free text). Choosing <strong>Greenhouse</strong> auto-selects the 🏡 GH flair.</td></tr>
           <tr><td>Date acquired</td><td>When you received or collected it</td></tr>
           <tr><td>Status</td><td>See status table below</td></tr>
           <tr><td>Flairs</td><td>Coloured provenance labels (clone, form, etc.)</td></tr>
@@ -2239,74 +2246,128 @@ main > .dview, main > .editor{ margin:0 auto; }
 
       <h2 id="h-greenhouse">🏡 Greenhouse List</h2>
       <div class="help-section-card">
-        <p>Track every stock plant in the greenhouse. This is the bridge between your field collection and your TC lab — recording what you have, where it is, and its history as both an explant source and a lab output destination.</p>
+        <p>Bidirectional stock plant management — tracks what's in the greenhouse, where it came from, and where it's going. The bridge between field collection and the TC lab.</p>
 
-        <h3>Core Concept — The Circular Flow</h3>
+        <h3>The Circular Flow</h3>
         <div class="help-flow">
-          <span class="flow-step">🏡 GH Stock Plant</span>
-          <span class="flow-arrow">→</span>
-          <span class="flow-step">🌿 Take Explant</span>
-          <span class="flow-arrow">→</span>
-          <span class="flow-step">🫙 Bottle / 🔥 Session</span>
-          <span class="flow-arrow">→</span>
-          <span class="flow-step">✂️ Subcultured</span>
-          <span class="flow-arrow">→</span>
-          <span class="flow-step">🏡 Send to GH</span>
-          <span class="flow-arrow">→</span>
-          <span class="flow-step">🏡 GH Stock grows</span>
+          <span class="flow-step">🏡 GH Stock</span><span class="flow-arrow">→</span>
+          <span class="flow-step">🌿 Take Explant</span><span class="flow-arrow">→</span>
+          <span class="flow-step">🫙 Bottle / 🔥 Session</span><span class="flow-arrow">→</span>
+          <span class="flow-step">✂️ Subcultured</span><span class="flow-arrow">→</span>
+          <span class="flow-step">🏡 Send to GH</span><span class="flow-arrow">→</span>
+          <span class="flow-step">🏡 Stock grows</span>
         </div>
 
         <h3>Plant Entry Fields</h3>
         <table><tr><th>Field</th><th>Purpose</th></tr>
-          <tr><td>Species</td><td>Taxonomy autocomplete + Browse modal</td></tr>
-          <tr><td>Quantity</td><td>Number of individual plants of this species at this location</td></tr>
-          <tr><td>Health status</td><td>Healthy / Stressed / Dormant / Declined — colour-coded dot indicator</td></tr>
-          <tr><td>Source</td><td>Wild collected / Lab output / Nursery / Trade</td></tr>
-          <tr><td>Date added</td><td>When the plants entered the greenhouse</td></tr>
-          <tr><td>Greenhouse location</td><td>Bench, section, or area (e.g. "Bench 3A", "Shade house")</td></tr>
-          <tr><td>Linked accession</td><td>Optional link to the Accession Registry record</td></tr>
-          <tr><td>Notes</td><td>Markdown — phenotype observations, provenance, permit notes</td></tr>
+          <tr><td>Species</td><td>Taxonomy autocomplete + Browse modal. Hybrids (×) fully supported.</td></tr>
+          <tr><td>Quantity</td><td>Number of plants — tracked via the Quantity Ledger tab.</td></tr>
+          <tr><td>Health status</td><td>Healthy 🟢 / Stressed 🟡 / Dormant ⚪ / Declined 🔴 — coloured dot in list + bench view.</td></tr>
+          <tr><td>Source</td><td>Wild / Lab output / Nursery / Trade — used for LAB / WILD badges in list.</td></tr>
+          <tr><td>Date added</td><td>Logged as the first entry in the Quantity Ledger.</td></tr>
+          <tr><td>Greenhouse location</td><td>Bench, section, shade house — defines bench view grouping.</td></tr>
+          <tr><td>Next inspection date</td><td>Appears in ⏰ Reminders (🏡 icon). Overdue shows red badge in list; due ≤7 days shows yellow.</td></tr>
+          <tr><td>Linked accession</td><td>Optional link to Accession Registry record.</td></tr>
+          <tr><td>Notes</td><td>Markdown — phenotype, provenance, permits.</td></tr>
         </table>
 
-        <h3>Health Status Indicators</h3>
-        <table><tr><th>Status</th><th>Colour</th><th>Meaning</th></tr>
-          <tr><td>Healthy</td><td style="color:var(--gn)">● Green (glow)</td><td>Actively growing, good as explant source</td></tr>
-          <tr><td>Stressed</td><td style="color:var(--yw)">● Yellow</td><td>Heat, water, or pest stress — explants may have higher contam risk</td></tr>
-          <tr><td>Dormant</td><td style="color:var(--mu)">● Grey</td><td>Not actively growing — seasonal or induced dormancy</td></tr>
-          <tr><td>Declined</td><td style="color:var(--rd)">● Red</td><td>Poor condition, not a viable explant source</td></tr>
+        <h3>Plant Detail — 4 Tabs</h3>
+        <table><tr><th>Tab</th><th>Contents</th></tr>
+          <tr><td>📋 Overview</td><td>Core info table, Take Explant buttons, linked bottles list, notes body</td></tr>
+          <tr><td>📦 Ledger</td><td>Full stock movement history as a running-balance table. ＋ Adjust opens an inline form to log any change.</td></tr>
+          <tr><td>🩺 Health</td><td>Timestamped condition timeline with coloured dots. ＋ Log opens an inline form (health dropdown + date + observation text).</td></tr>
+          <tr><td>⚗️ Plan</td><td>Production overview: GH stock count, bottles in culture, subcultured-ready count, harvest estimate (bottles / sessions), lab pipeline note.</td></tr>
         </table>
 
-        <h3>Explant → Lab Flow (Greenhouse to Culture)</h3>
-        <p>From a plant's detail view, tap one of:</p>
+        <h3>📦 Quantity Ledger</h3>
+        <p>Every change to plant count is logged with a row in the ledger: date, event type, delta (+ or −), and a running balance column so you can see the full stock history at a glance.</p>
+        <table><tr><th>Event type</th><th>When used</th></tr>
+          <tr><td>Received</td><td>New plants arrived — wild, nursery, exchange</td></tr>
+          <tr><td>Loss</td><td>Plants died, damaged, or lost</td></tr>
+          <tr><td>Sent out</td><td>Sold, gifted, or transferred to another party</td></tr>
+          <tr><td>Natural propagation</td><td>GH plant produced new plants on its own</td></tr>
+          <tr><td>Lab output</td><td>TC plants transferred from lab to greenhouse</td></tr>
+        </table>
+        <p>Entries are auto-created when: the plant is first saved (Initial entry), when you edit the quantity in the editor (Manual edit), and when "Send to GH" is used from a bottle.</p>
+
+        <h3>🩺 Condition History Log</h3>
+        <p>A timeline of every health state the plant has been in, newest at the top. The current entry is badged green. Each entry has: status (colour-coded), date, and an optional observation note (e.g. "Aphid infestation — treated with neem oil").</p>
+        <p>Entries are auto-created when you first save a plant and whenever you change the health in the editor. Add manual entries any time via <strong>＋ Log</strong> in the Health tab.</p>
+
+        <h3>⊞ Bench / Layout View</h3>
+        <p>Toggle between list view and bench view using the <strong>≡ / ⊞</strong> buttons in the list panel header.</p>
+        <table><tr><th>View</th><th>How it works</th></tr>
+          <tr><td>≡ List</td><td>Standard sorted list with species, quantity, health dot, inspection badge</td></tr>
+          <tr><td>⊞ Bench</td><td>Plants grouped by <em>location</em> into labelled sections with card grid. Plants without a location go under "Unassigned". Due/overdue inspection shown as badge on the card corner.</td></tr>
+        </table>
+        <p>Both views respect the filter pills (All / Healthy / Stressed / Lab origin) and the search box.</p>
+
+        <h3>⚗️ Output Planning</h3>
+        <p>The Plan tab computes production capacity from your actual data:</p>
+        <table><tr><th>Stat</th><th>Source</th></tr>
+          <tr><td>GH stock</td><td>Current plant count</td></tr>
+          <tr><td>In culture</td><td>Bottles for this species in inoculated or growing status</td></tr>
+          <tr><td>Ready for GH</td><td>Subcultured bottles — lab output waiting to transfer back</td></tr>
+          <tr><td>Avg harvest yield</td><td>Average explants per event from explant history</td></tr>
+          <tr><td>Projected bottles</td><td>Stock × avg yield if all plants harvested</td></tr>
+          <tr><td>Sessions needed</td><td>Projected bottles ÷ 120 (autoclave capacity)</td></tr>
+        </table>
+        <div class="help-tip">💡 The more explant events you log, the more accurate the harvest estimate. Fill <strong>Cultures Out</strong> on your notes to refine the pipeline view.</div>
+
+        <h3>🔔 Inspection Reminders</h3>
+        <p>Set a <strong>Next inspection date</strong> on any plant. It then appears in the <strong>⏰ Reminders</strong> section with a 🏡 icon, grouped by urgency alongside notes and bottles. The nav badge count includes GH plants due within 7 days. Tapping a GH reminder navigates directly to that plant.</p>
+        <table><tr><th>Badge</th><th>Meaning</th></tr>
+          <tr><td style="color:var(--rd)">Red OVERDUE</td><td>Inspection date has passed</td></tr>
+          <tr><td style="color:var(--yw)">Yellow INSPECT</td><td>Due within 7 days</td></tr>
+          <tr><td>🔔 chip in header</td><td>Exact days until / past inspection</td></tr>
+        </table>
+
+        <h3>⬆ CSV Mass Import</h3>
+        <p>Click <strong>⬆ CSV</strong> in the list panel header to open the import modal.</p>
+        <table><tr><th>Column</th><th>Required</th><th>Notes</th></tr>
+          <tr><td>species</td><td>✓</td><td>Scientific name or hybrid. Wrap in quotes if it contains commas: <code>"Nepenthes × (rajah × lowii)"</code></td></tr>
+          <tr><td>quantity</td><td></td><td>Integer, default 1</td></tr>
+          <tr><td>health</td><td></td><td>healthy · stressed · dormant · declined (default: healthy)</td></tr>
+          <tr><td>source</td><td></td><td>greenhouse · wild · lab · nursery · trade (default: greenhouse)</td></tr>
+          <tr><td>location</td><td></td><td>Bench label — used for bench view grouping</td></tr>
+          <tr><td>next_inspection</td><td></td><td>YYYY-MM-DD</td></tr>
+          <tr><td>accession_number</td><td></td><td>Stored as a reference note; does not auto-link to Registry</td></tr>
+          <tr><td>notes</td><td></td><td>Free text</td></tr>
+        </table>
+        <p>The preview table shows every parsed row with a HYBRID badge (detected by ×), colour-coded health, and ✓ / ✕ validity. Invalid rows (missing species) are skipped on import. All imported plants automatically get the <strong>🏡 GH flair</strong> and have their condition_log and quantity_log initialised. Click <strong>⬇ Download template</strong> for a ready-to-fill sample CSV.</p>
+
+        <h3>🏡 GH System Flair</h3>
+        <p>A system flair named <strong>GH</strong> (emoji 🏡, colour green) is automatically created the first time you:</p>
+        <ul>
+          <li>Tap <strong>Take Explant → Bottle</strong> — flair is pre-selected in the new bottle editor</li>
+          <li>Set accession source to <strong>Greenhouse</strong> — flair pill auto-toggles in the accession editor</li>
+          <li>Import plants via CSV — all imports get the flair assigned</li>
+        </ul>
+        <p>The GH flair uses a stable ID and is never duplicated. It appears everywhere flairs appear: accession detail badges, autocomplete sub-rows, and bottle detail.</p>
+
+        <h3>Explant → Lab</h3>
         <table><tr><th>Button</th><th>What happens</th></tr>
-          <tr><td>🌿 Take Explant → Bottle</td><td>Prompts for quantity and a note. Logs the explant event. Opens the Single Bottle editor with species, accession, and source plant pre-filled and linked.</td></tr>
-          <tr><td>🔥 Take Explant → Session</td><td>Same logging, then opens the Autoclave Session builder with this species pre-filled in the first batch row. Useful when taking a large explant batch for a full autoclave run.</td></tr>
+          <tr><td>🌿 Take Explant → Bottle</td><td>Prompts for quantity + optional note. Logs event to Explant history. Opens Single Bottle editor with species, accession, source plant, and 🏡 GH flair all pre-filled.</td></tr>
+          <tr><td>🔥 Take Explant → Session</td><td>Same logging. Opens Autoclave Session builder with species in first batch row.</td></tr>
         </table>
-        <p>Every event is saved in the <strong>Explant history</strong> table on the plant detail — date, quantity, and optional note. The total explants taken and number of culture events is shown in the plant detail.</p>
 
-        <h3>Lab → Greenhouse Flow (Subcultured bottles to GH)</h3>
-        <p>On any bottle detail, tap <strong>🏡 Send to GH</strong>. Enter how many plants you are transferring. The app then:</p>
+        <h3>Lab → Greenhouse (closing the loop)</h3>
+        <p>Every bottle detail has a <strong>🏡 Send to GH</strong> button. On tap:</p>
         <ol style="font-size:14px;line-height:1.75;padding-left:20px;margin:6px 0">
-          <li>If a GH entry for that species already exists: offers to merge (adds to the quantity count)</li>
-          <li>If not: creates a new GH entry tagged <strong>Source: Lab output</strong></li>
-          <li>Logs a transfer event (type: lab_output_in) with the bottle reference for full traceability</li>
+          <li>Choose plant count to transfer</li>
+          <li>If a GH entry for this species already exists — option to merge (quantity + N)</li>
+          <li>Otherwise — a new entry is created with source = Lab output</li>
+          <li>A transfer event (type: lab_output_in) is logged with the bottle reference</li>
         </ol>
 
         <h3>Connections Throughout the App</h3>
         <table><tr><th>Where</th><th>What you see</th></tr>
-          <tr><td>Bottle editor</td><td>"Source greenhouse plant" dropdown — filtered by species when you type a species name</td></tr>
-          <tr><td>Bottle detail</td><td>"Source plant" row with a link back to the GH plant</td></tr>
-          <tr><td>Species detail panel</td><td>🏡 Greenhouse Plants section — all plants of that species with health dots + "+ Add plant" shortcut</td></tr>
-          <tr><td>Dashboard</td><td>Greenhouse strip shows healthy stock plants. A yellow alert appears when subcultured bottles exist for a species — lab output ready to send back to GH.</td></tr>
+          <tr><td>Bottle editor</td><td>"Source greenhouse plant" dropdown, filtered by species</td></tr>
+          <tr><td>Bottle detail</td><td>"Source plant" row — clickable link to the GH plant</td></tr>
+          <tr><td>⏰ Reminders</td><td>🏡 GH inspection items alongside notes and bottles</td></tr>
+          <tr><td>Species detail panel</td><td>🏡 Greenhouse Plants section with health dots, quantities + "Add plant" shortcut</td></tr>
           <tr><td>Dashboard stat card</td><td>🏡 Greenhouse: entry count / total plant count</td></tr>
-        </table>
-
-        <h3>List Panel Filters</h3>
-        <table><tr><th>Filter</th><th>Shows</th></tr>
-          <tr><td>All</td><td>Every plant entry</td></tr>
-          <tr><td>Healthy</td><td>Entries with health = Healthy</td></tr>
-          <tr><td>Stressed</td><td>Entries with health = Stressed</td></tr>
-          <tr><td>Lab origin</td><td>Plants sourced from lab output (source = lab)</td></tr>
+          <tr><td>Dashboard strip</td><td>Healthy plants as chips; yellow "lab output ready" alert when subcultured bottles exist</td></tr>
         </table>
       </div>
 
