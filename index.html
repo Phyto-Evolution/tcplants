@@ -1410,15 +1410,21 @@ main > .dview, main > .editor{ margin:0 auto; }
         <div class="row2">
           <div class="field">
             <label>Source</label>
-            <select id="ae-source">
+            <select id="ae-source" onchange="onAccSourceChange(this.value)">
               <option value="">— select —</option>
-              <option>Wild collection</option>
-              <option>Donated</option>
-              <option>Purchased</option>
-              <option>Lab-propagated</option>
-              <option>Botanical garden</option>
-              <option>Other</option>
+              <option value="greenhouse">🏡 Greenhouse (own plants)</option>
+              <option value="seeds">🌱 Seeds</option>
+              <option value="wild">Wild collection</option>
+              <option value="lab-propagated">Lab-propagated (in-house)</option>
+              <option value="other-lab">Other lab / Exchange</option>
+              <option value="nursery">Nursery / Botanical garden</option>
+              <option value="purchased">Purchased</option>
+              <option value="donated">Donated</option>
+              <option value="custom">Custom…</option>
             </select>
+            <div id="ae-source-custom-wrap" style="display:none;margin-top:6px">
+              <input type="text" id="ae-source-custom" placeholder="Enter custom source name">
+            </div>
           </div>
           <div class="field">
             <label>Date Acquired</label>
@@ -2636,7 +2642,10 @@ main > .dview, main > .editor{ margin:0 auto; }
       <!-- Greenhouse list panel -->
       <div class="nd-list-area" id="nd-greenhouse">
         <div class="aside-top">
-          <button class="btn sm" style="width:100%;background:#2d6a4f;color:#d8f3dc" id="new-gh-btn" onclick="startNewGHPlant()">＋ Add Plant</button>
+          <div style="display:flex;gap:6px">
+            <button class="btn sm" style="flex:1;background:#2d6a4f;color:#d8f3dc" id="new-gh-btn" onclick="startNewGHPlant()">＋ Add Plant</button>
+            <button class="btn sm ghost" onclick="openGHImport()" title="Import from CSV" style="flex-shrink:0;border-color:#52b788;color:#52b788">⬆ CSV</button>
+          </div>
           <div class="search-wrap" style="margin-top:6px">
             <span class="search-icon">🔍</span>
             <input type="text" id="gh-search" placeholder="Search species, location…" oninput="S.ghSearch=this.value;renderGHList()">
@@ -2662,6 +2671,52 @@ main > .dview, main > .editor{ margin:0 auto; }
   </div>
 
 </div><!-- /app -->
+
+<!-- ═══════════ GH IMPORT MODAL ═══════════ -->
+<div id="gh-import-modal" onclick="if(event.target===this)closeGHImport()" style="display:none;position:fixed;inset:0;z-index:8000;background:rgba(13,17,23,.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);align-items:center;justify-content:center">
+  <div style="background:var(--sf);border:1px solid var(--bd);border-radius:14px;width:700px;max-width:96vw;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 16px 56px rgba(0,0,0,.35)">
+    <div style="padding:16px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <div>
+        <div style="font-size:16px;font-weight:700">⬆ Import Greenhouse Plants</div>
+        <div style="font-size:12px;color:var(--mu);margin-top:2px">Upload a CSV file or paste rows directly — all entries get the 🏡 GH flair automatically</div>
+      </div>
+      <button class="btn sm ghost" onclick="closeGHImport()">✕</button>
+    </div>
+    <div style="padding:18px 20px;flex:1;overflow-y:auto">
+      <!-- Step 1: Input -->
+      <div id="ghi-step1">
+        <div style="display:flex;gap:10px;margin-bottom:12px">
+          <div style="flex:1">
+            <label style="font-size:12px;font-weight:600;display:block;margin-bottom:5px">Upload CSV file</label>
+            <input type="file" id="ghi-file" accept=".csv,.txt" onchange="handleGHCsvFile(this)" style="font-size:13px">
+          </div>
+        </div>
+        <label style="font-size:12px;font-weight:600;display:block;margin-bottom:5px">Or paste CSV here</label>
+        <textarea id="ghi-paste" rows="7" placeholder="species,quantity,health,source,location,next_inspection,accession_number,notes&#10;Vanilla planifolia,3,healthy,greenhouse,Bench 3A,,,&#10;Nepenthes × (rajah × lowii),2,healthy,greenhouse,Shade house,,,Unregistered hybrid" style="width:100%;font-family:var(--mono);font-size:12px;margin-bottom:10px"></textarea>
+        <div style="background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:12px;font-size:11px;font-family:var(--mono);color:var(--mu);margin-bottom:14px;overflow-x:auto">
+          <div style="font-weight:700;color:var(--tx);margin-bottom:4px">CSV column format:</div>
+          species (required) · quantity · health · source · location · next_inspection (YYYY-MM-DD) · accession_number · notes<br>
+          <span style="color:var(--pu)">Hybrids:</span> wrap in quotes if the name has commas — e.g. <em>"Nepenthes × (rajah × lowii)"</em><br>
+          <span style="color:var(--gn)">health values:</span> healthy · stressed · dormant · declined (defaults to healthy)<br>
+          <span style="color:var(--ac)">source values:</span> greenhouse · wild · lab · nursery · trade (defaults to greenhouse)
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn sm" onclick="parseGHCsv()">Preview →</button>
+          <button class="btn sm ghost" onclick="downloadGHCsvTemplate()">⬇ Download template</button>
+        </div>
+      </div>
+      <!-- Step 2: Preview -->
+      <div id="ghi-step2" style="display:none">
+        <div id="ghi-summary" style="font-size:13px;margin-bottom:10px;padding:8px 12px;background:var(--sf2);border-radius:6px"></div>
+        <div id="ghi-preview" style="overflow-x:auto;margin-bottom:14px;max-height:360px;overflow-y:auto"></div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn sm green" id="ghi-confirm-btn" onclick="saveGHImport()">✓ Import all valid rows</button>
+          <button class="btn sm ghost" onclick="document.getElementById('ghi-step2').style.display='none';document.getElementById('ghi-step1').style.display=''">← Back</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ═══════════ SPECIES PICKER MODAL ═══════════ -->
 <div id="species-picker-modal" onclick="if(event.target===this)closeSpeciesPicker()">
@@ -5607,8 +5662,7 @@ function _renderAccFlairPicker(assignedIds){
   field.style.display='';
   container.innerHTML=S.taxFlairs.map(f=>{
     const active=(assignedIds||[]).includes(f.id);
-    return `<span class="flair-pill flair-toggle ${f.color} ${active?'active':''}" data-fid="${f.id}"
-      onclick="this.classList.toggle('active')">${esc(f.name)}</span>`;
+    return `<span class="flair-pill flair-toggle ${f.color} ${active?'active':''}" data-fid="${f.id}" onclick="this.classList.toggle('active')">${f.emoji?esc(f.emoji)+' ':''}${esc(f.name)}</span>`;
   }).join('');
 }
 function _getSelectedFlairIds(){
@@ -5632,7 +5686,11 @@ function startEditAccession(){
   document.getElementById('ae-num').value=a.number||'';
   document.getElementById('ae-species').value=a.species||'';
   document.getElementById('ae-common').value=a.common||'';
-  document.getElementById('ae-source').value=a.source||'';
+  const knownSources=['greenhouse','seeds','wild','lab-propagated','other-lab','nursery','purchased','donated','custom',''];
+  const srcVal=knownSources.includes(a.source||'')?a.source||'':'custom';
+  document.getElementById('ae-source').value=srcVal;
+  if(srcVal==='custom'){ document.getElementById('ae-source-custom-wrap').style.display=''; document.getElementById('ae-source-custom').value=a.source||''; }
+  else document.getElementById('ae-source-custom-wrap').style.display='none';
   document.getElementById('ae-date').value=a.date_acquired||'';
   document.getElementById('ae-location').value=a.location||'';
   document.getElementById('ae-status').value=a.status||'Active in culture';
@@ -5649,7 +5707,9 @@ async function saveAccession(){
     id:S.editingAcc||uid(),
     number:document.getElementById('ae-num').value.trim(),
     species, common:document.getElementById('ae-common').value.trim(),
-    source:document.getElementById('ae-source').value,
+    source:(document.getElementById('ae-source').value==='custom'
+      ? document.getElementById('ae-source-custom').value.trim()||'Custom'
+      : document.getElementById('ae-source').value),
     date_acquired:document.getElementById('ae-date').value||null,
     location:document.getElementById('ae-location').value.trim(),
     status:document.getElementById('ae-status').value,
@@ -5735,6 +5795,192 @@ function _botCode(){
 const GH_HEALTH_COLOR={healthy:'var(--gn)',stressed:'var(--yw)',dormant:'var(--mu)',declined:'var(--rd)'};
 const GH_HEALTH_LABEL={healthy:'Healthy',stressed:'Stressed',dormant:'Dormant',declined:'Declined'};
 const GH_SOURCE_LABEL={lab:'Lab output',wild:'Wild',nursery:'Nursery',trade:'Trade'};
+
+// ── GH FLAIR SYSTEM ────────────────────────────────────────────
+async function _ensureGHFlair(){
+  // Use a stable ID so we never duplicate even across sessions
+  const GH_FLAIR_ID='gh-system-flair';
+  const existing=(S.taxFlairs||[]).find(f=>f.id===GH_FLAIR_ID||f.name==='GH');
+  if(existing) return existing.id;
+  // Create it
+  const f={id:GH_FLAIR_ID,name:'GH',emoji:'🏡',color:'green',system:true,created_at:new Date().toISOString()};
+  if(!S.taxCustom) S.taxCustom={species:[],flairs:[]};
+  if(!S.taxCustom.flairs) S.taxCustom.flairs=[];
+  S.taxCustom.flairs.push(f);
+  S.taxFlairs=[...(S.taxFlairs||[]),f];
+  try{
+    const res=await ghPut(TAX_CUSTOM_FILE, await enc(JSON.stringify(S.taxCustom)), S.taxCustomSha,
+      `lab: taxonomy custom — ${S.taxCustom.species.length} species, ${S.taxCustom.flairs.length} flairs`);
+    S.taxCustomSha=res.content.sha; _writeCache();
+  }catch(e){ console.warn('GH flair save:',e.message); }
+  return GH_FLAIR_ID;
+}
+
+function _autoSelectFlair(containerId, flairId){
+  if(!flairId) return;
+  const pill=document.querySelector(`#${containerId} [data-fid="${flairId}"]`);
+  if(pill){
+    // ae-flair-pills uses .active, bot-flair-pills uses .selected
+    const isActive=containerId==='ae-flair-pills'?!pill.classList.contains('active'):!pill.classList.contains('selected');
+    if(isActive) pill.click();
+  }
+}
+
+function onAccSourceChange(val){
+  document.getElementById('ae-source-custom-wrap').style.display=val==='custom'?'':'none';
+  if(val==='greenhouse'){
+    _ensureGHFlair().then(fid=>{ if(fid) _autoSelectFlair('ae-flair-pills',fid); });
+  }
+}
+
+// ── GH CSV IMPORT ───────────────────────────────────────────────
+function openGHImport(){
+  document.getElementById('ghi-paste').value='';
+  document.getElementById('ghi-step1').style.display='';
+  document.getElementById('ghi-step2').style.display='none';
+  document.getElementById('gh-import-modal').style.display='flex';
+}
+function closeGHImport(){
+  document.getElementById('gh-import-modal').style.display='none';
+  window._ghImportRows=null;
+}
+
+function handleGHCsvFile(input){
+  const f=input.files[0]; if(!f) return;
+  const reader=new FileReader();
+  reader.onload=e=>{ document.getElementById('ghi-paste').value=e.target.result; };
+  reader.readAsText(f);
+}
+
+function _parseCSVLine(line){
+  const out=[]; let cur=''; let inQ=false;
+  for(let i=0;i<line.length;i++){
+    const c=line[i];
+    if(c==='"'){ if(inQ&&line[i+1]==='"'){cur+='"';i++;} else inQ=!inQ; }
+    else if(c===','&&!inQ){ out.push(cur.trim()); cur=''; }
+    else cur+=c;
+  }
+  out.push(cur.trim()); return out;
+}
+
+function parseGHCsv(){
+  const raw=document.getElementById('ghi-paste').value.trim();
+  if(!raw){ toast('Paste or upload CSV first','fail'); return; }
+  const lines=raw.split(/\r?\n/).filter(l=>l.trim()&&!l.trim().startsWith('#'));
+  if(lines.length<2){ toast('Need at least a header row + one data row','fail'); return; }
+  const headerRaw=_parseCSVLine(lines[0]).map(h=>h.toLowerCase().replace(/[^a-z_]/g,'_').replace(/_+/g,'_').replace(/^_|_$/g,''));
+  // Map common aliases
+  const colMap={species:['species','plant','name','scientific_name'],quantity:['quantity','qty','count','num'],health:['health','status','condition'],source:['source','origin'],location:['location','bench','spot'],next_inspection:['next_inspection','inspect','inspection_date'],accession_number:['accession_number','accession','acc_num','acc'],notes:['notes','note','remarks']};
+  const colIdx={};
+  Object.entries(colMap).forEach(([key,aliases])=>{ colIdx[key]=headerRaw.findIndex(h=>aliases.includes(h)); });
+  const VALID_HEALTH=new Set(['healthy','stressed','dormant','declined']);
+  const VALID_SOURCE=new Set(['greenhouse','wild','lab','nursery','trade','lab-propagated','other-lab']);
+  const rows=[];
+  for(let i=1;i<lines.length;i++){
+    const vals=_parseCSVLine(lines[i]);
+    const get=k=>colIdx[k]>=0?(vals[colIdx[k]]||'').trim():'';
+    const species=get('species');
+    const qty=parseInt(get('quantity'))||1;
+    const rawHealth=(get('health')||'healthy').toLowerCase();
+    const health=VALID_HEALTH.has(rawHealth)?rawHealth:'healthy';
+    const rawSrc=(get('source')||'greenhouse').toLowerCase();
+    const source=VALID_SOURCE.has(rawSrc)?rawSrc:'greenhouse';
+    const location=get('location')||null;
+    const next_inspection=get('next_inspection')||null;
+    const accession_number=get('accession_number')||null;
+    const notes=get('notes')||null;
+    const isHybrid=species.includes('×')||species.includes('x ')||species.toLowerCase().includes('hybrid');
+    const error=!species?'Species name required':(qty<1?'Quantity must be ≥1':null);
+    rows.push({species,quantity:qty,health,source,location,next_inspection,accession_number,notes,isHybrid,_line:i+1,_valid:!error,_error:error});
+  }
+  window._ghImportRows=rows;
+  _showGHImportPreview(rows);
+}
+
+function _showGHImportPreview(rows){
+  const valid=rows.filter(r=>r._valid);
+  document.getElementById('ghi-step1').style.display='none';
+  document.getElementById('ghi-step2').style.display='';
+  const btn=document.getElementById('ghi-confirm-btn');
+  btn.disabled=valid.length===0;
+  const errors=rows.filter(r=>!r._valid);
+  document.getElementById('ghi-summary').innerHTML=
+    `<span style="color:var(--gn);font-weight:700">${valid.length} valid</span> row${valid.length!==1?'s':''} ready · `+
+    (errors.length?`<span style="color:var(--rd);font-weight:700">${errors.length} error${errors.length!==1?'s':''}</span> will be skipped · `:'') +
+    `${rows.filter(r=>r.isHybrid&&r._valid).length} hybrid${rows.filter(r=>r.isHybrid&&r._valid).length!==1?'s':''} detected · All get 🏡 GH flair`;
+  document.getElementById('ghi-preview').innerHTML=`
+    <table style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--mono)">
+      <tr style="position:sticky;top:0;background:var(--sf2);border-bottom:1px solid var(--bd)">
+        <th style="padding:5px 8px;text-align:left">#</th>
+        <th style="padding:5px 8px;text-align:left">Species</th>
+        <th style="padding:5px 8px;text-align:center">Qty</th>
+        <th style="padding:5px 8px;text-align:center">Health</th>
+        <th style="padding:5px 8px;text-align:left">Location</th>
+        <th style="padding:5px 8px;text-align:left">Accession</th>
+        <th style="padding:5px 8px;text-align:center">OK?</th>
+      </tr>
+      ${rows.map(r=>`<tr style="border-bottom:1px solid rgba(128,128,128,.07);${r._valid?'':'background:rgba(248,81,73,.06)'}">
+        <td style="padding:4px 8px;color:var(--mu)">${r._line}</td>
+        <td style="padding:4px 8px;color:${r._valid?'var(--tx)':'var(--rd)'}">
+          ${esc(r.species||'(missing)')}
+          ${r.isHybrid&&r._valid?'<span style="color:var(--pu);font-size:9px;border:1px solid var(--pu);border-radius:3px;padding:0 3px;margin-left:4px">HYBRID</span>':''}
+        </td>
+        <td style="padding:4px 8px;text-align:center">${r.quantity}</td>
+        <td style="padding:4px 8px;text-align:center;color:${{healthy:'var(--gn)',stressed:'var(--yw)',dormant:'var(--mu)',declined:'var(--rd)'}[r.health]||'var(--mu)'}">${r.health}</td>
+        <td style="padding:4px 8px;color:var(--mu)">${esc(r.location||'—')}</td>
+        <td style="padding:4px 8px;color:var(--ac)">${esc(r.accession_number||'—')}</td>
+        <td style="padding:4px 8px;text-align:center">${r._valid
+          ?'<span style="color:var(--gn);font-size:14px">✓</span>'
+          :`<span style="color:var(--rd)" title="${esc(r._error||'')}">✕</span>`}</td>
+      </tr>`).join('')}
+    </table>`;
+}
+
+async function saveGHImport(){
+  const rows=(window._ghImportRows||[]).filter(r=>r._valid);
+  if(!rows.length){ toast('No valid rows','fail'); return; }
+  const btn=document.getElementById('ghi-confirm-btn');
+  btn.disabled=true; btn.textContent='Importing…';
+  try{
+    const ghFid=await _ensureGHFlair();
+    const now=new Date().toISOString(); const today=now.slice(0,10);
+    const newPlants=rows.map(r=>{
+      const noteParts=[r.notes, r.accession_number?`Accession ref: ${r.accession_number}`:null].filter(Boolean);
+      return {
+        id:uid(), species:r.species, quantity:r.quantity, health:r.health,
+        source:r.source, location:r.location, next_inspection:r.next_inspection,
+        notes:noteParts.join('\n')||null,
+        flair_ids:ghFid?[ghFid]:[],
+        condition_log:[{id:uid(),date:today,health:r.health,note:`CSV import${r.isHybrid?' (hybrid)':''}`,created_at:now}],
+        quantity_log:[{id:uid(),date:today,delta:r.quantity,reason:'CSV import',type:'in',created_at:now}],
+        created_at:now, updated_at:now
+      };
+    });
+    S.greenhouse=[...(S.greenhouse||[]),...newPlants];
+    S.greenhouseSha=await saveGreenhouse(S.greenhouse,S.greenhouseSha);
+    _writeCache(); renderGHList();
+    closeGHImport();
+    toast(`🌱 ${newPlants.length} plant${newPlants.length!==1?'s':''} imported · 🏡 GH flair applied`,'ok',4000);
+    window._ghImportRows=null;
+    navTo('greenhouse'); showGHEmpty();
+  }catch(e){ toast('Import failed: '+e.message,'fail'); }
+  btn.disabled=false; btn.textContent='✓ Import all valid rows';
+}
+
+function downloadGHCsvTemplate(){
+  const csv=[
+    'species,quantity,health,source,location,next_inspection,accession_number,notes',
+    'Vanilla planifolia,3,healthy,greenhouse,Bench 3A,2026-05-15,VAN-001,Main mother plant',
+    'Nepenthes rajah,1,stressed,wild,Shade house,,NEP-001,Highland form — needs monitoring',
+    '"Nepenthes × (rajah × lowii)",2,healthy,greenhouse,Bench 2,,,Unregistered hybrid — own cross 2025',
+    'Musa acuminata,5,healthy,lab,Propagation bench,2026-06-01,,From Stage IV batch April 2026',
+  ].join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='greenhouse_import_template.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
 
 function setGHView(v){
   S.ghView=v;
@@ -6207,7 +6453,7 @@ async function deleteGHPlant(id){
   }catch(e){ S.greenhouse.push(p); toast('Delete failed: '+e.message,'fail'); }
 }
 
-function takeExplantFromGH(plantId, asSession=false){
+async function takeExplantFromGH(plantId, asSession=false){
   const p=(S.greenhouse||[]).find(x=>x.id===plantId); if(!p) return;
   const qty=parseInt(prompt(`Explants from "${p.species||'this plant'}"?\nEnter the number of explants you are taking:`,'1'));
   if(!qty||qty<1) return;
@@ -6216,24 +6462,23 @@ function takeExplantFromGH(plantId, asSession=false){
   S.ghTransfers=[...(S.ghTransfers||[]),transfer];
   saveGreenhouse(S.greenhouse,S.greenhouseSha,S.ghTransfers).then(sha=>{S.greenhouseSha=sha;_writeCache();openGHPlant(plantId);});
   toast(`🌿 ${qty} explant${qty!==1?'s':''} logged`);
+  // Ensure GH flair exists before opening bottle editor so flair pill renders correctly
+  const ghFid=await _ensureGHFlair();
   if(asSession){
+    navTo('bottles'); startNewBottle('session');
     setTimeout(()=>{
-      navTo('bottles'); startNewBottle('session');
-      setTimeout(()=>{
-        const firstSpec=document.querySelector('#sess-batch-rows .sb-species');
-        if(firstSpec){ firstSpec.value=p.species||''; _updateSessionCap(); }
-      },120);
-    },100);
+      const firstSpec=document.querySelector('#sess-batch-rows .sb-species');
+      if(firstSpec){ firstSpec.value=p.species||''; _updateSessionCap(); }
+    },120);
   } else {
+    navTo('bottles'); startNewBottle('single');
     setTimeout(()=>{
-      navTo('bottles'); startNewBottle('single');
-      setTimeout(()=>{
-        document.getElementById('bot-species').value=p.species||'';
-        _botPopulateAccessions(p.species||'');
-        _populateGHDropdown(p.species||'',plantId);
-        if(p.accession_id) document.getElementById('bot-accession').value=p.accession_id;
-      },80);
-    },100);
+      document.getElementById('bot-species').value=p.species||'';
+      _botPopulateAccessions(p.species||'');
+      _populateGHDropdown(p.species||'',plantId);
+      if(p.accession_id) document.getElementById('bot-accession').value=p.accession_id;
+      if(ghFid) _autoSelectFlair('bot-flair-pills',ghFid);
+    },80);
   }
 }
 
@@ -6436,7 +6681,7 @@ function _populateBotEditor(b){
   const allFlairs=[...(S.taxFlairs||[]),...(S.taxCustom?.flairs||[])];
   const selIds=new Set(b?b.flair_ids||[]:[]);
   document.getElementById('bot-flair-pills').innerHTML=allFlairs.map(f=>
-    `<span class="flair-pill${selIds.has(f.id)?' selected':''}" style="cursor:pointer${selIds.has(f.id)?';background:var(--ac);color:#0d1117':''}" onclick="_toggleBotFlair('${f.id}',this)">${esc(f.emoji||'')} ${esc(f.name)}</span>`
+    `<span class="flair-pill${selIds.has(f.id)?' selected':''}" data-fid="${f.id}" style="cursor:pointer${selIds.has(f.id)?';background:var(--ac);color:#0d1117':''}" onclick="_toggleBotFlair('${f.id}',this)">${esc(f.emoji||'')} ${esc(f.name)}</span>`
   ).join('');
 }
 
