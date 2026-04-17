@@ -628,7 +628,8 @@ main > .dview, main > .editor{ margin:0 auto; }
 .widget-min-btn{background:transparent;border:1px solid var(--bd);border-radius:5px;color:var(--mu);cursor:pointer;font-size:11px;line-height:1;padding:2px 6px;flex-shrink:0}
 .widget-min-btn:hover{border-color:var(--ac);color:var(--ac)}
 /* widget tray */
-#widget-tray{position:fixed;bottom:0;left:0;right:0;display:none;flex-wrap:wrap;gap:6px;padding:6px 12px;background:var(--sf);border-top:1px solid var(--bd);z-index:900;align-items:center}
+#widget-tray{position:fixed;bottom:0;left:0;right:0;display:none;flex-wrap:wrap;gap:6px;padding:5px 12px;background:var(--sf);border-top:1px solid var(--bd);z-index:900;align-items:center;min-height:36px}
+/* tray always shows when any tool is running OR minimised */
 .widget-chip{display:flex;align-items:center;gap:6px;background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:4px 10px 4px 10px;font-size:12px;font-weight:600;cursor:pointer;user-select:none}
 .widget-chip:hover{border-color:var(--ac)}
 .widget-chip-label{flex:1;white-space:nowrap}
@@ -1079,17 +1080,30 @@ main > .dview, main > .editor{ margin:0 auto; }
 #ai-btn.on{display:flex}
 #ai-btn:hover{opacity:.88}
 #ai-panel{
-  position:fixed;bottom:132px;right:14px;z-index:200;
-  width:340px;max-width:96vw;
-  background:var(--sf);border:1px solid var(--bd);border-radius:12px;
-  box-shadow:0 8px 32px rgba(0,0,0,.25);display:none;flex-direction:column;
-  max-height:70vh
+  position:fixed;bottom:80px;right:14px;z-index:200;
+  width:400px;max-width:calc(100vw - 28px);
+  background:var(--sf);border:1px solid var(--bd);border-radius:14px;
+  box-shadow:0 12px 48px rgba(0,0,0,.3);display:none;flex-direction:column;
+  height:520px;max-height:calc(100vh - 100px);
+  transition:width .2s ease,height .2s ease,bottom .2s ease,right .2s ease,border-radius .2s ease
 }
 #ai-panel.on{display:flex}
-#ai-head{padding:12px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px;flex-shrink:0}
-#ai-head .ai-title{flex:1;font-weight:700;font-size:14px;background:linear-gradient(135deg,#4285f4,#8250df);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-#ai-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
-.ai-msg{padding:8px 12px;border-radius:8px;font-size:13px;line-height:1.6;max-width:90%}
+#ai-panel.maximised{
+  width:min(720px,calc(100vw - 28px));
+  height:calc(100vh - 80px);
+  bottom:14px;right:14px;
+  border-radius:16px
+}
+@media(max-width:600px){
+  #ai-panel,#ai-panel.maximised{width:calc(100vw - 20px);right:10px}
+  #ai-panel.maximised{height:calc(100vh - 60px);bottom:10px}
+}
+#ai-head{padding:10px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px;flex-shrink:0}
+#ai-head .ai-title{flex:1;font-weight:700;font-size:13px;background:linear-gradient(135deg,#4285f4,#8250df);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+#ai-msgs{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
+.ai-msg{padding:9px 13px;border-radius:10px;font-size:13px;line-height:1.65;max-width:88%;word-break:break-word}
+/* widget tray — always visible when active, also persistent tools status */
+#tools-status-bar{position:fixed;bottom:0;left:0;right:0;height:0;z-index:150;pointer-events:none}
 .ai-msg.user{background:var(--ac);color:#fff;align-self:flex-end;border-radius:8px 8px 2px 8px}
 .ai-msg.ai{background:var(--sf2);color:var(--tx);align-self:flex-start;border-radius:8px 8px 8px 2px}
 .ai-msg.thinking{color:var(--mu);font-style:italic;font-size:12px}
@@ -3263,7 +3277,8 @@ main > .dview, main > .editor{ margin:0 auto; }
       <option value="gpt">◎ GPT-4o</option>
       <option value="grok">𝕏 Grok</option>
     </select>
-    <button class="al-hbtn" onclick="_toggleAIKeyRow()" title="API key settings">⚙️</button>
+    <button class="al-hbtn" onclick="_toggleAIKeyRow()" title="API key">⚙️</button>
+    <button class="al-hbtn" onclick="_toggleAIMaximise()" id="ai-max-btn" title="Expand">⛶</button>
     <button class="al-hbtn" onclick="document.getElementById('ai-panel').classList.remove('on')" title="Close">✕</button>
   </div>
   <div id="ai-key-row" style="display:none;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid var(--bd);background:var(--sf2)">
@@ -3271,16 +3286,18 @@ main > .dview, main > .editor{ margin:0 auto; }
     <button class="btn xs green" onclick="_saveCurrentModelKey()">Save</button>
     <a id="ai-key-link" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
   </div>
-  <div id="ai-chips">
+  <div id="ai-chips" style="padding:8px 12px;display:flex;flex-wrap:wrap;gap:5px;border-bottom:1px solid var(--bd);flex-shrink:0">
     <button class="ai-chip" onclick="askAI('Summarise this note in 3-5 bullet points, highlighting key observations, results, and recommended next steps.')">Summarise note</button>
     <button class="ai-chip" onclick="askAI('Based on the species, stage, and media shown in context, what PGR concentrations and media modifications would you recommend? Cite typical ranges from literature.')">PGR advice</button>
     <button class="ai-chip" onclick="askAI('Looking at the species and contamination data in context, what are the likely contamination sources and the most effective prevention strategies for this lab setup?')">Contam analysis</button>
     <button class="ai-chip" onclick="askAI('Using the species summary and note history in context, give a brief cultivation assessment: which species are thriving, which are at risk, and what actions to prioritise.')">Lab overview</button>
+    <button class="ai-chip" onclick="askAI('What sterilisation protocol would you recommend for my current species and the contamination pattern I have shown?')">Sterilisation</button>
+    <button class="ai-chip" onclick="askAI('Based on my bottle records and subculture history, what is the estimated multiplication rate and what should I optimise next?')">Multiplication rate</button>
   </div>
-  <div id="ai-msgs"><div class="ai-msg ai">Hello! I can help with TC protocols, species info, PGR doses, and note summaries. What would you like to know?</div></div>
-  <div id="ai-input-row">
-    <textarea id="ai-input" placeholder="Ask anything about TC…" rows="1"></textarea>
-    <button class="btn sm" id="ai-send-btn">→</button>
+  <div id="ai-msgs"><div class="ai-msg ai">Hello! I can help with TC protocols, species info, PGR doses, contamination, and note summaries. What would you like to know?</div></div>
+  <div id="ai-input-row" style="padding:10px 12px;border-top:1px solid var(--bd);display:flex;gap:8px;flex-shrink:0;align-items:flex-end">
+    <textarea id="ai-input" placeholder="Ask anything about TC, media, PGRs, sterilisation…" rows="2" style="flex:1;font-size:13px;padding:8px 11px;resize:none;min-height:40px;max-height:120px;overflow-y:auto;line-height:1.5"></textarea>
+    <button class="btn" id="ai-send-btn" style="height:40px;padding:0 16px;flex-shrink:0">→</button>
   </div>
 </div>
 
@@ -3388,66 +3405,55 @@ main > .dview, main > .editor{ margin:0 auto; }
     </div>
     <div class="set-section">
       <div class="set-section-title">AI Assistant</div>
-      <!-- Claude — always on, primary -->
-      <div class="set-row set-row-full" style="background:rgba(88,166,255,.06);border-radius:8px;padding:10px;margin-bottom:6px;border:1px solid rgba(88,166,255,.2)">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-          <span style="font-weight:700;color:var(--ac)">◇ Claude (Anthropic)</span>
-          <span style="font-size:10px;background:var(--ac);color:#0d1117;padding:1px 7px;border-radius:10px;font-weight:700">DEFAULT · ALWAYS ON</span>
+      <!-- Compact single card: dropdown + per-model enable + key input -->
+      <div style="background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:8px">
+        <!-- Model selector row -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <span style="font-size:12px;font-weight:700;color:var(--mu);white-space:nowrap">Active model</span>
+          <select id="set-ai-model-pick" style="flex:1;font-size:12px;padding:5px 8px;background:var(--bg);border:1px solid var(--bd);border-radius:6px;color:var(--tx)" onchange="_setAISettingsModel(this.value)">
+            <option value="claude">◇ Claude (Anthropic) — DEFAULT</option>
+            <option value="gemini">✦ Gemini (Google)</option>
+            <option value="gpt">◎ GPT-4o (OpenAI)</option>
+            <option value="grok">𝕏 Grok (xAI)</option>
+          </select>
         </div>
-        <div class="set-row-sub" style="margin-bottom:6px">claude-opus-4-5 · Primary model — hardwired, cannot be disabled</div>
-        <input type="password" id="set-claude-key" placeholder="Paste Anthropic API key…" style="margin-bottom:6px">
+        <!-- Per-model enable toggles -->
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:12px;flex:1">◇ Claude</span>
+            <span style="font-size:10px;background:var(--ac);color:#0d1117;padding:1px 6px;border-radius:8px;font-weight:700">Always On</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:12px;flex:1">✦ Gemini</span>
+            <label class="toggle-switch" style="width:36px;height:20px;flex-shrink:0">
+              <input type="checkbox" id="set-en-gemini" onchange="_setAIEnabled('gemini',this.checked)" ${_getAIEnabled('gemini')?'checked':''}>
+              <div class="toggle-track"></div>
+            </label>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:12px;flex:1">◎ GPT-4o</span>
+            <label class="toggle-switch" style="width:36px;height:20px;flex-shrink:0">
+              <input type="checkbox" id="set-en-gpt" onchange="_setAIEnabled('gpt',this.checked)" ${_getAIEnabled('gpt')?'checked':''}>
+              <div class="toggle-track"></div>
+            </label>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:12px;flex:1">𝕏 Grok (xAI)</span>
+            <label class="toggle-switch" style="width:36px;height:20px;flex-shrink:0">
+              <input type="checkbox" id="set-en-grok" onchange="_setAIEnabled('grok',this.checked)" ${_getAIEnabled('grok')?'checked':''}>
+              <div class="toggle-track"></div>
+            </label>
+          </div>
+        </div>
+        <!-- Key input (changes label based on selected model) -->
+        <div style="font-size:11px;font-weight:700;color:var(--mu);margin-bottom:4px" id="set-ai-key-label">API Key — Claude (Anthropic)</div>
+        <input type="password" id="set-ai-key-input" placeholder="Paste API key…" style="width:100%;margin-bottom:6px">
         <div style="display:flex;gap:6px">
-          <button class="btn xs ghost" onclick="_setModelKey('claude','set-claude-key')" style="flex:1">Save Key</button>
-          <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
+          <button class="btn xs ghost" onclick="_setAIKeyFromSettings()" style="flex:1">💾 Save Key</button>
+          <a id="set-ai-key-link" href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
         </div>
-      </div>
-      <!-- Gemini -->
-      <div class="set-row set-row-full" style="margin-bottom:6px">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-          <span style="font-weight:600">✦ Gemini</span>
-          <label class="toggle-switch" style="margin-left:auto;width:36px;height:20px">
-            <input type="checkbox" id="set-en-gemini" onchange="_setAIEnabled('gemini',this.checked)" ${_getAIEnabled('gemini')?'checked':''}>
-            <div class="toggle-track"></div>
-          </label>
-        </div>
-        <div class="set-row-sub" style="margin-bottom:6px">gemini-2.0-flash · Free tier · Enable first, then set key</div>
-        <input type="password" id="set-gemini-key" placeholder="Paste Gemini API key…" style="margin-bottom:6px">
-        <div style="display:flex;gap:6px">
-          <button class="btn xs ghost" onclick="_setModelKey('gemini','set-gemini-key')" style="flex:1">Save Key</button>
-          <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
-        </div>
-      </div>
-      <!-- GPT-4o -->
-      <div class="set-row set-row-full" style="margin-bottom:6px">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-          <span style="font-weight:600">◎ GPT-4o</span>
-          <label class="toggle-switch" style="margin-left:auto;width:36px;height:20px">
-            <input type="checkbox" id="set-en-gpt" onchange="_setAIEnabled('gpt',this.checked)" ${_getAIEnabled('gpt')?'checked':''}>
-            <div class="toggle-track"></div>
-          </label>
-        </div>
-        <div class="set-row-sub" style="margin-bottom:6px">gpt-4o · OpenAI paid API</div>
-        <input type="password" id="set-openai-key" placeholder="Paste OpenAI API key…" style="margin-bottom:6px">
-        <div style="display:flex;gap:6px">
-          <button class="btn xs ghost" onclick="_setModelKey('gpt','set-openai-key')" style="flex:1">Save Key</button>
-          <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
-        </div>
-      </div>
-      <!-- Grok -->
-      <div class="set-row set-row-full">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-          <span style="font-weight:600">𝕏 Grok (xAI)</span>
-          <label class="toggle-switch" style="margin-left:auto;width:36px;height:20px">
-            <input type="checkbox" id="set-en-grok" onchange="_setAIEnabled('grok',this.checked)" ${_getAIEnabled('grok')?'checked':''}>
-            <div class="toggle-track"></div>
-          </label>
-        </div>
-        <div class="set-row-sub" style="margin-bottom:6px">grok-3 · xAI platform</div>
-        <input type="password" id="set-grok-key" placeholder="Paste xAI API key…" style="margin-bottom:6px">
-        <div style="display:flex;gap:6px">
-          <button class="btn xs ghost" onclick="_setModelKey('grok','set-grok-key')" style="flex:1">Save Key</button>
-          <a href="https://console.x.ai/" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
-        </div>
+        <!-- Hidden legacy inputs for compatibility -->
+        <input type="hidden" id="set-claude-key"><input type="hidden" id="set-gemini-key"><input type="hidden" id="set-openai-key"><input type="hidden" id="set-grok-key">
       </div>
     </div>
     <div class="set-section">
@@ -6480,6 +6486,43 @@ function _setModelKey(model,inputId){
 const _getGeminiKey=()=>localStorage.getItem('tcplants_gemini_key')||'';
 function _saveGeminiKey(){ _saveCurrentModelKey(); }
 function _setGeminiKey(){ _setModelKey('gemini','set-gemini-key'); }
+
+// ── Compact AI settings panel helpers ────────────────────────
+const _aiKeyLinks={claude:'https://console.anthropic.com/settings/keys',gemini:'https://aistudio.google.com/app/apikey',gpt:'https://platform.openai.com/api-keys',grok:'https://console.x.ai/'};
+const _aiKeyLabels={claude:'Claude (Anthropic)',gemini:'Gemini (Google)',gpt:'GPT-4o (OpenAI)',grok:'Grok (xAI)'};
+function _setAISettingsModel(m){
+  const lbl=document.getElementById('set-ai-key-label');
+  const lnk=document.getElementById('set-ai-key-link');
+  const inp=document.getElementById('set-ai-key-input');
+  if(lbl) lbl.textContent='API Key — '+(_aiKeyLabels[m]||m);
+  if(lnk) lnk.href=_aiKeyLinks[m]||'#';
+  if(inp){ inp.value=''; inp.placeholder='Paste '+(_aiKeyLabels[m]||m)+' API key…'; }
+}
+function _setAIKeyFromSettings(){
+  const m=document.getElementById('set-ai-model-pick')?.value||'claude';
+  const k=document.getElementById('set-ai-key-input')?.value.trim();
+  if(!k){toast('Paste an API key first','fail');return;}
+  const mi=AI_MODELS[m]; if(!mi) return;
+  localStorage.setItem(mi.lsKey,k);
+  document.getElementById('set-ai-key-input').value='';
+  toast((_aiKeyLabels[m]||m)+' key saved ✓');
+}
+// Sync settings panel dropdown with active model on open
+function _syncAISettingsPanel(){
+  const sel=document.getElementById('set-ai-model-pick');
+  if(sel) sel.value=_aiModel;
+  _setAISettingsModel(_aiModel);
+}
+
+// ── AI panel maximize ─────────────────────────────────────────
+let _aiMaximised=false;
+function _toggleAIMaximise(){
+  _aiMaximised=!_aiMaximised;
+  const panel=document.getElementById('ai-panel');
+  const btn=document.getElementById('ai-max-btn');
+  if(panel) panel.classList.toggle('maximised',_aiMaximised);
+  if(btn) btn.title=_aiMaximised?'Restore':'Expand', btn.textContent=_aiMaximised?'⊡':'⛶';
+}
 function _initAIKeyHint(){
   const mi=AI_MODELS[_aiModel]||AI_MODELS.claude;
   if(!mi.getKey()){
@@ -9812,7 +9855,8 @@ function openSettings(){
   const harder=localStorage.getItem('tcplants_qr_harder')==='1';
   document.getElementById('set-lab-name').value=labName;
   document.getElementById('set-weather-city').value=city;
-  document.getElementById('set-gemini-key').value=gemKey;
+  // Sync compact AI panel
+  _syncAISettingsPanel();
   document.getElementById('set-qr-enhance').checked=enhance;
   document.getElementById('set-qr-harder').checked=harder;
   const isDark=document.documentElement.dataset.theme==='dark';
@@ -10462,25 +10506,35 @@ function _updateWidgetTray(){
   const tray=document.getElementById('widget-tray');
   if(!tray) return;
   const chips=[];
-  if(_widgetMin.timers){
-    const running=timerList.filter(t=>t.running);
-    const done=timerList.filter(t=>t.done&&!t.running);
-    let lbl=_widgetLabels.timers;
-    if(done.length) lbl+=' 🔔';
-    else if(running.length) lbl+=` · ${fmtHMS(running[0].remaining)}`;
-    chips.push(`<div class="widget-chip" onclick="restoreWidget('timers')"><span class="widget-chip-label">${lbl}</span><button class="widget-chip-close" title="Close" onclick="event.stopPropagation();closeWidget('timers')">✕</button></div>`);
+
+  // Timers — show if minimised OR if any timer is running/done
+  const runningTimers=timerList.filter(t=>t.running);
+  const doneTimers=timerList.filter(t=>t.done&&!t.running);
+  if(_widgetMin.timers||runningTimers.length||doneTimers.length){
+    let lbl='⏱ Timers';
+    if(doneTimers.length) lbl+=' 🔔 Done!';
+    else if(runningTimers.length) lbl+=` · ${fmtHMS(runningTimers[0].remaining)}`;
+    const action=_widgetMin.timers?`restoreWidget('timers')`:`navTo('tools')`;
+    chips.push(`<div class="widget-chip" onclick="${action}"><span class="widget-chip-label">${lbl}</span>${_widgetMin.timers?`<button class="widget-chip-close" onclick="event.stopPropagation();closeWidget('timers')">✕</button>`:''}</div>`);
   }
-  if(_widgetMin.sw){
-    const running=swList.filter(s=>s.running);
-    let lbl=_widgetLabels.sw;
-    if(running.length) lbl+=` · ${fmtSW(running[0].elapsed+(Date.now()-running[0].startedAt))}`;
-    chips.push(`<div class="widget-chip" onclick="restoreWidget('sw')"><span class="widget-chip-label">${lbl}</span><button class="widget-chip-close" title="Close" onclick="event.stopPropagation();closeWidget('sw')">✕</button></div>`);
+
+  // Stopwatches — show if minimised OR running
+  const runningSW=swList.filter(s=>s.running);
+  if(_widgetMin.sw||runningSW.length){
+    let lbl='⏱ Stopwatch';
+    if(runningSW.length) lbl+=` · ${fmtSW(runningSW[0].elapsed+(Date.now()-runningSW[0].startedAt))}`;
+    const action=_widgetMin.sw?`restoreWidget('sw')`:`navTo('tools')`;
+    chips.push(`<div class="widget-chip" onclick="${action}"><span class="widget-chip-label">${lbl}</span>${_widgetMin.sw?`<button class="widget-chip-close" onclick="event.stopPropagation();closeWidget('sw')">✕</button>`:''}</div>`);
   }
-  if(_widgetMin.stepper){
-    let lbl=_widgetLabels.stepper;
-    if(SS.running&&SS.cur>=0&&SS.steps[SS.cur]) lbl+=` · Step ${SS.cur+1}/${SS.steps.length}`;
-    chips.push(`<div class="widget-chip" onclick="restoreWidget('stepper')"><span class="widget-chip-label">${lbl}</span><button class="widget-chip-close" title="Close" onclick="event.stopPropagation();closeWidget('stepper')">✕</button></div>`);
+
+  // Stepper — show if minimised OR running
+  if(_widgetMin.stepper||SS.running){
+    let lbl='🧫 Stepper';
+    if(SS.running&&SS.steps[SS.cur]) lbl+=` · Step ${SS.cur+1}/${SS.steps.length}: ${SS.steps[SS.cur].name.slice(0,20)}`;
+    const action=_widgetMin.stepper?`restoreWidget('stepper')`:`navTo('sterilise')`;
+    chips.push(`<div class="widget-chip" onclick="${action}"><span class="widget-chip-label">${lbl}</span>${_widgetMin.stepper?`<button class="widget-chip-close" onclick="event.stopPropagation();closeWidget('stepper')">✕</button>`:''}</div>`);
   }
+
   tray.innerHTML=chips.join('');
   tray.style.display=chips.length?'flex':'none';
 }
