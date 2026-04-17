@@ -3372,7 +3372,10 @@ main > .dview, main > .editor{ margin:0 auto; }
   <div id="ai-msgs"><div class="ai-msg ai">Hello! I can help with TC protocols, species info, PGR doses, contamination, and note summaries. What would you like to know?</div></div>
   <!-- Input row: mic + textarea + send -->
   <div id="ai-input-row" style="padding:8px 10px;border-top:1px solid var(--bd);display:flex;gap:6px;flex-shrink:0;align-items:flex-end">
-    <button id="ai-mic-btn" onclick="_voiceTap()" title="Voice input" style="width:36px;height:36px;border-radius:50%;border:1px solid var(--bd);background:var(--sf2);color:var(--tx);font-size:15px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .15s">🎤</button>
+    <div style="display:flex;flex-direction:column;gap:3px;align-items:center;flex-shrink:0">
+      <button id="ai-mic-btn" onclick="_voiceTap()" title="Voice input" style="width:36px;height:36px;border-radius:50%;border:1px solid var(--bd);background:var(--sf2);color:var(--tx);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s">🎤</button>
+      <button id="ai-stt-toggle" onclick="_toggleSTTMode()" title="Switch STT: Native ↔ Whisper" style="font-size:9px;font-weight:700;color:var(--mu);background:none;border:none;cursor:pointer;white-space:nowrap;padding:0;line-height:1">NAT</button>
+    </div>
     <textarea id="ai-input" placeholder="Ask or speak…" rows="1" style="flex:1;font-size:13px;padding:8px 10px;resize:none;min-height:36px;max-height:120px;overflow-y:auto;line-height:1.5"></textarea>
     <button class="btn" id="ai-send-btn" style="height:36px;padding:0 14px;flex-shrink:0">→</button>
   </div>
@@ -7001,12 +7004,22 @@ function _setSTTMode(m){
   document.getElementById('set-stt-whisper')?.classList.toggle('active',m==='whisper');
   document.getElementById('set-stt-native')?.style&&(document.getElementById('set-stt-native').style.borderColor=m==='native'?'var(--ac)':'');
   document.getElementById('set-stt-whisper')?.style&&(document.getElementById('set-stt-whisper').style.borderColor=m==='whisper'?'var(--ac)':'');
-  document.getElementById('set-voice-native-opts').style.display=m==='native'?'':'none';
-  document.getElementById('set-voice-whisper-opts').style.display=m==='whisper'?'':'none';
+  const nOpts=document.getElementById('set-voice-native-opts');
+  const wOpts=document.getElementById('set-voice-whisper-opts');
+  if(nOpts) nOpts.style.display=m==='native'?'':'none';
+  if(wOpts) wOpts.style.display=m==='whisper'?'':'none';
+  // Update inline toggle label
+  const lbl=document.getElementById('ai-stt-toggle');
+  if(lbl){ lbl.textContent=m==='whisper'?'WSP':'NAT'; lbl.style.color=m==='whisper'?'var(--ac)':'var(--mu)'; }
+  toast('STT: '+(m==='whisper'?'Whisper (Groq)':'Native (Chrome)'));
+}
+function _toggleSTTMode(){
+  const current=_voiceCfg().mode||'native';
+  _setSTTMode(current==='native'?'whisper':'native');
 }
 function _initVoiceSettings(){
   const c=_voiceCfg();
-  _setSTTMode(c.mode||'native');
+  _setSTTMode(c.mode||'native'); // also syncs the inline toggle label
   const si=id=>document.getElementById(id);
   if(si('set-voice-confirm')) si('set-voice-confirm').checked=c.confirm??true;
   if(si('set-voice-cmd-confirm')) si('set-voice-cmd-confirm').checked=c.cmdConfirm??true;
