@@ -635,6 +635,14 @@ main > .dview, main > .editor{ margin:0 auto; }
 .stepper-bar{height:100%;background:var(--ac);border-radius:3px;transition:width .5s linear}
 /* scaler */
 .scaler-result{background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:10px;font-family:var(--mono);font-size:13px;margin-top:8px;white-space:pre-wrap;min-height:40px;line-height:1.8}
+/* dashboard */
+.dash-hero{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px}
+@media(max-width:860px){.dash-hero{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.dash-hero{grid-template-columns:1fr}}
+.dash-hero-card{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:6px}
+.dash-heatmap-cell{width:11px;height:11px;border-radius:2px;flex-shrink:0}
+.dash-qr-btn{background:var(--sf2);border:2px dashed var(--bd);border-radius:10px;padding:18px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;transition:all .15s;text-align:center}
+.dash-qr-btn:hover{border-color:var(--ac);background:rgba(88,166,255,.05)}
 /* sterilise */
 .steril-preset-card{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:10px 14px;cursor:pointer;transition:all .15s}
 .steril-preset-card:hover{border-color:var(--ac);background:rgba(88,166,255,.05)}
@@ -3424,35 +3432,106 @@ function showNote(name){
   if(name==='empty') _renderDashboard();
 }
 
+// ── Dashboard helpers ─────────────────────────────────────────
+function _donutSvg(segments,size=110){
+  const total=segments.reduce((s,d)=>s+d.v,0);
+  if(!total) return `<svg width="${size}" height="${size}"><text x="${size/2}" y="${size/2+5}" text-anchor="middle" font-size="11" fill="var(--mu)">No data</text></svg>`;
+  const cx=size/2,cy=size/2,ro=size*.40,ri=size*.24;
+  let angle=-Math.PI/2; const paths=[];
+  for(const d of segments){
+    if(!d.v) continue;
+    const sweep=(d.v/total)*Math.PI*2;
+    const x1=cx+ro*Math.cos(angle),y1=cy+ro*Math.sin(angle);
+    const x2=cx+ro*Math.cos(angle+sweep),y2=cy+ro*Math.sin(angle+sweep);
+    const ix1=cx+ri*Math.cos(angle+sweep),iy1=cy+ri*Math.sin(angle+sweep);
+    const ix2=cx+ri*Math.cos(angle),iy2=cy+ri*Math.sin(angle);
+    const la=sweep>Math.PI?1:0;
+    paths.push(`<path d="M${x1},${y1} A${ro},${ro} 0 ${la},1 ${x2},${y2} L${ix1},${iy1} A${ri},${ri} 0 ${la},0 ${ix2},${iy2} Z" fill="${d.c}" opacity=".9"><title>${esc(d.l)}: ${d.v}</title></path>`);
+    angle+=sweep;
+  }
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="display:block">${paths.join('')}<text x="${cx}" y="${cy-3}" text-anchor="middle" font-size="18" font-weight="800" fill="var(--tx)">${total}</text><text x="${cx}" y="${cy+12}" text-anchor="middle" font-size="9" fill="var(--mu)">vessels</text></svg>`;
+}
+
+function _contamHeatmap(notes){
+  const WEEKS=14,DAYS=7;
+  const now=new Date(); const todayStr=now.toISOString().slice(0,10);
+  const cMap={};
+  notes.filter(n=>n.type==='Contamination Log').forEach(n=>{ if(n.date){const d=n.date.slice(0,10);cMap[d]=(cMap[d]||0)+1;} });
+  const allBotNotes=notes; // total entries per day for context
+  const eMap={};
+  notes.forEach(n=>{if(n.date){const d=n.date.slice(0,10);eMap[d]=(eMap[d]||0)+1;}});
+  // Start on Monday 14 weeks ago
+  const start=new Date(now); start.setDate(start.getDate()-WEEKS*7+1);
+  const cols=[];
+  for(let w=0;w<WEEKS;w++){
+    const col=[];
+    for(let d=0;d<DAYS;d++){
+      const dt=new Date(start); dt.setDate(start.getDate()+w*7+d);
+      const ds=dt.toISOString().slice(0,10);
+      const cc=cMap[ds]||0; const ec=eMap[ds]||0;
+      const future=dt>now;
+      col.push({ds,cc,ec,future,today:ds===todayStr});
+    }
+    cols.push(col);
+  }
+  const maxCC=Math.max(...cols.flat().map(c=>c.cc),1);
+  const cellColor=c=>{
+    if(c.future) return 'transparent';
+    if(!c.cc&&!c.ec) return 'var(--sf3)';
+    if(!c.cc) return 'rgba(88,166,255,.12)'; // entries but no contam
+    const i=c.cc/maxCC;
+    if(i>=.66) return '#f85149';
+    if(i>=.33) return 'rgba(248,81,73,.55)';
+    return 'rgba(248,81,73,.28)';
+  };
+  const dlbls=['M','T','W','T','F','S','S'];
+  return `<div style="display:flex;gap:1px;align-items:flex-start">
+    <div style="display:flex;flex-direction:column;gap:1px;margin-right:3px;margin-top:0">
+      ${dlbls.map((l,i)=>`<div style="height:11px;font-size:8px;color:var(--mu);line-height:11px;text-align:right;padding-right:2px">${i%2===0?l:''}</div>`).join('')}
+    </div>
+    ${cols.map((col,wi)=>`<div style="display:flex;flex-direction:column;gap:1px">
+      ${col.map(c=>`<div class="dash-heatmap-cell" title="${c.ds}${c.cc?' · '+c.cc+' contam':c.ec?' · '+c.ec+' entries':''}" style="background:${cellColor(c)};${c.today?'outline:1.5px solid var(--ac);outline-offset:1px':''}"></div>`).join('')}
+    </div>`).join('')}
+  </div>
+  <div style="display:flex;align-items:center;gap:5px;margin-top:6px;font-size:10px;color:var(--mu)">
+    <span>Contam:</span>
+    <div class="dash-heatmap-cell" style="background:var(--sf3)"></div><span>0</span>
+    <div class="dash-heatmap-cell" style="background:rgba(248,81,73,.28)"></div>
+    <div class="dash-heatmap-cell" style="background:rgba(248,81,73,.55)"></div>
+    <div class="dash-heatmap-cell" style="background:#f85149"></div><span>high</span>
+    <div class="dash-heatmap-cell" style="background:rgba(88,166,255,.18);margin-left:8px"></div><span>entries only</span>
+  </div>`;
+}
+
 function _renderDashboard(){
   const labName=localStorage.getItem('tcplants_lab_name')||'';
-  // Update header
   const syncEl=document.getElementById('dash-last-sync');
   if(syncEl) syncEl.textContent=labName||'Encrypted · GitHub-backed';
-
-  // Stats row
-  const activeBot=(S.bottles||[]).filter(b=>['inoculated','growing'].includes(b.status)).length;
-  const overdueCount=[...S.notes.filter(n=>n.next_review&&daysFrom(n.next_review)<=0),
-    ...(S.bottles||[]).filter(b=>b.next_review&&['inoculated','growing'].includes(b.status)&&daysFrom(b.next_review)<=0)].length;
-  const thisWeek=[...S.notes.filter(n=>n.next_review&&daysFrom(n.next_review)>0&&daysFrom(n.next_review)<=7),
-    ...(S.bottles||[]).filter(b=>b.next_review&&['inoculated','growing'].includes(b.status)&&daysFrom(b.next_review)>0&&daysFrom(b.next_review)<=7)].length;
-  const ghTotal=(S.greenhouse||[]).reduce((s,p)=>s+(p.quantity||1),0);
-  const stats=[
-    {icon:'📋',val:S.notes.length,label:'Notes',color:'var(--ac)',action:"navTo('notes');"},
-    {icon:'🫙',val:(S.bottles||[]).length,label:`${activeBot} active`,color:'#1abc9c',action:"navTo('bottles');"},
-    {icon:'🌿',val:S.accs.length,label:'Accessions',color:'var(--gn)',action:"navTo('registry');"},
-    {icon:'🏡',val:(S.greenhouse||[]).length,label:`${ghTotal} plant${ghTotal!==1?'s':''}`,color:'#52b788',action:"navTo('greenhouse');"},
-    {icon:'⏰',val:overdueCount+thisWeek,label:`${overdueCount} overdue`,color:overdueCount?'var(--rd)':'var(--yw)',action:"navTo('reminders');"},
-  ];
   const el=document.getElementById('dash-stats'); if(!el) return;
-  el.innerHTML=stats.map(s=>`<div onclick="${s.action}" style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:12px 14px;cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='${s.color}'" onmouseout="this.style.borderColor='var(--bd)'">
-    <div style="font-size:20px;margin-bottom:4px">${s.icon}</div>
-    <div style="font-size:24px;font-weight:700;color:${s.color}">${s.val}</div>
-    <div style="font-size:11px;color:var(--mu);margin-top:2px">${s.label}</div>
+
+  const now=new Date(); const todayStr=now.toISOString().slice(0,10);
+  const allBots=S.bottles||[];
+  const activeBot=allBots.filter(b=>['inoculated','growing'].includes(b.status));
+  const overdueCount=[...S.notes.filter(n=>n.next_review&&daysFrom(n.next_review)<=0),
+    ...allBots.filter(b=>b.next_review&&['inoculated','growing'].includes(b.status)&&daysFrom(b.next_review)<=0)].length;
+  const ghTotal=(S.greenhouse||[]).reduce((s,p)=>s+(p.quantity||1),0);
+
+  // ── Stat pills ──────────────────────────────────────────────
+  const stats=[
+    {icon:'📋',val:S.notes.length,label:'Notes',c:'var(--ac)',fn:"navTo('notes')"},
+    {icon:'🫙',val:allBots.length,label:`${activeBot.length} active`,c:'#1abc9c',fn:"navTo('bottles')"},
+    {icon:'🌿',val:S.accs.length,label:'Accessions',c:'var(--gn)',fn:"navTo('registry')"},
+    {icon:'🏡',val:(S.greenhouse||[]).length,label:`${ghTotal} plants`,c:'#52b788',fn:"navTo('greenhouse')"},
+    {icon:'⏰',val:overdueCount,label:'overdue',c:overdueCount?'var(--rd)':'var(--mu)',fn:"navTo('reminders')"},
+  ];
+  el.innerHTML=stats.map(s=>`<div onclick="${s.fn}" style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:12px 14px;cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='${s.c}'" onmouseout="this.style.borderColor='var(--bd)'">
+    <div style="font-size:18px;margin-bottom:4px">${s.icon}</div>
+    <div style="font-size:24px;font-weight:800;color:${s.c}">${s.val}</div>
+    <div style="font-size:11px;color:var(--mu);margin-top:1px">${s.label}</div>
   </div>`).join('');
 
-  // 7-day activity bar
-  const now=new Date(); const days7=[];
+  // ── Computed values ─────────────────────────────────────────
+  const days7=[];
   for(let i=6;i>=0;i--){
     const d=new Date(now); d.setDate(d.getDate()-i);
     const ds=d.toISOString().slice(0,10);
@@ -3462,25 +3541,174 @@ function _renderDashboard(){
   const maxCnt=Math.max(...days7.map(d=>d.cnt),1);
   const totalLast7=days7.reduce((s,d)=>s+d.cnt,0);
 
-  // Quick actions
+  const contamNotes=S.notes.filter(n=>n.type==='Contamination Log');
+  const contamRate=S.notes.length>0?Math.round(contamNotes.length/S.notes.length*100):0;
+  const recentContam30=contamNotes.filter(n=>{const d=new Date(n.date);return(Date.now()-d)<30*24*3600*1000;});
+
+  const stageOrder=['prepared','inoculated','growing','subcultured','rooting','hardening','weaned','contaminated','discarded'];
+  const stageLabel={'prepared':'🧪 Prepared','inoculated':'💉 Inoculated','growing':'🌿 Growing','subcultured':'✂️ Subcultured','rooting':'🌱 Rooting','hardening':'☀️ Hardening','weaned':'🪴 Weaned','contaminated':'☣️ Contaminated','discarded':'🗑 Discarded'};
+  const stageCols={'prepared':'var(--mu)','inoculated':'var(--ac)','growing':'var(--gn)','subcultured':'var(--yw)','rooting':'#52b788','hardening':'#f4a261','weaned':'var(--gn)','contaminated':'var(--rd)','discarded':'var(--mu)'};
+  const stageCounts={}; allBots.forEach(b=>{const s=b.status||'unknown';stageCounts[s]=(stageCounts[s]||0)+1;});
+  const donutSegs=stageOrder.filter(s=>stageCounts[s]).map(s=>({v:stageCounts[s],c:stageCols[s]||'var(--mu)',l:stageLabel[s]||s}));
+
+  const transferDue=allBots.filter(b=>{
+    if(!['inoculated','growing'].includes(b.status)||!b.date_inoculated) return false;
+    return Math.floor((now-new Date(b.date_inoculated))/86400000)>=28;
+  }).sort((a,b)=>new Date(a.date_inoculated)-new Date(b.date_inoculated));
+
+  const upcoming=[
+    ...S.notes.filter(n=>n.next_review&&daysFrom(n.next_review)<=14).map(n=>({title:n.title,days:daysFrom(n.next_review),icon:'📋',id:n.id,isBot:false})),
+    ...allBots.filter(b=>b.next_review&&['inoculated','growing'].includes(b.status)&&daysFrom(b.next_review)<=14).map(b=>({title:b.code,days:daysFrom(b.next_review),icon:'🫙',id:b.id,isBot:true})),
+  ].sort((a,b)=>a.days-b.days).slice(0,6);
+
+  const recent=[...S.notes].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5);
+
+  const spActMap={};
+  S.notes.forEach(n=>{if(n.species){const k=n.species.toLowerCase();if(!spActMap[k])spActMap[k]={name:n.species,notes:0,bottles:0};spActMap[k].notes++;}});
+  allBots.forEach(b=>{if(b.species){const k=b.species.toLowerCase();if(!spActMap[k])spActMap[k]={name:b.species,notes:0,bottles:0};spActMap[k].bottles++;}});
+  const topSp=Object.values(spActMap).sort((a,b)=>(b.notes+b.bottles)-(a.notes+a.bottles)).slice(0,8);
+
+  const ghPlants=S.greenhouse||[];
+  const ghHealthy=ghPlants.filter(p=>p.health==='healthy');
+  const subculturedBots=allBots.filter(b=>b.status==='subcultured');
+  const spWithSubcult=[...new Set(subculturedBots.map(b=>b.species).filter(Boolean))];
+  const recentRecs=(S.recs||[]).slice(0,5);
+
   const pEl=document.getElementById('dash-panels');
   if(pEl){
     pEl.innerHTML=`
-    <div style="grid-column:1/-1;margin-bottom:4px">
-      <div class="dash-section-label"><span>7-day Activity</span><span style="color:var(--ac);font-weight:700">${totalLast7} entries</span></div>
-      <div class="dash-activity-bar">
-        ${days7.map(d=>`<div class="dab-col" title="${esc(d.label)}: ${d.cnt} entries" style="height:${Math.max(8,Math.round(d.cnt/maxCnt*100))}%;${d.cnt===0?'opacity:.2':'opacity:.75'}"></div>`).join('')}
+    <!-- ═══ ROW 1: HERO TRIO ═══ -->
+    <div style="grid-column:1/-1">
+      <div class="dash-hero">
+
+        <!-- Donut: TC Stage Distribution -->
+        <div class="dash-hero-card">
+          <div class="dash-section-label"><span>⚗️ TC Stage Distribution</span><a onclick="navTo('bottles')" style="color:var(--ac);font-size:11px;cursor:pointer;font-weight:600">All →</a></div>
+          ${allBots.length?`<div style="display:flex;align-items:center;gap:16px">
+            <div style="flex-shrink:0">${_donutSvg(donutSegs)}</div>
+            <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:0">
+              ${stageOrder.filter(s=>stageCounts[s]).map(s=>`
+                <div onclick="navTo('bottles');setBotFilter('${s}');renderBottleList()" style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:2px 0" onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">
+                  <div style="width:9px;height:9px;border-radius:2px;flex-shrink:0;background:${stageCols[s]}"></div>
+                  <span style="font-size:11px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--mu)">${stageLabel[s].replace(/^\S+\s/,'')}</span>
+                  <span style="font-size:12px;font-weight:700;flex-shrink:0">${stageCounts[s]}</span>
+                </div>`).join('')}
+            </div>
+          </div>`:`<div style="font-size:12px;color:var(--mu);padding:12px 0">No bottles yet. <a onclick="navTo('bottles');startNewBottle('single')" style="color:var(--ac);cursor:pointer">Add one →</a></div>`}
+        </div>
+
+        <!-- Contamination Heatmap -->
+        <div class="dash-hero-card">
+          <div class="dash-section-label">
+            <span>☣️ Contamination — 14 weeks</span>
+            <a onclick="navTo('contam')" style="color:var(--rd);font-size:11px;cursor:pointer;font-weight:600">Log →</a>
+          </div>
+          <div style="display:flex;gap:12px;align-items:center;margin-bottom:8px">
+            <div style="text-align:center">
+              <div style="font-size:26px;font-weight:800;color:${contamRate>10?'var(--rd)':contamRate>5?'var(--yw)':'var(--gn)'}">${contamRate}%</div>
+              <div style="font-size:10px;color:var(--mu)">overall rate</div>
+            </div>
+            <div style="text-align:center">
+              <div style="font-size:26px;font-weight:800;color:${recentContam30.length>3?'var(--yw)':'var(--tx)'}">${recentContam30.length}</div>
+              <div style="font-size:10px;color:var(--mu)">last 30 days</div>
+            </div>
+          </div>
+          ${_contamHeatmap(S.notes)}
+        </div>
+
+        <!-- QR Scan + Transfer Window quick view -->
+        <div class="dash-hero-card" style="gap:10px">
+          <div class="dash-qr-btn" onclick="openQRScan()">
+            <div style="font-size:32px">📷</div>
+            <div style="font-size:13px;font-weight:700;color:var(--tx)">Scan QR Code</div>
+            <div style="font-size:11px;color:var(--mu)">Open bottle, note, or accession</div>
+          </div>
+          ${transferDue.length?`<div>
+            <div class="dash-section-label"><span>✂️ Transfer Due</span><span style="color:var(--yw);font-weight:700">${transferDue.length}</span></div>
+            ${transferDue.slice(0,3).map(b=>{
+              const di=Math.floor((now-new Date(b.date_inoculated))/86400000);
+              const urg=di>=56?'var(--rd)':di>=42?'var(--yw)':'var(--ac)';
+              return`<div onclick="navTo('bottles');openBottle('${b.id}')" style="display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:5px;cursor:pointer;border:1px solid var(--bd);margin-bottom:4px;border-left:3px solid ${urg}" onmouseover="this.style.background='var(--sf2)'" onmouseout="this.style.background=''">
+                <span style="font-family:var(--mono);font-size:11px;font-weight:700">${esc(b.code)}</span>
+                <span style="font-size:11px;color:var(--mu);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><em>${esc(b.species||'')}</em></span>
+                <span style="font-size:10px;font-weight:700;color:${urg};flex-shrink:0">${di}d</span>
+              </div>`;}).join('')}
+            ${transferDue.length>3?`<div onclick="navTo('bottles')" style="font-size:11px;color:var(--ac);cursor:pointer;padding:2px 0">+${transferDue.length-3} more →</div>`:''}
+          </div>`:''}
+        </div>
       </div>
-      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--mu)"><span>${days7[0].ds.slice(5)}</span><span>Today</span></div>
     </div>
-    <div>
-      <div class="dash-section-label"><span>Recent Entries</span></div>
-      <div id="dash-recent"></div>
+
+    <!-- ═══ ROW 2: Activity + Reviews + Recent ═══ -->
+    <div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:4px">
+      <!-- 7-day activity -->
+      <div>
+        <div class="dash-section-label"><span>📊 7-day Activity</span><span style="color:var(--ac);font-weight:700">${totalLast7} entries</span></div>
+        <div class="dash-activity-bar">
+          ${days7.map(d=>`<div class="dab-col" title="${esc(d.label)}: ${d.cnt} entries" style="height:${Math.max(8,Math.round(d.cnt/maxCnt*100))}%;${d.cnt===0?'opacity:.15':'opacity:.8'}"></div>`).join('')}
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--mu);margin-top:2px"><span>${days7[0].ds.slice(5)}</span><span>Today</span></div>
+      </div>
+      <!-- Reviews due -->
+      <div>
+        <div class="dash-section-label"><span>⏰ Reviews Due</span>${overdueCount?`<span style="color:var(--rd)">${overdueCount} overdue</span>`:''}</div>
+        ${upcoming.length?upcoming.map(r=>{
+          const cls=r.days<=0?'var(--rd)':r.days<=3?'var(--yw)':'var(--mu)';
+          const dl=r.days<0?`${Math.abs(r.days)}d late`:r.days===0?'Today':`${r.days}d`;
+          const act=r.isBot?`navTo('bottles');openBottle('${r.id}')`:`openNote('${r.id}')`;
+          return`<div onclick="${act}" style="padding:5px 8px;border-radius:5px;cursor:pointer;background:var(--sf);border:1px solid var(--bd);margin-bottom:4px;display:flex;align-items:center;gap:6px" onmouseover="this.style.borderColor='${cls}'" onmouseout="this.style.borderColor='var(--bd)'">
+            <span>${r.icon}</span>
+            <div style="flex:1;min-width:0;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.title)}</div>
+            <span style="font-size:11px;font-weight:700;color:${cls};flex-shrink:0">${dl}</span>
+          </div>`;}).join(''):`<div style="font-size:12px;color:var(--mu)">All clear 🎉</div>`}
+      </div>
+      <!-- Recent entries -->
+      <div>
+        <div class="dash-section-label"><span>📋 Recent Entries</span></div>
+        ${recent.map(n=>`<div onclick="openNote('${n.id}')" style="padding:5px 8px;border-radius:5px;cursor:pointer;background:var(--sf);border:1px solid var(--bd);margin-bottom:4px" onmouseover="this.style.borderColor='var(--ac)'" onmouseout="this.style.borderColor='var(--bd)'">
+          <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(n.title)}</div>
+          <div style="font-size:10px;color:var(--mu);margin-top:1px">${fmtDateShort(n.date)}${n.species?` · <em>${esc(n.species)}</em>`:''}</div>
+        </div>`).join('')||`<div style="font-size:12px;color:var(--mu)">No notes yet.</div>`}
+      </div>
     </div>
-    <div>
-      <div class="dash-section-label"><span>Reviews Due</span>${overdueCount?`<span style="color:var(--rd)">${overdueCount} overdue</span>`:''}</div>
-      <div id="dash-upcoming"></div>
-    </div>`;
+
+    <!-- ═══ ROW 3: Top Species ═══ -->
+    ${topSp.length?`<div style="grid-column:1/-1;margin-top:4px;padding-top:14px;border-top:1px solid var(--bd)">
+      <div class="dash-section-label"><span>🌱 Species in Active Culture</span><a onclick="navTo('species')" style="color:var(--ac);font-size:11px;cursor:pointer;font-weight:600">Species hub →</a></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px">
+        ${topSp.map(sp=>`<div onclick="navTo('species')" style="background:var(--sf);border:1px solid var(--bd);border-radius:7px;padding:8px 12px;cursor:pointer;display:flex;align-items:center;gap:8px" onmouseover="this.style.borderColor='var(--gn)'" onmouseout="this.style.borderColor='var(--bd)'">
+          <span style="flex:1;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-style:italic">${esc(sp.name)}</span>
+          <span style="font-size:10px;color:var(--mu);flex-shrink:0">${sp.notes?`📋${sp.notes} `:''}${sp.bottles?`🫙${sp.bottles}`:''}</span>
+        </div>`).join('')}
+      </div>
+    </div>`:''}
+
+    <!-- ═══ ROW 4: Media Recipes + GH strip ═══ -->
+    <div style="grid-column:1/-1;margin-top:4px;padding-top:14px;border-top:1px solid var(--bd);display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      ${recentRecs.length?`<div>
+        <div class="dash-section-label"><span>🧪 Media Recipes</span><a onclick="navTo('recipes');startNewRecipe()" style="color:var(--pu);font-size:11px;cursor:pointer;font-weight:600">+ New →</a></div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          ${recentRecs.map(r=>`<div onclick="navTo('recipes');openRecipe('${r.id}')" style="background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:7px 12px;cursor:pointer;display:flex;align-items:center;gap:10px" onmouseover="this.style.borderColor='var(--pu)'" onmouseout="this.style.borderColor='var(--bd)'">
+            <div style="flex:1;min-width:0">
+              <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.name)}</div>
+              <div style="color:var(--mu);font-size:10px">${esc(r.base||'')}${r.agar?` · Gelrite ${r.agar}g/L`:''}</div>
+            </div>
+          </div>`).join('')}
+        </div>
+      </div>`:'<div></div>'}
+      ${ghPlants.length?`<div>
+        <div class="dash-section-label"><span>🏡 Greenhouse — ${ghTotal} plants</span><a onclick="navTo('greenhouse')" style="color:var(--ac);font-size:11px;cursor:pointer;font-weight:600">View all →</a></div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          ${ghHealthy.slice(0,5).map(p=>`<div onclick="navTo('greenhouse');openGHPlant('${p.id}')" style="display:flex;align-items:center;gap:8px;padding:5px 8px;background:var(--sf);border:1px solid var(--bd);border-radius:6px;cursor:pointer" onmouseover="this.style.borderColor='var(--gn)'" onmouseout="this.style.borderColor='var(--bd)'">
+            <div class="gh-health-dot healthy"></div>
+            <span style="flex:1;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-style:italic">${esc(p.species||'?')}</span>
+            <span style="color:var(--mu);font-size:11px">${p.quantity||1}×</span>
+          </div>`).join('')}
+          ${spWithSubcult.length?`<div style="font-size:11px;color:var(--yw);margin-top:4px">⚗️ Lab → GH ready: ${spWithSubcult.slice(0,3).map(s=>esc(s)).join(', ')}${spWithSubcult.length>3?'…':''}</div>`:''}
+        </div>
+      </div>`:''}
+    </div>`;}
+}
 
     // Recent entries
     const recent=[...S.notes].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5);
@@ -8000,7 +8228,7 @@ function switchSection(name){
   if(name==='reminders') renderReminders();
   if(name==='contam') renderContamDashboard();
   if(name==='analytics') renderAnalytics();
-  if(name==='sterilise') renderSterilPage();
+  if(name==='sterilise'){ if(_sterilActiveId===undefined) loadCustomSterilProtocol(); else renderSterilPage(); }
   if(name==='species') renderSpecies();
   if(name==='news' && document.getElementById('news-toggle').checked && !_newsData) handleNewsToggle(true);
   if(name==='calendar') renderCalendar();
@@ -8924,7 +9152,17 @@ let _sterilActiveId=null;
 function renderSterilPage(){
   const presetList=document.getElementById('steril-preset-list'); if(!presetList) return;
   const categories=[...new Set(STERIL_PROTOCOLS.map(p=>p.category))];
-  presetList.innerHTML=categories.map(cat=>`
+  // Custom protocol card always at top
+  const customActive=_sterilActiveId===null;
+  let html=`<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mu);padding:6px 0 3px">Your Work</div>
+    <div class="steril-preset-card${customActive?' active':''}" onclick="loadCustomSterilProtocol()">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+        <span style="font-size:14px">✏️</span>
+        <div class="steril-preset-name">Custom Protocol</div>
+      </div>
+      <div style="font-size:11px;color:var(--mu)">Build from scratch · add your own steps</div>
+    </div>`;
+  html+=categories.map(cat=>`
     <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mu);padding:6px 0 3px">${esc(cat)}</div>
     ${STERIL_PROTOCOLS.filter(p=>p.category===cat).map(p=>`
       <div class="steril-preset-card${_sterilActiveId===p.id?' active':''}" onclick="loadSterilPreset('${p.id}')">
@@ -8937,11 +9175,23 @@ function renderSterilPage(){
           <span style="font-size:11px;color:var(--mu)">${p.steps.length} steps · ${Math.round(p.steps.reduce((s,x)=>s+x.secs,0)/60)} min</span>
         </div>
       </div>`).join('')}`).join('');
+  presetList.innerHTML=html;
   // Saved protocols
   _stepperRenderSaved();
   const saved=_stepperGetSaved();
   const noSaved=document.getElementById('steril-no-saved');
   if(noSaved) noSaved.style.display=saved.length?'none':'';
+}
+
+function loadCustomSterilProtocol(){
+  _sterilActiveId=null;
+  SS.steps=[];
+  resetStepper();
+  const nameEl=document.getElementById('steril-active-name');
+  if(nameEl) nameEl.textContent='✏️ Custom Protocol';
+  const tips=document.getElementById('steril-tips');
+  if(tips){tips.style.display='';tips.innerHTML='<strong style="color:var(--tx)">✏️ Build your own:</strong> Click <strong>＋ Step</strong> to add steps. Set name, duration (seconds), temperature and bench notes for each. Save the finished protocol with 💾 to reuse it.';}
+  renderSterilPage();
 }
 
 function loadSterilPreset(id){
