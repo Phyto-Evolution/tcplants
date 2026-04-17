@@ -983,7 +983,18 @@ main > .dview, main > .editor{ margin:0 auto; }
   padding:10px 14px;margin-bottom:14px;font-size:13px;display:none
 }
 #saved-device-banner.on{display:block}
-/* ── GEMINI AI ── */
+/* ── AI ASSISTANT ── */
+.ai-model-sel{background:var(--sf2);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-size:11px;font-weight:700;padding:3px 7px;cursor:pointer;font-family:var(--font)}
+/* heatmap widget */
+.hw-card{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;transition:border-color .15s}
+.hw-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.hw-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);flex:1}
+.hw-meta{font-size:12px;font-weight:700}
+.hw-toggle{background:transparent;border:1px solid var(--bd);border-radius:4px;color:var(--mu);cursor:pointer;font-size:10px;padding:2px 7px;white-space:nowrap}
+.hw-toggle:hover{border-color:var(--ac);color:var(--ac)}
+/* dash widget columns */
+.dash-cols{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.dash-col{display:flex;flex-direction:column;gap:10px;flex:1;min-width:260px}
 #ai-btn{
   position:fixed;bottom:80px;right:24px;z-index:155;
   width:44px;height:44px;border-radius:50%;
@@ -3055,18 +3066,24 @@ main > .dview, main > .editor{ margin:0 auto; }
   </div>
 </div>
 
-<!-- ═══════════ GEMINI AI ═══════════ -->
+<!-- ═══════════ AI ASSISTANT ═══════════ -->
 <button id="ai-btn" title="Ask AI assistant">✦</button>
 <div id="ai-panel">
   <div id="ai-head">
-    <div class="ai-title">✦ Gemini AI</div>
-    <button class="al-hbtn" onclick="document.getElementById('ai-key-row').style.display=document.getElementById('ai-key-row').style.display==='none'?'flex':'none'" title="API key settings">⚙️</button>
+    <div class="ai-title" id="ai-title-label">✦ Lab AI</div>
+    <select class="ai-model-sel" id="ai-model-sel" onchange="_onAIModelChange(this.value)" title="Select AI model">
+      <option value="claude">◇ Claude</option>
+      <option value="gemini">✦ Gemini</option>
+      <option value="gpt">◎ GPT-4o</option>
+      <option value="grok">𝕏 Grok</option>
+    </select>
+    <button class="al-hbtn" onclick="_toggleAIKeyRow()" title="API key settings">⚙️</button>
     <button class="al-hbtn" onclick="document.getElementById('ai-panel').classList.remove('on')" title="Close">✕</button>
   </div>
   <div id="ai-key-row" style="display:none;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid var(--bd);background:var(--sf2)">
-    <input type="password" id="ai-key-input" placeholder="Paste your Gemini API key here…" style="flex:1;font-size:12px;padding:5px 8px">
-    <button class="btn xs green" onclick="_saveGeminiKey()">Save</button>
-    <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
+    <input type="password" id="ai-key-input" placeholder="API key for selected model…" style="flex:1;font-size:12px;padding:5px 8px">
+    <button class="btn xs green" onclick="_saveCurrentModelKey()">Save</button>
+    <a id="ai-key-link" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
   </div>
   <div id="ai-chips">
     <button class="ai-chip" onclick="askAI('Summarise this note in 3-5 bullet points, highlighting key observations, results, and recommended next steps.')">Summarise note</button>
@@ -3184,14 +3201,41 @@ main > .dview, main > .editor{ margin:0 auto; }
       </div>
     </div>
     <div class="set-section">
-      <div class="set-section-title">AI Assistant</div>
+      <div class="set-section-title">AI Assistant — API Keys</div>
+      <div class="set-row set-row-full" style="background:rgba(88,166,255,.05);border-radius:8px;padding:10px;margin-bottom:6px">
+        <div class="set-row-label" style="color:var(--ac)">◇ Claude (Anthropic) — default model</div>
+        <div class="set-row-sub">claude-opus-4-5 · Hardwired as the primary model</div>
+        <input type="password" id="set-claude-key" placeholder="Paste Anthropic API key…" style="margin-top:6px">
+        <div style="display:flex;gap:6px;margin-top:6px">
+          <button class="btn xs ghost" onclick="_setModelKey('claude','set-claude-key')" style="flex:1">Save Key</button>
+          <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
+        </div>
+      </div>
       <div class="set-row set-row-full">
-        <div class="set-row-label">Gemini API Key</div>
-        <div class="set-row-sub">For AI note summaries and advice</div>
+        <div class="set-row-label">✦ Gemini API Key</div>
+        <div class="set-row-sub">gemini-2.0-flash · Free tier available</div>
         <input type="password" id="set-gemini-key" placeholder="Paste Gemini API key…" style="margin-top:6px">
         <div style="display:flex;gap:6px;margin-top:6px">
-          <button class="btn xs ghost" onclick="_setGeminiKey()" style="flex:1">Save Key</button>
+          <button class="btn xs ghost" onclick="_setModelKey('gemini','set-gemini-key')" style="flex:1">Save Key</button>
           <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
+        </div>
+      </div>
+      <div class="set-row set-row-full">
+        <div class="set-row-label">◎ OpenAI API Key</div>
+        <div class="set-row-sub">gpt-4o · Paid API access required</div>
+        <input type="password" id="set-openai-key" placeholder="Paste OpenAI API key…" style="margin-top:6px">
+        <div style="display:flex;gap:6px;margin-top:6px">
+          <button class="btn xs ghost" onclick="_setModelKey('gpt','set-openai-key')" style="flex:1">Save Key</button>
+          <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
+        </div>
+      </div>
+      <div class="set-row set-row-full">
+        <div class="set-row-label">𝕏 Grok API Key (xAI)</div>
+        <div class="set-row-sub">grok-3 · xAI platform API key</div>
+        <input type="password" id="set-grok-key" placeholder="Paste xAI API key…" style="margin-top:6px">
+        <div style="display:flex;gap:6px;margin-top:6px">
+          <button class="btn xs ghost" onclick="_setModelKey('grok','set-grok-key')" style="flex:1">Save Key</button>
+          <a href="https://console.x.ai/" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
         </div>
       </div>
     </div>
@@ -3538,6 +3582,40 @@ function _donutSvg(segments,size=110){
   return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="display:block">${paths.join('')}<text x="${cx}" y="${cy-3}" text-anchor="middle" font-size="18" font-weight="800" fill="var(--tx)">${total}</text><text x="${cx}" y="${cy+12}" text-anchor="middle" font-size="9" fill="var(--mu)">vessels</text></svg>`;
 }
 
+function _genericHeatmap(dayMap, weeks, colorFn, todayStr){
+  const now=new Date(); const start=new Date(now); start.setDate(start.getDate()-weeks*7+1);
+  const dlbls=['M','T','W','T','F','S','S'];
+  const cols=[];
+  for(let w=0;w<weeks;w++){
+    const col=[];
+    for(let d=0;d<7;d++){
+      const dt=new Date(start); dt.setDate(start.getDate()+w*7+d);
+      const ds=dt.toISOString().slice(0,10);
+      col.push({ds,v:dayMap[ds]||0,future:dt>now,today:ds===todayStr});
+    }
+    cols.push(col);
+  }
+  const maxV=Math.max(...cols.flat().map(c=>c.v),1);
+  return `<div style="display:flex;gap:2px;align-items:flex-start;overflow-x:auto">
+    <div style="display:flex;flex-direction:column;gap:2px;margin-right:2px">
+      ${dlbls.map((l,i)=>`<div style="height:11px;font-size:8px;color:var(--mu);line-height:11px;text-align:right;padding-right:2px">${i%2===0?l:''}</div>`).join('')}
+    </div>
+    ${cols.map(col=>`<div style="display:flex;flex-direction:column;gap:2px">
+      ${col.map(c=>`<div class="dash-heatmap-cell" title="${c.ds}${c.v?' · '+c.v:''}" style="background:${c.future?'transparent':colorFn(c.v,maxV)};${c.today?'outline:1.5px solid var(--ac);outline-offset:1px':''}"></div>`).join('')}
+    </div>`).join('')}
+  </div>`;
+}
+const _hmGreen=(v,mx)=>v===0?'var(--sf3)':v/mx>=.66?'#2ea043':v/mx>=.33?'rgba(46,160,67,.55)':'rgba(46,160,67,.28)';
+const _hmRed=(v,mx)=>v===0?'var(--sf3)':v/mx>=.66?'#f85149':v/mx>=.33?'rgba(248,81,73,.55)':'rgba(248,81,73,.28)';
+const _hmBlue=(v,mx)=>v===0?'var(--sf3)':v/mx>=.66?'var(--ac)':v/mx>=.33?'rgba(88,166,255,.55)':'rgba(88,166,255,.28)';
+
+const _hwState={}; // widget expand states: id → weeks (7 | 14 | 26)
+function _hwToggle(id, el){
+  const cur=_hwState[id]||14;
+  _hwState[id]=cur<26?cur*2:7;
+  _renderDashboard();
+}
+
 function _contamHeatmap(notes){
   const WEEKS=14,DAYS=7;
   const now=new Date(); const todayStr=now.toISOString().slice(0,10);
@@ -3758,41 +3836,116 @@ function _renderDashboard(){
       </div>
     </div>
 
-    <!-- ═══ ROW 3: Top Species ═══ -->
-    ${topSp.length?`<div style="grid-column:1/-1;margin-top:4px;padding-top:14px;border-top:1px solid var(--bd)">
-      <div class="dash-section-label"><span>🌱 Species in Active Culture</span><a onclick="navTo('species')" style="color:var(--ac);font-size:11px;cursor:pointer;font-weight:600">Species hub →</a></div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px">
-        ${topSp.map(sp=>`<div onclick="navTo('species')" style="background:var(--sf);border:1px solid var(--bd);border-radius:7px;padding:8px 12px;cursor:pointer;display:flex;align-items:center;gap:8px" onmouseover="this.style.borderColor='var(--gn)'" onmouseout="this.style.borderColor='var(--bd)'">
-          <span style="flex:1;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-style:italic">${esc(sp.name)}</span>
-          <span style="font-size:10px;color:var(--mu);flex-shrink:0">${sp.notes?`📋${sp.notes} `:''}${sp.bottles?`🫙${sp.bottles}`:''}</span>
-        </div>`).join('')}
-      </div>
-    </div>`:''}
+    <!-- ═══ ROW 3: Heatmap + Species + Media/GH widgets (independent columns) ═══ -->
+    <div style="grid-column:1/-1;margin-top:8px;padding-top:14px;border-top:1px solid var(--bd)">
+      <div class="dash-cols">
 
-    <!-- ═══ ROW 4: Media Recipes + GH strip ═══ -->
-    <div style="grid-column:1/-1;margin-top:4px;padding-top:14px;border-top:1px solid var(--bd);display:grid;grid-template-columns:1fr 1fr;gap:16px">
-      ${recentRecs.length?`<div>
-        <div class="dash-section-label"><span>🧪 Media Recipes</span><a onclick="navTo('recipes');startNewRecipe()" style="color:var(--pu);font-size:11px;cursor:pointer;font-weight:600">+ New →</a></div>
-        <div style="display:flex;flex-direction:column;gap:5px">
-          ${recentRecs.map(r=>`<div onclick="navTo('recipes');openRecipe('${r.id}')" style="background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:7px 12px;cursor:pointer;display:flex;align-items:center;gap:10px" onmouseover="this.style.borderColor='var(--pu)'" onmouseout="this.style.borderColor='var(--bd)'">
-            <div style="flex:1;min-width:0">
-              <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.name)}</div>
-              <div style="color:var(--mu);font-size:10px">${esc(r.base||'')}${r.agar?` · Gelrite ${r.agar}g/L`:''}</div>
+        <!-- COL A: Lab Activity + Bottle Activity heatmaps -->
+        <div class="dash-col">
+          ${(()=>{
+            const wk=_hwState['lab']||14;
+            const eMap={};
+            S.notes.forEach(n=>{if(n.date){const d=n.date.slice(0,10);eMap[d]=(eMap[d]||0)+1;}});
+            const tot7=S.notes.filter(n=>n.date&&n.date.slice(0,10)>=new Date(Date.now()-6*864e5).toISOString().slice(0,10)).length;
+            return `<div class="hw-card">
+              <div class="hw-head">
+                <span class="hw-title">📋 Lab Activity</span>
+                <span class="hw-meta" style="color:var(--gn)">${tot7} this week</span>
+                <button class="hw-toggle" onclick="_hwState['lab']=${wk<26?wk*2:7};_renderDashboard()">${wk===7?'▼ Expand':wk===14?'▼ More':'▲ Collapse'}</button>
+              </div>
+              ${_genericHeatmap(eMap,wk,_hmGreen,todayStr)}
+              <div style="display:flex;align-items:center;gap:5px;margin-top:5px;font-size:10px;color:var(--mu)">
+                <span>Less</span>
+                <div class="dash-heatmap-cell" style="background:var(--sf3)"></div>
+                <div class="dash-heatmap-cell" style="background:rgba(46,160,67,.28)"></div>
+                <div class="dash-heatmap-cell" style="background:rgba(46,160,67,.55)"></div>
+                <div class="dash-heatmap-cell" style="background:#2ea043"></div>
+                <span>More entries</span>
+              </div>
+            </div>`;
+          })()}
+          ${(()=>{
+            const wk=_hwState['bots']||14;
+            const bMap={};
+            allBots.forEach(b=>{if(b.date_prepared){const d=b.date_prepared.slice(0,10);bMap[d]=(bMap[d]||0)+1;}});
+            const tot=allBots.filter(b=>b.date_prepared&&b.date_prepared.slice(0,10)>=new Date(Date.now()-6*864e5).toISOString().slice(0,10)).length;
+            return `<div class="hw-card">
+              <div class="hw-head">
+                <span class="hw-title">🫙 Bottle Prep</span>
+                <span class="hw-meta" style="color:var(--ac)">${tot} this week</span>
+                <button class="hw-toggle" onclick="_hwState['bots']=${wk<26?wk*2:7};_renderDashboard()">${wk===7?'▼ Expand':wk===14?'▼ More':'▲ Collapse'}</button>
+              </div>
+              ${_genericHeatmap(bMap,wk,_hmBlue,todayStr)}
+              <div style="display:flex;align-items:center;gap:5px;margin-top:5px;font-size:10px;color:var(--mu)">
+                <span>Less</span>
+                <div class="dash-heatmap-cell" style="background:var(--sf3)"></div>
+                <div class="dash-heatmap-cell" style="background:rgba(88,166,255,.28)"></div>
+                <div class="dash-heatmap-cell" style="background:rgba(88,166,255,.55)"></div>
+                <div class="dash-heatmap-cell" style="background:var(--ac)"></div>
+                <span>More bottles</span>
+              </div>
+            </div>`;
+          })()}
+        </div>
+
+        <!-- COL B: Contamination heatmap + Species grid -->
+        <div class="dash-col">
+          ${(()=>{
+            const wk=_hwState['contam']||14;
+            const cMap={};
+            contamNotes.forEach(n=>{if(n.date){const d=n.date.slice(0,10);cMap[d]=(cMap[d]||0)+1;}});
+            return `<div class="hw-card">
+              <div class="hw-head">
+                <span class="hw-title">☣️ Contamination</span>
+                <span class="hw-meta" style="color:${contamRate>10?'var(--rd)':contamRate>5?'var(--yw)':'var(--gn)'}">${contamRate}% · ${recentContam30.length} this month</span>
+                <button class="hw-toggle" onclick="_hwState['contam']=${wk<26?wk*2:7};_renderDashboard()">${wk===7?'▼ Expand':wk===14?'▼ More':'▲ Collapse'}</button>
+              </div>
+              ${_genericHeatmap(cMap,wk,_hmRed,todayStr)}
+              <div style="display:flex;align-items:center;gap:5px;margin-top:5px;font-size:10px;color:var(--mu)">
+                <span>0</span>
+                <div class="dash-heatmap-cell" style="background:var(--sf3)"></div>
+                <div class="dash-heatmap-cell" style="background:rgba(248,81,73,.28)"></div>
+                <div class="dash-heatmap-cell" style="background:rgba(248,81,73,.55)"></div>
+                <div class="dash-heatmap-cell" style="background:#f85149"></div>
+                <span>High</span>
+              </div>
+            </div>`;
+          })()}
+          ${topSp.length?`<div class="hw-card">
+            <div class="hw-head"><span class="hw-title">🌱 Species Active</span><a onclick="navTo('species')" style="color:var(--ac);font-size:11px;cursor:pointer;font-weight:600">All →</a></div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              ${topSp.slice(0,6).map(sp=>`<div onclick="navTo('species')" style="display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer;border-bottom:1px solid var(--sf2)" onmouseover="this.style.color='var(--ac)'" onmouseout="this.style.color=''">
+                <span style="flex:1;font-size:12px;font-weight:600;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(sp.name)}</span>
+                <span style="font-size:10px;color:var(--mu);flex-shrink:0">${sp.notes?`📋${sp.notes} `:''}${sp.bottles?`🫙${sp.bottles}`:''}</span>
+              </div>`).join('')}
             </div>
-          </div>`).join('')}
+          </div>`:''}
         </div>
-      </div>`:'<div></div>'}
-      ${ghPlants.length?`<div>
-        <div class="dash-section-label"><span>🏡 Greenhouse — ${ghTotal} plants</span><a onclick="navTo('greenhouse')" style="color:var(--ac);font-size:11px;cursor:pointer;font-weight:600">View all →</a></div>
-        <div style="display:flex;flex-direction:column;gap:4px">
-          ${ghHealthy.slice(0,5).map(p=>`<div onclick="navTo('greenhouse');openGHPlant('${p.id}')" style="display:flex;align-items:center;gap:8px;padding:5px 8px;background:var(--sf);border:1px solid var(--bd);border-radius:6px;cursor:pointer" onmouseover="this.style.borderColor='var(--gn)'" onmouseout="this.style.borderColor='var(--bd)'">
-            <div class="gh-health-dot healthy"></div>
-            <span style="flex:1;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-style:italic">${esc(p.species||'?')}</span>
-            <span style="color:var(--mu);font-size:11px">${p.quantity||1}×</span>
-          </div>`).join('')}
-          ${spWithSubcult.length?`<div style="font-size:11px;color:var(--yw);margin-top:4px">⚗️ Lab → GH ready: ${spWithSubcult.slice(0,3).map(s=>esc(s)).join(', ')}${spWithSubcult.length>3?'…':''}</div>`:''}
+
+        <!-- COL C: Media recipes + GH plants -->
+        <div class="dash-col">
+          ${recentRecs.length?`<div class="hw-card">
+            <div class="hw-head"><span class="hw-title">🧪 Media Recipes</span><a onclick="navTo('recipes');startNewRecipe()" style="color:var(--pu);font-size:11px;cursor:pointer;font-weight:600">+ New →</a></div>
+            <div style="display:flex;flex-direction:column;gap:5px">
+              ${recentRecs.map(r=>`<div onclick="navTo('recipes');openRecipe('${r.id}')" style="background:var(--sf2);border-radius:6px;padding:7px 10px;cursor:pointer" onmouseover="this.style.borderColor='var(--pu)'" onmouseout="this.style.borderColor=''">
+                <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.name)}</div>
+                <div style="color:var(--mu);font-size:10px">${esc(r.base||'')}${r.agar?` · Gelrite ${r.agar}g/L`:''}</div>
+              </div>`).join('')}
+            </div>
+          </div>`:''}
+          ${ghPlants.length?`<div class="hw-card">
+            <div class="hw-head"><span class="hw-title">🏡 Greenhouse</span><span class="hw-meta">${ghTotal} plants</span><a onclick="navTo('greenhouse')" style="color:var(--ac);font-size:11px;cursor:pointer;font-weight:600">All →</a></div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              ${ghHealthy.slice(0,5).map(p=>`<div onclick="navTo('greenhouse');openGHPlant('${p.id}')" style="display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer;border-bottom:1px solid var(--sf2)">
+                <div class="gh-health-dot healthy"></div>
+                <span style="flex:1;font-size:12px;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.species||'?')}</span>
+                <span style="color:var(--mu);font-size:11px">${p.quantity||1}×</span>
+              </div>`).join('')}
+              ${spWithSubcult.length?`<div style="font-size:11px;color:var(--yw);margin-top:6px">⚗️ Lab → GH: ${spWithSubcult.slice(0,2).map(s=>esc(s)).join(', ')}${spWithSubcult.length>2?'…':''}</div>`:''}
+            </div>
+          </div>`:''}
         </div>
-      </div>`:''}
+      </div>
     </div>`;}
 }
 
@@ -5906,20 +6059,65 @@ async function _saveNewsToRepo(articles){
 }
 
 // ── GEMINI AI ────────────────────────────────────────────────
-const _getGeminiKey=()=>localStorage.getItem('tcplants_gemini_key')||'';
-const _getGeminiURL=()=>`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${_getGeminiKey()}`;
-function _saveGeminiKey(){
+// ── AI Model system ──────────────────────────────────────────
+const AI_MODELS={
+  claude:{name:'Claude',icon:'◇',lsKey:'tcplants_claude_key',getKey:()=>localStorage.getItem('tcplants_claude_key')||'',getLink:'https://console.anthropic.com/settings/keys'},
+  gemini:{name:'Gemini',icon:'✦',lsKey:'tcplants_gemini_key',getKey:()=>localStorage.getItem('tcplants_gemini_key')||'',getLink:'https://aistudio.google.com/app/apikey'},
+  gpt:{name:'GPT-4o',icon:'◎',lsKey:'tcplants_openai_key',getKey:()=>localStorage.getItem('tcplants_openai_key')||'',getLink:'https://platform.openai.com/api-keys'},
+  grok:{name:'Grok',icon:'𝕏',lsKey:'tcplants_grok_key',getKey:()=>localStorage.getItem('tcplants_grok_key')||'',getLink:'https://console.x.ai/'},
+};
+let _aiModel=localStorage.getItem('tcplants_ai_model')||'claude';
+(()=>{
+  const sel=document.getElementById('ai-model-sel');
+  if(sel) sel.value=_aiModel;
+})();
+function _onAIModelChange(m){
+  _aiModel=m;
+  localStorage.setItem('tcplants_ai_model',m);
+  const mi=AI_MODELS[m]||AI_MODELS.claude;
+  const title=document.getElementById('ai-title-label');
+  if(title) title.textContent=`${mi.icon} ${mi.name} AI`;
+  const lnk=document.getElementById('ai-key-link');
+  if(lnk) lnk.href=mi.getLink;
+  document.getElementById('ai-key-input').value='';
+  document.getElementById('ai-key-row').style.display='none';
+}
+function _toggleAIKeyRow(){
+  const row=document.getElementById('ai-key-row');
+  const showing=row.style.display==='flex';
+  row.style.display=showing?'none':'flex';
+  if(!showing){
+    const lnk=document.getElementById('ai-key-link');
+    const mi=AI_MODELS[_aiModel]||AI_MODELS.claude;
+    if(lnk) lnk.href=mi.getLink;
+    document.getElementById('ai-key-input').placeholder=`Paste ${mi.name} API key…`;
+  }
+}
+function _saveCurrentModelKey(){
   const k=document.getElementById('ai-key-input').value.trim();
-  if(!k){toast('Paste your API key first','fail');return;}
-  localStorage.setItem('tcplants_gemini_key',k);
+  if(!k){toast('Paste an API key first','fail');return;}
+  const mi=AI_MODELS[_aiModel]||AI_MODELS.claude;
+  localStorage.setItem(mi.lsKey,k);
   document.getElementById('ai-key-row').style.display='none';
   document.getElementById('ai-key-input').value='';
-  toast('Gemini API key saved ✓');
+  toast(`${mi.name} API key saved ✓`);
 }
+function _setModelKey(model,inputId){
+  const k=document.getElementById(inputId)?.value.trim();
+  if(!k){toast('Paste an API key first','fail');return;}
+  const mi=AI_MODELS[model];
+  if(mi) localStorage.setItem(mi.lsKey,k);
+  toast(`${mi?.name||model} key saved ✓`);
+}
+// Legacy compat
+const _getGeminiKey=()=>localStorage.getItem('tcplants_gemini_key')||'';
+function _saveGeminiKey(){ _saveCurrentModelKey(); }
+function _setGeminiKey(){ _setModelKey('gemini','set-gemini-key'); }
 function _initAIKeyHint(){
-  if(!_getGeminiKey()){
+  const mi=AI_MODELS[_aiModel]||AI_MODELS.claude;
+  if(!mi.getKey()){
     const msg=document.getElementById('ai-msgs');
-    msg.innerHTML='<div class="ai-msg ai">👋 To use the AI assistant, tap ⚙️ above and paste your free Gemini API key. Get one at <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--ac)">aistudio.google.com</a> — it\'s free with a Google account.</div>';
+    if(msg) msg.innerHTML=`<div class="ai-msg ai">👋 No ${mi.name} API key set. Tap ⚙️ above to add one, or switch model in the dropdown.</div>`;
     document.getElementById('ai-key-row').style.display='flex';
   }
 }
@@ -6005,34 +6203,52 @@ async function askAI(prompt){
   const panel=document.getElementById('ai-panel');
   panel.classList.add('on');
   const msgs=document.getElementById('ai-msgs');
-  // Append user message
   msgs.innerHTML+=`<div class="ai-msg user">${esc(prompt)}</div>`;
   const thinking=document.createElement('div');
   thinking.className='ai-msg thinking'; thinking.textContent='Thinking…';
-  msgs.appendChild(thinking);
-  msgs.scrollTop=msgs.scrollHeight;
-  // Build rich context
+  msgs.appendChild(thinking); msgs.scrollTop=msgs.scrollHeight;
   const context=await _buildAIContext();
-  if(!_getGeminiKey()){
+  const mi=AI_MODELS[_aiModel]||AI_MODELS.claude;
+  const key=mi.getKey();
+  if(!key){
     thinking.remove();
-    msgs.innerHTML+='<div class="ai-msg ai">⚙️ No API key set. Tap ⚙️ above to add your Gemini key.</div>';
+    msgs.innerHTML+=`<div class="ai-msg ai">⚙️ No ${mi.name} API key set. Tap ⚙️ above to add one.</div>`;
     document.getElementById('ai-key-row').style.display='flex';
     return;
   }
+  const fullPrompt=GEMINI_SYS+context+'\n\nUser question: '+prompt;
   try{
-    const r=await fetch(_getGeminiURL(),{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        contents:[{role:'user',parts:[{text:GEMINI_SYS+context+'\n\nUser question: '+prompt}]}]
-      })
-    });
-    if(!r.ok){
-      if(r.status===429) throw new Error('Rate limit hit (429). Your key may be over quota — try again in a minute, or check your Google AI Studio limits.');
-      throw new Error('Gemini API error '+r.status);
+    let text='';
+    if(_aiModel==='claude'){
+      const r=await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+        body:JSON.stringify({model:'claude-opus-4-5',max_tokens:1024,messages:[{role:'user',content:fullPrompt}]})
+      });
+      if(!r.ok) throw new Error(`Claude API error ${r.status}`);
+      const d=await r.json(); text=d.content?.[0]?.text||'No response.';
+    } else if(_aiModel==='gemini'){
+      const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({contents:[{role:'user',parts:[{text:fullPrompt}]}]})
+      });
+      if(!r.ok){if(r.status===429) throw new Error('Gemini rate limit (429). Try again in a minute.'); throw new Error('Gemini error '+r.status);}
+      const d=await r.json(); text=d.candidates?.[0]?.content?.parts?.[0]?.text||'No response.';
+    } else if(_aiModel==='gpt'){
+      const r=await fetch('https://api.openai.com/v1/chat/completions',{
+        method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+        body:JSON.stringify({model:'gpt-4o',messages:[{role:'user',content:fullPrompt}],max_tokens:1024})
+      });
+      if(!r.ok) throw new Error(`OpenAI error ${r.status}`);
+      const d=await r.json(); text=d.choices?.[0]?.message?.content||'No response.';
+    } else if(_aiModel==='grok'){
+      const r=await fetch('https://api.x.ai/v1/chat/completions',{
+        method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+        body:JSON.stringify({model:'grok-3',messages:[{role:'user',content:fullPrompt}],max_tokens:1024})
+      });
+      if(!r.ok) throw new Error(`Grok error ${r.status}`);
+      const d=await r.json(); text=d.choices?.[0]?.message?.content||'No response.';
     }
-    const data=await r.json();
-    const text=data.candidates?.[0]?.content?.parts?.[0]?.text||'No response.';
     thinking.remove();
     msgs.innerHTML+=`<div class="ai-msg ai">${esc(text).replace(/\n/g,'<br>')}</div>`;
   }catch(e){
