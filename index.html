@@ -3466,7 +3466,12 @@ main > .dview, main > .editor{ margin:0 auto; }
           <button class="btn xs ghost" onclick="_testTelegram()">Test 🔔</button>
           <button class="btn xs" style="background:var(--gn);color:#0d1117;flex:1" onclick="_configureTelegramBot()">⚙️ Configure Bot</button>
         </div>
-        <div style="margin-top:8px;font-size:11px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">⚙️ Configure Bot</strong> sets all commands, the 🌿 menu button (opens the app inside Telegram), and the bot description — one tap, everything done.</div>
+        <div style="margin-top:8px;font-size:11px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">⚙️ Configure Bot</strong> sets all commands, the 🌿 menu button, and bot description — one tap.</div>
+      </div>
+      <div class="set-row set-row-full" style="margin-top:4px;background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.25);border-radius:8px;padding:10px">
+        <div class="set-row-label" style="color:var(--gn)">🔗 Link Telegram (one-time setup)</div>
+        <div class="set-row-sub" style="margin-bottom:8px">Sends your passphrase to Telegram CloudStorage so the bot app never asks you to log in again. Do this once from the web app while you're already logged in.</div>
+        <button class="btn sm green" style="width:100%" onclick="_twaLinkSetup()">🔗 Link Now — Open Bot in Telegram</button>
       </div>
       <div class="set-row">
         <div class="set-row-info">
@@ -10492,6 +10497,9 @@ const _twaStartParam=(()=>{
   return new URLSearchParams(location.search).get('go')||'';
 })();
 
+// Check if start param contains link credentials (one-time setup)
+const _twaLinkParam=_twaStartParam.startsWith('link_')?_twaStartParam.slice(5):'';
+
 // ── Init on page load ──────────────────────────────────────
 (function _twaBoot(){
   if(!_isTWA) return;
@@ -10501,7 +10509,24 @@ const _twaStartParam=(()=>{
   if(TG?.colorScheme==='light') document.documentElement.dataset.theme='light';
   // Show the TWA overlay immediately (hides the normal login)
   document.getElementById('twa-overlay')?.classList.add('on');
-  // Try CloudStorage auto-login
+  // One-time link setup: credentials passed via deeplink from main app
+  if(_twaLinkParam){
+    try{
+      const decoded=JSON.parse(atob(_twaLinkParam));
+      if(decoded.pw&&decoded.tok){
+        // Store to CloudStorage immediately
+        if(TG?.CloudStorage){
+          TG.CloudStorage.setItems({tcplants_pw:decoded.pw,tcplants_tok:decoded.tok},()=>{
+            _twaAutoLogin(decoded.pw,decoded.tok);
+          });
+        } else {
+          _twaAutoLogin(decoded.pw,decoded.tok);
+        }
+        return;
+      }
+    }catch(e){ /* fall through to normal auth */ }
+  }
+  // Normal: try CloudStorage auto-login
   if(TG?.CloudStorage){
     TG.CloudStorage.getItems(['tcplants_pw','tcplants_tok'],(err,vals)=>{
       if(!err&&vals.tcplants_pw&&vals.tcplants_tok){
@@ -10511,11 +10536,7 @@ const _twaStartParam=(()=>{
       }
     });
   } else {
-    // Fallback — try localStorage (desktop Telegram)
-    const pw=sessionStorage.getItem('twa_cached_pw');
-    const tok=localStorage.getItem('tcplants_tok_cached');
-    if(pw&&tok) _twaAutoLogin(pw,tok);
-    else _twaShowLogin();
+    _twaShowLogin();
   }
 })();
 
@@ -10738,6 +10759,18 @@ async function _twaSyncDashboard(){
 function _twaOpenFull(){
   // Open the full PWA (non-TWA) in a browser
   TG?.openLink?.(location.href.replace('?twa=1',''));
+}
+
+// ── One-time link setup: pass credentials to TWA via deeplink ─
+function _twaLinkSetup(){
+  if(!S.pw||!S.tok){toast('Log in to TC Plants first','fail');return;}
+  // Encode passphrase and token as base64 in the start param
+  // This opens t.me/notestcp1bot?start=ENCODED_CREDS which the TWA reads
+  // and immediately stores to CloudStorage — after that no login ever needed
+  const payload=btoa(JSON.stringify({pw:S.pw,tok:S.tok})).replace(/=/g,'');
+  const deeplink=`https://t.me/notestcp1bot?start=link_${payload}`;
+  window.open(deeplink,'_blank');
+  toast('Opening Telegram… tap Start, then Open Lab to complete setup','ok',5000);
 }
 
 // ── Bot auto-configure ─────────────────────────────────────
