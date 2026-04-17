@@ -541,8 +541,12 @@ main > .dview, main > .editor{ margin:0 auto; }
 .set-head{padding:12px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px;flex-shrink:0;height:48px}
 .set-head h3{flex:1;font-size:15px;font-weight:700}
 .set-body{flex:1;overflow-y:auto;padding:0}
-.set-section{padding:14px 16px;border-bottom:1px solid var(--bd)}
-.set-section-title{font-size:10px;font-weight:700;color:var(--mu);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+.set-section{border-bottom:1px solid var(--bd)}
+.set-section-title{font-size:10px;font-weight:700;color:var(--mu);letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;user-select:none}
+.set-section-title::after{content:'▾';font-size:12px;opacity:.5;transition:transform .2s}
+.set-section.collapsed .set-section-title::after{transform:rotate(-90deg)}
+.set-section-body{padding:0 16px 14px}
+.set-section.collapsed .set-section-body{display:none}
 .set-row{display:flex;align-items:center;gap:10px;padding:6px 0}
 .set-row-info{flex:1}
 .set-row-label{font-size:13px;font-weight:500}
@@ -2889,9 +2893,14 @@ main > .dview, main > .editor{ margin:0 auto; }
         <p>Enable <strong>Scan Enhancement</strong> in ⚙️ Settings. When active, contrast and brightness sliders appear during scanning — drag to boost image clarity. Enable <strong>Try Harder Mode</strong> for a slower but more thorough decoder pass.</p>
       </div>
 
-      <h2 id="h-ai">◇ Claude AI Assistant</h2>
+      <h2 id="h-ai">⚡ AI Assistant</h2>
       <div class="help-section-card">
-        <p>Tap <strong>✦</strong> (bottom-right, above the Quick Log FAB) to open the assistant powered by Claude (Anthropic). Add your API key once in ⚙️ Settings — it is encrypted and synced to your GitHub repo so it loads automatically on any device.</p>
+        <p>Tap <strong>✦</strong> (bottom-right) to open the AI assistant. Two models available — tap the model badge in the panel header to switch:</p>
+        <table><tr><th>Model</th><th>When to use</th></tr>
+          <tr><td>⚡ Groq (default)</td><td>Everyday queries — free, fast, no billing. Runs Llama 3.1 8B. Get a free key at console.groq.com</td></tr>
+          <tr><td>◇ Claude (optional)</td><td>Complex multi-part questions needing deeper reasoning. Requires Anthropic key.</td></tr>
+        </table>
+        <p>Both keys are encrypted with your passphrase and stored in your GitHub repo — enter once, auto-loads on any device after login.</p>
         <h3>Context Automatically Sent</h3>
         <table><tr><th>Context</th><th>Detail</th></tr>
           <tr><td>Open note</td><td>Title, type, stage, species, date, full decrypted body</td></tr>
@@ -2980,7 +2989,7 @@ main > .dview, main > .editor{ margin:0 auto; }
           <tr><td>Theme</td><td>Dark / Light mode toggle</td></tr>
           <tr><td>Lab Name</td><td>Shown in the dashboard header and Vanakkam greeting</td></tr>
           <tr><td>Weather Location</td><td>City name for the weather widget</td></tr>
-          <tr><td>AI Key</td><td>Claude (Anthropic) — paste your API key in Settings → AI Assistant. Get a free key at console.anthropic.com.</td></tr>
+          <tr><td>AI Keys</td><td>Groq (free default) + Claude (optional). Both encrypted in GitHub — enter once, auto-loads on any device.</td></tr>
           <tr><td>Telegram Bot Token</td><td>From @BotFather. Required for alert notifications.</td></tr>
           <tr><td>Telegram Chat ID</td><td>Your personal or group chat ID. Use @userinfobot to find yours.</td></tr>
           <tr><td>Alert on overdue review</td><td>Fires on each login if bottles or GH plants have past-due dates</td></tr>
@@ -3270,16 +3279,16 @@ main > .dview, main > .editor{ margin:0 auto; }
 <button id="ai-btn" title="Ask AI assistant">✦</button>
 <div id="ai-panel">
   <div id="ai-head">
-    <div class="ai-title" id="ai-title-label">✦ Lab AI</div>
-    <span style="font-size:12px;font-weight:700;color:var(--mu);padding:0 4px">◇ Claude</span>
+    <div class="ai-title" id="ai-title-label">⚡ Lab AI</div>
+    <button class="al-hbtn" id="ai-model-toggle" onclick="_toggleAIModel()" title="Switch model" style="font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px;background:var(--sf2);border:1px solid var(--bd)">⚡ Groq</button>
     <button class="al-hbtn" onclick="_toggleAIKeyRow()" title="API key">⚙️</button>
     <button class="al-hbtn" onclick="_toggleAIMaximise()" id="ai-max-btn" title="Expand">⛶</button>
     <button class="al-hbtn" onclick="document.getElementById('ai-panel').classList.remove('on')" title="Close">✕</button>
   </div>
   <div id="ai-key-row" style="display:none;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid var(--bd);background:var(--sf2)">
-    <input type="password" id="ai-key-input" placeholder="API key for selected model…" style="flex:1;font-size:12px;padding:5px 8px">
+    <input type="password" id="ai-key-input" placeholder="Paste key…" style="flex:1;font-size:12px;padding:5px 8px">
     <button class="btn xs green" onclick="_saveCurrentModelKey()">Save</button>
-    <a id="ai-key-link" href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
+    <a id="ai-key-link" href="https://console.groq.com" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
   </div>
   <div id="ai-chips" style="padding:8px 12px;display:flex;flex-wrap:wrap;gap:5px;border-bottom:1px solid var(--bd);flex-shrink:0">
     <button class="ai-chip" onclick="askAI('Summarise this note in 3-5 bullet points, highlighting key observations, results, and recommended next steps.')">Summarise note</button>
@@ -3374,138 +3383,154 @@ main > .dview, main > .editor{ margin:0 auto; }
   </div>
   <div class="set-body">
     <div class="set-section">
-      <div class="set-section-title">Appearance</div>
-      <div class="set-row">
-        <div class="set-row-info">
-          <div class="set-row-label">Theme</div>
-          <div class="set-row-sub">Dark or light mode</div>
+      <div class="set-section-title" onclick="_toggleSetSection(this)">Appearance</div>
+      <div class="set-section-body">
+        <div class="set-row">
+          <div class="set-row-info">
+            <div class="set-row-label">Theme</div>
+            <div class="set-row-sub">Dark or light mode</div>
+          </div>
+          <button class="btn xs ghost" id="set-theme-btn" onclick="_setToggleTheme()">☀️ Light</button>
         </div>
-        <button class="btn xs ghost" id="set-theme-btn" onclick="_setToggleTheme()">☀️ Light</button>
       </div>
     </div>
     <div class="set-section">
-      <div class="set-section-title">Lab Identity</div>
-      <div class="set-row set-row-full">
-        <div class="set-row-label">Lab Name</div>
-        <div class="set-row-sub">Shown on dashboard header</div>
-        <input type="text" id="set-lab-name" placeholder="e.g. PhytoLabs TC Room 1" style="margin-top:6px">
-        <button class="btn xs ghost" onclick="_setLabName()" style="margin-top:6px;width:100%">Save Lab Name</button>
+      <div class="set-section-title" onclick="_toggleSetSection(this)">Lab Identity</div>
+      <div class="set-section-body">
+        <div class="set-row set-row-full">
+          <div class="set-row-label">Lab Name</div>
+          <div class="set-row-sub">Shown on dashboard header</div>
+          <input type="text" id="set-lab-name" placeholder="e.g. PhytoLabs TC Room 1" style="margin-top:6px">
+          <button class="btn xs ghost" onclick="_setLabName()" style="margin-top:6px;width:100%">Save Lab Name</button>
+        </div>
       </div>
     </div>
     <div class="set-section">
-      <div class="set-section-title">AI Assistant</div>
-      <!-- Compact single card: dropdown + per-model enable + key input -->
-      <div style="background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:8px">
-        <!-- Model selector row -->
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-          <span style="font-size:12px;font-weight:700;color:var(--mu);white-space:nowrap">Active model</span>
-          <span style="font-size:12px;font-weight:700;color:var(--tx)">◇ Claude (Anthropic)</span>
+      <div class="set-section-title" onclick="_toggleSetSection(this)">AI Assistant</div>
+      <div class="set-section-body">
+        <!-- Groq key -->
+        <div style="background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:10px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span style="font-size:13px;font-weight:700">⚡ Groq</span>
+            <span style="font-size:10px;background:var(--gn);color:#0d1117;padding:1px 7px;border-radius:8px;font-weight:700">Default · Free</span>
+          </div>
+          <div style="font-size:11px;color:var(--mu);margin-bottom:6px;line-height:1.5">Runs Llama 3.1 8B — free tier, no billing. Get key at <a href="https://console.groq.com" target="_blank" rel="noopener" style="color:var(--ac)">console.groq.com</a> → API Keys</div>
+          <input type="password" id="set-groq-key-input" placeholder="Paste Groq key (gsk_…)" style="width:100%;margin-bottom:6px">
+          <div style="display:flex;gap:6px">
+            <button class="btn xs ghost" onclick="_setGroqKeyFromSettings()" style="flex:1">💾 Save Key</button>
+            <a href="https://console.groq.com" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
+          </div>
         </div>
-        <!-- Claude always on indicator -->
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-          <span style="font-size:12px;flex:1">◇ Claude</span>
-          <span style="font-size:10px;background:var(--ac);color:#0d1117;padding:1px 6px;border-radius:8px;font-weight:700">Always On</span>
+        <!-- Claude key -->
+        <div style="background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:12px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span style="font-size:13px;font-weight:700">◇ Claude</span>
+            <span style="font-size:10px;background:var(--pu);color:#fff;padding:1px 7px;border-radius:8px;font-weight:700">High Quality · Optional</span>
+          </div>
+          <div style="font-size:11px;color:var(--mu);margin-bottom:6px;line-height:1.5">Anthropic Claude — for complex queries. Get key at <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener" style="color:var(--ac)">console.anthropic.com</a></div>
+          <input type="password" id="set-ai-key-input" placeholder="Paste Claude key (sk-ant-…)" style="width:100%;margin-bottom:6px">
+          <div style="display:flex;gap:6px">
+            <button class="btn xs ghost" onclick="_setAIKeyFromSettings()" style="flex:1">💾 Save Key</button>
+            <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
+          </div>
         </div>
-        <!-- Claude API key input -->
-        <div style="font-size:11px;font-weight:700;color:var(--mu);margin-bottom:4px">Claude API Key</div>
-        <div style="font-size:11px;color:var(--mu);margin-bottom:6px;line-height:1.5">Get your free key at <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener" style="color:var(--ac)">console.anthropic.com</a> → sign up → API Keys → Create Key</div>
-        <input type="password" id="set-ai-key-input" placeholder="Paste Claude API key (sk-ant-…)" style="width:100%;margin-bottom:6px">
-        <div style="display:flex;gap:6px">
-          <button class="btn xs ghost" onclick="_setAIKeyFromSettings()" style="flex:1">💾 Save Key</button>
-          <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
-        </div>
-        <input type="hidden" id="set-claude-key">
       </div>
     </div>
-    <div class="set-section">
-      <div class="set-section-title">Telegram Alerts</div>
-      <div class="set-row set-row-full">
-        <div class="set-row-label">Bot Token</div>
-        <div class="set-row-sub">Create a bot via @BotFather on Telegram</div>
-        <input type="password" id="set-tg-token" placeholder="123456:ABC-DEF1234ghIkl..." style="margin-top:6px">
-      </div>
-      <div class="set-row set-row-full">
-        <div class="set-row-label">Chat ID</div>
-        <div class="set-row-sub">Your chat/group ID — use @userinfobot to find it</div>
-        <input type="text" id="set-tg-chatid" placeholder="-1001234567890" style="margin-top:6px">
-        <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
-          <button class="btn xs ghost" onclick="_saveTelegramSettings()" style="flex:1">Save</button>
-          <button class="btn xs ghost" onclick="_testTelegram()">Test 🔔</button>
-          <button class="btn xs" style="background:var(--gn);color:#0d1117;flex:1" onclick="_configureTelegramBot()">⚙️ Configure Bot</button>
+    <div class="set-section collapsed">
+      <div class="set-section-title" onclick="_toggleSetSection(this)">Telegram Alerts</div>
+      <div class="set-section-body">
+        <div class="set-row set-row-full">
+          <div class="set-row-label">Bot Token</div>
+          <div class="set-row-sub">Create a bot via @BotFather on Telegram</div>
+          <input type="password" id="set-tg-token" placeholder="123456:ABC-DEF1234ghIkl..." style="margin-top:6px">
         </div>
-        <div style="margin-top:8px;font-size:11px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">⚙️ Configure Bot</strong> sets all commands, the 🌿 menu button, and bot description — one tap.</div>
-      </div>
-      <div class="set-row set-row-full" style="margin-top:4px;background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.25);border-radius:8px;padding:10px">
-        <div class="set-row-label" style="color:var(--gn)">🔗 Link Telegram (one-time setup)</div>
-        <div class="set-row-sub" style="margin-bottom:8px">Sends your passphrase to Telegram CloudStorage so the bot app never asks you to log in again. Do this once from the web app while you're already logged in.</div>
-        <button class="btn sm green" style="width:100%" onclick="_twaLinkSetup()">🔗 Link Now — Open Bot in Telegram</button>
-      </div>
-      <div class="set-row">
-        <div class="set-row-info">
-          <div class="set-row-label">Alert on overdue review</div>
-          <div class="set-row-sub">Fires once per session on login if items are overdue</div>
+        <div class="set-row set-row-full">
+          <div class="set-row-label">Chat ID</div>
+          <div class="set-row-sub">Your chat/group ID — use @userinfobot to find it</div>
+          <input type="text" id="set-tg-chatid" placeholder="-1001234567890" style="margin-top:6px">
+          <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
+            <button class="btn xs ghost" onclick="_saveTelegramSettings()" style="flex:1">Save</button>
+            <button class="btn xs ghost" onclick="_testTelegram()">Test 🔔</button>
+            <button class="btn xs" style="background:var(--gn);color:#0d1117;flex:1" onclick="_configureTelegramBot()">⚙️ Configure Bot</button>
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">⚙️ Configure Bot</strong> sets all commands, the 🌿 menu button, and bot description — one tap.</div>
         </div>
-        <label class="toggle-switch">
-          <input type="checkbox" id="set-tg-overdue" onchange="localStorage.setItem('tcplants_tg_overdue',this.checked?'1':'0')">
-          <div class="toggle-track"></div>
-        </label>
-      </div>
-      <div class="set-row">
-        <div class="set-row-info">
-          <div class="set-row-label">Alert on contamination log</div>
-          <div class="set-row-sub">Fires when you save a Contamination Log entry</div>
+        <div class="set-row set-row-full" style="margin-top:4px;background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.25);border-radius:8px;padding:10px">
+          <div class="set-row-label" style="color:var(--gn)">🔗 Link Telegram (one-time setup)</div>
+          <div class="set-row-sub" style="margin-bottom:8px">Sends your passphrase to Telegram CloudStorage so the bot app never asks you to log in again. Do this once from the web app while you're already logged in.</div>
+          <button class="btn sm green" style="width:100%" onclick="_twaLinkSetup()">🔗 Link Now — Open Bot in Telegram</button>
         </div>
-        <label class="toggle-switch">
-          <input type="checkbox" id="set-tg-contam" onchange="localStorage.setItem('tcplants_tg_contam',this.checked?'1':'0')">
-          <div class="toggle-track"></div>
-        </label>
+        <div class="set-row">
+          <div class="set-row-info">
+            <div class="set-row-label">Alert on overdue review</div>
+            <div class="set-row-sub">Fires once per session on login if items are overdue</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="set-tg-overdue" onchange="localStorage.setItem('tcplants_tg_overdue',this.checked?'1':'0')">
+            <div class="toggle-track"></div>
+          </label>
+        </div>
+        <div class="set-row">
+          <div class="set-row-info">
+            <div class="set-row-label">Alert on contamination log</div>
+            <div class="set-row-sub">Fires when you save a Contamination Log entry</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="set-tg-contam" onchange="localStorage.setItem('tcplants_tg_contam',this.checked?'1':'0')">
+            <div class="toggle-track"></div>
+          </label>
+        </div>
       </div>
     </div>
-    <div class="set-section">
-      <div class="set-section-title">Camera &amp; QR</div>
-      <div class="set-row">
-        <div class="set-row-info">
-          <div class="set-row-label">Scan Enhancement</div>
-          <div class="set-row-sub">Boost contrast for low-light QR scans</div>
+    <div class="set-section collapsed">
+      <div class="set-section-title" onclick="_toggleSetSection(this)">Camera &amp; QR</div>
+      <div class="set-section-body">
+        <div class="set-row">
+          <div class="set-row-info">
+            <div class="set-row-label">Scan Enhancement</div>
+            <div class="set-row-sub">Boost contrast for low-light QR scans</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="set-qr-enhance" onchange="_setScanEnhance(this.checked)">
+            <div class="toggle-track"></div>
+          </label>
         </div>
-        <label class="toggle-switch">
-          <input type="checkbox" id="set-qr-enhance" onchange="_setScanEnhance(this.checked)">
-          <div class="toggle-track"></div>
-        </label>
-      </div>
-      <div class="set-row">
-        <div class="set-row-info">
-          <div class="set-row-label">Try Harder Mode</div>
-          <div class="set-row-sub">Slower but more thorough QR detection</div>
+        <div class="set-row">
+          <div class="set-row-info">
+            <div class="set-row-label">Try Harder Mode</div>
+            <div class="set-row-sub">Slower but more thorough QR detection</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="set-qr-harder" onchange="_setScanHarder(this.checked)">
+            <div class="toggle-track"></div>
+          </label>
         </div>
-        <label class="toggle-switch">
-          <input type="checkbox" id="set-qr-harder" onchange="_setScanHarder(this.checked)">
-          <div class="toggle-track"></div>
-        </label>
       </div>
     </div>
-    <div class="set-section">
-      <div class="set-section-title">Data &amp; Privacy</div>
-      <div class="set-row">
-        <div class="set-row-info">
-          <div class="set-row-label">Clear Local Cache</div>
-          <div class="set-row-sub">Force reload from GitHub on next login</div>
+    <div class="set-section collapsed">
+      <div class="set-section-title" onclick="_toggleSetSection(this)">Data &amp; Privacy</div>
+      <div class="set-section-body">
+        <div class="set-row">
+          <div class="set-row-info">
+            <div class="set-row-label">Clear Local Cache</div>
+            <div class="set-row-sub">Force reload from GitHub on next login</div>
+          </div>
+          <button class="btn xs ghost" onclick="_clearCache()">Clear</button>
         </div>
-        <button class="btn xs ghost" onclick="_clearCache()">Clear</button>
-      </div>
-      <div class="set-row">
-        <div class="set-row-info">
-          <div class="set-row-label">Forget Trusted Device</div>
-          <div class="set-row-sub">Remove saved encrypted token</div>
+        <div class="set-row">
+          <div class="set-row-info">
+            <div class="set-row-label">Forget Trusted Device</div>
+            <div class="set-row-sub">Remove saved encrypted token</div>
+          </div>
+          <button class="btn xs danger" onclick="forgetDevice()">Forget</button>
         </div>
-        <button class="btn xs danger" onclick="forgetDevice()">Forget</button>
-      </div>
-      <div class="set-row">
-        <div class="set-row-info">
-          <div class="set-row-label">Reset Usage Stats</div>
-          <div class="set-row-sub">Clear feature usage metrics</div>
+        <div class="set-row">
+          <div class="set-row-info">
+            <div class="set-row-label">Reset Usage Stats</div>
+            <div class="set-row-sub">Clear feature usage metrics</div>
+          </div>
+          <button class="btn xs ghost" onclick="_resetUsageStats()">Reset</button>
         </div>
-        <button class="btn xs ghost" onclick="_resetUsageStats()">Reset</button>
       </div>
     </div>
     <div class="set-about">
@@ -3669,13 +3694,16 @@ async function loadEncryptedKeys(){
     if(!f) return;
     _keysSha=f.sha;
     const obj=JSON.parse(await dec(ghDec(f.content)));
-    if(obj.claudeKey){ localStorage.setItem('tcplants_claude_key',obj.claudeKey); }
+    if(obj.claudeKey) localStorage.setItem('tcplants_claude_key',obj.claudeKey);
+    if(obj.groqKey)   localStorage.setItem('tcplants_groq_key',obj.groqKey);
   }catch(e){ console.warn('keys.enc load failed:',e.message); }
 }
 async function saveEncryptedKeys(){
-  const obj={claudeKey:localStorage.getItem('tcplants_claude_key')||''};
+  const obj={
+    claudeKey: localStorage.getItem('tcplants_claude_key')||'',
+    groqKey:   localStorage.getItem('tcplants_groq_key')||''
+  };
   await ghPut(KEYS_F, await enc(JSON.stringify(obj)), _keysSha, 'lab: update api keys');
-  // refresh sha for next save
   const f=await ghGet(KEYS_F); if(f) _keysSha=f.sha;
 }
 
@@ -6407,10 +6435,30 @@ RULES YOU MUST FOLLOW AT ALL TIMES:
 8. Never make up unpublished protocols — flag if information is from general extrapolation.`;
 
 const AI_MODELS={
-  claude:{name:'Claude',icon:'◇',lsKey:'tcplants_claude_key',getKey:()=>localStorage.getItem('tcplants_claude_key')||'',getLink:'https://console.anthropic.com/settings/keys'},
+  groq:  {name:'Groq',  icon:'⚡', lsKey:'tcplants_groq_key',  getKey:()=>localStorage.getItem('tcplants_groq_key')||'',  getLink:'https://console.groq.com'},
+  claude:{name:'Claude',icon:'◇', lsKey:'tcplants_claude_key',getKey:()=>localStorage.getItem('tcplants_claude_key')||'',getLink:'https://console.anthropic.com/settings/keys'},
 };
-const _getAIEnabled=m=>m==='claude';
-let _aiModel='claude';
+let _aiModel=localStorage.getItem('tcplants_ai_model')||'groq';
+function _toggleAIModel(){
+  _aiModel=_aiModel==='groq'?'claude':'groq';
+  localStorage.setItem('tcplants_ai_model',_aiModel);
+  const mi=AI_MODELS[_aiModel];
+  const btn=document.getElementById('ai-model-toggle');
+  const title=document.getElementById('ai-title-label');
+  const lnk=document.getElementById('ai-key-link');
+  if(btn) btn.textContent=mi.icon+' '+mi.name;
+  if(title) title.textContent=mi.icon+' Lab AI';
+  if(lnk) lnk.href=mi.getLink;
+  document.getElementById('ai-key-input').placeholder='Paste '+mi.name+' key…';
+  document.getElementById('ai-key-row').style.display='none';
+}
+(()=>{
+  const mi=AI_MODELS[_aiModel]||AI_MODELS.groq;
+  const btn=document.getElementById('ai-model-toggle');
+  const title=document.getElementById('ai-title-label');
+  if(btn) btn.textContent=mi.icon+' '+mi.name;
+  if(title) title.textContent=mi.icon+' Lab AI';
+})();
 function _toggleAIKeyRow(){
   const row=document.getElementById('ai-key-row');
   const showing=row.style.display==='flex';
@@ -6425,16 +6473,13 @@ function _toggleAIKeyRow(){
 async function _saveCurrentModelKey(){
   const k=document.getElementById('ai-key-input').value.trim();
   if(!k){toast('Paste an API key first','fail');return;}
-  localStorage.setItem('tcplants_claude_key',k);
+  const mi=AI_MODELS[_aiModel]||AI_MODELS.groq;
+  localStorage.setItem(mi.lsKey,k);
   document.getElementById('ai-key-row').style.display='none';
   document.getElementById('ai-key-input').value='';
-  toast('Saving key to encrypted vault…');
-  try{
-    await saveEncryptedKeys();
-    toast('Claude key saved & encrypted in GitHub ✓');
-  }catch(e){
-    toast('Key saved locally — GitHub sync failed: '+e.message,'fail');
-  }
+  toast('Saving to encrypted vault…');
+  try{ await saveEncryptedKeys(); toast(mi.name+' key saved & encrypted ✓'); }
+  catch(e){ toast('Saved locally — sync failed: '+e.message,'fail'); }
 }
 function _setModelKey(model,inputId){
   const k=document.getElementById(inputId)?.value.trim();
@@ -6444,18 +6489,23 @@ function _setModelKey(model,inputId){
   toast(`${mi?.name||model} key saved ✓`);
 }
 // ── AI settings panel helpers ─────────────────────────────────
+async function _setGroqKeyFromSettings(){
+  const k=document.getElementById('set-groq-key-input')?.value.trim();
+  if(!k){toast('Paste Groq key first','fail');return;}
+  localStorage.setItem('tcplants_groq_key',k);
+  document.getElementById('set-groq-key-input').value='';
+  toast('Saving to encrypted vault…');
+  try{ await saveEncryptedKeys(); toast('Groq key saved & encrypted ✓'); }
+  catch(e){ toast('Saved locally — sync failed: '+e.message,'fail'); }
+}
 async function _setAIKeyFromSettings(){
   const k=document.getElementById('set-ai-key-input')?.value.trim();
-  if(!k){toast('Paste an API key first','fail');return;}
+  if(!k){toast('Paste Claude key first','fail');return;}
   localStorage.setItem('tcplants_claude_key',k);
   document.getElementById('set-ai-key-input').value='';
-  toast('Saving key to encrypted vault…');
-  try{
-    await saveEncryptedKeys();
-    toast('Claude key saved & encrypted in GitHub ✓');
-  }catch(e){
-    toast('Key saved locally — GitHub sync failed: '+e.message,'fail');
-  }
+  toast('Saving to encrypted vault…');
+  try{ await saveEncryptedKeys(); toast('Claude key saved & encrypted ✓'); }
+  catch(e){ toast('Saved locally — sync failed: '+e.message,'fail'); }
 }
 // Sync settings panel dropdown with active model on open
 function _syncAISettingsPanel(){
@@ -6472,12 +6522,20 @@ function _toggleAIMaximise(){
   if(btn) btn.title=_aiMaximised?'Restore':'Expand', btn.textContent=_aiMaximised?'⊡':'⛶';
 }
 function _initAIKeyHint(){
-  const mi=AI_MODELS[_aiModel]||AI_MODELS.claude;
+  const mi=AI_MODELS[_aiModel]||AI_MODELS.groq;
   if(!mi.getKey()){
     const msg=document.getElementById('ai-msgs');
-    if(msg) msg.innerHTML=`<div class="ai-msg ai">👋 No Claude API key set. Tap ⚙️ above to add one. Get a free key at <strong>console.anthropic.com</strong> → API Keys.</div>`;
+    const hint=_aiModel==='groq'
+      ?'👋 No Groq key set. Tap ⚙️ above or go to Settings → AI Assistant. Free key at <strong>console.groq.com</strong>'
+      :'👋 No Claude key set. Tap ⚙️ above or go to Settings → AI Assistant.';
+    if(msg) msg.innerHTML=`<div class="ai-msg ai">${hint}</div>`;
+    const lnk=document.getElementById('ai-key-link');
+    if(lnk) lnk.href=mi.getLink;
     document.getElementById('ai-key-row').style.display='flex';
   }
+}
+function _toggleSetSection(titleEl){
+  titleEl.closest('.set-section').classList.toggle('collapsed');
 }
 
 async function _buildAIContext(){
@@ -6582,13 +6640,24 @@ async function askAI(prompt){
   }
   const fullPrompt=AI_RULEBOOK+'\n\n---\n## Lab Data Context'+context+'\n\n---\nUser question: '+prompt;
   try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-opus-4-5',max_tokens:1024,messages:[{role:'user',content:fullPrompt}]})
-    });
-    if(!r.ok) throw new Error(`Claude API error ${r.status}`);
-    const d=await r.json(); let text=d.content?.[0]?.text||'No response.';
+    let text='';
+    if(_aiModel==='claude'){
+      const r=await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+        body:JSON.stringify({model:'claude-opus-4-5',max_tokens:1024,messages:[{role:'user',content:fullPrompt}]})
+      });
+      if(!r.ok) throw new Error(`Claude error ${r.status}`);
+      const d=await r.json(); text=d.content?.[0]?.text||'No response.';
+    } else {
+      const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+        body:JSON.stringify({model:'llama-3.1-8b-instant',max_tokens:1024,messages:[{role:'user',content:fullPrompt}]})
+      });
+      if(!r.ok) throw new Error(`Groq error ${r.status}`);
+      const d=await r.json(); text=d.choices?.[0]?.message?.content||'No response.';
+    }
     thinking.remove();
     msgs.innerHTML+=`<div class="ai-msg ai">${esc(text).replace(/\n/g,'<br>')}</div>`;
   }catch(e){
