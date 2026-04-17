@@ -5990,7 +5990,7 @@ async function saveNoteAction(){
     _clearDraft();
     updateReminderBadge();
     toast('Saved ✓ — committed to GitHub');
-    renderNoteList(); await openNote(S.cur);
+    renderNoteList(); await openNote(S.cur); closeNavDrawer();
   }catch(e){toast('Save failed: '+e.message,'fail');}
   document.getElementById('save-note-btn').disabled=false;
   unload();
@@ -6342,7 +6342,7 @@ async function saveAccession(){
     _writeCache();
     S.curAcc=data.id;
     toast('Accession saved ✓');
-    renderAccList(); openAccession(data.id);
+    renderAccList(); openAccession(data.id); closeNavDrawer();
   }catch(e){toast('Save failed: '+e.message,'fail');}
   document.getElementById('save-acc-btn').disabled=false;
   unload();
@@ -7059,7 +7059,7 @@ async function saveGHPlantAction(){
       S.greenhouse[idx]={...prev,species:sp,quantity,health,source,location,date_added,next_inspection,accession_id,notes,condition_log,quantity_log,updated_at:now};
       S.greenhouseSha=await saveGreenhouse(S.greenhouse,S.greenhouseSha);
       S.curGH=S.editingGH; S.editingGH=null;
-      renderGHList(); openGHPlant(S.curGH);
+      renderGHList(); openGHPlant(S.curGH); closeNavDrawer();
       toast(`🌱 ${sp} updated`);
     } else {
       const plant={
@@ -7070,7 +7070,7 @@ async function saveGHPlantAction(){
       };
       S.greenhouse=[...(S.greenhouse||[]),plant];
       S.greenhouseSha=await saveGreenhouse(S.greenhouse,S.greenhouseSha);
-      S.curGH=plant.id; renderGHList(); openGHPlant(S.curGH);
+      S.curGH=plant.id; renderGHList(); openGHPlant(S.curGH); closeNavDrawer();
       toast(`🌱 ${sp} added to greenhouse`);
     }
     _writeCache(); updateReminderBadge();
@@ -7553,7 +7553,7 @@ async function saveBottleAction(){
       newBots=S.bottles;
       S.bottlesSha=await saveBottles(newBots, S.bottlesSha);
       S.curBot=S.editingBot; S.editingBot=null;
-      renderBottleList(); openBottle(S.curBot);
+      renderBottleList(); openBottle(S.curBot); closeNavDrawer();
     } else {
       // Create new
       const qty=(S._botMode==='batch')?(parseInt(document.getElementById('bot-qty').value)||1):1;
@@ -7567,7 +7567,7 @@ async function saveBottleAction(){
       S.bottles=newBots;
       S.bottlesSha=await saveBottles(newBots, S.bottlesSha);
       S.curBot=newBottles[0].id;
-      renderBottleList(); openBottle(S.curBot);
+      renderBottleList(); openBottle(S.curBot); closeNavDrawer();
     }
     toast(S.editingBot===null?`🫙 Bottle${base.species?' for '+base.species:''} saved`:'Saved','ok');
   } catch(e){ toast('Save failed: '+e.message,'fail'); }
@@ -7802,7 +7802,7 @@ async function saveRecipe(){
     _writeCache();
     S.curRec=data.id;
     toast('Recipe saved ✓');
-    renderRecList(); openRecipe(data.id);
+    renderRecList(); openRecipe(data.id); closeNavDrawer();
   }catch(e){toast('Save failed: '+e.message,'fail');}
   document.getElementById('save-rec-btn').disabled=false;
   unload();
