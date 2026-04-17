@@ -7147,69 +7147,63 @@ function _parseVoiceCommand(text){
   return null;
 }
 
-// ── Native STT ───────────────────────────────────────────────
-let _nativeSR=null, _nativePending='';
+// ── Native STT ── simple, reliable, no continuous mode ────────
+let _nativeSR=null, _nativePending='', _nativeDoneCallback=null;
 function _startNativeSTT(isWake, onDone){
   if(!('SpeechRecognition' in window||'webkitSpeechRecognition' in window)){
-    toast('Speech recognition not supported in this browser','fail');
+    toast('Speech recognition not supported — use Whisper mode','fail');
     if(onDone) onDone(); return;
   }
+  if(_nativeSR){ try{_nativeSR.abort();}catch{} _nativeSR=null; }
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   _nativeSR=new SR();
-  _nativeSR.lang='en-IN';
-  _nativeSR.continuous=true;      // stay open until we explicitly stop
-  _nativeSR.interimResults=true;  // so we get interim feedback
+  _nativeSR.lang='en-US';
+  _nativeSR.continuous=false;
+  _nativeSR.interimResults=false;
   _nativeSR.maxAlternatives=1;
+  _nativeDoneCallback=onDone||null;
   _setMicBtnState('listening');
+  // Show hint in textarea
+  const inp=document.getElementById('ai-input');
+  const prevPH=inp.placeholder;
+  inp.placeholder='Listening… speak now';
   _nativeSR.onresult=e=>{
-    // grab the latest final result only
-    const results=Array.from(e.results);
-    const final=results.filter(r=>r.isFinal);
-    if(!final.length) return; // still interim, keep listening
-    const transcript=final[final.length-1][0].transcript.trim();
-    if(!transcript) return;
-    try{ _nativeSR.stop(); }catch{} _nativeSR=null;
+    inp.placeholder=prevPH;
+    const transcript=e.results[0][0].transcript.trim();
+    if(!transcript){ _setMicBtnState('idle'); return; }
     _nativePending=transcript;
-    _nativeDoneCallback=onDone||null;
     _setMicBtnState('idle');
-    _dumpVoiceTranscript(transcript); // save to local dump
+    _dumpVoiceTranscript(transcript);
     const c=_voiceCfg();
-    if(c.confirm){
+    if(c.confirm!==false){
       document.getElementById('vc-heard-text').textContent=transcript;
       document.getElementById('ai-voice-confirm').classList.add('on');
       document.getElementById('ai-panel').classList.add('on');
-      if(c.cmdConfirm){
-        _ttsSpeak(`I heard: ${transcript}. Say send or re-listen.`);
-        _startConfirmListener();
-      } else {
-        _ttsSpeak(`I heard: ${transcript}`);
-      }
     } else {
       _voiceExecute(transcript);
-      if(onDone) onDone();
+      const cb=_nativeDoneCallback; _nativeDoneCallback=null; if(cb) cb();
     }
   };
   _nativeSR.onerror=e=>{
-    _setMicBtnState('idle');
-    if(e.error!=='aborted') toast('Mic error: '+e.error,'fail');
-    if(onDone) onDone();
-  };
-  _nativeSR.onend=()=>{
+    inp.placeholder=prevPH;
     _setMicBtnState('idle');
     _nativeSR=null;
+    if(e.error==='no-speech') toast('No speech detected — tap mic and speak','fail');
+    else if(e.error!=='aborted') toast('Mic: '+e.error,'fail');
+    const cb=_nativeDoneCallback; _nativeDoneCallback=null; if(cb) cb();
   };
+  _nativeSR.onend=()=>{ inp.placeholder=prevPH; _setMicBtnState('idle'); _nativeSR=null; };
   _nativeSR.start();
 }
-let _nativeDoneCallback=null;
 let _confirmSR=null;
 function _startConfirmListener(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR) return;
-  _confirmSR=new SR(); _confirmSR.lang='en-IN'; _confirmSR.interimResults=false;
+  _confirmSR=new SR(); _confirmSR.lang='en-US'; _confirmSR.interimResults=false;
   _confirmSR.onresult=e=>{
     const t=e.results[0][0].transcript.trim().toLowerCase();
-    if(t.includes('send')||t.includes('yes')||t.includes('go')){ _voiceConfirmSend(); }
-    else if(t.includes('listen')||t.includes('again')||t.includes('no')||t.includes('retry')){ _voiceRetry(); }
+    if(t.includes('send')||t.includes('yes')||t.includes('go')) _voiceConfirmSend();
+    else if(t.includes('listen')||t.includes('again')||t.includes('no')||t.includes('retry')) _voiceRetry();
   };
   _confirmSR.onerror=()=>{};
   _confirmSR.start();
@@ -7220,63 +7214,63 @@ function _voiceConfirmSend(){
   document.getElementById('ai-voice-confirm').classList.remove('on');
   const t=_nativePending; _nativePending='';
   const cb=_nativeDoneCallback; _nativeDoneCallback=null;
-  _voiceExecute(t);
-  if(cb) cb();
+  _voiceExecute(t); if(cb) cb();
 }
 function _voiceRetry(){
   _ttsStop();
   if(_confirmSR){ try{_confirmSR.stop();}catch{} _confirmSR=null; }
   document.getElementById('ai-voice-confirm').classList.remove('on');
   _nativePending='';
-  // keep _nativeDoneCallback, will be passed to new session
   const cb=_nativeDoneCallback; _nativeDoneCallback=null;
   _startNativeSTT(false, cb);
 }
 
-// ── Whisper STT ───────────────────────────────────────────────
-let _whisperRec=null, _whisperChunks=[], _whisperSilenceTimer=null, _whisperAnalyser=null, _whisperCtx=null;
+// ── Whisper STT ── tap to start, tap to stop, manual control ──
+let _whisperRec=null, _whisperChunks=[], _whisperAnalyser=null, _whisperCtx=null, _whisperStream=null;
 async function _startWhisperSTT(){
   const c=_voiceCfg();
   const constraints={audio:{noiseSuppression:c.noise??true,echoCancellation:c.echo??true,autoGainControl:c.agc??true}};
-  let stream;
-  try{ stream=await navigator.mediaDevices.getUserMedia(constraints); }
+  try{ _whisperStream=await navigator.mediaDevices.getUserMedia(constraints); }
   catch(e){ toast('Mic access denied','fail'); return; }
   _whisperChunks=[];
-  _whisperRec=new MediaRecorder(stream,{mimeType:MediaRecorder.isTypeSupported('audio/webm')?'audio/webm':'audio/ogg'});
-  _whisperRec.ondataavailable=e=>{ if(e.data.size>0) _whisperChunks.push(e.data); };
+  const mime=MediaRecorder.isTypeSupported('audio/webm;codecs=opus')?'audio/webm;codecs=opus':
+              MediaRecorder.isTypeSupported('audio/webm')?'audio/webm':'audio/ogg';
+  _whisperRec=new MediaRecorder(_whisperStream,{mimeType:mime});
+  _whisperRec.ondataavailable=e=>{ if(e.data&&e.data.size>0) _whisperChunks.push(e.data); };
   _whisperRec.onstop=async()=>{
-    stream.getTracks().forEach(t=>t.stop());
-    _setMicBtnState('idle');
+    _whisperStream.getTracks().forEach(t=>t.stop());
+    if(_whisperCtx){ try{_whisperCtx.close();}catch{} _whisperCtx=null; }
+    if(!_whisperChunks.length){ _setMicBtnState('idle'); return; }
     _setMicBtnState('processing');
-    const blob=new Blob(_whisperChunks,{type:_whisperRec.mimeType});
+    const blob=new Blob(_whisperChunks,{type:mime});
+    // Minimum size check — if blob is tiny it's just silence, skip API call
+    if(blob.size<5000){ toast('Too short — nothing recorded','fail'); _setMicBtnState('idle'); return; }
     await _transcribeWhisper(blob);
     _setMicBtnState('idle');
   };
-  _whisperRec.start(100);
+  _whisperRec.start(250);
   _setMicBtnState('listening');
-  // Silence detection via AnalyserNode
-  const gate=c.gate??10;
-  const silenceSec=c.whisperSilence||2;
+  // Optional silence auto-stop — only after 3.5s grace AND actual speech detected
+  const gate=(c.gate??10)+20; // higher threshold = real speech only
+  const silenceSec=c.whisperSilence||3;
   _whisperCtx=new AudioContext();
   _whisperAnalyser=_whisperCtx.createAnalyser();
   _whisperAnalyser.fftSize=512;
-  _whisperCtx.createMediaStreamSource(stream).connect(_whisperAnalyser);
+  _whisperCtx.createMediaStreamSource(_whisperStream).connect(_whisperAnalyser);
   const buf=new Uint8Array(_whisperAnalyser.frequencyBinCount);
-  let silenceStart=null;
-  let hasSpeech=false; // don't stop until user has actually spoken
-  const graceEnd=Date.now()+3500; // 3.5s grace — don't check silence at all on start
+  let silenceStart=null, hasSpeech=false;
+  const graceEnd=Date.now()+3500;
   const checkSilence=()=>{
     if(!_whisperRec||_whisperRec.state!=='recording') return;
     _whisperAnalyser.getByteFrequencyData(buf);
     const avg=buf.reduce((a,b)=>a+b,0)/buf.length;
-    if(Date.now()<graceEnd){ requestAnimationFrame(checkSilence); return; } // grace period
-    if(avg>gate+5) hasSpeech=true; // user has spoken
-    if(avg<gate+5){
-      if(hasSpeech){ // only start silence timer after actual speech detected
-        if(!silenceStart) silenceStart=Date.now();
+    if(Date.now()<graceEnd){ requestAnimationFrame(checkSilence); return; }
+    if(avg>gate) hasSpeech=true;
+    if(hasSpeech){
+      if(avg<gate){ if(!silenceStart) silenceStart=Date.now();
         else if(Date.now()-silenceStart>silenceSec*1000){ _stopWhisperSTT(); return; }
-      }
-    } else { silenceStart=null; }
+      } else silenceStart=null;
+    }
     requestAnimationFrame(checkSilence);
   };
   requestAnimationFrame(checkSilence);
