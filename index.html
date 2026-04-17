@@ -803,15 +803,39 @@ main > .dview, main > .editor{ margin:0 auto; }
 .tl-title:hover{text-decoration:underline}
 .tl-badges{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
 /* ── QUICK LOG FAB ── */
-#ql-fab{
-  position:fixed;bottom:24px;right:24px;z-index:150;
-  width:48px;height:48px;border-radius:50%;
-  background:var(--ac);border:none;color:#0d1117;
-  font-size:24px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.3);
-  display:none;align-items:center;justify-content:center;transition:opacity .15s
+/* ── LAB FOOTER BAR ── */
+#lab-footer-bar{
+  position:fixed;bottom:20px;right:16px;z-index:160;
+  display:none;align-items:center;gap:6px;
+  background:var(--sf);border:1px solid var(--bd);
+  border-radius:30px;padding:6px 10px;
+  box-shadow:0 4px 20px rgba(0,0,0,.35);
 }
-#ql-fab.on{display:flex}
-#ql-fab:hover{opacity:.88}
+#lab-footer-bar.on{display:flex}
+.lfb-btn{
+  width:38px;height:38px;border-radius:50%;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;transition:opacity .15s;flex-shrink:0;
+}
+.lfb-btn:hover{opacity:.8}
+#lfb-mic{background:var(--sf2);color:var(--tx);border:1px solid var(--bd)}
+#lfb-mic.listening{background:var(--rd);color:#fff;animation:pulse-mic 1s infinite}
+#lfb-mic.processing{background:var(--yw);color:#0d1117}
+#lfb-model{background:transparent;border:1px solid var(--bd);color:var(--mu);font-size:10px;font-weight:700;border-radius:14px;width:auto;padding:0 8px;white-space:nowrap}
+#lfb-ai{background:linear-gradient(135deg,#4285f4,#8250df);color:#fff}
+#lfb-ql{background:var(--ac);color:#0d1117}
+@keyframes pulse-mic{0%,100%{box-shadow:0 0 0 0 rgba(248,81,73,.5)}50%{box-shadow:0 0 0 8px rgba(248,81,73,0)}}
+/* wake-word armed indicator */
+#wake-indicator{
+  position:fixed;bottom:70px;right:20px;z-index:159;
+  display:none;align-items:center;gap:5px;
+  background:var(--sf);border:1px solid var(--bd);border-radius:12px;
+  padding:3px 9px;font-size:10px;color:var(--mu);
+}
+#wake-indicator.on{display:flex}
+#wake-indicator::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--rd);animation:pulse-mic .8s infinite}
+
+#ql-fab{display:none} /* replaced by footer bar */
 #ql-modal{
   position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.6);
   display:none;align-items:center;justify-content:center
@@ -1073,16 +1097,7 @@ main > .dview, main > .editor{ margin:0 auto; }
 /* dash widget columns */
 .dash-cols{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
 .dash-col{display:flex;flex-direction:column;gap:10px;flex:1;min-width:260px}
-#ai-btn{
-  position:fixed;bottom:80px;right:24px;z-index:155;
-  width:44px;height:44px;border-radius:50%;
-  background:linear-gradient(135deg,#4285f4,#8250df);
-  border:none;color:#fff;font-size:20px;cursor:pointer;
-  box-shadow:0 4px 16px rgba(0,0,0,.3);display:none;
-  align-items:center;justify-content:center;transition:opacity .15s
-}
-#ai-btn.on{display:flex}
-#ai-btn:hover{opacity:.88}
+#ai-btn{display:none} /* replaced by footer bar */
 #ai-panel{
   position:fixed;bottom:80px;right:14px;z-index:200;
   width:400px;max-width:calc(100vw - 28px);
@@ -1104,7 +1119,21 @@ main > .dview, main > .editor{ margin:0 auto; }
 }
 #ai-head{padding:10px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px;flex-shrink:0}
 #ai-head .ai-title{flex:1;font-weight:700;font-size:13px;background:linear-gradient(135deg,#4285f4,#8250df);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+#ai-tab-bar{display:flex;border-bottom:1px solid var(--bd);flex-shrink:0}
+.ai-tab{flex:1;padding:7px;font-size:11px;font-weight:700;color:var(--mu);background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.ai-tab.active{color:var(--ac);border-bottom-color:var(--ac)}
 #ai-msgs{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
+#ai-voice-log{flex:1;overflow-y:auto;padding:12px 14px;display:none;flex-direction:column;gap:8px}
+.vl-entry{border:1px solid var(--bd);border-radius:8px;padding:8px 10px;font-size:12px}
+.vl-entry .vl-ts{font-size:10px;color:var(--mu);margin-bottom:4px}
+.vl-entry .vl-transcript{color:var(--tx);font-weight:500}
+.vl-entry .vl-cmd{font-size:10px;color:var(--gn);margin-top:2px}
+.vl-entry .vl-err{font-size:10px;color:var(--rd);margin-top:2px}
+/* voice confirm overlay inside panel */
+#ai-voice-confirm{display:none;flex-direction:column;align-items:center;gap:10px;padding:16px;border-bottom:1px solid var(--bd);background:var(--sf2);flex-shrink:0;text-align:center}
+#ai-voice-confirm.on{display:flex}
+#ai-voice-confirm .vc-heard{font-size:13px;font-style:italic;color:var(--tx);padding:8px 12px;background:var(--sf);border-radius:8px;width:100%;box-sizing:border-box}
+#ai-voice-confirm .vc-btns{display:flex;gap:8px;width:100%}
 .ai-msg{padding:9px 13px;border-radius:10px;font-size:13px;line-height:1.65;max-width:88%;word-break:break-word}
 /* widget tray — always visible when active, also persistent tools status */
 #tools-status-bar{position:fixed;bottom:0;left:0;right:0;height:0;z-index:150;pointer-events:none}
@@ -2894,33 +2923,57 @@ main > .dview, main > .editor{ margin:0 auto; }
         <p>Enable <strong>Scan Enhancement</strong> in ⚙️ Settings. When active, contrast and brightness sliders appear during scanning — drag to boost image clarity. Enable <strong>Try Harder Mode</strong> for a slower but more thorough decoder pass.</p>
       </div>
 
-      <h2 id="h-ai">⚡ AI Assistant</h2>
+      <h2 id="h-ai">⚡ AI &amp; Voice</h2>
       <div class="help-section-card">
-        <p>Tap <strong>✦</strong> (bottom-right) to open the AI assistant. Two models available — tap the model badge in the panel header to switch:</p>
-        <table><tr><th>Model</th><th>When to use</th></tr>
-          <tr><td>⚡ Groq (default)</td><td>Everyday queries — free, no billing. Runs Llama 3.1 70B. Get a free key at console.groq.com</td></tr>
-          <tr><td>◇ Claude (optional)</td><td>Complex multi-part questions needing deeper reasoning. Requires Anthropic key.</td></tr>
+        <h3>Lab Footer Bar</h3>
+        <p>Fixed bottom-right bar visible after login — all AI and voice controls in one place:</p>
+        <table><tr><th>Button</th><th>Action</th></tr>
+          <tr><td>🎤</td><td>Voice input — tap to start, tap again to stop. Pulses red while listening, yellow while processing.</td></tr>
+          <tr><td>Model badge</td><td>Tap to cycle: ⚡ Quick → 🔬 Deep → ◇ Claude</td></tr>
+          <tr><td>✦</td><td>Open / close AI chat panel</td></tr>
+          <tr><td>＋</td><td>Quick log (fast note)</td></tr>
         </table>
-        <p>Both keys are encrypted with your passphrase and stored in your GitHub repo — enter once, auto-loads on any device after login.</p>
-        <h3>Context Automatically Sent</h3>
-        <table><tr><th>Context</th><th>Detail</th></tr>
-          <tr><td>Open note</td><td>Title, type, stage, species, date, full decrypted body</td></tr>
-          <tr><td>Linked recipe</td><td>Base medium, PGRs, pH, sucrose, agar</td></tr>
-          <tr><td>Accession record</td><td>Status, source, origin for the note's species</td></tr>
-          <tr><td>Species summary</td><td>Top 10 species — stage distribution, contam rate, avg cultures per transfer</td></tr>
+        <h3>AI Models</h3>
+        <table><tr><th>Model</th><th>Use for</th></tr>
+          <tr><td>⚡ Quick — Llama 3.1 8B</td><td>Voice chat, simple questions. Default for all voice input. Free, fast.</td></tr>
+          <tr><td>🔬 Deep — Llama 3.3 70B</td><td>Complex protocols, multi-species analysis, detailed troubleshooting.</td></tr>
+          <tr><td>◇ Claude</td><td>Hardest reasoning, undescribed species, nuanced protocol design.</td></tr>
         </table>
-        <h3>Pre-Built Chips</h3>
-        <table><tr><th>Chip</th><th>What it asks</th></tr>
-          <tr><td>Summarise note</td><td>Bullet-point summary of the open note body</td></tr>
-          <tr><td>PGR advice</td><td>Growth regulator recommendations based on species + media context</td></tr>
-          <tr><td>Contam analysis</td><td>Likely contamination causes and prevention steps</td></tr>
-          <tr><td>Lab overview</td><td>Status summary across all species in culture</td></tr>
+        <p>All keys encrypted with your passphrase and stored in GitHub — enter once, auto-loads on any device.</p>
+        <h3>AI Panel Tabs</h3>
+        <table><tr><th>Tab</th><th>Shows</th></tr>
+          <tr><td>💬 Chat</td><td>Text conversation, quick-action chips, send field</td></tr>
+          <tr><td>🎤 Voice</td><td>All voice session transcripts with timestamps — accumulates even when panel is closed</td></tr>
         </table>
-        <p>Press <span class="kbd">Enter</span> to send free-text questions. The assistant has full context of your lab data for every question.</p>
-        <h3>📚 PubMed Species Context (automatic)</h3>
-        <p>When a note with a species set is open, the assistant automatically fetches the 3 most recent PubMed papers on <em>"[species] tissue culture"</em> and injects their abstracts (up to 600 chars each) into the context. This gives the AI literature-backed, species-specific knowledge without any extra steps from you.</p>
-        <h3>Hardwired Rulebook</h3>
-        <p>The AI is bound by an 8-rule system prompt baked into the app (not user-editable): TC-only scope, tropical climate context (Kelambakkam, Tamil Nadu), always cite mg/L and µM, use literature-based ranges only, never fabricate protocols. This ensures consistent, safe lab advice.</p>
+        <h3>Voice Input Modes</h3>
+        <table><tr><th>Mode</th><th>How it works</th></tr>
+          <tr><td>Native (Chrome)</td><td>Browser STT → reads transcript back → confirm by saying "send"/"re-listen" or tap buttons</td></tr>
+          <tr><td>Whisper (Groq)</td><td>Records audio → silence auto-detects stop → Groq Whisper transcribes → auto-sends. Better accuracy for species names and scientific terms.</td></tr>
+        </table>
+        <h3>Voice Commands (no AI call, instant)</h3>
+        <table><tr><th>Say</th><th>Does</th></tr>
+          <tr><td>"home" / "dashboard"</td><td>Navigate to dashboard</td></tr>
+          <tr><td>"notes" / "bottles" / "greenhouse" / "recipes" / "registry" / "reminders" / "analytics"</td><td>Navigate to that section</td></tr>
+          <tr><td>"settings"</td><td>Open settings panel</td></tr>
+          <tr><td>"open scanner" / "scan QR"</td><td>Open QR scanner</td></tr>
+          <tr><td>"sidebar" / "menu"</td><td>Open navigation drawer</td></tr>
+          <tr><td>"read protocol 2" / "read recipe 3"</td><td>TTS reads that numbered recipe aloud</td></tr>
+          <tr><td>"what's overdue"</td><td>TTS reads overdue notes and bottles</td></tr>
+          <tr><td>"how many bottles"</td><td>TTS reads bottle count and active count</td></tr>
+          <tr><td>"latest note" / "read last note"</td><td>TTS reads most recent note</td></tr>
+          <tr><td>"switch to deep" / "switch to Claude" / "switch to quick"</td><td>Change AI model</td></tr>
+          <tr><td>"whisper mode" / "native mode"</td><td>Switch STT mode</td></tr>
+          <tr><td>"stop reading" / "stop"</td><td>Stop TTS mid-sentence</td></tr>
+          <tr><td>"close"</td><td>Close AI panel</td></tr>
+        </table>
+        <h3>Wake Word</h3>
+        <p><strong>"Hey Lab"</strong> — say it anywhere in the app to open the AI panel and start a voice session (Native mode only). Enable in Settings → Voice &amp; Lab Mode. A small pulsing indicator appears when armed.</p>
+        <h3>Context &amp; Rulebook</h3>
+        <p>Every AI message includes your open note, linked recipe, accession, and species summary. The AI is bound to TC-only topics, cites mg/L and µM, uses literature ranges only, and never fabricates protocols.</p>
+        <h3>PubMed Auto-Context</h3>
+        <p>When a species note is open, the 3 most recent PubMed abstracts for that species + "tissue culture" are injected automatically.</p>
+        <h3>Voice Settings</h3>
+        <p>Settings → Voice &amp; Lab Mode: STT mode selector, readback confirmation, voice commands, wake word toggle, TTS voice/speed/pitch, noise suppression, echo cancellation, auto-gain control, silence threshold for Whisper auto-stop.</p>
       </div>
 
       <h2 id="h-news">📰 TC Research News</h2>
@@ -3276,6 +3329,15 @@ main > .dview, main > .editor{ margin:0 auto; }
   </div>
 </div>
 
+<!-- ═══════════ LAB FOOTER BAR ═══════════ -->
+<div id="wake-indicator" title="Listening for 'Hey Lab'">Hey Lab</div>
+<div id="lab-footer-bar">
+  <button class="lfb-btn" id="lfb-mic" onclick="_voiceTap()" title="Voice input (tap or say Hey Lab)">🎤</button>
+  <button class="lfb-btn" id="lfb-model" onclick="_cycleAIModel()" title="Cycle AI model">⚡ Quick</button>
+  <button class="lfb-btn" id="lfb-ai" onclick="_toggleAIPanel()" title="AI assistant">✦</button>
+  <button class="lfb-btn" id="lfb-ql" onclick="showQuickLog()" title="Quick log">＋</button>
+</div>
+
 <!-- ═══════════ AI ASSISTANT ═══════════ -->
 <button id="ai-btn" title="Ask AI assistant">✦</button>
 <div id="ai-panel">
@@ -3284,7 +3346,7 @@ main > .dview, main > .editor{ margin:0 auto; }
     <button class="al-hbtn" id="ai-model-toggle" onclick="_cycleAIModel()" title="Tap to cycle: Quick → Deep → Claude" style="font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px;background:var(--sf2);border:1px solid var(--bd)">⚡ Quick</button>
     <button class="al-hbtn" onclick="_toggleAIKeyRow()" title="API key">⚙️</button>
     <button class="al-hbtn" onclick="_toggleAIMaximise()" id="ai-max-btn" title="Expand">⛶</button>
-    <button class="al-hbtn" onclick="document.getElementById('ai-panel').classList.remove('on')" title="Close">✕</button>
+    <button class="al-hbtn" onclick="_closeAIPanel()" title="Close">✕</button>
   </div>
   <div id="ai-key-row" style="display:none;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid var(--bd);background:var(--sf2)">
     <input type="password" id="ai-key-input" placeholder="Paste key…" style="flex:1;font-size:12px;padding:5px 8px">
@@ -3292,6 +3354,22 @@ main > .dview, main > .editor{ margin:0 auto; }
     <a id="ai-key-link" href="https://console.groq.com" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
   </div>
   <div id="ai-usage-bar" style="padding:6px 12px;border-bottom:1px solid var(--bd);background:var(--sf2);flex-shrink:0"></div>
+  <!-- Tab bar: Chat / Voice -->
+  <div id="ai-tab-bar">
+    <button class="ai-tab active" id="ai-tab-chat" onclick="_switchAITab('chat')">💬 Chat</button>
+    <button class="ai-tab" id="ai-tab-voice" onclick="_switchAITab('voice')">🎤 Voice</button>
+  </div>
+  <!-- Voice confirm overlay (native mode only) -->
+  <div id="ai-voice-confirm">
+    <div style="font-size:11px;color:var(--mu)">I heard:</div>
+    <div class="vc-heard" id="vc-heard-text"></div>
+    <div class="vc-btns">
+      <button class="btn xs ghost" style="flex:1" onclick="_voiceRetry()">↺ Re-listen</button>
+      <button class="btn xs green" style="flex:1" onclick="_voiceConfirmSend()">✓ Send</button>
+    </div>
+    <div style="font-size:10px;color:var(--mu)">Say "send" or "re-listen"</div>
+  </div>
+  <!-- Chat tab -->
   <div id="ai-chips" style="padding:8px 12px;display:flex;flex-wrap:wrap;gap:5px;border-bottom:1px solid var(--bd);flex-shrink:0">
     <button class="ai-chip" onclick="askAI('Summarise this note in 3-5 bullet points, highlighting key observations, results, and recommended next steps.')">Summarise note</button>
     <button class="ai-chip" onclick="askAI('Based on the species, stage, and media shown in context, what PGR concentrations and media modifications would you recommend? Cite typical ranges from literature.')">PGR advice</button>
@@ -3301,6 +3379,8 @@ main > .dview, main > .editor{ margin:0 auto; }
     <button class="ai-chip" onclick="askAI('Based on my bottle records and subculture history, what is the estimated multiplication rate and what should I optimise next?')">Multiplication rate</button>
   </div>
   <div id="ai-msgs"><div class="ai-msg ai">Hello! I can help with TC protocols, species info, PGR doses, contamination, and note summaries. What would you like to know?</div></div>
+  <!-- Voice log tab -->
+  <div id="ai-voice-log"></div>
   <div id="ai-input-row" style="padding:10px 12px;border-top:1px solid var(--bd);display:flex;gap:8px;flex-shrink:0;align-items:flex-end">
     <textarea id="ai-input" placeholder="Ask anything about TC, media, PGRs, sterilisation…" rows="2" style="flex:1;font-size:13px;padding:8px 11px;resize:none;min-height:40px;max-height:120px;overflow-y:auto;line-height:1.5"></textarea>
     <button class="btn" id="ai-send-btn" style="height:40px;padding:0 16px;flex-shrink:0">→</button>
@@ -3475,6 +3555,128 @@ main > .dview, main > .editor{ margin:0 auto; }
       </div>
     </div>
     END FROZEN: Telegram Alerts -->
+    <div class="set-section collapsed">
+      <div class="set-section-title" onclick="_toggleSetSection(this)">Voice &amp; Lab Mode</div>
+      <div class="set-section-body">
+        <!-- STT Mode -->
+        <div style="font-size:11px;font-weight:700;color:var(--mu);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">Input</div>
+        <div class="set-row">
+          <div class="set-row-info">
+            <div class="set-row-label">STT Mode</div>
+            <div class="set-row-sub">Native = Chrome built-in · Whisper = Groq (accurate)</div>
+          </div>
+          <div style="display:flex;gap:4px">
+            <button id="set-stt-native" class="btn xs ghost" onclick="_setSTTMode('native')" style="font-size:11px">Native</button>
+            <button id="set-stt-whisper" class="btn xs ghost" onclick="_setSTTMode('whisper')" style="font-size:11px">Whisper</button>
+          </div>
+        </div>
+        <!-- Native-only settings -->
+        <div id="set-voice-native-opts">
+          <div class="set-row">
+            <div class="set-row-info">
+              <div class="set-row-label">Confirm before send</div>
+              <div class="set-row-sub">TTS reads transcript back, wait for "send" / "re-listen"</div>
+            </div>
+            <label class="toggle-switch"><input type="checkbox" id="set-voice-confirm" onchange="_saveVoiceSettings()" checked><div class="toggle-track"></div></label>
+          </div>
+          <div class="set-row">
+            <div class="set-row-info">
+              <div class="set-row-label">Voice confirm commands</div>
+              <div class="set-row-sub">Say "send" / "re-listen" to confirm (else tap buttons)</div>
+            </div>
+            <label class="toggle-switch"><input type="checkbox" id="set-voice-cmd-confirm" onchange="_saveVoiceSettings()" checked><div class="toggle-track"></div></label>
+          </div>
+          <div class="set-row">
+            <div class="set-row-info">
+              <div class="set-row-label">Wake word "Hey Lab" <span style="font-size:9px;background:var(--yw);color:#0d1117;padding:1px 5px;border-radius:6px;margin-left:4px">Experimental</span></div>
+              <div class="set-row-sub">Activates voice from anywhere in the app</div>
+            </div>
+            <label class="toggle-switch"><input type="checkbox" id="set-voice-wake" onchange="_saveVoiceSettings()"><div class="toggle-track"></div></label>
+          </div>
+        </div>
+        <!-- Whisper-only settings -->
+        <div id="set-voice-whisper-opts" style="display:none">
+          <div class="set-row">
+            <div class="set-row-info">
+              <div class="set-row-label">Auto-send after transcription</div>
+              <div class="set-row-sub">Sends immediately, no review step</div>
+            </div>
+            <label class="toggle-switch"><input type="checkbox" id="set-whisper-autosend" onchange="_saveVoiceSettings()" checked><div class="toggle-track"></div></label>
+          </div>
+          <div class="set-row set-row-full">
+            <div class="set-row-label">Silence threshold</div>
+            <div class="set-row-sub">Seconds of silence before auto-stop recording</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+              <input type="range" min="1" max="4" step="0.5" value="2" id="set-whisper-silence" oninput="this.nextElementSibling.textContent=this.value+'s';_saveVoiceSettings()" style="flex:1">
+              <span style="font-size:12px;color:var(--mu);min-width:24px">2s</span>
+            </div>
+          </div>
+        </div>
+        <!-- Shared: Output -->
+        <div style="font-size:11px;font-weight:700;color:var(--mu);margin:12px 0 8px;text-transform:uppercase;letter-spacing:.06em">Output (TTS)</div>
+        <div class="set-row">
+          <div class="set-row-info">
+            <div class="set-row-label">Read AI replies aloud</div>
+            <div class="set-row-sub">Auto-plays when panel is open</div>
+          </div>
+          <label class="toggle-switch"><input type="checkbox" id="set-voice-tts" onchange="_saveVoiceSettings()"><div class="toggle-track"></div></label>
+        </div>
+        <div class="set-row set-row-full" style="margin-top:4px">
+          <div class="set-row-label">Voice</div>
+          <select id="set-voice-voice" onchange="_saveVoiceSettings()" style="width:100%;margin-top:6px;font-size:12px;padding:5px 8px;background:var(--bg);border:1px solid var(--bd);border-radius:6px;color:var(--tx)">
+            <option value="">System default</option>
+          </select>
+        </div>
+        <div class="set-row set-row-full">
+          <div class="set-row-label">Speed</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+            <span style="font-size:10px;color:var(--mu)">0.8×</span>
+            <input type="range" min="0.8" max="1.6" step="0.1" value="1" id="set-voice-rate" oninput="this.nextElementSibling.textContent=parseFloat(this.value).toFixed(1)+'×';_saveVoiceSettings()" style="flex:1">
+            <span style="font-size:12px;color:var(--mu);min-width:28px">1.0×</span>
+          </div>
+        </div>
+        <div class="set-row set-row-full">
+          <div class="set-row-label">Pitch</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+            <span style="font-size:10px;color:var(--mu)">Low</span>
+            <input type="range" min="0.5" max="1.5" step="0.1" value="1" id="set-voice-pitch" oninput="_saveVoiceSettings()" style="flex:1">
+            <span style="font-size:10px;color:var(--mu)">High</span>
+          </div>
+        </div>
+        <!-- Shared: Noise -->
+        <div style="font-size:11px;font-weight:700;color:var(--mu);margin:12px 0 8px;text-transform:uppercase;letter-spacing:.06em">Noise &amp; Mic</div>
+        <div class="set-row">
+          <div class="set-row-info">
+            <div class="set-row-label">Noise suppression</div>
+            <div class="set-row-sub">Hardware-level via browser (Chrome/Android)</div>
+          </div>
+          <label class="toggle-switch"><input type="checkbox" id="set-voice-noise" onchange="_saveVoiceSettings()" checked><div class="toggle-track"></div></label>
+        </div>
+        <div class="set-row">
+          <div class="set-row-info">
+            <div class="set-row-label">Echo cancellation</div>
+            <div class="set-row-sub">Prevents TTS playback feeding back into mic</div>
+          </div>
+          <label class="toggle-switch"><input type="checkbox" id="set-voice-echo" onchange="_saveVoiceSettings()" checked><div class="toggle-track"></div></label>
+        </div>
+        <div class="set-row">
+          <div class="set-row-info">
+            <div class="set-row-label">Auto gain control</div>
+            <div class="set-row-sub">Normalises mic level in noisy environments</div>
+          </div>
+          <label class="toggle-switch"><input type="checkbox" id="set-voice-agc" onchange="_saveVoiceSettings()" checked><div class="toggle-track"></div></label>
+        </div>
+        <div class="set-row set-row-full">
+          <div class="set-row-label">Noise gate threshold</div>
+          <div class="set-row-sub">Ignore audio below this level (0 = off, higher = quieter sounds ignored)</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+            <span style="font-size:10px;color:var(--mu)">Off</span>
+            <input type="range" min="0" max="40" step="2" value="10" id="set-voice-gate" oninput="this.nextElementSibling.textContent=this.value==0?'Off':this.value;_saveVoiceSettings()" style="flex:1">
+            <span style="font-size:12px;color:var(--mu);min-width:24px">10</span>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="set-section collapsed">
       <div class="set-section-title" onclick="_toggleSetSection(this)">Camera &amp; QR</div>
       <div class="set-section-body">
@@ -6539,9 +6741,11 @@ function _cycleAIModel(){
 function _updateAIModelUI(){
   const mi=AI_MODELS[_aiModel]||AI_MODELS.groq70;
   const btn=document.getElementById('ai-model-toggle');
+  const fab=document.getElementById('lfb-model');
   const title=document.getElementById('ai-title-label');
   const lnk=document.getElementById('ai-key-link');
   if(btn) btn.textContent=mi.icon+' '+mi.label;
+  if(fab) fab.textContent=mi.icon+' '+mi.label;
   if(title) title.textContent=mi.icon+' Lab AI';
   if(lnk) lnk.href=mi.getLink;
   _renderAIUsageBar();
@@ -6764,6 +6968,347 @@ async function askAI(prompt){
     msgs.innerHTML+=`<div class="ai-msg ai" style="color:var(--rd)">Error: ${esc(e.message)}</div>`;
   }
   msgs.scrollTop=msgs.scrollHeight;
+}
+
+// ════════════════════════════════════════════════════════════
+// VOICE SYSTEM
+// ════════════════════════════════════════════════════════════
+const VOICE_KEY='tcplants_voice_settings';
+function _voiceCfg(){
+  try{ return JSON.parse(localStorage.getItem(VOICE_KEY)||'{}'); }catch{ return {}; }
+}
+function _saveVoiceSettings(){
+  const c={
+    mode: document.getElementById('set-stt-whisper')?.classList.contains('active')?'whisper':'native',
+    confirm: document.getElementById('set-voice-confirm')?.checked??true,
+    cmdConfirm: document.getElementById('set-voice-cmd-confirm')?.checked??true,
+    wake: document.getElementById('set-voice-wake')?.checked??false,
+    whisperAutoSend: document.getElementById('set-whisper-autosend')?.checked??true,
+    whisperSilence: parseFloat(document.getElementById('set-whisper-silence')?.value||2),
+    tts: document.getElementById('set-voice-tts')?.checked??false,
+    voice: document.getElementById('set-voice-voice')?.value||'',
+    rate: parseFloat(document.getElementById('set-voice-rate')?.value||1),
+    pitch: parseFloat(document.getElementById('set-voice-pitch')?.value||1),
+    noise: document.getElementById('set-voice-noise')?.checked??true,
+    echo: document.getElementById('set-voice-echo')?.checked??true,
+    agc: document.getElementById('set-voice-agc')?.checked??true,
+    gate: parseInt(document.getElementById('set-voice-gate')?.value||10),
+  };
+  localStorage.setItem(VOICE_KEY,JSON.stringify(c));
+  if(c.wake) _startWakeListener(); else _stopWakeListener();
+}
+function _setSTTMode(m){
+  localStorage.setItem(VOICE_KEY,JSON.stringify({..._voiceCfg(),mode:m}));
+  document.getElementById('set-stt-native')?.classList.toggle('active',m==='native');
+  document.getElementById('set-stt-whisper')?.classList.toggle('active',m==='whisper');
+  document.getElementById('set-stt-native')?.style&&(document.getElementById('set-stt-native').style.borderColor=m==='native'?'var(--ac)':'');
+  document.getElementById('set-stt-whisper')?.style&&(document.getElementById('set-stt-whisper').style.borderColor=m==='whisper'?'var(--ac)':'');
+  document.getElementById('set-voice-native-opts').style.display=m==='native'?'':'none';
+  document.getElementById('set-voice-whisper-opts').style.display=m==='whisper'?'':'none';
+}
+function _initVoiceSettings(){
+  const c=_voiceCfg();
+  _setSTTMode(c.mode||'native');
+  const si=id=>document.getElementById(id);
+  if(si('set-voice-confirm')) si('set-voice-confirm').checked=c.confirm??true;
+  if(si('set-voice-cmd-confirm')) si('set-voice-cmd-confirm').checked=c.cmdConfirm??true;
+  if(si('set-voice-wake')) si('set-voice-wake').checked=c.wake??false;
+  if(si('set-whisper-autosend')) si('set-whisper-autosend').checked=c.whisperAutoSend??true;
+  if(si('set-whisper-silence')){ si('set-whisper-silence').value=c.whisperSilence||2; si('set-whisper-silence').nextElementSibling.textContent=(c.whisperSilence||2)+'s'; }
+  if(si('set-voice-tts')) si('set-voice-tts').checked=c.tts??false;
+  if(si('set-voice-rate')){ si('set-voice-rate').value=c.rate||1; si('set-voice-rate').nextElementSibling.textContent=parseFloat(c.rate||1).toFixed(1)+'×'; }
+  if(si('set-voice-pitch')) si('set-voice-pitch').value=c.pitch||1;
+  if(si('set-voice-gate')){ si('set-voice-gate').value=c.gate??10; si('set-voice-gate').nextElementSibling.textContent=c.gate==0?'Off':(c.gate??10); }
+  if(si('set-voice-noise')) si('set-voice-noise').checked=c.noise??true;
+  if(si('set-voice-echo')) si('set-voice-echo').checked=c.echo??true;
+  if(si('set-voice-agc')) si('set-voice-agc').checked=c.agc??true;
+  // Populate voice list
+  const vSel=si('set-voice-voice');
+  if(vSel&&speechSynthesis){
+    const populate=()=>{
+      const voices=speechSynthesis.getVoices().filter(v=>v.lang.startsWith('en'));
+      vSel.innerHTML='<option value="">System default</option>'+voices.map(v=>`<option value="${v.name}" ${v.name===c.voice?'selected':''}>${v.name}</option>`).join('');
+    };
+    populate();
+    speechSynthesis.onvoiceschanged=populate;
+  }
+  if(c.wake) _startWakeListener();
+}
+
+// ── TTS ───────────────────────────────────────────────────────
+let _ttsUtter=null;
+function _ttsSpeak(text, onEnd){
+  if(!('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  const c=_voiceCfg();
+  const u=new SpeechSynthesisUtterance(text);
+  u.rate=c.rate||1; u.pitch=c.pitch||1;
+  if(c.voice){ const v=speechSynthesis.getVoices().find(x=>x.name===c.voice); if(v) u.voice=v; }
+  if(onEnd) u.onend=onEnd;
+  _ttsUtter=u;
+  speechSynthesis.speak(u);
+}
+function _ttsStop(){ speechSynthesis.cancel(); }
+
+// ── AI panel tab switch ───────────────────────────────────────
+function _switchAITab(tab){
+  const isChat=tab==='chat';
+  document.getElementById('ai-msgs').style.display=isChat?'flex':'none';
+  document.getElementById('ai-voice-log').style.display=isChat?'none':'flex';
+  document.getElementById('ai-chips').style.display=isChat?'flex':'none';
+  document.getElementById('ai-input-row').style.display=isChat?'flex':'none';
+  document.getElementById('ai-tab-chat').classList.toggle('active',isChat);
+  document.getElementById('ai-tab-voice').classList.toggle('active',!isChat);
+}
+function _toggleAIPanel(){
+  const p=document.getElementById('ai-panel');
+  p.classList.toggle('on');
+}
+function _closeAIPanel(){
+  document.getElementById('ai-panel').classList.remove('on');
+}
+
+// ── Voice log ─────────────────────────────────────────────────
+function _voiceLog(transcript, result, isError){
+  const ts=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const log=document.getElementById('ai-voice-log');
+  if(!log) return;
+  const el=document.createElement('div');
+  el.className='vl-entry';
+  el.innerHTML=`<div class="vl-ts">${ts}</div><div class="vl-transcript">${esc(transcript)}</div>${result?`<div class="${isError?'vl-err':'vl-cmd'}">${esc(result)}</div>`:''}`;
+  log.appendChild(el);
+  log.scrollTop=log.scrollHeight;
+  // Badge on Voice tab if panel minimised or on Chat tab
+  const tab=document.getElementById('ai-tab-voice');
+  if(tab&&!tab.classList.contains('active')){
+    tab.textContent='🎤 Voice •';
+    tab.style.color='var(--ac)';
+  }
+}
+
+// ── Command parser ────────────────────────────────────────────
+const _CMD_NAV=[
+  {r:/\b(home|dashboard|go home)\b/,fn:()=>{navTo('notes');showNote('empty');},label:'→ Dashboard'},
+  {r:/\b(open |go to |show )?(notes?)\b/,fn:()=>navTo('notes'),label:'→ Notes'},
+  {r:/\b(open |go to |show )?(bottles?|cultures?)\b/,fn:()=>navTo('bottles'),label:'→ Bottles'},
+  {r:/\b(open |go to |show )?(greenhouse|gh)\b/,fn:()=>navTo('greenhouse'),label:'→ Greenhouse'},
+  {r:/\b(open |go to |show )?(recipes?|protocols?)\b/,fn:()=>navTo('recipes'),label:'→ Recipes'},
+  {r:/\b(open |go to |show )?(registry|accessions?)\b/,fn:()=>navTo('registry'),label:'→ Registry'},
+  {r:/\b(open |go to |show )?(reminders?)\b/,fn:()=>navTo('reminders'),label:'→ Reminders'},
+  {r:/\b(open |go to |show )?(analytics?)\b/,fn:()=>navTo('analytics'),label:'→ Analytics'},
+  {r:/\b(open |go to )?(settings?)\b/,fn:()=>openSettings(),label:'→ Settings'},
+  {r:/\b(open |show )?(scanner|scan qr|qr)\b/,fn:()=>document.querySelector('[onclick*="openQR"]')?.click(),label:'→ QR Scanner'},
+  {r:/\b(open |show )?(sidebar|menu|nav)\b/,fn:()=>document.getElementById('nav-drawer')?.classList.add('open'),label:'→ Sidebar'},
+  {r:/\b(close|go back|dismiss)\b/,fn:()=>{document.getElementById('ai-panel').classList.remove('on');},label:'Close panel'},
+  {r:/\b(stop|stop reading|stop talking)\b/,fn:()=>_ttsStop(),label:'TTS stopped'},
+  {r:/\b(switch to )?(quick|8b|8 b)\b/,fn:()=>{_aiModel='groq8';_updateAIModelUI();},label:'→ Quick mode'},
+  {r:/\b(switch to )?(deep|70b|70 b)\b/,fn:()=>{_aiModel='groq70';_updateAIModelUI();},label:'→ Deep mode'},
+  {r:/\b(switch to )?claude\b/,fn:()=>{_aiModel='claude';_updateAIModelUI();},label:'→ Claude'},
+  {r:/\b(whisper mode)\b/,fn:()=>_setSTTMode('whisper'),label:'→ Whisper mode'},
+  {r:/\b(native mode)\b/,fn:()=>_setSTTMode('native'),label:'→ Native mode'},
+];
+const _CMD_READ=[
+  {r:/\b(what'?s? |show )?(overdue|due)\b/,fn:()=>{
+    const ov=[...S.notes.filter(n=>n.next_review&&daysFrom(n.next_review)<=0),...(S.bottles||[]).filter(b=>b.next_review&&daysFrom(b.next_review)<=0)];
+    return ov.length?`${ov.length} overdue: ${ov.slice(0,3).map(x=>x.title||x.code).join(', ')}`:'Nothing overdue';
+  }},
+  {r:/\bhow many bottles?\b/,fn:()=>`${(S.bottles||[]).length} bottles, ${(S.bottles||[]).filter(b=>['inoculated','growing'].includes(b.status)).length} active`},
+  {r:/\b(latest|last|read) note\b/,fn:()=>{ const n=[...S.notes].sort((a,b)=>new Date(b.date)-new Date(a.date))[0]; return n?`${n.title}: ${(n.body||'').slice(0,120)}`:'No notes yet'; }},
+  {r:/\bread (the )?(\d+)(st|nd|rd|th)? (recipe|protocol)\b/,fn:(m)=>{
+    const i=parseInt(m[2])-1; const r=(S.recs||[])[i];
+    return r?`Recipe ${m[2]}: ${r.name}. Base: ${r.base||'?'}. pH ${r.ph||'?'}. ${r.notes||''}`:`No recipe number ${m[2]}`;
+  }},
+];
+function _parseVoiceCommand(text){
+  const t=text.toLowerCase().trim();
+  for(const c of _CMD_NAV){ if(c.r.test(t)){ c.fn(); return {label:c.label,isNav:true}; } }
+  for(const c of _CMD_READ){
+    const m=t.match(c.r);
+    if(m){ const result=c.fn(m); _ttsSpeak(result); return {label:'Read: '+result.slice(0,40),isNav:true}; }
+  }
+  return null;
+}
+
+// ── Native STT ───────────────────────────────────────────────
+let _nativeSR=null, _nativePending='';
+function _startNativeSTT(isWake){
+  if(!('SpeechRecognition' in window||'webkitSpeechRecognition' in window)){
+    toast('Speech recognition not supported in this browser','fail'); return;
+  }
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  _nativeSR=new SR();
+  _nativeSR.lang='en-IN'; _nativeSR.interimResults=false; _nativeSR.maxAlternatives=1;
+  document.getElementById('lfb-mic').classList.add('listening');
+  _nativeSR.onresult=e=>{
+    const transcript=e.results[0][0].transcript.trim();
+    _nativePending=transcript;
+    document.getElementById('lfb-mic').classList.remove('listening');
+    const c=_voiceCfg();
+    if(c.confirm){
+      // Show confirm overlay
+      document.getElementById('vc-heard-text').textContent=transcript;
+      document.getElementById('ai-voice-confirm').classList.add('on');
+      document.getElementById('ai-panel').classList.add('on');
+      if(c.cmdConfirm){
+        _ttsSpeak(`I heard: ${transcript}. Say send or re-listen.`);
+        _startConfirmListener();
+      } else {
+        _ttsSpeak(`I heard: ${transcript}`);
+      }
+    } else {
+      _voiceExecute(transcript);
+    }
+  };
+  _nativeSR.onerror=e=>{ document.getElementById('lfb-mic').classList.remove('listening'); if(e.error!=='aborted') toast('Mic error: '+e.error,'fail'); };
+  _nativeSR.onend=()=>document.getElementById('lfb-mic').classList.remove('listening');
+  _nativeSR.start();
+}
+let _confirmSR=null;
+function _startConfirmListener(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR) return;
+  _confirmSR=new SR(); _confirmSR.lang='en-IN'; _confirmSR.interimResults=false;
+  _confirmSR.onresult=e=>{
+    const t=e.results[0][0].transcript.trim().toLowerCase();
+    if(t.includes('send')||t.includes('yes')||t.includes('go')){ _voiceConfirmSend(); }
+    else if(t.includes('listen')||t.includes('again')||t.includes('no')||t.includes('retry')){ _voiceRetry(); }
+  };
+  _confirmSR.onerror=()=>{};
+  _confirmSR.start();
+}
+function _voiceConfirmSend(){
+  _ttsStop();
+  if(_confirmSR){ try{_confirmSR.stop();}catch{} _confirmSR=null; }
+  document.getElementById('ai-voice-confirm').classList.remove('on');
+  const t=_nativePending; _nativePending='';
+  _voiceExecute(t);
+}
+function _voiceRetry(){
+  _ttsStop();
+  if(_confirmSR){ try{_confirmSR.stop();}catch{} _confirmSR=null; }
+  document.getElementById('ai-voice-confirm').classList.remove('on');
+  _nativePending='';
+  _startNativeSTT(false);
+}
+
+// ── Whisper STT ───────────────────────────────────────────────
+let _whisperRec=null, _whisperChunks=[], _whisperSilenceTimer=null, _whisperAnalyser=null, _whisperCtx=null;
+async function _startWhisperSTT(){
+  const c=_voiceCfg();
+  const constraints={audio:{noiseSuppression:c.noise??true,echoCancellation:c.echo??true,autoGainControl:c.agc??true}};
+  let stream;
+  try{ stream=await navigator.mediaDevices.getUserMedia(constraints); }
+  catch(e){ toast('Mic access denied','fail'); return; }
+  _whisperChunks=[];
+  _whisperRec=new MediaRecorder(stream,{mimeType:MediaRecorder.isTypeSupported('audio/webm')?'audio/webm':'audio/ogg'});
+  _whisperRec.ondataavailable=e=>{ if(e.data.size>0) _whisperChunks.push(e.data); };
+  _whisperRec.onstop=async()=>{
+    stream.getTracks().forEach(t=>t.stop());
+    document.getElementById('lfb-mic').classList.remove('listening');
+    document.getElementById('lfb-mic').classList.add('processing');
+    const blob=new Blob(_whisperChunks,{type:_whisperRec.mimeType});
+    await _transcribeWhisper(blob);
+    document.getElementById('lfb-mic').classList.remove('processing');
+  };
+  _whisperRec.start(100);
+  document.getElementById('lfb-mic').classList.add('listening');
+  // Silence detection via AnalyserNode
+  const gate=c.gate??10;
+  const silenceSec=c.whisperSilence||2;
+  _whisperCtx=new AudioContext();
+  _whisperAnalyser=_whisperCtx.createAnalyser();
+  _whisperAnalyser.fftSize=512;
+  _whisperCtx.createMediaStreamSource(stream).connect(_whisperAnalyser);
+  const buf=new Uint8Array(_whisperAnalyser.frequencyBinCount);
+  let silenceStart=null;
+  const checkSilence=()=>{
+    if(!_whisperRec||_whisperRec.state!=='recording') return;
+    _whisperAnalyser.getByteFrequencyData(buf);
+    const avg=buf.reduce((a,b)=>a+b,0)/buf.length;
+    if(avg<gate+5){
+      if(!silenceStart) silenceStart=Date.now();
+      else if(Date.now()-silenceStart>silenceSec*1000){ _stopWhisperSTT(); return; }
+    } else { silenceStart=null; }
+    requestAnimationFrame(checkSilence);
+  };
+  requestAnimationFrame(checkSilence);
+}
+function _stopWhisperSTT(){
+  if(_whisperCtx){ _whisperCtx.close(); _whisperCtx=null; }
+  if(_whisperRec&&_whisperRec.state==='recording') _whisperRec.stop();
+}
+async function _transcribeWhisper(blob){
+  const key=localStorage.getItem('tcplants_groq_key');
+  if(!key){ toast('Groq key needed for Whisper','fail'); return; }
+  const fd=new FormData();
+  fd.append('file',blob,'audio.webm');
+  fd.append('model','whisper-large-v3');
+  fd.append('language','en');
+  try{
+    const r=await fetch('https://api.groq.com/openai/v1/audio/transcriptions',{method:'POST',headers:{Authorization:'Bearer '+key},body:fd});
+    if(!r.ok) throw new Error('Whisper error '+r.status);
+    const d=await r.json();
+    const t=d.text?.trim();
+    if(!t){ toast('No speech detected','fail'); return; }
+    const c=_voiceCfg();
+    if(c.whisperAutoSend??true){ _voiceExecute(t); }
+    else { document.getElementById('ai-input').value=t; document.getElementById('ai-panel').classList.add('on'); }
+  }catch(e){ toast('Transcription failed: '+e.message,'fail'); }
+}
+
+// ── Execute voice input ───────────────────────────────────────
+function _voiceExecute(transcript){
+  const cmd=_parseVoiceCommand(transcript);
+  _voiceLog(transcript, cmd?cmd.label:'→ AI', false);
+  if(cmd) return;
+  // Not a command — send to AI (8B Quick only)
+  const prevModel=_aiModel;
+  if(_aiModel!=='groq8') _aiModel='groq8'; // voice always uses 8B
+  document.getElementById('ai-panel').classList.add('on');
+  _switchAITab('chat');
+  askAI(transcript).then(()=>{ _aiModel=prevModel; });
+}
+
+// ── Mic tap handler ───────────────────────────────────────────
+function _voiceTap(){
+  const c=_voiceCfg();
+  const mode=c.mode||'native';
+  const btn=document.getElementById('lfb-mic');
+  if(mode==='whisper'){
+    if(_whisperRec&&_whisperRec.state==='recording'){ _stopWhisperSTT(); return; }
+    _startWhisperSTT();
+  } else {
+    if(_nativeSR){ try{_nativeSR.stop();}catch{} _nativeSR=null; btn.classList.remove('listening'); return; }
+    _startNativeSTT(false);
+  }
+}
+
+// ── Wake word ─────────────────────────────────────────────────
+let _wakeLoop=null, _wakeActive=false;
+function _startWakeListener(){
+  if(!('SpeechRecognition' in window||'webkitSpeechRecognition' in window)) return;
+  _wakeActive=true;
+  document.getElementById('wake-indicator').classList.add('on');
+  _wakeLoop=()=>{
+    if(!_wakeActive) return;
+    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    const sr=new SR(); sr.lang='en-IN'; sr.interimResults=false; sr.maxAlternatives=1;
+    sr.onresult=e=>{
+      const t=e.results[0][0].transcript.toLowerCase();
+      if(t.includes('hey lab')||t.includes('hey lab')){
+        document.getElementById('ai-panel').classList.add('on');
+        setTimeout(()=>_startNativeSTT(true),300);
+      }
+    };
+    sr.onend=()=>{ if(_wakeActive) setTimeout(_wakeLoop,500); };
+    sr.onerror=()=>{ if(_wakeActive) setTimeout(_wakeLoop,2000); };
+    try{ sr.start(); }catch{}
+  };
+  _wakeLoop();
+}
+function _stopWakeListener(){
+  _wakeActive=false;
+  document.getElementById('wake-indicator')?.classList.remove('on');
 }
 
 let S_noteMode='tc'; // 'generic' | 'tc'
@@ -9026,7 +9571,8 @@ async function login(){
     setTimeout(()=>showVanakkam(_labN||''), 350);
     document.getElementById('ql-fab').classList.add('on');
     document.getElementById('ai-btn').classList.add('on');
-    loadEncryptedKeys().then(()=>_initAIKeyHint());
+    document.getElementById('lab-footer-bar').classList.add('on');
+    loadEncryptedKeys().then(()=>{ _initAIKeyHint(); _initVoiceSettings(); });
     document.getElementById('actlog-tab').classList.add('on');
     fetchActivityLog();
     // Offer to save device if not already saved
@@ -9109,7 +9655,9 @@ function lock(){
   document.getElementById('ql-fab').classList.remove('on');
   document.getElementById('ai-btn').classList.remove('on');
   document.getElementById('ai-panel').classList.remove('on');
+  document.getElementById('lab-footer-bar').classList.remove('on');
   document.getElementById('actlog-tab').classList.remove('on');
+  _stopWakeListener();
   document.getElementById('actlog-panel').classList.remove('open');
   sessionStorage.clear();
   document.getElementById('app').classList.remove('on');
