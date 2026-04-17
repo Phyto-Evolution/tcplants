@@ -4397,90 +4397,61 @@ function _renderDashboard(){
       </div>
     </div>`:'';})()}
 
-    <!-- Heatmaps, Species, Media/GH inline in col 3 -->
-    <div>
-          ${(()=>{
-            const wk=_hwState['lab']||14;
-            const eMap={};
-            S.notes.forEach(n=>{if(n.date){const d=n.date.slice(0,10);eMap[d]=(eMap[d]||0)+1;}});
-            const tot7=S.notes.filter(n=>n.date&&n.date.slice(0,10)>=new Date(Date.now()-6*864e5).toISOString().slice(0,10)).length;
-            return `<div class="hw-card">
-              <div class="hw-head">
-                <span class="hw-title">📋 Lab Activity</span>
-                <span class="hw-meta" style="color:var(--gn)">${tot7} this week</span>
-                <button class="hw-toggle" onclick="_hwState['lab']=${wk<26?wk*2:7};_renderDashboard()">${wk===7?'▼ Expand':wk===14?'▼ More':'▲ Collapse'}</button>
-              </div>
-              ${_genericHeatmap(eMap,wk,_hmGreen,todayStr)}
-              <div style="display:flex;align-items:center;gap:5px;margin-top:5px;font-size:10px;color:var(--mu)">
-                <span>Less</span>
-                <div class="dash-heatmap-cell" style="background:var(--sf3)"></div>
-                <div class="dash-heatmap-cell" style="background:rgba(46,160,67,.28)"></div>
-                <div class="dash-heatmap-cell" style="background:rgba(46,160,67,.55)"></div>
-                <div class="dash-heatmap-cell" style="background:#2ea043"></div>
-                <span>More entries</span>
-              </div>
-            </div>`;
-          })()}
-          ${(()=>{
-            const wk=_hwState['bots']||14;
-            const bMap={};
-            allBots.forEach(b=>{if(b.date_prepared){const d=b.date_prepared.slice(0,10);bMap[d]=(bMap[d]||0)+1;}});
-            const tot=allBots.filter(b=>b.date_prepared&&b.date_prepared.slice(0,10)>=new Date(Date.now()-6*864e5).toISOString().slice(0,10)).length;
-            return `<div class="hw-card">
-              <div class="hw-head">
-                <span class="hw-title">🫙 Bottle Prep</span>
-                <span class="hw-meta" style="color:var(--ac)">${tot} this week</span>
-                <button class="hw-toggle" onclick="_hwState['bots']=${wk<26?wk*2:7};_renderDashboard()">${wk===7?'▼ Expand':wk===14?'▼ More':'▲ Collapse'}</button>
-              </div>
-              ${_genericHeatmap(bMap,wk,_hmBlue,todayStr)}
-              <div style="display:flex;align-items:center;gap:5px;margin-top:5px;font-size:10px;color:var(--mu)">
-                <span>Less</span>
-                <div class="dash-heatmap-cell" style="background:var(--sf3)"></div>
-                <div class="dash-heatmap-cell" style="background:rgba(88,166,255,.28)"></div>
-                <div class="dash-heatmap-cell" style="background:rgba(88,166,255,.55)"></div>
-                <div class="dash-heatmap-cell" style="background:var(--ac)"></div>
-                <span>More bottles</span>
-              </div>
-            </div>`;
-          })()}
-        </div>
-
-        <!-- COL B: Species grid + Transfer Window -->
-        <div class="dash-col">
-          ${topSp.length?`<div class="hw-card">
-            <div class="hw-head"><span class="hw-title">🌱 Species Active</span><a onclick="navTo('species')" style="color:var(--ac);font-size:11px;cursor:pointer;font-weight:600">All →</a></div>
-            <div style="display:flex;flex-direction:column;gap:4px">
-              ${topSp.slice(0,6).map(sp=>`<div onclick="navTo('species')" style="display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer;border-bottom:1px solid var(--sf2)" onmouseover="this.style.color='var(--ac)'" onmouseout="this.style.color=''">
-                <span style="flex:1;font-size:12px;font-weight:600;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(sp.name)}</span>
-                <span style="font-size:10px;color:var(--mu);flex-shrink:0">${sp.notes?`📋${sp.notes} `:''}${sp.bottles?`🫙${sp.bottles}`:''}</span>
-              </div>`).join('')}
-            </div>
-          </div>`:''}
-        </div>
-
-        <!-- COL C: Media recipes + GH plants -->
-        <div class="dash-col">
-          ${recentRecs.length?`<div class="hw-card">
-            <div class="hw-head"><span class="hw-title">🧪 Media Recipes</span><a onclick="navTo('recipes');startNewRecipe()" style="color:var(--pu);font-size:11px;cursor:pointer;font-weight:600">+ New →</a></div>
-            <div style="display:flex;flex-direction:column;gap:5px">
-              ${recentRecs.map(r=>`<div onclick="navTo('recipes');openRecipe('${r.id}')" style="background:var(--sf2);border-radius:6px;padding:7px 10px;cursor:pointer" onmouseover="this.style.borderColor='var(--pu)'" onmouseout="this.style.borderColor=''">
-                <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.name)}</div>
-                <div style="color:var(--mu);font-size:10px">${esc(r.base||'')}${r.agar?` · Gelrite ${r.agar}g/L`:''}</div>
-              </div>`).join('')}
-            </div>
-          </div>`:''}
-          ${ghPlants.length?`<div class="hw-card">
-            <div class="hw-head"><span class="hw-title">🏡 Greenhouse</span><span class="hw-meta">${ghTotal} plants</span><a onclick="navTo('greenhouse')" style="color:var(--ac);font-size:11px;cursor:pointer;font-weight:600">All →</a></div>
-            <div style="display:flex;flex-direction:column;gap:4px">
-              ${ghHealthy.slice(0,5).map(p=>`<div onclick="navTo('greenhouse');openGHPlant('${p.id}')" style="display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer;border-bottom:1px solid var(--sf2)">
-                <div class="gh-health-dot healthy"></div>
-                <span style="flex:1;font-size:12px;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.species||'?')}</span>
-                <span style="color:var(--mu);font-size:11px">${p.quantity||1}×</span>
-              </div>`).join('')}
-              ${spWithSubcult.length?`<div style="font-size:11px;color:var(--yw);margin-top:6px">⚗️ Lab → GH: ${spWithSubcult.slice(0,2).map(s=>esc(s)).join(', ')}${spWithSubcult.length>2?'…':''}</div>`:''}
-            </div>
-          </div>`:''}
-    </div><!-- end heatmaps/species/media div -->
+    <!-- Activity heatmaps -->
+    ${(()=>{
+      const wk=_hwState['lab']||14;
+      const eMap={};
+      S.notes.forEach(n=>{if(n.date){const d=n.date.slice(0,10);eMap[d]=(eMap[d]||0)+1;}});
+      const tot7=S.notes.filter(n=>n.date&&n.date.slice(0,10)>=new Date(Date.now()-6*864e5).toISOString().slice(0,10)).length;
+      return `<div class="hw-card">
+        <div class="hw-head"><span class="hw-title">📋 Lab Activity</span><span class="hw-meta" style="color:var(--gn)">${tot7} this week</span>
+          <button class="hw-toggle" onclick="_hwState['lab']=${wk<26?wk*2:7};_renderDashboard()">${wk===7?'▼ Expand':wk===14?'▼ More':'▲ Collapse'}</button></div>
+        ${_genericHeatmap(eMap,wk,_hmGreen,todayStr)}
+      </div>`;
+    })()}
+    ${(()=>{
+      const wk=_hwState['bots']||14;
+      const bMap={};
+      allBots.forEach(b=>{if(b.date_prepared){const d=b.date_prepared.slice(0,10);bMap[d]=(bMap[d]||0)+1;}});
+      const tot=allBots.filter(b=>b.date_prepared&&b.date_prepared.slice(0,10)>=new Date(Date.now()-6*864e5).toISOString().slice(0,10)).length;
+      return `<div class="hw-card">
+        <div class="hw-head"><span class="hw-title">🫙 Bottle Prep</span><span class="hw-meta" style="color:var(--ac)">${tot} this week</span>
+          <button class="hw-toggle" onclick="_hwState['bots']=${wk<26?wk*2:7};_renderDashboard()">${wk===7?'▼ Expand':wk===14?'▼ More':'▲ Collapse'}</button></div>
+        ${_genericHeatmap(bMap,wk,_hmBlue,todayStr)}
+      </div>`;
+    })()}
+    <!-- Species -->
+    ${topSp.length?`<div class="hw-card">
+      <div class="hw-head"><span class="hw-title">🌱 Species Active</span><a onclick="navTo('species')" style="color:var(--ac);font-size:11px;cursor:pointer;font-weight:600">All →</a></div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        ${topSp.slice(0,6).map(sp=>`<div onclick="navTo('species')" style="display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer;border-bottom:1px solid var(--sf2)" onmouseover="this.style.color='var(--ac)'" onmouseout="this.style.color=''">
+          <span style="flex:1;font-size:12px;font-weight:600;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(sp.name)}</span>
+          <span style="font-size:10px;color:var(--mu);flex-shrink:0">${sp.notes?`📋${sp.notes} `:''}${sp.bottles?`🫙${sp.bottles}`:''}</span>
+        </div>`).join('')}
+      </div>
+    </div>`:''}
+    <!-- Recipes -->
+    ${recentRecs.length?`<div class="hw-card">
+      <div class="hw-head"><span class="hw-title">🧪 Media Recipes</span><a onclick="navTo('recipes');startNewRecipe()" style="color:var(--pu);font-size:11px;cursor:pointer;font-weight:600">+ New →</a></div>
+      <div style="display:flex;flex-direction:column;gap:5px">
+        ${recentRecs.map(r=>`<div onclick="navTo('recipes');openRecipe('${r.id}')" style="background:var(--sf2);border-radius:6px;padding:7px 10px;cursor:pointer">
+          <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.name)}</div>
+          <div style="color:var(--mu);font-size:10px">${esc(r.base||'')}${r.agar?` · Gelrite ${r.agar}g/L`:''}</div>
+        </div>`).join('')}
+      </div>
+    </div>`:''}
+    <!-- GH plants -->
+    ${ghPlants.length?`<div class="hw-card">
+      <div class="hw-head"><span class="hw-title">🏡 Greenhouse</span><span class="hw-meta">${ghTotal} plants</span><a onclick="navTo('greenhouse')" style="color:var(--ac);font-size:11px;cursor:pointer;font-weight:600">All →</a></div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        ${ghHealthy.slice(0,5).map(p=>`<div onclick="navTo('greenhouse');openGHPlant('${p.id}')" style="display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer;border-bottom:1px solid var(--sf2)">
+          <div class="gh-health-dot healthy"></div>
+          <span style="flex:1;font-size:12px;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.species||'?')}</span>
+          <span style="color:var(--mu);font-size:11px">${p.quantity||1}×</span>
+        </div>`).join('')}
+        ${spWithSubcult.length?`<div style="font-size:11px;color:var(--yw);margin-top:6px">⚗️ Lab → GH: ${spWithSubcult.slice(0,2).map(s=>esc(s)).join(', ')}${spWithSubcult.length>2?'…':''}</div>`:''}
+      </div>
+    </div>`:''}
       </div><!-- end col 3 inner -->
     </div><!-- end col 3 -->
     </div><!-- end 3-col flex row -->
