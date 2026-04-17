@@ -2252,7 +2252,8 @@ main > .dview, main > .editor{ margin:0 auto; }
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
           <div style="font-size:13px;line-height:1.6"><strong>🌍 GBIF Species Lookup</strong> — fetch IUCN conservation status, taxonomy hierarchy, and GBIF link from inside the custom species form</div>
           <div style="font-size:13px;line-height:1.6"><strong>📚 PubMed AI Context</strong> — when a note has a species set, top 3 TC abstracts from PubMed are auto-fed to the AI for literature-backed answers</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🔔 Telegram Alerts</strong> — connect your Telegram bot to receive overdue review + GH inspection alerts on login</div>
+          <!-- FROZEN: Telegram Alerts feature paused -->
+          <!-- <div style="font-size:13px;line-height:1.6"><strong>🔔 Telegram Alerts</strong> — connect your Telegram bot to receive overdue review + GH inspection alerts on login</div> -->
           <div style="font-size:13px;line-height:1.6"><strong>✂️ Subculture Calendar</strong> — set subculture interval per species in taxonomy; auto-reminders appear in ⏰ Reminders when bottles approach transfer window</div>
           <div style="font-size:13px;line-height:1.6"><strong>📦 Lab Stock &amp; Inventory</strong> — new section to track reagents, gelling agents, glassware with low-stock alerts, expiry dates, and quantity adjustment log</div>
           <div style="font-size:13px;line-height:1.6"><strong>🖨 Label size selector</strong> — choose 58mm / 62mm thermal or A4 sheet before printing QR bottle labels</div>
@@ -3437,6 +3438,7 @@ main > .dview, main > .editor{ margin:0 auto; }
         </div>
       </div>
     </div>
+    <!-- FROZEN: Telegram Alerts — paused for redesign, preserved for future use
     <div class="set-section collapsed">
       <div class="set-section-title" onclick="_toggleSetSection(this)">Telegram Alerts</div>
       <div class="set-section-body">
@@ -3483,6 +3485,7 @@ main > .dview, main > .editor{ margin:0 auto; }
         </div>
       </div>
     </div>
+    END FROZEN: Telegram Alerts -->
     <div class="set-section collapsed">
       <div class="set-section-title" onclick="_toggleSetSection(this)">Camera &amp; QR</div>
       <div class="set-section-body">
@@ -9043,10 +9046,11 @@ async function login(){
     }
     loadTaxonomy();
     // Restore Telegram settings to settings panel
-    const _tgTok=localStorage.getItem('tcplants_tg_token'); if(_tgTok){const el=document.getElementById('set-tg-token');if(el)el.value=_tgTok;}
-    const _tgCid=localStorage.getItem('tcplants_tg_chatid'); if(_tgCid){const el=document.getElementById('set-tg-chatid');if(el)el.value=_tgCid;}
-    const _tgOd=document.getElementById('set-tg-overdue'); if(_tgOd) _tgOd.checked=localStorage.getItem('tcplants_tg_overdue')==='1';
-    const _tgCo=document.getElementById('set-tg-contam'); if(_tgCo) _tgCo.checked=localStorage.getItem('tcplants_tg_contam')==='1';
+    // FROZEN: Telegram settings restore — paused
+    // const _tgTok=localStorage.getItem('tcplants_tg_token'); if(_tgTok){const el=document.getElementById('set-tg-token');if(el)el.value=_tgTok;}
+    // const _tgCid=localStorage.getItem('tcplants_tg_chatid'); if(_tgCid){const el=document.getElementById('set-tg-chatid');if(el)el.value=_tgCid;}
+    // const _tgOd=document.getElementById('set-tg-overdue'); if(_tgOd) _tgOd.checked=localStorage.getItem('tcplants_tg_overdue')==='1';
+    // const _tgCo=document.getElementById('set-tg-contam'); if(_tgCo) _tgCo.checked=localStorage.getItem('tcplants_tg_contam')==='1';
     // Fire alerts after data load
     setTimeout(_checkAlerts, 3000);
     setTimeout(_doWriteSummary, 5000); // write summary on login
@@ -10325,6 +10329,7 @@ async function _fetchPubMedContext(species){
 // ════════════════════════════════════════════════════════════
 // 3. TELEGRAM ALERTS
 // ════════════════════════════════════════════════════════════
+/* FROZEN: Telegram functions — paused for redesign, all logic preserved
 function _saveTelegramSettings(){
   const tok=document.getElementById('set-tg-token')?.value.trim();
   const cid=document.getElementById('set-tg-chatid')?.value.trim();
@@ -10352,7 +10357,6 @@ async function _checkAlerts(){
   if(!localStorage.getItem('tcplants_tg_token')) return;
   const labName=localStorage.getItem('tcplants_lab_name')||'TC Plants';
   const msgs=[];
-  // Overdue bottles
   if(localStorage.getItem('tcplants_tg_overdue')==='1'){
     const overdue=(S.bottles||[]).filter(b=>b.next_review&&['inoculated','growing'].includes(b.status)&&daysFrom(b.next_review)<=0);
     if(overdue.length) msgs.push(`🫙 <b>${overdue.length} bottle${overdue.length!==1?'s':''} overdue for review</b>\n${overdue.slice(0,5).map(b=>`• ${b.code} — ${b.species||'?'} (${Math.abs(daysFrom(b.next_review))}d)`).join('\n')}`);
@@ -10364,6 +10368,12 @@ async function _checkAlerts(){
     await _sendTelegram(full);
   }
 }
+END FROZEN: Telegram functions */
+// Stub so login flow doesn't break if _checkAlerts is still called
+async function _checkAlerts(){ return; }
+function _saveTelegramSettings(){ return; }
+async function _sendTelegram(){ return false; }
+async function _testTelegram(){ return; }
 
 // ════════════════════════════════════════════════════════════
 // 4. SUBCULTURE CALENDAR — derive from bottles + species interval
@@ -10904,19 +10914,14 @@ function _twaOpenFull(){
   TG?.openLink?.(location.href.replace('?twa=1',''));
 }
 
-// ── One-time link setup: pass credentials to TWA via deeplink ─
+/* FROZEN: Telegram TWA + bot config — preserved for future use
 function _twaLinkSetup(){
   if(!S.pw||!S.tok){toast('Log in to TC Plants first','fail');return;}
-  // Encode passphrase and token as base64 in the start param
-  // This opens t.me/notestcp1bot?start=ENCODED_CREDS which the TWA reads
-  // and immediately stores to CloudStorage — after that no login ever needed
   const payload=btoa(JSON.stringify({pw:S.pw,tok:S.tok})).replace(/=/g,'');
   const deeplink=`https://t.me/notestcp1bot?start=link_${payload}`;
   window.open(deeplink,'_blank');
   toast('Opening Telegram… tap Start, then Open Lab to complete setup','ok',5000);
 }
-
-// ── Bot auto-configure ─────────────────────────────────────
 async function _configureTelegramBot(){
   const tok=localStorage.getItem('tcplants_tg_token');
   if(!tok){toast('Save your bot token in Settings → Telegram first','fail');return;}
@@ -10924,7 +10929,6 @@ async function _configureTelegramBot(){
   const TWA=location.origin+'?twa=1';
   load('Configuring bot…');
   try{
-    // Commands
     await fetch(`${api}/setMyCommands`,{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({commands:[
         {command:'start',description:'🌿 Open TC Plants Lab'},
@@ -10939,10 +10943,8 @@ async function _configureTelegramBot(){
         {command:'checklist',description:'✅ Today\'s lab tasks'},
         {command:'help',description:'❓ All commands'},
       ]})});
-    // Menu button
     await fetch(`${api}/setChatMenuButton`,{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({menu_button:{type:'web_app',text:'🌿 Open Lab',web_app:{url:TWA}}})});
-    // Description
     await fetch(`${api}/setMyDescription`,{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({description:'🌿 TC Plants Lab — encrypted tissue culture lab notebook. Track cultures, log notes, get alerts, and run sterilisation protocols.'})});
     await fetch(`${api}/setMyShortDescription`,{method:'POST',headers:{'Content-Type':'application/json'},
@@ -10951,6 +10953,9 @@ async function _configureTelegramBot(){
   }catch(e){toast('Config error: '+e.message,'fail');}
   unload();
 }
+END FROZEN: Telegram TWA + bot config */
+function _twaLinkSetup(){ return; }
+async function _configureTelegramBot(){ return; }
 </script>
 <!-- Widget tray — fixed footer for minimised lab tools -->
 <div id="widget-tray"></div>
