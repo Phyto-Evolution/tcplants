@@ -7195,14 +7195,8 @@ function _startNativeSTT(isWake, onDone){
     if(onDone) onDone();
   };
   _nativeSR.onend=()=>{
-    // If ended without capturing anything (Chrome cut off too early), restart
-    if(!_nativePending && _nativeSR !== null){
-      _nativeSR=null;
-      setTimeout(()=>_startNativeSTT(false, onDone), 200);
-    } else {
-      _setMicBtnState('idle');
-      _nativeSR=null;
-    }
+    _setMicBtnState('idle');
+    _nativeSR=null;
   };
   _nativeSR.start();
 }
