@@ -985,6 +985,21 @@ main > .dview, main > .editor{ margin:0 auto; }
 #saved-device-banner.on{display:block}
 /* ── AI ASSISTANT ── */
 .ai-model-sel{background:var(--sf2);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-size:11px;font-weight:700;padding:3px 7px;cursor:pointer;font-family:var(--font)}
+/* note mode tabs */
+.note-mode-tabs{display:flex;gap:0;margin-bottom:14px;border:1px solid var(--bd);border-radius:7px;overflow:hidden}
+.note-mode-tab{flex:1;background:transparent;border:none;color:var(--mu);cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;padding:7px 4px;transition:all .15s;text-align:center}
+.note-mode-tab.active{background:var(--ac);color:#0d1117}
+.note-mode-tab.active.generic{background:var(--gn)}
+/* pinned note on dashboard */
+.dash-pin-card{background:var(--sf);border:1px solid var(--yw);border-radius:8px;padding:10px 12px;cursor:pointer;transition:all .15s;border-left:3px solid var(--yw)}
+.dash-pin-card:hover{background:var(--sf2)}
+/* note pin btn */
+.note-pin-btn{background:transparent;border:1px solid var(--bd);border-radius:5px;cursor:pointer;font-size:13px;padding:3px 8px;color:var(--mu);transition:all .15s}
+.note-pin-btn.pinned{border-color:var(--yw);color:var(--yw)}
+.note-pin-btn:hover{border-color:var(--yw);color:var(--yw)}
+/* dash section divider */
+.dash-section-divider{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--mu);padding:4px 0 8px;border-top:1px solid var(--bd);margin-top:4px;display:flex;align-items:center;gap:8px}
+.dash-section-divider::after{content:'';flex:1;height:1px;background:var(--bd)}
 /* heatmap widget */
 .hw-card{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;transition:border-color .15s}
 .hw-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
@@ -1230,11 +1245,12 @@ main > .dview, main > .editor{ margin:0 auto; }
         </div>
         <!-- Quick Actions -->
         <div class="dash-quick-actions" style="margin-bottom:16px">
-          <button class="dqa-btn primary" onclick="startNewNote()">＋ New Entry</button>
+          <button class="dqa-btn primary" onclick="navTo('notes');startNewNote('generic')">📝 Quick Note</button>
+          <button class="dqa-btn primary" style="background:var(--ac)" onclick="navTo('notes');startNewNote('tc')">🧪 Lab Entry</button>
           <button class="dqa-btn" onclick="navTo('bottles');startNewBottle('single')">🫙 New Bottle</button>
           <button class="dqa-btn" onclick="navTo('greenhouse');startNewGHPlant()">🏡 GH Plant</button>
           <button class="dqa-btn" onclick="navTo('sterilise')">🧫 Sterilise</button>
-          <button class="dqa-btn" onclick="openQRScan()">📷 Scan QR</button>
+          <button class="dqa-btn" onclick="openQRScan()">📷 QR Scan</button>
           <button class="dqa-btn" onclick="navTo('analytics')">📊 Analytics</button>
         </div>
         <!-- Quick Stats -->
@@ -1256,6 +1272,7 @@ main > .dview, main > .editor{ margin:0 auto; }
           <div class="ddate" id="nv-date"></div>
           <div class="dactions">
             <button class="btn sm" id="edit-note-btn">✏️ Edit</button>
+            <button class="note-pin-btn" id="note-pin-btn" onclick="toggleNotePin()" title="Pin to dashboard">📌</button>
             <button class="btn sm ghost" id="print-btn">🖨 Print / PDF</button>
             <button class="btn sm ghost" id="history-btn">📜 History</button>
             <button class="btn sm ghost" id="note-bottles-btn" style="display:none" onclick="navTo('bottles');S.bottleSearch='';setBotFilter('all');renderBottleList()">🫙 <span id="note-bottles-count">0</span> Bottles</button>
@@ -1276,12 +1293,18 @@ main > .dview, main > .editor{ margin:0 auto; }
         <div class="hp-list" id="history-list"></div>
       </div>
       <div class="editor" id="note-editor">
-        <div class="ehead" id="ne-head">New Lab Entry</div>
+        <div class="ehead" id="ne-head">New Entry</div>
+        <div class="note-mode-tabs" id="ne-mode-tabs">
+          <button class="note-mode-tab active generic" id="ne-tab-generic" onclick="setNoteMode('generic')">📝 Quick Note</button>
+          <button class="note-mode-tab" id="ne-tab-tc" onclick="setNoteMode('tc')">🧪 TC Lab Entry</button>
+        </div>
         <div id="draft-banner"><span id="draft-msg"></span><button class="btn xs ghost" id="draft-discard-btn">Discard</button></div>
         <div class="field">
           <label>Title</label>
           <input type="text" id="ne-title" placeholder="e.g. Stage II subculture — Nepenthes rajah batch 4">
         </div>
+        <!-- TC-only fields — hidden in generic mode -->
+        <div id="ne-tc-fields">
         <div class="row2">
           <div class="field">
             <label>Experiment Type</label>
@@ -1350,6 +1373,12 @@ main > .dview, main > .editor{ margin:0 auto; }
             <input type="number" id="ne-cultures-out" placeholder="e.g. 24" min="0" step="1">
             <div class="hint">Number of propagules / cultures produced in this entry.</div>
           </div>
+        </div>
+        </div><!-- /ne-tc-fields -->
+        <!-- Pin toggle (generic notes only) -->
+        <div id="ne-pin-row" style="display:none;margin-bottom:12px;display:flex;align-items:center;gap:8px">
+          <input type="checkbox" id="ne-pin-cb" style="width:auto;margin:0">
+          <label for="ne-pin-cb" style="font-size:13px;font-weight:500;margin:0;cursor:pointer">📌 Pin to dashboard homescreen</label>
         </div>
         <div class="field">
           <label>Notes <span style="font-weight:400;color:var(--mu)">(Markdown)</span></label>
@@ -2875,13 +2904,19 @@ main > .dview, main > .editor{ margin:0 auto; }
       <!-- Notes list panel -->
       <div class="nd-list-area on" id="nd-notes">
         <div class="aside-top">
-          <button class="btn" id="new-note-btn">＋ New Entry</button>
+          <div style="display:flex;gap:5px">
+            <button class="btn green sm" style="flex:1" onclick="startNewNote('generic')">📝 Quick Note</button>
+            <button class="btn sm" style="flex:1" id="new-note-btn">🧪 Lab Entry</button>
+          </div>
           <div class="search-wrap">
             <span class="search-icon">🔍</span>
             <input type="text" id="note-search" placeholder="Search titles, tags, species…">
           </div>
-          <div class="filter-row" id="type-filters">
-            <button class="fpill active" data-filter="type" data-val="">All</button>
+          <div class="filter-row" style="flex-wrap:wrap">
+            <button class="fpill active" data-ntype="all" onclick="_setNoteTypeFilter('all',this)">All</button>
+            <button class="fpill" data-ntype="generic" onclick="_setNoteTypeFilter('generic',this)" style="color:var(--gn)">📝</button>
+            <button class="fpill" data-ntype="tc" onclick="_setNoteTypeFilter('tc',this)">🧪</button>
+            <button class="fpill yellow" data-ntype="pinned" onclick="_setNoteTypeFilter('pinned',this)">📌</button>
             <button class="fpill red" data-filter="type" data-val="Contamination Log">☣️</button>
             <button class="fpill yellow" data-filter="type" data-val="__overdue">⏰</button>
           </div>
@@ -3201,39 +3236,64 @@ main > .dview, main > .editor{ margin:0 auto; }
       </div>
     </div>
     <div class="set-section">
-      <div class="set-section-title">AI Assistant — API Keys</div>
-      <div class="set-row set-row-full" style="background:rgba(88,166,255,.05);border-radius:8px;padding:10px;margin-bottom:6px">
-        <div class="set-row-label" style="color:var(--ac)">◇ Claude (Anthropic) — default model</div>
-        <div class="set-row-sub">claude-opus-4-5 · Hardwired as the primary model</div>
-        <input type="password" id="set-claude-key" placeholder="Paste Anthropic API key…" style="margin-top:6px">
-        <div style="display:flex;gap:6px;margin-top:6px">
+      <div class="set-section-title">AI Assistant</div>
+      <!-- Claude — always on, primary -->
+      <div class="set-row set-row-full" style="background:rgba(88,166,255,.06);border-radius:8px;padding:10px;margin-bottom:6px;border:1px solid rgba(88,166,255,.2)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <span style="font-weight:700;color:var(--ac)">◇ Claude (Anthropic)</span>
+          <span style="font-size:10px;background:var(--ac);color:#0d1117;padding:1px 7px;border-radius:10px;font-weight:700">DEFAULT · ALWAYS ON</span>
+        </div>
+        <div class="set-row-sub" style="margin-bottom:6px">claude-opus-4-5 · Primary model — hardwired, cannot be disabled</div>
+        <input type="password" id="set-claude-key" placeholder="Paste Anthropic API key…" style="margin-bottom:6px">
+        <div style="display:flex;gap:6px">
           <button class="btn xs ghost" onclick="_setModelKey('claude','set-claude-key')" style="flex:1">Save Key</button>
           <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
         </div>
       </div>
-      <div class="set-row set-row-full">
-        <div class="set-row-label">✦ Gemini API Key</div>
-        <div class="set-row-sub">gemini-2.0-flash · Free tier available</div>
-        <input type="password" id="set-gemini-key" placeholder="Paste Gemini API key…" style="margin-top:6px">
-        <div style="display:flex;gap:6px;margin-top:6px">
+      <!-- Gemini -->
+      <div class="set-row set-row-full" style="margin-bottom:6px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <span style="font-weight:600">✦ Gemini</span>
+          <label class="toggle-switch" style="margin-left:auto;width:36px;height:20px">
+            <input type="checkbox" id="set-en-gemini" onchange="_setAIEnabled('gemini',this.checked)" ${_getAIEnabled('gemini')?'checked':''}>
+            <div class="toggle-track"></div>
+          </label>
+        </div>
+        <div class="set-row-sub" style="margin-bottom:6px">gemini-2.0-flash · Free tier · Enable first, then set key</div>
+        <input type="password" id="set-gemini-key" placeholder="Paste Gemini API key…" style="margin-bottom:6px">
+        <div style="display:flex;gap:6px">
           <button class="btn xs ghost" onclick="_setModelKey('gemini','set-gemini-key')" style="flex:1">Save Key</button>
           <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
         </div>
       </div>
-      <div class="set-row set-row-full">
-        <div class="set-row-label">◎ OpenAI API Key</div>
-        <div class="set-row-sub">gpt-4o · Paid API access required</div>
-        <input type="password" id="set-openai-key" placeholder="Paste OpenAI API key…" style="margin-top:6px">
-        <div style="display:flex;gap:6px;margin-top:6px">
+      <!-- GPT-4o -->
+      <div class="set-row set-row-full" style="margin-bottom:6px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <span style="font-weight:600">◎ GPT-4o</span>
+          <label class="toggle-switch" style="margin-left:auto;width:36px;height:20px">
+            <input type="checkbox" id="set-en-gpt" onchange="_setAIEnabled('gpt',this.checked)" ${_getAIEnabled('gpt')?'checked':''}>
+            <div class="toggle-track"></div>
+          </label>
+        </div>
+        <div class="set-row-sub" style="margin-bottom:6px">gpt-4o · OpenAI paid API</div>
+        <input type="password" id="set-openai-key" placeholder="Paste OpenAI API key…" style="margin-bottom:6px">
+        <div style="display:flex;gap:6px">
           <button class="btn xs ghost" onclick="_setModelKey('gpt','set-openai-key')" style="flex:1">Save Key</button>
           <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
         </div>
       </div>
+      <!-- Grok -->
       <div class="set-row set-row-full">
-        <div class="set-row-label">𝕏 Grok API Key (xAI)</div>
-        <div class="set-row-sub">grok-3 · xAI platform API key</div>
-        <input type="password" id="set-grok-key" placeholder="Paste xAI API key…" style="margin-top:6px">
-        <div style="display:flex;gap:6px;margin-top:6px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <span style="font-weight:600">𝕏 Grok (xAI)</span>
+          <label class="toggle-switch" style="margin-left:auto;width:36px;height:20px">
+            <input type="checkbox" id="set-en-grok" onchange="_setAIEnabled('grok',this.checked)" ${_getAIEnabled('grok')?'checked':''}>
+            <div class="toggle-track"></div>
+          </label>
+        </div>
+        <div class="set-row-sub" style="margin-bottom:6px">grok-3 · xAI platform</div>
+        <input type="password" id="set-grok-key" placeholder="Paste xAI API key…" style="margin-bottom:6px">
+        <div style="display:flex;gap:6px">
           <button class="btn xs ghost" onclick="_setModelKey('grok','set-grok-key')" style="flex:1">Save Key</button>
           <a href="https://console.x.ai/" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
         </div>
@@ -3741,6 +3801,9 @@ function _renderDashboard(){
   const pEl=document.getElementById('dash-panels');
   if(pEl){
     pEl.innerHTML=`
+    <!-- ── SECTION 1: Lab Status ── -->
+    <div style="grid-column:1/-1"><div class="dash-section-divider">Lab Status</div></div>
+
     <!-- ═══ ROW 1: HERO TRIO ═══ -->
     <div style="grid-column:1/-1">
       <div class="dash-hero">
@@ -3764,44 +3827,56 @@ function _renderDashboard(){
         <!-- Contamination Heatmap -->
         <div class="dash-hero-card">
           <div class="dash-section-label">
-            <span>☣️ Contamination — 14 weeks</span>
-            <a onclick="navTo('contam')" style="color:var(--rd);font-size:11px;cursor:pointer;font-weight:600">Log →</a>
+            <span>☣️ Contamination</span>
+            <span style="font-weight:700;color:${contamRate>10?'var(--rd)':contamRate>5?'var(--yw)':'var(--gn)'}">${contamRate}%</span>
+            <a onclick="navTo('contam')" style="color:var(--rd);font-size:11px;cursor:pointer;font-weight:600;margin-left:auto">Log →</a>
           </div>
-          <div style="display:flex;gap:12px;align-items:center;margin-bottom:8px">
+          <div style="display:flex;gap:14px;align-items:center;margin-bottom:8px">
             <div style="text-align:center">
-              <div style="font-size:26px;font-weight:800;color:${contamRate>10?'var(--rd)':contamRate>5?'var(--yw)':'var(--gn)'}">${contamRate}%</div>
-              <div style="font-size:10px;color:var(--mu)">overall rate</div>
+              <div style="font-size:24px;font-weight:800;color:${contamRate>10?'var(--rd)':contamRate>5?'var(--yw)':'var(--gn)'}">${contamRate}%</div>
+              <div style="font-size:10px;color:var(--mu)">overall</div>
             </div>
             <div style="text-align:center">
-              <div style="font-size:26px;font-weight:800;color:${recentContam30.length>3?'var(--yw)':'var(--tx)'}">${recentContam30.length}</div>
-              <div style="font-size:10px;color:var(--mu)">last 30 days</div>
+              <div style="font-size:24px;font-weight:800;color:${recentContam30.length>3?'var(--yw)':'var(--tx)'}">${recentContam30.length}</div>
+              <div style="font-size:10px;color:var(--mu)">30 days</div>
+            </div>
+            <div style="text-align:center">
+              <div style="font-size:24px;font-weight:800">${contamNotes.length}</div>
+              <div style="font-size:10px;color:var(--mu)">total</div>
             </div>
           </div>
           ${_contamHeatmap(S.notes)}
         </div>
 
-        <!-- QR Scan + Transfer Window quick view -->
-        <div class="dash-hero-card" style="gap:10px">
-          <div class="dash-qr-btn" onclick="openQRScan()">
-            <div style="font-size:32px">📷</div>
-            <div style="font-size:13px;font-weight:700;color:var(--tx)">Scan QR Code</div>
-            <div style="font-size:11px;color:var(--mu)">Open bottle, note, or accession</div>
-          </div>
-          ${transferDue.length?`<div>
+        <!-- Pinned News + Transfer Window -->
+        <div class="dash-hero-card" style="gap:8px">
+          ${(()=>{
+            const pinnedArticles=(_newsData||[]).filter(a=>_newsPins.has(a.pmid)).slice(0,3);
+            if(pinnedArticles.length) return `<div class="dash-section-label"><span>📌 Pinned Research</span><a onclick="navTo('news')" style="color:var(--ac);font-size:11px;cursor:pointer;font-weight:600">News →</a></div>
+              ${pinnedArticles.map(a=>`<div onclick="window.open('${esc(a.url)}','_blank')" style="padding:6px 8px;border-radius:6px;background:rgba(210,153,34,.07);border:1px solid rgba(210,153,34,.25);cursor:pointer;margin-bottom:5px" onmouseover="this.style.background='rgba(210,153,34,.12)'" onmouseout="this.style.background='rgba(210,153,34,.07)'">
+                <div style="font-size:11px;font-weight:600;line-height:1.4;color:var(--ac)">${esc(a.title.slice(0,80))}${a.title.length>80?'…':''}</div>
+                <div style="font-size:10px;color:var(--mu);margin-top:2px">${esc(a.authors.split(',')[0]||'')} · ${esc(a.journal)} ${esc(a.year)}</div>
+              </div>`).join('')}`;
+            return `<div class="dash-section-label"><span>📌 Pinned Research</span><a onclick="navTo('news')" style="color:var(--ac);font-size:11px;cursor:pointer;font-weight:600">Load News →</a></div>
+              <div style="font-size:12px;color:var(--mu);padding:8px 0;text-align:center">No pinned articles yet.<br>Browse News and pin papers 📌 to see them here.</div>`;
+          })()}
+          ${transferDue.length?`<div style="margin-top:4px">
             <div class="dash-section-label"><span>✂️ Transfer Due</span><span style="color:var(--yw);font-weight:700">${transferDue.length}</span></div>
             ${transferDue.slice(0,3).map(b=>{
               const di=Math.floor((now-new Date(b.date_inoculated))/86400000);
               const urg=di>=56?'var(--rd)':di>=42?'var(--yw)':'var(--ac)';
-              return`<div onclick="navTo('bottles');openBottle('${b.id}')" style="display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:5px;cursor:pointer;border:1px solid var(--bd);margin-bottom:4px;border-left:3px solid ${urg}" onmouseover="this.style.background='var(--sf2)'" onmouseout="this.style.background=''">
+              return`<div onclick="navTo('bottles');openBottle('${b.id}')" style="display:flex;align-items:center;gap:7px;padding:4px 8px;border-radius:5px;cursor:pointer;border:1px solid var(--bd);margin-bottom:4px;border-left:2px solid ${urg}" onmouseover="this.style.background='var(--sf2)'" onmouseout="this.style.background=''">
                 <span style="font-family:var(--mono);font-size:11px;font-weight:700">${esc(b.code)}</span>
                 <span style="font-size:11px;color:var(--mu);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><em>${esc(b.species||'')}</em></span>
                 <span style="font-size:10px;font-weight:700;color:${urg};flex-shrink:0">${di}d</span>
               </div>`;}).join('')}
-            ${transferDue.length>3?`<div onclick="navTo('bottles')" style="font-size:11px;color:var(--ac);cursor:pointer;padding:2px 0">+${transferDue.length-3} more →</div>`:''}
           </div>`:''}
         </div>
       </div>
     </div>
+
+    <!-- ── SECTION 2: Activity & Trends ── -->
+    <div style="grid-column:1/-1"><div class="dash-section-divider">Activity &amp; Trends</div></div>
 
     <!-- ═══ ROW 2: Activity + Reviews + Recent ═══ -->
     <div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:4px">
@@ -3836,8 +3911,22 @@ function _renderDashboard(){
       </div>
     </div>
 
+    <!-- ── SECTION 3: Lab Intelligence ── -->
+    <div style="grid-column:1/-1"><div class="dash-section-divider">Lab Intelligence</div></div>
+
+    <!-- Pinned Notes strip -->
+    ${(()=>{const pinned=S.notes.filter(n=>n.pinned).slice(0,4);return pinned.length?`<div style="grid-column:1/-1;margin-bottom:4px">
+      <div class="dash-section-label"><span>📌 Pinned Notes</span><a onclick="navTo('notes');_setNoteTypeFilter('pinned',document.querySelector('[data-ntype=pinned]'))" style="color:var(--yw);font-size:11px;cursor:pointer;font-weight:600">All pinned →</a></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px">
+        ${pinned.map(n=>`<div class="dash-pin-card" onclick="openNote('${n.id}')">
+          <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(n.title)}</div>
+          <div style="font-size:10px;color:var(--mu);margin-top:2px">${fmtDateShort(n.date)}</div>
+        </div>`).join('')}
+      </div>
+    </div>`:'';})()}
+
     <!-- ═══ ROW 3: Heatmap + Species + Media/GH widgets (independent columns) ═══ -->
-    <div style="grid-column:1/-1;margin-top:8px;padding-top:14px;border-top:1px solid var(--bd)">
+    <div style="grid-column:1/-1;margin-top:4px">
       <div class="dash-cols">
 
         <!-- COL A: Lab Activity + Bottle Activity heatmaps -->
@@ -3888,29 +3977,8 @@ function _renderDashboard(){
           })()}
         </div>
 
-        <!-- COL B: Contamination heatmap + Species grid -->
+        <!-- COL B: Species grid + Transfer Window -->
         <div class="dash-col">
-          ${(()=>{
-            const wk=_hwState['contam']||14;
-            const cMap={};
-            contamNotes.forEach(n=>{if(n.date){const d=n.date.slice(0,10);cMap[d]=(cMap[d]||0)+1;}});
-            return `<div class="hw-card">
-              <div class="hw-head">
-                <span class="hw-title">☣️ Contamination</span>
-                <span class="hw-meta" style="color:${contamRate>10?'var(--rd)':contamRate>5?'var(--yw)':'var(--gn)'}">${contamRate}% · ${recentContam30.length} this month</span>
-                <button class="hw-toggle" onclick="_hwState['contam']=${wk<26?wk*2:7};_renderDashboard()">${wk===7?'▼ Expand':wk===14?'▼ More':'▲ Collapse'}</button>
-              </div>
-              ${_genericHeatmap(cMap,wk,_hmRed,todayStr)}
-              <div style="display:flex;align-items:center;gap:5px;margin-top:5px;font-size:10px;color:var(--mu)">
-                <span>0</span>
-                <div class="dash-heatmap-cell" style="background:var(--sf3)"></div>
-                <div class="dash-heatmap-cell" style="background:rgba(248,81,73,.28)"></div>
-                <div class="dash-heatmap-cell" style="background:rgba(248,81,73,.55)"></div>
-                <div class="dash-heatmap-cell" style="background:#f85149"></div>
-                <span>High</span>
-              </div>
-            </div>`;
-          })()}
           ${topSp.length?`<div class="hw-card">
             <div class="hw-head"><span class="hw-title">🌱 Species Active</span><a onclick="navTo('species')" style="color:var(--ac);font-size:11px;cursor:pointer;font-weight:600">All →</a></div>
             <div style="display:flex;flex-direction:column;gap:4px">
@@ -3995,6 +4063,11 @@ function filteredNotes(){
     (n.species||'').toLowerCase().includes(q) ||
     (n.tags||[]).some(t=>t.toLowerCase().includes(q))
   );
+  // Note type filter (new)
+  if(S_noteTypeFilter==='generic') list=list.filter(n=>n.note_type==='generic');
+  else if(S_noteTypeFilter==='tc') list=list.filter(n=>n.note_type!=='generic');
+  else if(S_noteTypeFilter==='pinned') list=list.filter(n=>n.pinned);
+  // Legacy type/overdue filters
   if(S.typeFilter==='__overdue'){
     list=list.filter(n=>n.next_review && daysFrom(n.next_review)!==null && daysFrom(n.next_review)<=0);
   } else if(S.typeFilter){
@@ -4019,12 +4092,13 @@ function renderNoteList(){
   el.innerHTML=list.map(n=>{
     const d=n.next_review?daysFrom(n.next_review):null;
     const dotClass=d!==null&&d<=0?'overdue':d!==null&&d<=7?'soon':'';
+    const isGeneric=n.note_type==='generic';
     return `<div class="n-item${S.cur===n.id?' active':''}" data-id="${n.id}">
-      <div class="n-title">${esc(n.title)}</div>
+      <div class="n-title">${isGeneric?'<span style="font-size:10px;color:var(--gn);margin-right:3px">📝</span>':''}${n.pinned?'<span style="font-size:10px;color:var(--yw);margin-right:3px">📌</span>':''}${esc(n.title)}</div>
       ${dotClass?`<div class="review-dot ${dotClass}"></div>`:''}
       <div class="n-meta">
         <span>${fmtDateShort(n.date)}</span>
-        ${n.type?`<span class="ntype">${esc(n.type.split('(')[0].trim().slice(0,12))}</span>`:''}
+        ${n.type&&!isGeneric?`<span class="ntype">${esc(n.type.split('(')[0].trim().slice(0,12))}</span>`:''}
       </div>
       ${n.species?`<div class="nspecies">${esc(n.species)}</div>`:''}
       ${n.tags?.length?`<div class="n-tags-row">${n.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>`:''}
@@ -4059,6 +4133,9 @@ async function openNote(id){
     }
     if(m.tags?.length) m.tags.forEach(t=>badges.push(`<span class="tag">${esc(t)}</span>`));
     document.getElementById('nv-badges').innerHTML=badges.join('');
+    // Pin button state
+    const pinBtn=document.getElementById('note-pin-btn');
+    if(pinBtn){pinBtn.classList.toggle('pinned',!!m.pinned);pinBtn.title=m.pinned?'Pinned to dashboard (click to unpin)':'Pin to dashboard';}
     // clicking the recipe badge opens that recipe
     document.getElementById('nv-badges').querySelectorAll('[data-recipe-id]').forEach(el=>{
       el.addEventListener('click',()=>{ switchSection('recipes'); openRecipe(el.dataset.recipeId); });
@@ -6060,20 +6137,41 @@ async function _saveNewsToRepo(articles){
 
 // ── GEMINI AI ────────────────────────────────────────────────
 // ── AI Model system ──────────────────────────────────────────
+// Hardwired system prompt — not user-editable
+const AI_RULEBOOK=`You are an expert plant tissue culture (TC) lab assistant for TC Plants Lab Notes.
+
+RULES YOU MUST FOLLOW AT ALL TIMES:
+1. You exclusively assist with: TC protocols, media formulations, PGR concentrations (cite mg/L and µM), contamination prevention, species-specific cultivation, sterilisation protocols, autoclave parameters, explant handling, lab management, and acclimatization.
+2. You NEVER discuss topics outside plant science, laboratory science, or lab management.
+3. Always be concise, practical, and cite literature-based ranges where applicable.
+4. When discussing concentrations, always specify mg/L or µM with the compound name.
+5. The lab is located in Kelambakkam, Tamil Nadu, India — account for tropical climate (high humidity, warm temperatures) in your recommendations.
+6. When a species is mentioned, prioritise published TC protocols for that genus/family.
+7. For contamination queries, always ask about: sterilisation method, media pH, culture vessel sealing, and laminar flow maintenance.
+8. Never make up unpublished protocols — flag if information is from general extrapolation.`;
+
 const AI_MODELS={
   claude:{name:'Claude',icon:'◇',lsKey:'tcplants_claude_key',getKey:()=>localStorage.getItem('tcplants_claude_key')||'',getLink:'https://console.anthropic.com/settings/keys'},
   gemini:{name:'Gemini',icon:'✦',lsKey:'tcplants_gemini_key',getKey:()=>localStorage.getItem('tcplants_gemini_key')||'',getLink:'https://aistudio.google.com/app/apikey'},
   gpt:{name:'GPT-4o',icon:'◎',lsKey:'tcplants_openai_key',getKey:()=>localStorage.getItem('tcplants_openai_key')||'',getLink:'https://platform.openai.com/api-keys'},
   grok:{name:'Grok',icon:'𝕏',lsKey:'tcplants_grok_key',getKey:()=>localStorage.getItem('tcplants_grok_key')||'',getLink:'https://console.x.ai/'},
 };
-let _aiModel=localStorage.getItem('tcplants_ai_model')||'claude';
+// Enabled state — Claude on by default, others off until explicitly enabled
+const _getAIEnabled=m=>m==='claude'||localStorage.getItem('tcplants_ai_en_'+m)==='1';
+const _setAIEnabled=(m,on)=>localStorage.setItem('tcplants_ai_en_'+m,on?'1':'0');
+let _aiModel='claude'; // always start on Claude
 (()=>{
   const sel=document.getElementById('ai-model-sel');
   if(sel) sel.value=_aiModel;
 })();
 function _onAIModelChange(m){
+  if(m!=='claude'&&!_getAIEnabled(m)){
+    const mi=AI_MODELS[m]||AI_MODELS.claude;
+    toast(`${mi.name} not enabled — turn it on in ⚙️ Settings → AI Assistant`,'fail');
+    document.getElementById('ai-model-sel').value=_aiModel; // revert
+    return;
+  }
   _aiModel=m;
-  localStorage.setItem('tcplants_ai_model',m);
   const mi=AI_MODELS[m]||AI_MODELS.claude;
   const title=document.getElementById('ai-title-label');
   if(title) title.textContent=`${mi.icon} ${mi.name} AI`;
@@ -6216,7 +6314,7 @@ async function askAI(prompt){
     document.getElementById('ai-key-row').style.display='flex';
     return;
   }
-  const fullPrompt=GEMINI_SYS+context+'\n\nUser question: '+prompt;
+  const fullPrompt=AI_RULEBOOK+'\n\n---\n## Lab Data Context'+context+'\n\n---\nUser question: '+prompt;
   try{
     let text='';
     if(_aiModel==='claude'){
@@ -6258,20 +6356,59 @@ async function askAI(prompt){
   msgs.scrollTop=msgs.scrollHeight;
 }
 
-function startNewNote(){
+let S_noteMode='tc'; // 'generic' | 'tc'
+let S_noteTypeFilter='all'; // 'all'|'generic'|'tc'|'pinned'
+
+function setNoteMode(mode){
+  S_noteMode=mode;
+  const tcFields=document.getElementById('ne-tc-fields');
+  const pinRow=document.getElementById('ne-pin-row');
+  const tabG=document.getElementById('ne-tab-generic');
+  const tabT=document.getElementById('ne-tab-tc');
+  if(tcFields) tcFields.style.display=mode==='tc'?'':'none';
+  if(pinRow) pinRow.style.display=mode==='generic'?'flex':'none';
+  if(tabG){tabG.classList.toggle('active',mode==='generic');}
+  if(tabT){tabT.classList.toggle('active',mode==='tc');}
+  const head=document.getElementById('ne-head');
+  if(head) head.textContent=S.editing?(mode==='generic'?'Edit Note':'Edit Lab Entry'):(mode==='generic'?'New Quick Note':'New TC Lab Entry');
+  const titleEl=document.getElementById('ne-title');
+  if(titleEl) titleEl.placeholder=mode==='generic'?'e.g. Equipment maintenance, supplier notes, SOPs…':'e.g. Stage II subculture — Nepenthes rajah batch 4';
+}
+
+function _setNoteTypeFilter(type, btn){
+  S_noteTypeFilter=type;
+  document.querySelectorAll('[data-ntype]').forEach(b=>b.classList.toggle('active',b.dataset.ntype===type));
+  renderNoteList(); showNote('empty');
+}
+
+function startNewNote(mode='tc'){
+  S_noteMode=mode;
   S.editing=null; S.cur=null; renderNoteList();
-  document.getElementById('ne-head').textContent='New Lab Entry';
   ['ne-title','ne-species','ne-tags','ne-body','ne-cultures-out'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('ne-type').value='';
   document.getElementById('ne-stage').value='';
   document.getElementById('ne-review').value='';
   document.getElementById('ne-tmpl-hint').textContent='';
+  const pinCb=document.getElementById('ne-pin-cb'); if(pinCb) pinCb.checked=false;
   populateRecipeSelect();
   const wrap=document.getElementById('editor-body-wrap');
   wrap.dataset.pane='editor';
   wrap.querySelectorAll('.pane-btn').forEach(b=>b.classList.toggle('active',b.dataset.pane==='editor'));
+  setNoteMode(mode);
   showNote('editor');
   _checkDraft(null);
+}
+
+function toggleNotePin(){
+  const m=S.notes.find(n=>n.id===S.cur); if(!m) return;
+  m.pinned=!m.pinned;
+  saveNotesIndex(S.notes,S.notesSha).then(sha=>{
+    S.notesSha=sha; _writeCache(); renderNoteList();
+    const btn=document.getElementById('note-pin-btn');
+    if(btn){btn.classList.toggle('pinned',m.pinned);btn.title=m.pinned?'Pinned to dashboard':'Pin to dashboard';}
+    toast(m.pinned?'📌 Pinned to dashboard':'Unpinned');
+    _renderDashboard();
+  }).catch(e=>toast('Pin failed: '+e.message,'fail'));
 }
 
 async function startEditNote(){
@@ -6281,7 +6418,8 @@ async function startEditNote(){
     const {body}=await loadNote(id);
     const m=S.notes.find(n=>n.id===id);
     S.editing=id;
-    document.getElementById('ne-head').textContent='Edit Entry';
+    const mode=m.note_type==='generic'?'generic':'tc';
+    S_noteMode=mode;
     document.getElementById('ne-title').value=m.title||'';
     document.getElementById('ne-type').value=m.type||'';
     document.getElementById('ne-stage').value=m.stage||'';
@@ -6291,10 +6429,12 @@ async function startEditNote(){
     document.getElementById('ne-cultures-out').value=m.cultures_out||'';
     document.getElementById('ne-body').value=body;
     document.getElementById('ne-tmpl-hint').textContent='';
+    const pinCb=document.getElementById('ne-pin-cb'); if(pinCb) pinCb.checked=!!m.pinned;
     populateRecipeSelect(m.recipe_id||'');
     const wrap=document.getElementById('editor-body-wrap');
     wrap.dataset.pane='editor';
     wrap.querySelectorAll('.pane-btn').forEach(b=>b.classList.toggle('active',b.dataset.pane==='editor'));
+    setNoteMode(mode);
     showNote('editor');
     _checkDraft(id);
   }catch(e){toast('Load failed: '+e.message,'fail');}
@@ -6303,14 +6443,17 @@ async function startEditNote(){
 
 async function saveNoteAction(){
   const title  =document.getElementById('ne-title').value.trim();
-  const type   =document.getElementById('ne-type').value;
-  const stage  =document.getElementById('ne-stage').value;
-  const species=document.getElementById('ne-species').value.trim();
+  const isGeneric=S_noteMode==='generic';
+  const type   =isGeneric?'Generic Note':document.getElementById('ne-type').value;
+  const stage  =isGeneric?'':document.getElementById('ne-stage').value;
+  const species=isGeneric?'':document.getElementById('ne-species').value.trim();
   const tags   =document.getElementById('ne-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
-  const review   =document.getElementById('ne-review').value||null;
-  const recipe_id=document.getElementById('ne-recipe').value||null;
-  const cultures_out = parseInt(document.getElementById('ne-cultures-out').value,10)||null;
+  const review   =isGeneric?null:document.getElementById('ne-review').value||null;
+  const recipe_id=isGeneric?null:document.getElementById('ne-recipe').value||null;
+  const cultures_out=isGeneric?null:parseInt(document.getElementById('ne-cultures-out').value,10)||null;
   const body   =document.getElementById('ne-body').value;
+  const note_type=isGeneric?'generic':'tc';
+  const pinned=isGeneric?!!(document.getElementById('ne-pin-cb')?.checked):false;
   if(!title){toast('Title is required','fail');return;}
   document.getElementById('save-note-btn').disabled=true;
   load('Encrypting & saving…');
@@ -6320,13 +6463,13 @@ async function saveNoteAction(){
       const ef=await ghGet(`${DIR}/${S.editing}.enc`);
       await writeNote(S.editing,body,ef.sha,`lab: update "${title}"`);
       const idx=notes.findIndex(n=>n.id===S.editing);
-      if(idx!==-1) notes[idx]={...notes[idx],title,type,stage,species,tags,next_review:review,recipe_id,cultures_out};
+      if(idx!==-1) notes[idx]={...notes[idx],title,type,stage,species,tags,next_review:review,recipe_id,cultures_out,note_type,pinned};
       S.notes=notes; S.cur=S.editing;
     }else{
       const id=uid(), date=S.calDate ? new Date(S.calDate).toISOString() : new Date().toISOString();
       S.calDate=null;
       await writeNote(id,body,null,`lab: add "${title}"`);
-      notes.push({id,title,date,type,stage,species,tags,next_review:review,recipe_id,cultures_out});
+      notes.push({id,title,date,type,stage,species,tags,next_review:review,recipe_id,cultures_out,note_type,pinned});
       S.notes=notes; S.cur=id;
     }
     S.notesSha=await saveNotesIndex(S.notes,iSha);
