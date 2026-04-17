@@ -2103,18 +2103,35 @@ main > .dview, main > .editor{ margin:0 auto; }
       <!-- VERSION HEADER -->
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
         <h1 style="font-size:22px;font-weight:800;margin:0">🌿 TC Plants Lab Notes</h1>
-        <span class="help-version-badge">v3.3</span>
+        <span class="help-version-badge">v3.5</span>
       </div>
       <p style="color:var(--mu);font-size:13px;margin-bottom:20px">April 2026 · Encrypted · GitHub-backed · Single-file PWA</p>
 
-      <!-- WHAT'S NEW v3.2 -->
+      <!-- WHAT'S NEW v3.5 -->
       <div style="background:linear-gradient(135deg,rgba(63,185,80,.1),rgba(88,166,255,.08));border:1px solid rgba(63,185,80,.3);border-radius:10px;padding:18px 20px;margin-bottom:14px">
-        <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v3.3</div>
+        <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v3.5</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
-          <div style="font-size:13px;line-height:1.6"><strong>✏️ Edit custom species</strong> — each custom species row now has an Edit button; all fields editable in place, button changes to "Update Species"</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🟣 Cultivar (CV)</strong> — new Conservation Status option; shows as a purple CV badge in autocomplete dropdowns and species lists</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🧫 Sterilisation Lab</strong> — dedicated page with 10 biologically accurate protocol presets, per-step timers, temp notes, and a custom protocol builder</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🏠 Dashboard redesign</strong> — TC Stage Donut (SVG), 14-week Contamination Heatmap, QR shortcut card, Transfer Window, species grid, recipe strip</div>
+          <div style="font-size:13px;line-height:1.6"><strong>📰 News overhaul</strong> — topic dropdown (Carnivorous Plants, Nepenthes, Orchids…), 2-col card grid, full abstracts, 📌 pin articles</div>
+          <div style="font-size:13px;line-height:1.6"><strong>📷 Species photos</strong> — upload a photo to any custom taxonomy species; canvas-compressed, displayed as thumbnail in the list</div>
+          <div style="font-size:13px;line-height:1.6"><strong>▂ Minimise-to-tray</strong> — Timers, Stopwatches, and Stepper can be minimised to a fixed footer bar and run while navigating other sections</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🌿 Gelrite default 1.9 g/L</strong> — renamed from Agar/Gelrite; default changed to 1.9 g/L in all new recipes</div>
+          <div style="font-size:13px;line-height:1.6"><strong>⬆ CSV → Taxonomy</strong> — CSV greenhouse imports auto-register unknown species as Custom Species with GH flair in the taxonomy</div>
+          <div style="font-size:13px;line-height:1.6"><strong>📍 GH location default</strong> — new plants default to Q5JV+2X Kelambakkam, Tamil Nadu with map hyperlink for climate reference</div>
         </div>
       </div>
+      <!-- v3.3 release notes (collapsed) -->
+      <details style="margin-bottom:8px">
+        <summary style="cursor:pointer;font-size:12px;color:var(--mu);padding:6px 0;font-weight:600;letter-spacing:.04em">▸ v3.3 release notes</summary>
+        <div style="background:var(--sf2);border-radius:8px;padding:12px;margin-top:6px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px">
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">✏️ Edit custom species</strong> — Edit button, form pre-fills, "Update Species" on save</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">🟣 Cultivar (CV)</strong> — new Conservation Status option, purple badge in autocomplete</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">🏷 Flairs on taxonomy</strong> — required flair picker when adding/editing custom species</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">🧪 Flairs on recipes</strong> — tag media recipes with flairs for stage/type labelling</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">12 GH sources</strong> — own cultivar, sister lab, swap, commercial vendor, botanical garden, donated, rescue…</div>
+        </div>
+      </details>
       <!-- v3.2 release notes (collapsed) -->
       <details style="margin-bottom:8px">
         <summary style="cursor:pointer;font-size:12px;color:var(--mu);padding:6px 0;font-weight:600;letter-spacing:.04em">▸ v3.2 release notes</summary>
@@ -2165,6 +2182,7 @@ main > .dview, main > .editor{ margin:0 auto; }
         <a href="#h-analytics">Analytics</a>
         <a href="#h-calendar">Calendar</a>
         <a href="#h-tools">Tools</a>
+        <a href="#h-sterilise">Sterilisation Lab</a>
         <a href="#h-qr">QR Scan</a>
         <a href="#h-ai">AI Assistant</a>
         <a href="#h-news">News</a>
@@ -2291,11 +2309,12 @@ main > .dview, main > .editor{ margin:0 auto; }
           <tr><td>Name</td><td>Free text — shown in all recipe dropdowns throughout the app</td></tr>
           <tr><td>Base Medium</td><td>Curated list: MS, LS, Knudson C, VW, Pierik, New Dogashima, B5, N6, MS-Musa, WPM, DKW, Anderson's, or Custom</td></tr>
           <tr><td>Sucrose</td><td>g/L</td></tr>
-          <tr><td>Agar / Gelrite</td><td>g/L</td></tr>
+          <tr><td>Gelrite</td><td>g/L — defaults to 1.9 g/L on new recipes (formerly labelled "Agar/Gelrite")</td></tr>
           <tr><td>pH (before autoclave)</td><td>Numeric</td></tr>
           <tr><td>Growth Regulators</td><td>Free text — e.g. "BAP 1 mg/L, NAA 0.1 mg/L"</td></tr>
           <tr><td>Autoclave params</td><td>Presets: 121°C/15m, 121°C/20m, 121°C/45m, 115°C/20m, Filter sterile — or type manually</td></tr>
           <tr><td>Target species</td><td>Optional — creates a clickable link to the matching accession</td></tr>
+          <tr><td>Flairs</td><td>Optional coloured labels — tag recipes by stage, type, or workflow (e.g. "Stage II", "Rooting", "High PGR")</td></tr>
           <tr><td>Preparation notes</td><td>Full Markdown — procedure steps, amendments, observations</td></tr>
         </table>
         <div class="help-tip">💡 Filling in "Target species" and linking to a note via "Recipe Used" powers the media efficiency score in Analytics.</div>
@@ -2394,9 +2413,9 @@ main > .dview, main > .editor{ margin:0 auto; }
           <tr><td>Species</td><td>Taxonomy autocomplete + Browse modal. Hybrids (×) fully supported.</td></tr>
           <tr><td>Quantity</td><td>Number of plants — tracked via the Quantity Ledger tab.</td></tr>
           <tr><td>Health status</td><td>Healthy 🟢 / Stressed 🟡 / Dormant ⚪ / Declined 🔴 — coloured dot in list + bench view.</td></tr>
-          <tr><td>Source</td><td>Wild / Lab output / Nursery / Trade — used for LAB / WILD badges in list.</td></tr>
+          <tr><td>Source</td><td>12 options: 🧪 Lab output · 🌿 Own cultivar · 🌍 Wild · 🔬 Sister lab/exchange · 🤝 Swap/barter · 🏪 Commercial vendor · 🌱 Nursery · 🏛 Botanical garden · 🎁 Donated · ♻️ Rescue · 🌾 Seeds/spores · ↔️ Trade. Badge shown in list.</td></tr>
           <tr><td>Date added</td><td>Logged as the first entry in the Quantity Ledger.</td></tr>
-          <tr><td>Greenhouse location</td><td>Bench, section, shade house — defines bench view grouping.</td></tr>
+          <tr><td>Greenhouse location</td><td>Bench, section, shade house — defines bench view grouping. Defaults to <strong>Q5JV+2X Kelambakkam, Tamil Nadu</strong> for new plants (linked to map for climate reference).</td></tr>
           <tr><td>Next inspection date</td><td>Appears in ⏰ Reminders (🏡 icon). Overdue shows red badge in list; due ≤7 days shows yellow.</td></tr>
           <tr><td>Linked accession</td><td>Optional link to Accession Registry record.</td></tr>
           <tr><td>Notes</td><td>Markdown — phenotype, provenance, permits.</td></tr>
@@ -2459,13 +2478,14 @@ main > .dview, main > .editor{ margin:0 auto; }
           <tr><td>species</td><td>✓</td><td>Scientific name or hybrid. Wrap in quotes if it contains commas: <code>"Nepenthes × (rajah × lowii)"</code></td></tr>
           <tr><td>quantity</td><td></td><td>Integer, default 1</td></tr>
           <tr><td>health</td><td></td><td>healthy · stressed · dormant · declined (default: healthy)</td></tr>
-          <tr><td>source</td><td></td><td>greenhouse · wild · lab · nursery · trade (default: greenhouse)</td></tr>
+          <tr><td>source</td><td></td><td>greenhouse · wild · lab · nursery · trade · own-cultivar · sister-lab · swap · commercial · botanical-garden · donated · rescue · seeds (default: greenhouse)</td></tr>
           <tr><td>location</td><td></td><td>Bench label — used for bench view grouping</td></tr>
           <tr><td>next_inspection</td><td></td><td>YYYY-MM-DD</td></tr>
           <tr><td>accession_number</td><td></td><td>Stored as a reference note; does not auto-link to Registry</td></tr>
           <tr><td>notes</td><td></td><td>Free text</td></tr>
         </table>
         <p>The preview table shows every parsed row with a HYBRID badge (detected by ×), colour-coded health, and ✓ / ✕ validity. Invalid rows (missing species) are skipped on import. All imported plants automatically get the <strong>🏡 GH flair</strong> and have their condition_log and quantity_log initialised. Click <strong>⬇ Download template</strong> for a ready-to-fill sample CSV.</p>
+        <p><strong>Auto-taxonomy registration:</strong> Any species in the CSV not already in your taxonomy is automatically added to <strong>Custom Species</strong> with source = Greenhouse and the GH flair. They appear immediately in the autocomplete across all sections.</p>
 
         <h3>🏡 GH System Flair</h3>
         <p>A system flair named <strong>GH</strong> (emoji 🏡, colour green) is automatically created the first time you:</p>
@@ -2504,32 +2524,34 @@ main > .dview, main > .editor{ margin:0 auto; }
 
       <h2 id="h-dashboard">🏠 Home Dashboard</h2>
       <div class="help-section-card">
-        <p>Always accessible via the <strong>🏠 Home</strong> button. Shows your whole lab at a glance.</p>
+        <p>Always accessible via the <strong>🏠 Home</strong> button. The dashboard is a real-time lab overview rebuilt around biological workflows.</p>
         <h3>Quick Actions</h3>
         <table><tr><th>Button</th><th>Action</th></tr>
           <tr><td>＋ New Entry</td><td>Open full lab note editor</td></tr>
           <tr><td>🫙 New Bottle</td><td>Open bottle editor (Single mode)</td></tr>
           <tr><td>🏡 GH Plant</td><td>Open greenhouse plant editor</td></tr>
+          <tr><td>🧫 Sterilise</td><td>Jump to Sterilisation Lab</td></tr>
           <tr><td>📷 Scan QR</td><td>Open QR scanner in route mode</td></tr>
-          <tr><td>📅 Calendar</td><td>Navigate to calendar view</td></tr>
           <tr><td>📊 Analytics</td><td>Navigate to analytics</td></tr>
         </table>
-        <h3>Stat Cards (5)</h3>
-        <table><tr><th>Card</th><th>Value</th><th>Sub-label</th></tr>
-          <tr><td>📋 Notes</td><td>Total note count</td><td>Click → Notes section</td></tr>
-          <tr><td>🫙 Bottles</td><td>Total bottle count</td><td>N active (inoculated + growing)</td></tr>
-          <tr><td>🌿 Accessions</td><td>Registry entry count</td><td>Click → Registry</td></tr>
-          <tr><td>🏡 Greenhouse</td><td>GH entry count</td><td>Total plant count</td></tr>
-          <tr><td>⏰ Reminders</td><td>Overdue + this-week count</td><td>N overdue (red if any)</td></tr>
+        <h3>Stat Pills (5)</h3>
+        <p>Notes · Bottles (N active) · Accessions · Greenhouse (total plants) · Overdue count. Each clickable.</p>
+        <h3>Row 1 — Hero Trio</h3>
+        <table><tr><th>Card</th><th>What it shows</th></tr>
+          <tr><td>⚗️ TC Stage Distribution</td><td>SVG donut chart of all bottles by stage. Each segment is clickable — jumps to that filtered bottle list. Legend alongside.</td></tr>
+          <tr><td>☣️ Contamination Heatmap</td><td>14-week GitHub-style grid (day × week). Blue cells = lab entries, red gradient = contamination events. Contamination rate % and last-30-day count shown above the grid. Today's cell is outlined in blue.</td></tr>
+          <tr><td>📷 QR Scan + Transfer Window</td><td>Large QR scan shortcut card. Below it: cultures ≥4 weeks post-inoculation flagged for subculture (blue=4wk, yellow=6wk, red=8wk+). Click any row to open the bottle.</td></tr>
         </table>
-        <h3>Dashboard Panels</h3>
-        <table><tr><th>Panel</th><th>Contents</th></tr>
-          <tr><td>7-Day Activity Bar</td><td>Column chart of notes created each of the last 7 days. Hover for exact date + count.</td></tr>
-          <tr><td>Recent Entries</td><td>5 most recent lab notes — click to open</td></tr>
-          <tr><td>Reviews Due</td><td>Notes + bottles due in next 14 days, sorted by urgency. Red = overdue, yellow = ≤3 days, grey = later.</td></tr>
-          <tr><td>Active Bottles strip</td><td>Status pills + top bottles by review urgency, click to open. Shows only when ≥1 active bottle.</td></tr>
-          <tr><td>Greenhouse strip</td><td>Healthy stock plants as clickable chips + yellow alert when lab output ready for GH. Shows only when GH has entries.</td></tr>
+        <h3>Row 2 — Ops Panel (3 columns)</h3>
+        <table><tr><th>Column</th><th>Contents</th></tr>
+          <tr><td>📊 7-day Activity</td><td>Bar chart of notes created per day for the last 7 days</td></tr>
+          <tr><td>⏰ Reviews Due</td><td>Notes + bottles due within 14 days, urgency-sorted. Red = overdue, yellow = ≤3 days.</td></tr>
+          <tr><td>📋 Recent Entries</td><td>5 most recent notes — click to open</td></tr>
         </table>
+        <h3>Row 3 — Species in Active Culture</h3>
+        <p>Up to 8 species ranked by combined note + bottle activity. Each shows 📋 note count and 🫙 bottle count. Click any → Species hub.</p>
+        <h3>Row 4 — Media Recipes + Greenhouse</h3>
+        <p>Side by side: last 5 saved recipes (click to open, + New shortcut) and healthy greenhouse stock plants (click to open, with "Lab → GH ready" alert when subcultured bottles exist).</p>
       </div>
 
       <h2 id="h-species">🌱 Species in Culture</h2>
@@ -2561,13 +2583,15 @@ main > .dview, main > .editor{ margin:0 auto; }
         <table><tr><th>Field</th><th>Purpose</th></tr>
           <tr><td>Scientific Name</td><td>Required. Any format — species, hybrid name, working name. Names with × are auto-detected as hybrids.</td></tr>
           <tr><td>Common Name</td><td>Optional display name</td></tr>
-          <tr><td>Source / Origin</td><td>🏡 Greenhouse (own plants) · 🌱 Seeds · Wild collection · Other lab / Exchange · Custom… (free text). Choosing <strong>Greenhouse</strong> auto-creates the 🏡 GH flair.</td></tr>
+          <tr><td>Source / Origin</td><td>12 options: 🏡 Greenhouse · 🌿 Own cultivar · 🌱 Seeds/spores · 🌍 Wild · 🔬 Sister lab/exchange · 🤝 Swap/barter · 🏪 Commercial vendor · 🌱 Nursery · 🏛 Botanical garden · 🎁 Donated · ♻️ Rescue · Custom. Choosing Greenhouse auto-creates the 🏡 GH flair.</td></tr>
           <tr><td>Conservation Status</td><td>LC · NT · VU · EN · CR · DD · <strong>CV (Cultivar)</strong> — shows as a coloured badge in autocomplete. CV appears purple.</td></tr>
+          <tr><td>Flairs</td><td><strong>Required</strong> — select at least one flair to label this species (provenance, clone ID, form, etc.). Flairs must be defined first in the Flairs tab.</td></tr>
+          <tr><td>Photo</td><td>Optional — upload any image. Automatically compressed to max 480 px JPEG at ~0.62 quality (~30–50 KB). Displayed as a thumbnail in the species list row. Click thumbnail for full-screen lightbox. Click the 📷 placeholder in the list to open the edit form.</td></tr>
         </table>
         <p>Once saved, the species appears immediately in the autocomplete dropdown for all Species fields across the app (notes, bottles, accessions, greenhouse).</p>
-        <p>Each row in the Custom Species list has two action buttons: <strong>✏️ Edit</strong> (opens the form pre-filled with that species' data, button changes to "Update Species") and <strong>✕ Delete</strong>. Editing does not affect existing notes, bottles, or accessions that already reference that name — only the autocomplete entry is updated.</p>
+        <p>Each row in the Custom Species list has an <strong>✏️ Edit</strong> button (opens form pre-filled, button changes to "Update Species") and <strong>✕ Delete</strong>. Editing does not affect existing notes or bottles that already use that name.</p>
         <h3>Flairs</h3>
-        <p>Define coloured labels in the <strong>Flairs</strong> tab — e.g. <em>Borneo clone</em>, <em>Highland form</em>, <em>SCV-01</em>. The <strong>🏡 GH</strong> flair is a system flair created automatically the first time you use a Greenhouse source. Assign flairs to accessions in the Registry editor. They appear as pills in the accession list and as sub-rows in the species autocomplete dropdown.</p>
+        <p>Define coloured labels in the <strong>Flairs</strong> tab — e.g. <em>Borneo clone</em>, <em>Highland form</em>, <em>SCV-01</em>. The <strong>🏡 GH</strong> flair is a system flair created automatically the first time you use a Greenhouse source. Flairs are now also assignable to <strong>media recipes</strong> and are required when adding custom species. They appear as pills in lists and as sub-rows in the species autocomplete dropdown.</p>
       </div>
 
       <h2 id="h-reminders">⏰ Reminders</h2>
@@ -2632,9 +2656,54 @@ main > .dview, main > .editor{ margin:0 auto; }
         <table><tr><th>Tool</th><th>How to use</th></tr>
           <tr><td>Countdown Timers</td><td>＋ Add Timer → enter h/m/s + name → ▶ Start. Up to 5 simultaneous. Beeps on zero. ↺ Reset.</td></tr>
           <tr><td>Stopwatches</td><td>Up to 4 simultaneous. ⏱ Lap records a split without stopping. ↺ resets.</td></tr>
-          <tr><td>Sterilisation Stepper</td><td>Pick sterilisation protocol → app walks you through each step with a per-step countdown timer, temperature field, and notes field. Great for surface sterilisation workflows.</td></tr>
+          <tr><td>🧫 Sterilisation Stepper</td><td>Now a dedicated page — click <strong>Open Sterilisation Lab →</strong> from Tools, or tap <strong>🧫 Sterilise</strong> in the nav. See section below.</td></tr>
           <tr><td>Media Volume Scaler</td><td>Enter base volume + target volume + ingredients (one per line: "name: amount unit"). Click Scale → proportional quantities shown immediately.</td></tr>
           <tr><td>BioChemistry Calculator</td><td>Molarity (MW/mass/volume), Dilution (C₁V₁=C₂V₂), % Solution (w/v), pH from [H⁺] or pOH, PGR converter (mg/L ↔ μM using molecular weight)</td></tr>
+        </table>
+        <h3>▂ Minimise to Tray</h3>
+        <p>Each widget (Countdown Timers, Stopwatches, Sterilisation Stepper) has a <strong>▂ minimise</strong> button in its header. Clicking it collapses the card and places a chip in a fixed footer bar visible on <em>all</em> sections — so timers and steppers keep running while you navigate to notes, bottles, or anywhere else.</p>
+        <table><tr><th>Footer chip action</th><th>Result</th></tr>
+          <tr><td>Click chip label</td><td>Navigate to Tools and restore the widget card</td></tr>
+          <tr><td>Click ✕ on chip</td><td>Close chip, restore card to Tools (timer keeps its state)</td></tr>
+          <tr><td>Timer chip</td><td>Shows live countdown or 🔔 when done</td></tr>
+          <tr><td>Stopwatch chip</td><td>Shows live elapsed time while running</td></tr>
+          <tr><td>Stepper chip</td><td>Shows current step number / total</td></tr>
+        </table>
+        <p>The Stepper card in Tools is now a shortcut button only — the full stepper UI lives in <strong>🧫 Sterilise</strong> but minimises to the same tray.</p>
+      </div>
+
+      <h2 id="h-sterilise">🧫 Sterilisation Lab</h2>
+      <div class="help-section-card">
+        <p>A dedicated page for surface sterilisation work — accessible via <strong>🧫 Sterilise</strong> in the nav drawer or the shortcut in Lab Tools. The stepper timer can be minimised to the footer bar and run in parallel with any other section.</p>
+        <h3>Protocol Library (left panel)</h3>
+        <p>10 biologically accurate preset protocols, grouped by explant category:</p>
+        <table><tr><th>Category</th><th>Protocols</th></tr>
+          <tr><td>Your Work</td><td><strong>✏️ Custom Protocol</strong> — always the first entry; clears all steps so you can build from scratch and save your own</td></tr>
+          <tr><td>Standard Material</td><td>🌿 Shoot Tips / Meristems · 🍃 Leaf Disk / Leaf Explants · 🪴 Nodal Segments (Axillary Buds)</td></tr>
+          <tr><td>Seeds &amp; Spores</td><td>🌱 Seeds (General Angiosperm) · 🌸 Orchid Seeds (Asymbiotic Germination — microcentrifuge method)</td></tr>
+          <tr><td>Specialised</td><td>🪲 Nepenthes / Carnivorous Plants (gentle: 5% NaOCl, anti-oxidant rinse, PVP note)</td></tr>
+          <tr><td>Challenging</td><td>🌍 Field Collected / Heavily Contaminated (fungicide pre-soak) · 🥔 Bulb / Corm / Rhizome · 🌡️ Thermotherapy (50–55°C water bath, viral elimination)</td></tr>
+          <tr><td>In Vitro</td><td>🔬 LAF-only Transfer (UV + flame + cool-down — no bleach needed)</td></tr>
+        </table>
+        <p>Each preset shows its <span class="steril-preset-tag gentle">gentle</span>, <span class="steril-preset-tag standard">standard</span>, <span class="steril-preset-tag robust">robust</span>, or <span class="steril-preset-tag field">field</span> intensity tag, step count, and estimated total time.</p>
+        <h3>Protocol Tips Panel</h3>
+        <p>When a preset is loaded, a blue tips box appears below the stepper explaining the biological rationale — why this concentration, what to watch for, what to do next.</p>
+        <h3>Saved Protocols</h3>
+        <p>Click <strong>💾 Save</strong> to save the current step list under a custom name. Saved protocols appear below the library and can be loaded or deleted. Stored in localStorage on this device.</p>
+        <h3>Stepper Controls</h3>
+        <table><tr><th>Control</th><th>Action</th></tr>
+          <tr><td>＋ Step</td><td>Add a blank step to the current protocol</td></tr>
+          <tr><td>▶ Start Protocol</td><td>Begin the timed walkthrough — each step counts down, beeps on completion, auto-advances</td></tr>
+          <tr><td>⏸ Pause / ▶ Resume</td><td>Pause the active step timer</td></tr>
+          <tr><td>↺ Reset</td><td>Return to step 1, clear active state</td></tr>
+          <tr><td>▂ Minimise</td><td>Collapse to footer tray — stepper keeps running</td></tr>
+        </table>
+        <h3>Step Fields</h3>
+        <table><tr><th>Field</th><th>Purpose</th></tr>
+          <tr><td>Step name</td><td>Displayed as the active step label during the run</td></tr>
+          <tr><td>Duration (seconds)</td><td>Countdown timer for this step</td></tr>
+          <tr><td>Temperature (°C)</td><td>Optional bench reference — shown during the step</td></tr>
+          <tr><td>📝 Note</td><td>Bench notes shown during the active step — technique reminders, cautions</td></tr>
         </table>
       </div>
 
@@ -2673,8 +2742,25 @@ main > .dview, main > .editor{ margin:0 auto; }
 
       <h2 id="h-news">📰 TC Research News</h2>
       <div class="help-section-card">
-        <p>Click <strong>News</strong> in the nav drawer. Toggle the switch to load the latest 100 plant tissue culture publications from <strong>PubMed</strong>. Each card shows title (DOI link), authors, journal, and year. Toggle off to clear from memory.</p>
-        <p>Results are automatically <strong>archived to your repo</strong> at <code>news/YYYY-MM-DD.json</code> — these files accumulate as a permanent research archive you can reference later.</p>
+        <p>Click <strong>📰 News</strong> in the nav drawer. Select a topic, then toggle the switch to load up to 60 publications from <strong>PubMed</strong>. Changing the topic resets the toggle so you can reload with the new query.</p>
+        <h3>Topic Dropdown</h3>
+        <table><tr><th>Topic</th><th>PubMed Query covers</th></tr>
+          <tr><td>🌿 General TC</td><td>Plant tissue culture, micropropagation, in vitro propagation, plant cell culture</td></tr>
+          <tr><td>🪲 Carnivorous Plants</td><td>Nepenthes, Drosera, Sarracenia, Dionaea, Pinguicula, Heliamphora + TC terms</td></tr>
+          <tr><td>🏔 Nepenthes</td><td>Nepenthes specifically + TC terms</td></tr>
+          <tr><td>🌸 Orchids</td><td>Paphiopedilum, Dendrobium, Phalaenopsis, Vanilla, orchid + TC terms</td></tr>
+          <tr><td>🍌 Banana / Musa</td><td>Musa, banana, plantain + TC terms</td></tr>
+          <tr><td>🌼 Vanilla</td><td>Vanilla planifolia / Vanilla spp. + in vitro</td></tr>
+          <tr><td>🔬 Somatic Embryogenesis</td><td>Somatic embryogenesis + plant</td></tr>
+          <tr><td>☣️ Contamination</td><td>Fungal/bacterial contamination in tissue culture</td></tr>
+          <tr><td>⚗️ Media &amp; Hormones</td><td>PGRs, cytokinins, auxins, Murashige, culture media</td></tr>
+        </table>
+        <h3>Card Grid</h3>
+        <p>Results appear in a responsive 2-column card grid. Each card shows: title (DOI link), authors, journal, year, and a collapsible full abstract (<strong>Read more ↓</strong> toggle). DOI and PubMed ↗ links open in a new tab.</p>
+        <h3>Pinning Articles</h3>
+        <p>Click <strong>📌</strong> on any card to pin it. Pinned articles float to the top in a dedicated <em>Pinned</em> section with a yellow border, and stay pinned across page reloads (stored in localStorage). Click 📌 again to unpin.</p>
+        <h3>Archive</h3>
+        <p>Each load is automatically saved to your repo at <code>news/YYYY-MM-DD.json</code> — a permanent dated research archive. If a file for today already exists, it is not overwritten.</p>
       </div>
 
       <h2 id="h-actlog">⚡ Activity Log</h2>
