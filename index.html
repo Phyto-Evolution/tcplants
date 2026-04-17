@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#161b22">
 <title>TC Plants — Lab Notes</title>
 <link rel="manifest" href="manifest.json">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3/dist/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.19.3/umd/index.min.js"></script>
@@ -28,6 +29,46 @@
 }
 body{background:var(--bg);color:var(--tx);font-family:var(--font);height:100vh;overflow:hidden}
 
+/* ── TELEGRAM WEB APP ── */
+#twa-overlay{position:fixed;inset:0;z-index:10000;background:var(--bg);display:none;flex-direction:column;overflow:hidden}
+#twa-overlay.on{display:flex}
+.twa-header{padding:12px 16px;background:var(--sf);border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.twa-logo{font-size:22px}
+.twa-brand{flex:1}
+.twa-brand-name{font-size:15px;font-weight:800;color:var(--tx)}
+.twa-brand-sub{font-size:11px;color:var(--mu)}
+.twa-sync-btn{background:transparent;border:1px solid var(--bd);border-radius:6px;color:var(--mu);cursor:pointer;font-size:11px;padding:4px 10px}
+.twa-sync-btn:hover{border-color:var(--ac);color:var(--ac)}
+.twa-stats-row{display:flex;gap:0;border-bottom:1px solid var(--bd);flex-shrink:0}
+.twa-stat{flex:1;padding:10px 8px;text-align:center;border-right:1px solid var(--bd);cursor:pointer;transition:background .12s}
+.twa-stat:last-child{border-right:none}
+.twa-stat:hover{background:var(--sf2)}
+.twa-stat-val{font-size:20px;font-weight:800;line-height:1}
+.twa-stat-lbl{font-size:10px;color:var(--mu);margin-top:2px;text-transform:uppercase;letter-spacing:.04em}
+.twa-body{flex:1;overflow-y:auto;padding:12px}
+.twa-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.twa-tile{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:16px 12px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;-webkit-tap-highlight-color:transparent}
+.twa-tile:active{transform:scale(.96);background:var(--sf2)}
+.twa-tile-icon{font-size:26px}
+.twa-tile-label{font-size:12px;font-weight:700;color:var(--tx)}
+.twa-tile-sub{font-size:10px;color:var(--mu);line-height:1.3}
+.twa-tile.danger{border-color:rgba(248,81,73,.3);background:rgba(248,81,73,.05)}
+.twa-tile.danger .twa-tile-label{color:var(--rd)}
+.twa-section-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--mu);margin-bottom:8px}
+.twa-feed-item{display:flex;align-items:center;gap:10px;padding:9px 10px;background:var(--sf);border:1px solid var(--bd);border-radius:8px;margin-bottom:5px;cursor:pointer;transition:border-color .12s}
+.twa-feed-item:active{background:var(--sf2)}
+.twa-feed-icon{font-size:16px;flex-shrink:0}
+.twa-feed-title{font-size:12px;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.twa-feed-date{font-size:10px;color:var(--mu);flex-shrink:0}
+.twa-login{display:flex;flex-direction:column;gap:12px;padding:20px 16px;flex:1}
+.twa-login-title{font-size:18px;font-weight:800;text-align:center;margin-bottom:4px}
+.twa-login-sub{font-size:13px;color:var(--mu);text-align:center;line-height:1.5;margin-bottom:8px}
+.twa-input{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:8px;color:var(--tx);font-family:var(--font);font-size:14px;padding:10px 14px;outline:none}
+.twa-input:focus{border-color:var(--ac)}
+.twa-btn{width:100%;background:linear-gradient(135deg,var(--gn),var(--ac));border:none;border-radius:8px;color:#fff;cursor:pointer;font-family:var(--font);font-size:14px;font-weight:700;padding:12px;transition:opacity .15s}
+.twa-btn:hover{opacity:.9}
+.twa-alert{background:rgba(248,81,73,.1);border:1px solid rgba(248,81,73,.3);border-radius:6px;color:var(--rd);font-size:12px;padding:8px 12px;display:none}
+.twa-contam-form{background:var(--sf);border:1px solid var(--rd);border-radius:10px;padding:14px;margin-bottom:10px}
 /* ── WELCOME SPLASH ── */
 #welcome-splash{
   position:fixed;inset:0;z-index:9999;
@@ -3420,10 +3461,12 @@ main > .dview, main > .editor{ margin:0 auto; }
         <div class="set-row-label">Chat ID</div>
         <div class="set-row-sub">Your chat/group ID — use @userinfobot to find it</div>
         <input type="text" id="set-tg-chatid" placeholder="-1001234567890" style="margin-top:6px">
-        <div style="display:flex;gap:6px;margin-top:6px">
+        <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
           <button class="btn xs ghost" onclick="_saveTelegramSettings()" style="flex:1">Save</button>
           <button class="btn xs ghost" onclick="_testTelegram()">Test 🔔</button>
+          <button class="btn xs" style="background:var(--gn);color:#0d1117;flex:1" onclick="_configureTelegramBot()">⚙️ Configure Bot</button>
         </div>
+        <div style="margin-top:8px;font-size:11px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">⚙️ Configure Bot</strong> sets all commands, the 🌿 menu button (opens the app inside Telegram), and the bot description — one tap, everything done.</div>
       </div>
       <div class="set-row">
         <div class="set-row-info">
@@ -10375,8 +10418,341 @@ function _updateWidgetTray(){
   tray.innerHTML=chips.join('');
   tray.style.display=chips.length?'flex':'none';
 }
+
+// ════════════════════════════════════════════════════════════
+// TELEGRAM WEB APP — Phase 1
+// ════════════════════════════════════════════════════════════
+const TG=window.Telegram?.WebApp;
+const _isTWA=!!(TG?.initData)||location.search.includes('twa=1');
+
+// ── Deep-link target from bot command ──────────────────────
+const _twaStartParam=(()=>{
+  if(TG?.initDataUnsafe?.start_param) return TG.initDataUnsafe.start_param;
+  return new URLSearchParams(location.search).get('go')||'';
+})();
+
+// ── Init on page load ──────────────────────────────────────
+(function _twaBoot(){
+  if(!_isTWA) return;
+  TG?.ready();
+  TG?.expand();
+  // Apply Telegram's colour scheme
+  if(TG?.colorScheme==='light') document.documentElement.dataset.theme='light';
+  // Show the TWA overlay immediately (hides the normal login)
+  document.getElementById('twa-overlay')?.classList.add('on');
+  // Try CloudStorage auto-login
+  if(TG?.CloudStorage){
+    TG.CloudStorage.getItems(['tcplants_pw','tcplants_tok'],(err,vals)=>{
+      if(!err&&vals.tcplants_pw&&vals.tcplants_tok){
+        _twaAutoLogin(vals.tcplants_pw,vals.tcplants_tok);
+      } else {
+        _twaShowLogin();
+      }
+    });
+  } else {
+    // Fallback — try localStorage (desktop Telegram)
+    const pw=sessionStorage.getItem('twa_cached_pw');
+    const tok=localStorage.getItem('tcplants_tok_cached');
+    if(pw&&tok) _twaAutoLogin(pw,tok);
+    else _twaShowLogin();
+  }
+})();
+
+// ── Auto-login using stored credentials ───────────────────
+async function _twaAutoLogin(pw,tok){
+  document.getElementById('twa-status').textContent='Decrypting your lab data…';
+  try{
+    // Set credentials in the existing login form and call doLogin
+    document.getElementById('lpw').value=pw;
+    document.getElementById('ltok').value=tok;
+    await doLogin();
+    // doLogin sets S.pw, S.tok — now render the launcher
+    _twaRenderLauncher();
+  }catch(e){
+    document.getElementById('twa-status').textContent='';
+    _twaShowLogin('Auto-login failed — please enter credentials again.');
+  }
+}
+
+// ── Login form ─────────────────────────────────────────────
+function _twaShowLogin(errMsg=''){
+  const body=document.getElementById('twa-body');
+  body.innerHTML=`<div class="twa-login">
+    <div class="twa-logo" style="text-align:center;font-size:48px;margin-bottom:8px">🌿</div>
+    <div class="twa-login-title">TC Plants Lab</div>
+    <div class="twa-login-sub">Enter your lab passphrase and GitHub token to unlock your encrypted data.</div>
+    ${errMsg?`<div class="twa-alert" style="display:block">${esc(errMsg)}</div>`:''}
+    <div>
+      <div style="font-size:12px;font-weight:600;margin-bottom:4px;color:var(--mu)">PASSPHRASE</div>
+      <input type="password" class="twa-input" id="twa-pw" placeholder="Your encryption passphrase">
+    </div>
+    <div>
+      <div style="font-size:12px;font-weight:600;margin-bottom:4px;color:var(--mu)">GITHUB TOKEN</div>
+      <input type="password" class="twa-input" id="twa-tok" placeholder="ghp_…">
+    </div>
+    <button class="twa-btn" onclick="_twaLogin()">🔓 Unlock Lab</button>
+    <div style="font-size:11px;color:var(--mu);text-align:center;line-height:1.6">Credentials are encrypted in Telegram's CloudStorage — you only enter them once per device.</div>
+  </div>`;
+}
+
+async function _twaLogin(){
+  const pw=document.getElementById('twa-pw')?.value.trim();
+  const tok=document.getElementById('twa-tok')?.value.trim();
+  if(!pw||!tok){TG?.HapticFeedback?.notificationOccurred('error');return;}
+  TG?.MainButton?.showProgress();
+  try{
+    document.getElementById('lpw').value=pw;
+    document.getElementById('ltok').value=tok;
+    await doLogin();
+    // Save to CloudStorage so next open is automatic
+    if(TG?.CloudStorage){
+      TG.CloudStorage.setItems({tcplants_pw:pw,tcplants_tok:tok},()=>{});
+    }
+    TG?.HapticFeedback?.notificationOccurred('success');
+    _twaRenderLauncher();
+  }catch(e){
+    TG?.HapticFeedback?.notificationOccurred('error');
+    _twaShowLogin('Login failed: '+e.message);
+  }
+  TG?.MainButton?.hideProgress();
+}
+
+// ── Update stats bar ───────────────────────────────────────
+function _twaUpdateStats(){
+  const active=(S.bottles||[]).filter(b=>['inoculated','growing'].includes(b.status)).length;
+  const overdue=[...S.notes.filter(n=>n.next_review&&daysFrom(n.next_review)<=0),
+    ...(S.bottles||[]).filter(b=>b.next_review&&daysFrom(b.next_review)<=0)].length;
+  const due7=[...S.notes.filter(n=>n.next_review&&daysFrom(n.next_review)>0&&daysFrom(n.next_review)<=7),
+    ...(S.bottles||[]).filter(b=>b.next_review&&daysFrom(b.next_review)>0&&daysFrom(b.next_review)<=7)].length;
+  const lowStock=(S_inv?.items||[]).filter(i=>i.quantity<=i.low_threshold&&i.low_threshold>0).length;
+  const el=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  el('twa-s-bots',active);
+  el('twa-s-due',due7);
+  el('twa-s-over',overdue);
+  el('twa-s-stock',lowStock||'✓');
+  if(overdue>0) document.getElementById('twa-s-over').style.color='var(--rd)';
+  const labName=localStorage.getItem('tcplants_lab_name')||'Lab Notes';
+  const nameEl=document.getElementById('twa-lab-name');
+  if(nameEl) nameEl.textContent=labName;
+}
+
+// ── Main launcher ─────────────────────────────────────────
+function _twaRenderLauncher(){
+  _twaUpdateStats();
+  const body=document.getElementById('twa-body');
+  const recent=[...S.notes].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5);
+  const contamNotes=S.notes.filter(n=>n.type==='Contamination Log');
+  const contamRate=S.notes.length?Math.round(contamNotes.length/S.notes.length*100):0;
+
+  body.innerHTML=`
+    <!-- Action tiles -->
+    <div class="twa-grid">
+      <div class="twa-tile" onclick="_twaGo('note')">
+        <div class="twa-tile-icon">📝</div>
+        <div class="twa-tile-label">Quick Note</div>
+        <div class="twa-tile-sub">Generic or TC entry</div>
+      </div>
+      <div class="twa-tile danger" onclick="_twaGo('contam')">
+        <div class="twa-tile-icon">☣️</div>
+        <div class="twa-tile-label">Contam Log</div>
+        <div class="twa-tile-sub">${contamRate}% overall rate</div>
+      </div>
+      <div class="twa-tile" onclick="_twaGo('bottles')">
+        <div class="twa-tile-icon">🫙</div>
+        <div class="twa-tile-label">Bottles</div>
+        <div class="twa-tile-sub">${(S.bottles||[]).length} total</div>
+      </div>
+      <div class="twa-tile" onclick="_twaGo('reminders')">
+        <div class="twa-tile-icon">⏰</div>
+        <div class="twa-tile-label">Reminders</div>
+        <div class="twa-tile-sub">Due & overdue</div>
+      </div>
+      <div class="twa-tile" onclick="_twaGo('stock')">
+        <div class="twa-tile-icon">📦</div>
+        <div class="twa-tile-label">Stock</div>
+        <div class="twa-tile-sub">Inventory check</div>
+      </div>
+      <div class="twa-tile" onclick="_twaGo('sterilise')">
+        <div class="twa-tile-icon">🧫</div>
+        <div class="twa-tile-label">Sterilise</div>
+        <div class="twa-tile-sub">Protocol timer</div>
+      </div>
+    </div>
+    <!-- Recent activity -->
+    <div class="twa-section-label">Recent Entries</div>
+    ${recent.length?recent.map(n=>`
+      <div class="twa-feed-item" onclick="_twaOpenNote('${n.id}')">
+        <div class="twa-feed-icon">${n.note_type==='generic'?'📝':n.type==='Contamination Log'?'☣️':'🧪'}</div>
+        <div class="twa-feed-title">${esc(n.title)}</div>
+        <div class="twa-feed-date">${fmtDateShort(n.date)}</div>
+      </div>`).join(''):'<div style="font-size:13px;color:var(--mu)">No entries yet.</div>'}`;
+
+  // Handle deep link after render
+  if(_twaStartParam) _twaGo(_twaStartParam);
+}
+
+// ── Navigation: hide TWA overlay, go to section ───────────
+function _twaGo(dest){
+  TG?.HapticFeedback?.selectionChanged();
+  const overlay=document.getElementById('twa-overlay');
+
+  if(dest==='note'){
+    overlay?.classList.remove('on');
+    navTo('notes'); startNewNote('generic');
+    _twaSetMainBtn('💾 Save Note',saveNoteAction);
+  } else if(dest==='contam'){
+    overlay?.classList.remove('on');
+    navTo('notes'); startNewNote('tc');
+    // Pre-select contamination type
+    setTimeout(()=>{
+      const typeEl=document.getElementById('ne-type');
+      if(typeEl){typeEl.value='Contamination Log';}
+      const headEl=document.getElementById('ne-head');
+      if(headEl) headEl.textContent='☣️ Log Contamination';
+    },100);
+    _twaSetMainBtn('💾 Save Log',saveNoteAction);
+  } else if(dest==='bottles'){
+    overlay?.classList.remove('on');
+    navTo('bottles');
+    TG?.BackButton?.show();
+    TG?.BackButton?.onClick(()=>{navTo('notes');showNote('empty');_twaShow();TG?.BackButton?.hide();});
+  } else if(dest==='reminders'){
+    overlay?.classList.remove('on');
+    navTo('reminders');
+    _twaBackBtn();
+  } else if(dest==='stock'){
+    overlay?.classList.remove('on');
+    navTo('stock');
+    loadInv().then(renderInv);
+    _twaBackBtn();
+  } else if(dest==='sterilise'){
+    overlay?.classList.remove('on');
+    navTo('sterilise');
+    _twaBackBtn();
+  } else if(dest==='dashboard'){
+    overlay?.classList.remove('on');
+    navTo('notes'); showNote('empty');
+    _twaBackBtn();
+  }
+}
+
+function _twaOpenNote(id){
+  document.getElementById('twa-overlay')?.classList.remove('on');
+  navTo('notes'); openNote(id);
+  _twaBackBtn();
+}
+
+function _twaBackBtn(){
+  TG?.BackButton?.show();
+  TG?.BackButton?.onClick(()=>{_twaShow();TG?.BackButton?.hide();TG?.MainButton?.hide();});
+}
+
+function _twaShow(){
+  document.getElementById('twa-overlay')?.classList.add('on');
+  _twaUpdateStats();
+  TG?.MainButton?.hide();
+}
+
+function _twaSetMainBtn(text,fn){
+  if(!TG?.MainButton) return;
+  TG.MainButton.text=text;
+  TG.MainButton.color='#2ea043';
+  TG.MainButton.show();
+  TG.MainButton.onClick(fn);
+}
+
+async function _twaSyncDashboard(){
+  const btn=document.getElementById('twa-sync-btn');
+  if(btn){btn.textContent='↻ Syncing…';btn.disabled=true;}
+  try{
+    const {notes,sha}=await loadNotesIndex();
+    S.notes=notes; S.notesSha=sha;
+    _twaUpdateStats();
+    _twaRenderLauncher();
+    TG?.HapticFeedback?.notificationOccurred('success');
+  }catch(e){TG?.HapticFeedback?.notificationOccurred('error');}
+  if(btn){btn.textContent='↻ Sync';btn.disabled=false;}
+}
+
+function _twaOpenFull(){
+  // Open the full PWA (non-TWA) in a browser
+  TG?.openLink?.(location.href.replace('?twa=1',''));
+}
+
+// ── Bot auto-configure ─────────────────────────────────────
+async function _configureTelegramBot(){
+  const tok=localStorage.getItem('tcplants_tg_token');
+  if(!tok){toast('Save your bot token in Settings → Telegram first','fail');return;}
+  const api=`https://api.telegram.org/bot${tok}`;
+  const TWA=location.origin+'?twa=1';
+  load('Configuring bot…');
+  try{
+    // Commands
+    await fetch(`${api}/setMyCommands`,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({commands:[
+        {command:'start',description:'🌿 Open TC Plants Lab'},
+        {command:'status',description:'📊 Lab dashboard'},
+        {command:'note',description:'📝 Create quick note'},
+        {command:'contam',description:'☣️ Log contamination event'},
+        {command:'bottles',description:'🫙 View active cultures'},
+        {command:'reminders',description:'⏰ Due reviews & inspections'},
+        {command:'stock',description:'📦 Low inventory check'},
+        {command:'sterilise',description:'🧫 Sterilisation timer'},
+        {command:'timer',description:'⏱ Countdown timer [secs] [label]'},
+        {command:'checklist',description:'✅ Today\'s lab tasks'},
+        {command:'help',description:'❓ All commands'},
+      ]})});
+    // Menu button
+    await fetch(`${api}/setChatMenuButton`,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({menu_button:{type:'web_app',text:'🌿 Open Lab',web_app:{url:TWA}}})});
+    // Description
+    await fetch(`${api}/setMyDescription`,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({description:'🌿 TC Plants Lab — encrypted tissue culture lab notebook. Track cultures, log notes, get alerts, and run sterilisation protocols.'})});
+    await fetch(`${api}/setMyShortDescription`,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({short_description:'Encrypted TC lab notebook & assistant'})});
+    toast('Bot configured ✓ — commands, menu button, and description set','ok',4000);
+  }catch(e){toast('Config error: '+e.message,'fail');}
+  unload();
+}
 </script>
 <!-- Widget tray — fixed footer for minimised lab tools -->
 <div id="widget-tray"></div>
+
+<!-- ═══════════ TELEGRAM WEB APP OVERLAY ═══════════ -->
+<div id="twa-overlay">
+  <!-- Header -->
+  <div class="twa-header">
+    <div class="twa-logo">🌿</div>
+    <div class="twa-brand">
+      <div class="twa-brand-name">TC Plants Lab</div>
+      <div class="twa-brand-sub" id="twa-lab-name">Loading…</div>
+    </div>
+    <button class="twa-sync-btn" onclick="_twaSyncDashboard()" id="twa-sync-btn">↻ Sync</button>
+    <button class="twa-sync-btn" onclick="_twaOpenFull()" style="margin-left:4px">⛶ Full</button>
+  </div>
+  <!-- Stats row -->
+  <div class="twa-stats-row" id="twa-stats-row">
+    <div class="twa-stat" onclick="_twaGo('bottles')">
+      <div class="twa-stat-val" id="twa-s-bots">—</div>
+      <div class="twa-stat-lbl">Active</div>
+    </div>
+    <div class="twa-stat" onclick="_twaGo('reminders')">
+      <div class="twa-stat-val" id="twa-s-due" style="color:var(--yw)">—</div>
+      <div class="twa-stat-lbl">Due</div>
+    </div>
+    <div class="twa-stat" onclick="_twaGo('reminders')">
+      <div class="twa-stat-val" id="twa-s-over" style="color:var(--rd)">—</div>
+      <div class="twa-stat-lbl">Overdue</div>
+    </div>
+    <div class="twa-stat" onclick="_twaGo('stock')">
+      <div class="twa-stat-val" id="twa-s-stock" style="color:var(--mu)">—</div>
+      <div class="twa-stat-lbl">Low stock</div>
+    </div>
+  </div>
+  <!-- Body — shows launcher OR login OR action form -->
+  <div class="twa-body" id="twa-body">
+    <div id="twa-status" style="text-align:center;color:var(--mu);padding:20px;font-size:13px">Loading your lab…</div>
+  </div>
+</div>
 </body>
 </html>
