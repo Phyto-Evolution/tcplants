@@ -1285,7 +1285,7 @@ main > .dview, main > .editor{ margin:0 auto; }
 
 <div id="overlay" aria-live="polite"><div class="spin"></div><p id="ovmsg">Working…</p></div>
 <div id="toast"></div>
-<div id="vanakkam-greeting">
+<div id="vanakkam-greeting" style="display:none!important">
   <div class="vk-card">
     <div class="vk-icon">🌿🙏</div>
     <div class="vk-text">Vanakkam</div>
@@ -4093,22 +4093,7 @@ function toast(msg,type='ok',dur=3200){
   clearTimeout(_tt);_tt=setTimeout(()=>{t.className='';},dur);
 }
 
-function showVanakkam(labName){
-  const el=document.getElementById('vanakkam-greeting');
-  if(!el) return;
-  document.getElementById('vk-lab-name').textContent=labName||'';
-  el.style.transition='none';
-  el.style.opacity='0';
-  el.style.display='flex';
-  void el.offsetWidth; // force reflow — browser must see opacity:0 before transition starts
-  el.style.transition='opacity .5s ease';
-  el.style.opacity='1';
-  clearTimeout(window._vkT);
-  window._vkT=setTimeout(()=>{
-    el.style.opacity='0';
-    setTimeout(()=>{ el.style.display='none'; },560);
-  }, 3200);
-}
+function showVanakkam(){ }
 
 function showNote(name){
   document.getElementById('ql-fab').style.display = name==='editor' ? 'none' : '';
@@ -4503,7 +4488,7 @@ function _renderDashboard(){
     pEl.style.cssText='';
     pEl.innerHTML=donutHTML+alertsHTML+actHTML+contamHTML+spHTML+ghHTML+recentHTML+pinnedHTML+researchHTML+aibarHTML+voiceHTML;
   }
-
+}
 
 function showReg(name){
   document.getElementById('reg-empty').style.display  = name==='empty'  ?'block':'none';
@@ -9694,9 +9679,7 @@ async function login(){
     populateTagsDatalist();
     updateReminderBadge();
     switchSection('notes'); showNote('empty');
-    // Vanakkam greeting after login
-    const _labN=localStorage.getItem('tcplants_lab_name');
-    setTimeout(()=>showVanakkam(_labN||''), 350);
+
     document.getElementById('ql-fab').classList.add('on');
     document.getElementById('ai-btn').classList.add('on');
     document.getElementById('lab-footer-bar').classList.add('on');
