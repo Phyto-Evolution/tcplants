@@ -27,7 +27,7 @@
   --ac:#0969da;--gn:#1a7f37;--rd:#d1242f;--yw:#9a6700;--pu:#8250df;
   --glass:rgba(255,255,255,.55);--glass-bd:rgba(9,105,218,.15);
 }
-body{background:var(--bg);color:var(--tx);font-family:var(--font);height:100vh;overflow:hidden}
+body{background:var(--bg);color:var(--tx);font-family:var(--font);font-size:14px;height:100vh;overflow:hidden}
 
 /* ── TELEGRAM WEB APP ── */
 #twa-overlay{position:fixed;inset:0;z-index:10000;background:var(--bg);display:none;flex-direction:column;overflow:hidden}
@@ -192,7 +192,7 @@ nav{
   display:flex;align-items:center;gap:5px;
   background:transparent;border:none;border-radius:6px;color:var(--mu);
   cursor:pointer;font-family:var(--font);font-size:12px;font-weight:500;
-  padding:5px 8px;transition:all .12s;white-space:nowrap
+  padding:7px 10px;transition:all .12s;white-space:nowrap
 }
 .ndtab:hover{background:var(--sf2);color:var(--tx)}
 .ndtab.active{background:var(--sf2);color:var(--tx);font-weight:600}
@@ -216,7 +216,7 @@ nav{
 /* ── LAYOUT ── */
 .section{display:none;flex:1;overflow:hidden}
 .section.on{display:flex}
-.section.fullpage{display:none;flex:1;overflow-y:auto;padding:32px 40px}
+.section.fullpage{display:none;flex:1;overflow-y:auto;padding:36px 48px}
 .section.fullpage.on{display:block}
 
 /* aside elements moved to nav drawer — kept as stub for compatibility */
@@ -235,7 +235,7 @@ aside{display:none}
 .fpill{
   background:var(--sf2);border:1px solid var(--bd);border-radius:12px;
   color:var(--mu);cursor:pointer;font-family:var(--font);font-size:11px;
-  padding:2px 9px;transition:all .15s
+  padding:3px 11px;transition:all .15s
 }
 .fpill:hover,.fpill.active{background:rgba(88,166,255,.15);border-color:var(--ac);color:var(--ac)}
 .fpill.red.active{background:rgba(248,81,73,.15);border-color:var(--rd);color:var(--rd)}
@@ -243,15 +243,15 @@ aside{display:none}
 
 /* Note list */
 #note-list,#acc-list,#rec-list{flex:1;overflow-y:auto}
-.n-item{padding:11px 14px;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .1s;position:relative;touch-action:manipulation;-webkit-tap-highlight-color:rgba(88,166,255,.15)}
+.n-item{padding:13px 16px;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .1s;position:relative;touch-action:manipulation;-webkit-tap-highlight-color:rgba(88,166,255,.15)}
 .n-item:hover{background:rgba(255,255,255,.04)}
-.n-item.active{background:rgba(88,166,255,.1);border-left:2px solid var(--ac);padding-left:12px}
-.n-title{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:16px}
-.n-meta{font-size:11px;color:var(--mu);margin-top:3px;display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.n-item.active{background:rgba(88,166,255,.08);border-left:3px solid var(--ac);padding-left:14px}
+.n-title{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:16px}
+.n-meta{font-size:12px;color:var(--mu);margin-top:4px;display:flex;gap:7px;align-items:center;flex-wrap:wrap}
 .ntype{background:var(--sf2);border-radius:4px;padding:1px 6px;font-size:10px;text-transform:uppercase;letter-spacing:.3px;flex-shrink:0}
 .nspecies{font-size:11px;color:var(--gn);font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .n-tags-row{margin-top:4px;display:flex;gap:4px;flex-wrap:wrap}
-.tag{background:rgba(88,166,255,.12);color:var(--ac);border-radius:10px;font-size:11px;padding:1px 7px}
+.tag{background:rgba(88,166,255,.12);color:var(--ac);border-radius:10px;font-size:12px;padding:2px 9px}
 .review-dot{
   position:absolute;right:10px;top:50%;transform:translateY(-50%);
   width:7px;height:7px;border-radius:50%
@@ -260,7 +260,7 @@ aside{display:none}
 .review-dot.soon{background:var(--yw)}
 
 /* Status badges */
-.sbadge{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:3px 10px;border-radius:12px;font-weight:500}
+.sbadge{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:4px 11px;border-radius:14px;font-weight:600}
 .sbadge.type{background:var(--sf2);border:1px solid var(--bd);color:var(--tx)}
 .sbadge.stage{background:rgba(210,153,34,.12);color:var(--yw);border:1px solid rgba(210,153,34,.3)}
 .sbadge.species{background:rgba(63,185,80,.1);color:var(--gn);border:1px solid rgba(63,185,80,.3);font-style:italic}
@@ -283,7 +283,7 @@ main > .dview, main > .editor{ margin:0 auto; }
 /* Detail view */
 .dview{display:none}
 .dview.on{display:block}
-.dhead{margin-bottom:26px;padding-bottom:18px;border-bottom:1px solid var(--bd)}
+.dhead{margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--bd)}
 .dtitle{font-size:28px;font-weight:700;line-height:1.35;margin-bottom:12px}
 .dbadges{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:8px;align-items:center}
 .ddate{font-size:13px;color:var(--mu);margin-bottom:10px}
@@ -682,12 +682,32 @@ main > .dview, main > .editor{ margin:0 auto; }
 /* scaler */
 .scaler-result{background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:10px;font-family:var(--mono);font-size:13px;margin-top:8px;white-space:pre-wrap;min-height:40px;line-height:1.8}
 /* dashboard */
-.dash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;align-items:start}
-.dash-card{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
-.dash-card-wide{grid-column:1/-1}
-/* legacy kept for anything still using it */
+/* ── DASHBOARD REDESIGN ── */
+#dash-panels{display:grid;gap:12px;grid-template-columns:1fr 1fr 1fr;grid-template-areas:
+  "donut  alerts  activity"
+  "contam contam  contam"
+  "species species gh"
+  "recent pinned  research"
+  "aibar  aibar   aibar"
+  "voice  voice   voice";
+}
+@media(max-width:900px){#dash-panels{grid-template-columns:1fr 1fr;grid-template-areas:"donut alerts""activity contam""species species""gh gh""recent pinned""research research""aibar aibar""voice voice";}}
+@media(max-width:580px){#dash-panels{grid-template-columns:1fr;grid-template-areas:"donut""alerts""activity""contam""species""gh""recent""pinned""research""aibar""voice";}}
+.dc{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.dc-label{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.dc-label a,.dc-label span[onclick]{color:var(--ac);cursor:pointer;font-size:9px;font-weight:700;text-transform:none;letter-spacing:0}
+.dc-num{font-size:32px;font-weight:800;line-height:1;margin-bottom:2px}
+.dc-sub{font-size:11px;color:var(--mu)}
+.dc-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--sf2);cursor:pointer}
+.dc-row:last-child{border-bottom:none}
+.dc-row:hover{background:var(--sf2);margin:0 -4px;padding-left:4px;padding-right:4px;border-radius:4px;border-bottom-color:transparent}
+.dc-tag{display:inline-flex;align-items:center;gap:4px;background:var(--sf2);border:1px solid var(--bd);border-radius:16px;padding:4px 10px;font-size:11px;white-space:nowrap;cursor:pointer;transition:border-color .1s}
+.dc-tag:hover{border-color:var(--ac);color:var(--ac)}
+/* legacy compat */
 .dash-hero{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:12px;align-items:start}
 .dash-hero-card{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.dash-card{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px 16px}
+.dash-card-wide{grid-column:1/-1}
 .dash-heatmap-cell{width:11px;height:11px;border-radius:2px;flex-shrink:0}
 .dash-qr-btn{background:var(--sf2);border:2px dashed var(--bd);border-radius:10px;padding:18px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;transition:all .15s;text-align:center}
 .dash-qr-btn:hover{border-color:var(--ac);background:rgba(88,166,255,.05)}
@@ -710,17 +730,17 @@ main > .dview, main > .editor{ margin:0 auto; }
 #re-base-custom-wrap{display:none;margin-top:6px}
 
 /* ── HELP ── */
-.help-body{max-width:800px}
-.help-body h2{font-size:20px;font-weight:700;margin:28px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--bd)}
+.help-body{max-width:960px}
+.help-body h2{font-size:22px;font-weight:700;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)}
 .help-body h2:first-child{margin-top:0}
 .help-body h3{font-size:15px;font-weight:700;margin:16px 0 6px;color:var(--ac)}
-.help-body p{font-size:14px;line-height:1.75;color:var(--tx);margin:6px 0}
+.help-body p{font-size:14px;line-height:1.8;color:var(--tx);margin:8px 0}
 .help-body ul{font-size:14px;line-height:1.75;padding-left:20px;margin:6px 0}
 .help-body li{margin:3px 0}
 .help-body code{background:rgba(255,255,255,.08);border-radius:4px;font-family:var(--mono);font-size:12px;padding:2px 6px}
 .help-body .kbd{background:var(--sf2);border:1px solid var(--bd);border-radius:4px;font-family:var(--mono);font-size:12px;padding:2px 7px}
 .help-body table{border-collapse:collapse;width:100%;margin:10px 0;font-size:13px}
-.help-body th,.help-body td{border:1px solid var(--bd);padding:7px 10px;text-align:left}
+.help-body th,.help-body td{border:1px solid var(--bd);padding:10px 14px;text-align:left;font-size:13px}
 .help-body th{background:var(--sf2)}
 .help-flow{background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;margin:12px 0;display:flex;flex-wrap:wrap;align-items:center;gap:6px;justify-content:center}
 .flow-step{background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:5px 12px;font-size:12px;white-space:nowrap;font-weight:600}
@@ -1090,7 +1110,7 @@ main > .dview, main > .editor{ margin:0 auto; }
 .dash-section-divider{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--mu);padding:4px 0 8px;border-top:1px solid var(--bd);margin-top:4px;display:flex;align-items:center;gap:8px}
 .dash-section-divider::after{content:'';flex:1;height:1px;background:var(--bd)}
 /* heatmap widget */
-.hw-card{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:18px 20px;transition:border-color .15s}
+.hw-card{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:20px 22px;transition:border-color .15s}
 .hw-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 .hw-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);flex:1}
 .hw-meta{font-size:12px;font-weight:700}
@@ -1127,7 +1147,7 @@ main > .dview, main > .editor{ margin:0 auto; }
 #ai-voice-confirm.on{display:flex}
 #ai-voice-confirm .vc-heard{font-size:13px;font-style:italic;color:var(--tx);padding:8px 12px;background:var(--sf);border-radius:8px;width:100%;box-sizing:border-box}
 #ai-voice-confirm .vc-btns{display:flex;gap:8px;width:100%}
-.ai-msg{padding:9px 13px;border-radius:10px;font-size:13px;line-height:1.65;max-width:88%;word-break:break-word}
+.ai-msg{padding:11px 15px;border-radius:12px;font-size:13px;line-height:1.7;max-width:88%;word-break:break-word}
 /* widget tray — always visible when active, also persistent tools status */
 #tools-status-bar{position:fixed;bottom:0;left:0;right:0;height:0;z-index:150;pointer-events:none}
 .ai-msg.user{background:var(--ac);color:#fff;align-self:flex-end;border-radius:8px 8px 2px 8px}
@@ -1139,7 +1159,7 @@ main > .dview, main > .editor{ margin:0 auto; }
 #ai-mic-btn.processing{background:var(--yw);color:#0d1117;border-color:var(--yw)}
 #ai-input-row{padding:10px;border-top:1px solid var(--bd);display:flex;gap:6px;flex-shrink:0}
 #ai-input{flex:1;font-size:13px;padding:7px 10px;resize:none;height:36px;min-height:36px;max-height:100px;overflow-y:auto}
-.ai-chip{background:var(--sf2);border:1px solid var(--bd);border-radius:14px;color:var(--mu);cursor:pointer;font-size:11px;padding:3px 10px;white-space:nowrap;font-family:var(--font)}
+.ai-chip{background:var(--sf2);border:1px solid var(--bd);border-radius:14px;color:var(--mu);cursor:pointer;font-size:12px;padding:4px 12px;white-space:nowrap;font-family:var(--font)}
 .ai-chip:hover{background:var(--sf3);color:var(--tx)}
 #ai-chips{display:flex;gap:5px;overflow-x:auto;padding:8px 12px 4px;flex-shrink:0;border-bottom:1px solid var(--bd)}
 /* ── SPECIES TABLE ── */
@@ -1356,7 +1376,7 @@ main > .dview, main > .editor{ margin:0 auto; }
           <button class="dqa-btn" onclick="navTo('analytics')">📊 Analytics</button>
         </div>
         <!-- Quick Stats -->
-        <div id="dash-stats" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;margin-bottom:20px"></div>
+        <div id="dash-stats" style="display:flex;gap:0;margin-bottom:16px;background:var(--sf);border:1px solid var(--bd);border-radius:12px;overflow:hidden"></div>
         <!-- Dynamic panels rendered by _renderDashboard() -->
         <div class="dash-grid" id="dash-panels">
           <div>
@@ -4217,7 +4237,7 @@ function _renderDashboard(){
     ...allBots.filter(b=>b.next_review&&['inoculated','growing'].includes(b.status)&&daysFrom(b.next_review)<=0)].length;
   const ghTotal=(S.greenhouse||[]).reduce((s,p)=>s+(p.quantity||1),0);
 
-  // ── Stat pills ──────────────────────────────────────────────
+  // ── Stat band ────────────────────────────────────────────────
   const stats=[
     {icon:'📋',val:S.notes.length,label:'Notes',c:'var(--ac)',fn:"navTo('notes')"},
     {icon:'🫙',val:allBots.length,label:`${activeBot.length} active`,c:'#1abc9c',fn:"navTo('bottles')"},
@@ -4225,10 +4245,9 @@ function _renderDashboard(){
     {icon:'🏡',val:(S.greenhouse||[]).length,label:`${ghTotal} plants`,c:'#52b788',fn:"navTo('greenhouse')"},
     {icon:'⏰',val:overdueCount,label:'overdue',c:overdueCount?'var(--rd)':'var(--mu)',fn:"navTo('reminders')"},
   ];
-  el.innerHTML=stats.map(s=>`<div onclick="${s.fn}" style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:12px 14px;cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='${s.c}'" onmouseout="this.style.borderColor='var(--bd)'">
-    <div style="font-size:18px;margin-bottom:4px">${s.icon}</div>
-    <div style="font-size:24px;font-weight:800;color:${s.c}">${s.val}</div>
-    <div style="font-size:11px;color:var(--mu);margin-top:1px">${s.label}</div>
+  el.innerHTML=stats.map((s,i)=>`<div onclick="${s.fn}" style="flex:1;padding:14px 16px;cursor:pointer;text-align:center;border-right:${i<stats.length-1?'1px solid var(--bd)':'none'};transition:background .12s" onmouseover="this.style.background='var(--sf2)'" onmouseout="this.style.background=''">
+    <div style="font-size:22px;font-weight:800;color:${s.c};line-height:1">${s.val}</div>
+    <div style="font-size:10px;color:var(--mu);margin-top:3px;text-transform:uppercase;letter-spacing:.06em">${s.icon} ${s.label}</div>
   </div>`).join('');
 
   // ── Computed values ─────────────────────────────────────────
@@ -4277,196 +4296,214 @@ function _renderDashboard(){
 
   const pEl=document.getElementById('dash-panels');
   if(pEl){
-    // ── helper: compact card wrapper ──────────────────────────
-    const card=(content,wide=false)=>`<div class="dash-card${wide?' dash-card-wide':''}">${content}</div>`;
-    const sec=(label)=>`<div class="dash-card-wide" style="padding:6px 0 2px"><div class="dash-section-divider">${label}</div></div>`;
-    const lnk=(label,fn,col='var(--ac)')=>`<a onclick="${fn}" style="color:${col};font-size:11px;cursor:pointer;font-weight:600">${label}</a>`;
-    const row=(a,b)=>`<div style="display:flex;align-items:center;justify-content:space-between">${a}${b}</div>`;
+    pEl.className=''; pEl.style.cssText='';
 
-    // ── Cards ──────────────────────────────────────────────────
-
-    // 1. TC Stage Donut
-    const donutCard=card(`
-      ${row('<span style="font-size:12px;font-weight:700">⚗️ TC Stages</span>',lnk('All →',"navTo('bottles')"))}
-      ${allBots.length?`<div style="display:flex;align-items:center;gap:12px;margin-top:6px">
-        <div style="flex-shrink:0">${_donutSvg(donutSegs)}</div>
-        <div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0">
-          ${stageOrder.filter(s=>stageCounts[s]).map(s=>`<div onclick="navTo('bottles');setBotFilter('${s}');renderBottleList()" style="display:flex;align-items:center;gap:5px;cursor:pointer" onmouseover="this.style.opacity='.6'" onmouseout="this.style.opacity='1'">
-            <div style="width:8px;height:8px;border-radius:2px;flex-shrink:0;background:${stageCols[s]}"></div>
-            <span style="font-size:11px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--mu)">${stageLabel[s].replace(/^\S+\s/,'')}</span>
-            <span style="font-size:11px;font-weight:700">${stageCounts[s]}</span>
-          </div>`).join('')}
+    // ── helpers ───────────────────────────────────────────────
+    const C=(area,content,extra='')=>`<div class="dc" style="grid-area:${area};${extra}">${content}</div>`;
+    const H=(label,action='',actionLabel='')=>`<div class="dc-label">${label}${action?`<span onclick="${action}" style="color:var(--ac);cursor:pointer;font-size:10px">${actionLabel}</span>`:''}</div>`;
+    const Row=(icon,title,sub,action,badge='',badgeCol='var(--mu)')=>`
+      <div class="dc-row" onclick="${action}">
+        ${icon?`<span style="font-size:14px;flex-shrink:0">${icon}</span>`:''}
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${title}</div>
+          ${sub?`<div style="font-size:11px;color:var(--mu);margin-top:1px">${sub}</div>`:''}
         </div>
-      </div>`:'<div style="font-size:12px;color:var(--mu);padding:8px 0">No bottles yet. <a onclick="navTo(\'bottles\');startNewBottle(\'single\')" style="color:var(--ac);cursor:pointer">Add one →</a></div>'}`);
+        ${badge?`<span style="font-size:11px;font-weight:700;color:${badgeCol};flex-shrink:0">${badge}</span>`:''}
+      </div>`;
 
-    // 2. Contamination
-    const contamCard=card(`
-      ${row(`<span style="font-size:12px;font-weight:700">☣️ Contamination</span>`,lnk('Log →',"navTo('contam')","var(--rd)"))}
-      <div style="display:flex;gap:16px;margin-top:4px">
-        <div style="text-align:center"><div style="font-size:22px;font-weight:800;color:${contamRate>10?'var(--rd)':contamRate>5?'var(--yw)':'var(--gn)'}">${contamRate}%</div><div style="font-size:10px;color:var(--mu)">overall</div></div>
-        <div style="text-align:center"><div style="font-size:22px;font-weight:800;color:${recentContam30.length>3?'var(--yw)':'var(--tx)'}">${recentContam30.length}</div><div style="font-size:10px;color:var(--mu)">30 days</div></div>
-        <div style="text-align:center"><div style="font-size:22px;font-weight:800">${contamNotes.length}</div><div style="font-size:10px;color:var(--mu)">total</div></div>
+    // ── 1. CULTURES — donut + stage list ──────────────────────
+    const donutHTML=C('donut',`
+      ${H('⚗️ CULTURES',`navTo('bottles')`,'All bottles →')}
+      ${allBots.length?`
+        <div style="display:flex;gap:16px;align-items:flex-start">
+          <div style="flex-shrink:0;margin-top:4px">${_donutSvg(donutSegs)}</div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+            ${stageOrder.filter(s=>stageCounts[s]).map(s=>`
+              <div onclick="navTo('bottles');setBotFilter('${s}');renderBottleList()" class="dc-row" style="padding:4px 0;border-bottom-color:var(--sf2)">
+                <div style="width:10px;height:10px;border-radius:2px;flex-shrink:0;background:${stageCols[s]}"></div>
+                <span style="flex:1;font-size:12px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${stageLabel[s].replace(/^\S+\s/,'')}</span>
+                <span style="font-size:13px;font-weight:700">${stageCounts[s]}</span>
+              </div>`).join('')}
+          </div>
+        </div>
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--sf2);display:flex;justify-content:space-between">
+          <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:var(--ac)">${activeBot.length}</div><div style="font-size:10px;color:var(--mu)">active</div></div>
+          <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:var(--yw)">${transferDue.length}</div><div style="font-size:10px;color:var(--mu)">transfer due</div></div>
+          <div style="text-align:center"><div style="font-size:20px;font-weight:800">${allBots.length}</div><div style="font-size:10px;color:var(--mu)">total</div></div>
+        </div>`
+      :`<div style="padding:24px 0;text-align:center;color:var(--mu)">
+          <div style="font-size:32px;margin-bottom:8px">🫙</div>
+          <div style="font-size:13px;margin-bottom:12px">No cultures yet</div>
+          <button class="btn sm green" onclick="navTo('bottles');startNewBottle('single')">+ Add first bottle</button>
+        </div>`}`);
+
+    // ── 2. ATTENTION — reviews + transfers ────────────────────
+    const alertItems=upcoming.slice(0,5).map(r=>{
+      const cls=r.days<=0?'var(--rd)':r.days<=3?'var(--yw)':'var(--mu)';
+      const dl=r.days<0?`${Math.abs(r.days)}d overdue`:r.days===0?'Today':`in ${r.days}d`;
+      const act=r.isBot?`navTo('bottles');openBottle('${r.id}')`:`openNote('${r.id}')`;
+      return Row(r.icon,esc(r.title),'',act,dl,cls);
+    }).join('');
+    const xferItems=transferDue.slice(0,3).map(b=>{
+      const di=Math.floor((now-new Date(b.date_inoculated))/86400000);
+      return Row('✂️',`${esc(b.code)} — ${esc(b.species||'?')}`,`Inoculated ${di}d ago`,`navTo('bottles');openBottle('${b.id}')`,di+'d',di>=56?'var(--rd)':'var(--yw)');
+    }).join('');
+    const alertsHTML=C('alerts',`
+      ${H('⚠️ ATTENTION',`navTo('reminders')`,'All reminders →')}
+      ${upcoming.length?alertItems:'<div style="padding:12px 0;text-align:center;color:var(--gn);font-size:13px">✓ Nothing overdue</div>'}
+      ${xferItems?`<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--sf2)">
+        <div style="font-size:9px;font-weight:800;letter-spacing:.08em;color:var(--mu);margin-bottom:6px">TRANSFER DUE</div>
+        ${xferItems}
+      </div>`:''}`);
+
+    // ── 3. ACTIVITY — 7-day bar + quick stats ─────────────────
+    const actHTML=C('activity',`
+      ${H('📊 THIS WEEK')}
+      <div style="display:flex;gap:16px;margin-bottom:14px">
+        <div><div style="font-size:28px;font-weight:800;color:var(--ac)">${totalLast7}</div><div style="font-size:11px;color:var(--mu)">entries</div></div>
+        <div><div style="font-size:28px;font-weight:800;color:var(--gn)">${S.notes.filter(n=>n.date&&n.date.slice(0,10)>=todayStr).length}</div><div style="font-size:11px;color:var(--mu)">today</div></div>
+        <div><div style="font-size:28px;font-weight:800;color:overdueCount?'var(--rd)':'var(--mu)'">${overdueCount}</div><div style="font-size:11px;color:var(--mu)">overdue</div></div>
       </div>
-      <div style="margin-top:8px">${_contamHeatmap(S.notes)}</div>`);
-
-    // 3. Reviews due
-    const reviewCard=card(`
-      ${row(`<span style="font-size:12px;font-weight:700">⏰ Reviews Due</span>`,overdueCount?`<span style="font-size:11px;color:var(--rd);font-weight:700">${overdueCount} overdue</span>`:'')}
-      <div style="display:flex;flex-direction:column;gap:4px;margin-top:4px">
-        ${upcoming.length?upcoming.map(r=>{
-          const cls=r.days<=0?'var(--rd)':r.days<=3?'var(--yw)':'var(--mu)';
-          const dl=r.days<0?`${Math.abs(r.days)}d late`:r.days===0?'Today':`${r.days}d`;
-          const act=r.isBot?`navTo('bottles');openBottle('${r.id}')`:`openNote('${r.id}')`;
-          return`<div onclick="${act}" style="display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:5px;cursor:pointer;background:var(--sf2)" onmouseover="this.style.background='var(--sf3)'" onmouseout="this.style.background='var(--sf2)'">
-            <span>${r.icon}</span><div style="flex:1;font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.title)}</div>
-            <span style="font-size:10px;font-weight:700;color:${cls};flex-shrink:0">${dl}</span>
-          </div>`;}).join(''):'<div style="font-size:12px;color:var(--gn)">All clear ✓</div>'}
+      <div class="dash-activity-bar" style="height:52px;margin-bottom:4px">
+        ${days7.map(d=>`<div class="dab-col" title="${esc(d.label)}: ${d.cnt}" style="height:${Math.max(6,Math.round(d.cnt/maxCnt*100))}%;${d.cnt===0?'opacity:.12':''}"></div>`).join('')}
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--mu)">
+        ${days7.map((d,i)=>`<span style="${i===6?'color:var(--ac);font-weight:700':''}">${d.ds.slice(8)}</span>`).join('')}
       </div>`);
 
-    // 4. Transfer due
-    const xferCard=transferDue.length?card(`
-      ${row(`<span style="font-size:12px;font-weight:700">✂️ Transfer Due</span>`,`<span style="font-size:11px;color:var(--yw);font-weight:700">${transferDue.length}</span>`)}
-      <div style="display:flex;flex-direction:column;gap:4px;margin-top:4px">
-        ${transferDue.slice(0,5).map(b=>{
-          const di=Math.floor((now-new Date(b.date_inoculated))/86400000);
-          const urg=di>=56?'var(--rd)':di>=42?'var(--yw)':'var(--ac)';
-          return`<div onclick="navTo('bottles');openBottle('${b.id}')" style="display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:5px;cursor:pointer;background:var(--sf2);border-left:2px solid ${urg}" onmouseover="this.style.background='var(--sf3)'" onmouseout="this.style.background='var(--sf2)'">
-            <span style="font-family:var(--mono);font-size:11px;font-weight:700">${esc(b.code)}</span>
-            <span style="font-size:11px;color:var(--mu);flex:1;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(b.species||'')}</span>
-            <span style="font-size:10px;font-weight:700;color:${urg};flex-shrink:0">${di}d</span>
-          </div>`;}).join('')}
-      </div>`):'';
+    // ── 4. CONTAMINATION — full-width horizontal band ─────────
+    const contamHTML=C('contam',`
+      <div style="display:flex;align-items:center;gap:0;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:6px;margin-right:20px;flex-shrink:0">
+          <span style="font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--mu);text-transform:uppercase">☣️ Contamination</span>
+          <a onclick="navTo('contam')" style="color:var(--rd);font-size:11px;font-weight:600;cursor:pointer;margin-left:4px">Log →</a>
+        </div>
+        <div style="display:flex;gap:20px;margin-right:20px;flex-shrink:0">
+          <div style="text-align:center">
+            <div style="font-size:24px;font-weight:800;color:${contamRate>10?'var(--rd)':contamRate>5?'var(--yw)':'var(--gn)'}">${contamRate}%</div>
+            <div style="font-size:10px;color:var(--mu)">rate</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:24px;font-weight:800">${recentContam30.length}</div>
+            <div style="font-size:10px;color:var(--mu)">30 days</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:24px;font-weight:800">${contamNotes.length}</div>
+            <div style="font-size:10px;color:var(--mu)">total</div>
+          </div>
+        </div>
+        <div style="flex:1;min-width:200px;overflow:hidden">${_contamHeatmap(S.notes)}</div>
+      </div>`,'background:rgba(248,81,73,.04);border-color:rgba(248,81,73,.18)');
 
-    // 5. 7-day activity bar
-    const actCard=card(`
-      ${row(`<span style="font-size:12px;font-weight:700">📊 7-day Activity</span>`,`<span style="font-size:11px;color:var(--ac);font-weight:700">${totalLast7} entries</span>`)}
-      <div class="dash-activity-bar" style="margin-top:6px">
-        ${days7.map(d=>`<div class="dab-col" title="${esc(d.label)}: ${d.cnt}" style="height:${Math.max(8,Math.round(d.cnt/maxCnt*100))}%;${d.cnt===0?'opacity:.15':'opacity:.8'}"></div>`).join('')}
+    // ── 5. SPECIES — horizontal scrolling chips ────────────────
+    const spChips=topSp.map(sp=>`
+      <div class="dc-tag" onclick="navTo('species')" title="${esc(sp.name)}">
+        <span style="font-style:italic;font-weight:600;max-width:120px;overflow:hidden;text-overflow:ellipsis">${esc(sp.name)}</span>
+        <span style="color:var(--mu);font-size:10px">${sp.notes?`📋${sp.notes}`:''}${sp.notes&&sp.bottles?' ':''}${sp.bottles?`🫙${sp.bottles}`:''}</span>
+      </div>`).join('');
+    const spHTML=C('species',`
+      ${H('🌱 SPECIES IN CULTURE',`navTo('species')`,'View all →')}
+      ${topSp.length
+        ?`<div style="display:flex;flex-wrap:wrap;gap:7px">${spChips}</div>`
+        :'<div style="color:var(--mu);font-size:13px">No species data yet.</div>'}`);
+
+    // ── 6. GREENHOUSE ─────────────────────────────────────────
+    const ghHTML=ghPlants.length?C('gh',`
+      ${H('🏡 GREENHOUSE',`navTo('greenhouse')`,'All plants →')}
+      <div style="display:flex;gap:16px;margin-bottom:10px">
+        <div><div style="font-size:24px;font-weight:800;color:var(--gn)">${ghTotal}</div><div style="font-size:10px;color:var(--mu)">plants</div></div>
+        <div><div style="font-size:24px;font-weight:800">${ghHealthy.length}</div><div style="font-size:10px;color:var(--mu)">healthy</div></div>
       </div>
-      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--mu);margin-top:2px"><span>${days7[0].ds.slice(5)}</span><span>Today</span></div>`);
+      ${ghHealthy.slice(0,5).map(p=>Row('',`${esc(p.species||'?')}`,`${p.quantity||1} plant${(p.quantity||1)>1?'s':''}`,`navTo('greenhouse');openGHPlant('${p.id}')`)).join('')}
+      ${spWithSubcult.length?`<div style="font-size:11px;color:var(--yw);margin-top:8px;padding-top:8px;border-top:1px solid var(--sf2)">⚗️ Lab → GH: ${spWithSubcult.slice(0,3).map(s=>esc(s)).join(', ')}${spWithSubcult.length>3?'…':''}</div>`:''}`):
+    C('gh',`${H('🏡 GREENHOUSE',`navTo('greenhouse')`,'Set up →')}<div style="color:var(--mu);font-size:13px;padding:12px 0">No greenhouse plants yet.</div>`);
 
-    // 6. Recent entries
-    const recentCard=card(`
-      ${row(`<span style="font-size:12px;font-weight:700">📋 Recent</span>`,lnk('All →',"navTo('notes')"))}
-      <div style="display:flex;flex-direction:column;gap:4px;margin-top:4px">
-        ${recent.map(n=>`<div onclick="openNote('${n.id}')" style="padding:4px 6px;border-radius:5px;cursor:pointer;background:var(--sf2)" onmouseover="this.style.background='var(--sf3)'" onmouseout="this.style.background='var(--sf2)'">
-          <div style="font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(n.title)}</div>
-          <div style="font-size:10px;color:var(--mu)">${fmtDateShort(n.date)}${n.species?` · <em>${esc(n.species)}</em>`:''}</div>
-        </div>`).join('')||'<div style="font-size:12px;color:var(--mu)">No notes yet.</div>'}
-      </div>`);
+    // ── 7. RECENT NOTES ───────────────────────────────────────
+    const recentHTML=C('recent',`
+      ${H('📋 RECENT NOTES',`navTo('notes')`,'All notes →')}
+      ${recent.map(n=>Row('',esc(n.title),`${fmtDateShort(n.date)}${n.species?' · '+esc(n.species):''}`,`openNote('${n.id}')`)).join('')
+        ||'<div style="color:var(--mu);font-size:13px;padding:12px 0">No notes yet.</div>'}`);
 
-    // 7. Species
-    const spCard=topSp.length?card(`
-      ${row(`<span style="font-size:12px;font-weight:700">🌱 Species</span>`,lnk('All →',"navTo('species')"))}
-      <div style="display:flex;flex-direction:column;gap:3px;margin-top:4px">
-        ${topSp.slice(0,7).map(sp=>`<div onclick="navTo('species')" style="display:flex;align-items:center;gap:8px;padding:3px 0;cursor:pointer;border-bottom:1px solid var(--sf2)" onmouseover="this.style.color='var(--ac)'" onmouseout="this.style.color=''">
-          <span style="flex:1;font-size:11px;font-weight:600;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(sp.name)}</span>
-          <span style="font-size:10px;color:var(--mu);flex-shrink:0">${sp.notes?`📋${sp.notes} `:''}${sp.bottles?`🫙${sp.bottles}`:''}</span>
-        </div>`).join('')}
-      </div>`):'';
+    // ── 8. PINNED NOTES ───────────────────────────────────────
+    const pinnedNotes=S.notes.filter(n=>n.pinned).slice(0,5);
+    const recentRecs2=(S.recs||[]).slice(0,4);
+    const pinnedHTML=C('pinned',`
+      ${H('📌 PINNED',`navTo('notes');_setNoteTypeFilter('pinned',document.querySelector('[data-ntype=pinned]'))`,'All →')}
+      ${pinnedNotes.length
+        ?pinnedNotes.map(n=>Row('',esc(n.title),fmtDateShort(n.date),`openNote('${n.id}')`)).join('')
+        :`<div style="color:var(--mu);font-size:13px;padding:8px 0">No pinned notes.</div>`}
+      ${recentRecs2.length?`<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--sf2)">
+        <div style="font-size:9px;font-weight:800;letter-spacing:.08em;color:var(--mu);margin-bottom:8px">🧪 RECIPES</div>
+        ${recentRecs2.map(r=>Row('',esc(r.name),esc(r.base||''),`navTo('recipes');openRecipe('${r.id}')`)).join('')}
+      </div>`:''}`);
 
-    // 8. Recipes
-    const recCard=recentRecs.length?card(`
-      ${row(`<span style="font-size:12px;font-weight:700">🧪 Recipes</span>`,lnk('+ New →',"navTo('recipes');startNewRecipe()","var(--pu)"))}
-      <div style="display:flex;flex-direction:column;gap:4px;margin-top:4px">
-        ${recentRecs.map(r=>`<div onclick="navTo('recipes');openRecipe('${r.id}')" style="padding:5px 8px;border-radius:6px;cursor:pointer;background:var(--sf2)" onmouseover="this.style.background='var(--sf3)'" onmouseout="this.style.background='var(--sf2)'">
-          <div style="font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.name)}</div>
-          <div style="color:var(--mu);font-size:10px">${esc(r.base||'')}${r.agar?` · ${r.agar}g/L`:''}</div>
-        </div>`).join('')}
-      </div>`):'';
+    // ── 9. RESEARCH ───────────────────────────────────────────
+    const pinnedArts=_getPinnedArticles().slice(0,4);
+    const researchHTML=C('research',`
+      ${H('📌 RESEARCH',`navTo('news')`,'Open News →')}
+      ${pinnedArts.length
+        ?pinnedArts.map(a=>`
+          <div class="dc-row" onclick="window.open('${esc(a.url)}','_blank')">
+            <div style="flex:1;min-width:0">
+              <div style="font-size:12px;font-weight:600;line-height:1.4;color:var(--ac);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${esc(a.title)}</div>
+              <div style="font-size:10px;color:var(--mu);margin-top:2px">${esc(a.authors?.split(',')[0]||'')} · ${esc(a.year||'')}</div>
+            </div>
+          </div>`).join('')
+        :`<div style="color:var(--mu);font-size:13px;padding:8px 0">Pin papers in News to see them here.</div>`}`);
 
-    // 9. GH plants
-    const ghCard=ghPlants.length?card(`
-      ${row(`<span style="font-size:12px;font-weight:700">🏡 Greenhouse</span>`,`<span style="font-size:11px;color:var(--gn)">${ghTotal} plants</span>`)}
-      <div style="display:flex;flex-direction:column;gap:3px;margin-top:4px">
-        ${ghHealthy.slice(0,5).map(p=>`<div onclick="navTo('greenhouse');openGHPlant('${p.id}')" style="display:flex;align-items:center;gap:6px;padding:3px 0;cursor:pointer;border-bottom:1px solid var(--sf2)">
-          <div class="gh-health-dot healthy"></div>
-          <span style="flex:1;font-size:11px;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.species||'?')}</span>
-          <span style="color:var(--mu);font-size:10px">${p.quantity||1}×</span>
-        </div>`).join('')}
-        ${spWithSubcult.length?`<div style="font-size:10px;color:var(--yw);margin-top:4px">⚗️ → GH: ${spWithSubcult.slice(0,2).map(s=>esc(s)).join(', ')}${spWithSubcult.length>2?'…':''}</div>`:''}
-      </div>`):'';
-
-    // 10. Pinned notes
-    const pinned=S.notes.filter(n=>n.pinned).slice(0,4);
-    const pinnedCard=pinned.length?card(`
-      ${row(`<span style="font-size:12px;font-weight:700">📌 Pinned</span>`,lnk('All →',"navTo('notes');_setNoteTypeFilter('pinned',document.querySelector('[data-ntype=pinned]'))","var(--yw)"))}
-      <div style="display:flex;flex-direction:column;gap:4px;margin-top:4px">
-        ${pinned.map(n=>`<div class="dash-pin-card" onclick="openNote('${n.id}')">
-          <div style="font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(n.title)}</div>
-          <div style="font-size:10px;color:var(--mu)">${fmtDateShort(n.date)}</div>
-        </div>`).join('')}
-      </div>`):'';
-
-    // 11. Pinned research
-    const pinnedArticles=(_newsData||_getPinnedArticles()).filter(a=>_newsPins.has(a.pmid)).slice(0,3);
-    const researchCard=pinnedArticles.length?card(`
-      ${row(`<span style="font-size:12px;font-weight:700">📌 Research</span>`,lnk('News →',"navTo('news')"))}
-      <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
-        ${pinnedArticles.map(a=>`<div onclick="window.open('${esc(a.url)}','_blank')" style="padding:5px 8px;border-radius:6px;cursor:pointer;background:rgba(210,153,34,.07);border:1px solid rgba(210,153,34,.2)">
-          <div style="font-size:11px;font-weight:600;line-height:1.4;color:var(--ac)">${esc(a.title.slice(0,70))}${a.title.length>70?'…':''}</div>
-          <div style="font-size:10px;color:var(--mu);margin-top:2px">${esc(a.authors.split(',')[0]||'')} · ${esc(a.year)}</div>
-        </div>`).join('')}
-      </div>`):'';
-
-    // 12. AI Usage (full-width)
+    // ── 10. AI USAGE — compact full-width bar ─────────────────
     const today=new Date().toISOString().slice(0,10);
     const u=_aiUsage();
     const aiMs=[
-      {key:'llama-3.1-8b-instant',  label:'⚡ 8B',  lim:AI_LIMITS['llama-3.1-8b-instant'],    col:'#1abc9c'},
-      {key:'llama-3.3-70b-versatile',label:'🔬 70B', lim:AI_LIMITS['llama-3.3-70b-versatile'], col:'var(--ac)'},
-      {key:'claude',                 label:'◇',      lim:AI_LIMITS['claude'],                   col:'var(--pu)'},
-      {key:'whisper-large-v3',       label:'🎤',      lim:AI_LIMITS['whisper-large-v3'],         col:'var(--yw)'},
+      {key:'llama-3.1-8b-instant',  label:'⚡ Quick 8B',  lim:AI_LIMITS['llama-3.1-8b-instant'],    col:'#1abc9c'},
+      {key:'llama-3.3-70b-versatile',label:'🔬 Deep 70B', lim:AI_LIMITS['llama-3.3-70b-versatile'], col:'var(--ac)'},
+      {key:'claude',                 label:'◇ Claude',    lim:AI_LIMITS['claude'],                   col:'var(--pu)'},
+      {key:'whisper-large-v3',       label:'🎤 Whisper',  lim:AI_LIMITS['whisper-large-v3'],         col:'var(--yw)'},
     ];
     const last30=Object.keys(u).filter(d=>d<=today).sort().slice(-30);
     const heatCols=['#161b22','#0d4429','#006d32','#26a641','#39d353'];
-    const heatMap=last30.map(d=>{
+    const heat=last30.map(d=>{
       const tot=aiMs.reduce((s,m)=>s+((u[d]||{})[m.key]?.req||0),0);
       const i=tot===0?0:tot<5?1:tot<20?2:tot<50?3:4;
-      return`<div title="${d}: ${tot} req" style="width:11px;height:11px;border-radius:2px;background:${heatCols[i]}"></div>`;
+      return`<div title="${d}: ${tot} requests" style="width:11px;height:11px;border-radius:2px;flex-shrink:0;background:${heatCols[i]}"></div>`;
     }).join('');
-    const aiUsageCard=card(`
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <span style="font-size:12px;font-weight:700">🤖 AI Usage today</span>
-        <div style="display:flex;gap:12px">
-          ${aiMs.map(m=>{
-            const d=(u[today]||{})[m.key]||{req:0};
-            const pct=Math.min(d.req/m.lim.reqDay*100,100);
-            const warn=pct>80?'var(--rd)':pct>50?'var(--yw)':m.col;
-            return`<div style="text-align:center;min-width:44px">
-              <div style="font-size:10px;color:${warn};font-weight:700">${d.req}<span style="font-weight:400;color:var(--mu)">/${m.lim.reqDay<1000?m.lim.reqDay:Math.round(m.lim.reqDay/1000)+'k'}</span></div>
-              <div style="font-size:10px;color:var(--mu)">${m.label}</div>
-              <div style="height:3px;background:var(--sf3);border-radius:2px;margin-top:2px"><div style="height:3px;border-radius:2px;background:${warn};width:${pct}%"></div></div>
-            </div>`;
-          }).join('')}
-        </div>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:2px">${heatMap||'<span style="font-size:11px;color:var(--mu)">No usage yet</span>'}</div>`,true);
+    const aibarHTML=C('aibar',`
+      <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+        <span style="font-size:9px;font-weight:800;letter-spacing:.1em;color:var(--mu);white-space:nowrap;text-transform:uppercase">🤖 AI Usage today</span>
+        ${aiMs.map(m=>{
+          const d=(u[today]||{})[m.key]||{req:0};
+          const pct=Math.min(d.req/m.lim.reqDay*100,100);
+          const warn=pct>80?'var(--rd)':pct>50?'var(--yw)':m.col;
+          return`<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+            <span style="font-size:11px;color:var(--mu)">${m.label}</span>
+            <div style="width:80px;height:4px;background:var(--sf3);border-radius:2px"><div style="height:4px;border-radius:2px;background:${warn};width:${pct}%;transition:width .4s"></div></div>
+            <span style="font-size:11px;font-weight:700;color:${warn}">${d.req}<span style="font-weight:400;color:var(--mu)">/${m.lim.reqDay<1000?m.lim.reqDay:Math.round(m.lim.reqDay/1000)+'k'}</span></span>
+          </div>`;
+        }).join('')}
+        <div style="flex:1;display:flex;flex-wrap:wrap;gap:2px;justify-content:flex-end">${heat}</div>
+      </div>`,'padding:12px 18px');
 
-    // 13. Voice transcripts (full-width, only if any)
-    const dump=_getVoiceDump().slice(-8).reverse();
-    const voiceCard=dump.length?card(`
-      <div style="font-size:12px;font-weight:700;margin-bottom:6px">🎤 Voice Transcripts</div>
+    // ── 11. VOICE LOG — only if transcripts exist ─────────────
+    const dump=_getVoiceDump().slice(-10).reverse();
+    const voiceHTML=dump.length?C('voice',`
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:9px;font-weight:800;letter-spacing:.1em;color:var(--mu);text-transform:uppercase">🎤 Voice Log</span>
+        <button class="btn xs ghost" onclick="_exportVoiceDump()" style="font-size:10px">⬇ Export</button>
+      </div>
       <div style="display:flex;flex-wrap:wrap;gap:6px">
         ${dump.map(e=>{
           const ts=new Date(e.ts).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
-          return`<div style="background:var(--sf2);border-radius:6px;padding:4px 8px;font-size:11px;max-width:260px">
-            <span style="color:var(--mu);font-size:10px;margin-right:4px">${ts}</span>${esc(e.text)}
+          return`<div style="background:var(--sf2);border-radius:20px;padding:4px 12px;font-size:12px;max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+            <span style="color:var(--mu);font-size:10px;margin-right:5px">${ts}</span>${esc(e.text)}
           </div>`;
         }).join('')}
-      </div>
-      <button class="btn xs ghost" onclick="_exportVoiceDump()" style="margin-top:6px;align-self:flex-start">⬇ Export</button>`,true):'';
+      </div>`,'padding:12px 18px'):'';
 
-    // ── Assemble ────────────────────────────────────────────────
-    pEl.className='dash-grid';
-    pEl.innerHTML=
-      donutCard+contamCard+reviewCard+
-      (xferCard||'')+actCard+recentCard+
-      (spCard||'')+(recCard||'')+(ghCard||'')+
-      (pinnedCard||'')+(researchCard||'')+
-      aiUsageCard+(voiceCard||'');
+    // ── Assemble — CSS class handles layout ───────────────────
+    pEl.style.cssText='';
+    pEl.innerHTML=donutHTML+alertsHTML+actHTML+contamHTML+spHTML+ghHTML+recentHTML+pinnedHTML+researchHTML+aibarHTML+voiceHTML;
   }
-}
+
 
 function showReg(name){
   document.getElementById('reg-empty').style.display  = name==='empty'  ?'block':'none';
