@@ -7195,7 +7195,14 @@ function _startNativeSTT(isWake, onDone){
     if(onDone) onDone();
   };
   _nativeSR.onend=()=>{
-    _setMicBtnState('idle');
+    // If ended without capturing anything (Chrome cut off too early), restart
+    if(!_nativePending && _nativeSR !== null){
+      _nativeSR=null;
+      setTimeout(()=>_startNativeSTT(false, onDone), 200);
+    } else {
+      _setMicBtnState('idle');
+      _nativeSR=null;
+    }
   };
   _nativeSR.start();
 }
@@ -7263,7 +7270,7 @@ async function _startWhisperSTT(){
   const buf=new Uint8Array(_whisperAnalyser.frequencyBinCount);
   let silenceStart=null;
   let hasSpeech=false; // don't stop until user has actually spoken
-  const graceEnd=Date.now()+1500; // 1.5s grace — don't check silence at all on start
+  const graceEnd=Date.now()+3500; // 3.5s grace — don't check silence at all on start
   const checkSilence=()=>{
     if(!_whisperRec||_whisperRec.state!=='recording') return;
     _whisperAnalyser.getByteFrequencyData(buf);
