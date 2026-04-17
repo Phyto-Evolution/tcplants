@@ -985,6 +985,23 @@ main > .dview, main > .editor{ margin:0 auto; }
 #saved-device-banner.on{display:block}
 /* ── AI ASSISTANT ── */
 .ai-model-sel{background:var(--sf2);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-size:11px;font-weight:700;padding:3px 7px;cursor:pointer;font-family:var(--font)}
+/* inventory */
+.inv-cat{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--mu);padding:8px 0 4px;border-top:1px solid var(--bd);margin-top:4px}
+.inv-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--sf2)}
+.inv-name{font-size:13px;font-weight:600;flex:1}
+.inv-qty{font-size:13px;font-family:var(--mono);font-weight:700;flex-shrink:0;min-width:60px;text-align:right}
+.inv-low{color:var(--rd)}
+.inv-ok{color:var(--gn)}
+.inv-warn{color:var(--yw)}
+.gbif-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:2px 8px;border-radius:4px;border:1px solid;margin-top:4px}
+.gbif-badge.lc{color:var(--gn);border-color:rgba(63,185,80,.4);background:rgba(63,185,80,.1)}
+.gbif-badge.en,.gbif-badge.cr{color:var(--rd);border-color:rgba(248,81,73,.4);background:rgba(248,81,73,.1)}
+.gbif-badge.vu,.gbif-badge.nt{color:var(--yw);border-color:rgba(210,153,34,.4);background:rgba(210,153,34,.1)}
+.gbif-badge.dd{color:var(--mu);border-color:var(--bd)}
+/* label print size selector */
+.label-size-sel{display:flex;gap:6px;margin-bottom:10px}
+.label-size-btn{background:var(--sf2);border:1px solid var(--bd);border-radius:5px;color:var(--mu);cursor:pointer;font-size:11px;padding:3px 10px}
+.label-size-btn.active{border-color:var(--ac);color:var(--ac);background:rgba(88,166,255,.1)}
 /* note mode tabs */
 .note-mode-tabs{display:flex;gap:0;margin-bottom:14px;border:1px solid var(--bd);border-radius:7px;overflow:hidden}
 .note-mode-tab{flex:1;background:transparent;border:none;color:var(--mu);cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;padding:7px 4px;transition:all .15s;text-align:center}
@@ -2075,6 +2092,29 @@ main > .dview, main > .editor{ margin:0 auto; }
     </div>
   </div>
 
+  <!-- ── STOCK / INVENTORY ── -->
+  <div class="section fullpage" id="sec-stock">
+    <div style="max-width:1000px;margin:0 auto;width:100%;padding-bottom:40px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+        <h2 style="font-size:20px;font-weight:700">📦 Lab Stock &amp; Inventory</h2>
+        <button class="btn sm green" style="margin-left:auto" onclick="_invOpenEditor(null)">＋ Add Item</button>
+      </div>
+      <div style="display:grid;grid-template-columns:240px 1fr;gap:16px;align-items:start" id="inv-layout">
+        <!-- Left: category list + low-stock summary -->
+        <div>
+          <div id="inv-summary" style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:12px;margin-bottom:12px"></div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin-bottom:6px">Categories</div>
+          <div id="inv-cat-list" style="display:flex;flex-direction:column;gap:4px"></div>
+        </div>
+        <!-- Right: item list + editor -->
+        <div>
+          <div id="inv-editor" style="display:none;background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:18px;margin-bottom:14px"></div>
+          <div id="inv-items"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ── NEWS ── -->
   <div class="section fullpage" id="sec-news">
     <div style="max-width:1200px;margin:0 auto;width:100%;padding-bottom:40px">
@@ -2893,6 +2933,7 @@ main > .dview, main > .editor{ margin:0 auto; }
       <button class="ndtab" data-sec="species" onclick="navTo('species')"><span class="nd-icon">🌱</span>Species</button>
       <button class="ndtab" data-sec="tools" onclick="navTo('tools')"><span class="nd-icon">⏱</span>Tools</button>
       <button class="ndtab" data-sec="sterilise" onclick="navTo('sterilise')"><span class="nd-icon">🧫</span>Sterilise</button>
+      <button class="ndtab" data-sec="stock" onclick="navTo('stock')"><span class="nd-icon">📦</span>Stock</button>
       <button class="ndtab" data-sec="calendar" onclick="navTo('calendar')"><span class="nd-icon">📅</span>Calendar</button>
       <button class="ndtab" data-sec="news" onclick="navTo('news')"><span class="nd-icon">📰</span>News</button>
       <button class="ndtab" data-sec="help" onclick="navTo('help')"><span class="nd-icon">❓</span>Help</button>
@@ -3297,6 +3338,43 @@ main > .dview, main > .editor{ margin:0 auto; }
           <button class="btn xs ghost" onclick="_setModelKey('grok','set-grok-key')" style="flex:1">Save Key</button>
           <a href="https://console.x.ai/" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
         </div>
+      </div>
+    </div>
+    <div class="set-section">
+      <div class="set-section-title">Telegram Alerts</div>
+      <div class="set-row set-row-full">
+        <div class="set-row-label">Bot Token</div>
+        <div class="set-row-sub">Create a bot via @BotFather on Telegram</div>
+        <input type="password" id="set-tg-token" placeholder="123456:ABC-DEF1234ghIkl..." style="margin-top:6px">
+      </div>
+      <div class="set-row set-row-full">
+        <div class="set-row-label">Chat ID</div>
+        <div class="set-row-sub">Your chat/group ID — use @userinfobot to find it</div>
+        <input type="text" id="set-tg-chatid" placeholder="-1001234567890" style="margin-top:6px">
+        <div style="display:flex;gap:6px;margin-top:6px">
+          <button class="btn xs ghost" onclick="_saveTelegramSettings()" style="flex:1">Save</button>
+          <button class="btn xs ghost" onclick="_testTelegram()">Test 🔔</button>
+        </div>
+      </div>
+      <div class="set-row">
+        <div class="set-row-info">
+          <div class="set-row-label">Alert on overdue review</div>
+          <div class="set-row-sub">Fires once per session on login if items are overdue</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="set-tg-overdue" onchange="localStorage.setItem('tcplants_tg_overdue',this.checked?'1':'0')">
+          <div class="toggle-track"></div>
+        </label>
+      </div>
+      <div class="set-row">
+        <div class="set-row-info">
+          <div class="set-row-label">Alert on contamination log</div>
+          <div class="set-row-sub">Fires when you save a Contamination Log entry</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="set-tg-contam" onchange="localStorage.setItem('tcplants_tg_contam',this.checked?'1':'0')">
+          <div class="toggle-track"></div>
+        </label>
       </div>
     </div>
     <div class="set-section">
@@ -5549,6 +5627,17 @@ function _renderTaxonomyPanel(){
             <input type="file" id="tc-photo-input" accept="image/*" style="display:none" onchange="_tcHandlePhoto(this)">
           </div>
         </div>
+        <div class="row2" style="margin-bottom:10px">
+          <div class="field" style="margin:0">
+            <label>Subculture Interval <span style="font-weight:400;color:var(--mu);font-size:11px">(days, for calendar)</span></label>
+            <input type="number" id="tc-subcult-days" placeholder="e.g. 28" min="1" max="365">
+          </div>
+          <div class="field" style="margin:0">
+            <label>🌍 GBIF Lookup</label>
+            <button type="button" class="btn ghost sm" onclick="_taxGBIFLookup()" style="width:100%;margin-top:4px">Fetch conservation data ↗</button>
+          </div>
+        </div>
+        <div id="tc-gbif-result" style="display:none;margin-bottom:10px;font-size:12px;color:var(--mu);background:var(--sf2);border-radius:6px;padding:8px 10px"></div>
         <div style="display:flex;gap:8px">
           <button class="btn sm green" id="tc-save-btn" onclick="_taxSaveCustomSpecies()">Add Species</button>
           <button class="btn sm ghost" onclick="_taxResetForm()">Cancel</button>
@@ -5751,6 +5840,8 @@ function _taxEditCustomSpecies(id){
   document.getElementById('tc-status').value=sp.conservation_status||'';
   _renderTcFlairPills(sp.flair_ids||[]);
   _tcSetPhotoUI(sp.photo||null);
+  const sdEl=document.getElementById('tc-subcult-days'); if(sdEl) sdEl.value=sp.subculture_interval_days||'';
+  document.getElementById('tc-gbif-result').style.display='none';
   // Restore source
   const knownSrc=['greenhouse','seeds','wild','other-lab','own-cultivar','swap','commercial','nursery','botanical-garden','donated','rescue'];
   if(knownSrc.includes(sp.source||'')){
@@ -5782,6 +5873,7 @@ async function _taxSaveCustomSpecies(){
     source,
     flair_ids:_getTcFlairIds(),
     photo:_tcPhotoData||undefined,
+    subculture_interval_days:parseInt(document.getElementById('tc-subcult-days')?.value)||null,
   };
 
   if(_taxEditingSpeciesId){
@@ -6292,6 +6384,13 @@ async function _buildAIContext(){
       const avgOut=sp.out.length?(sp.out.reduce((a,b)=>a+b,0)/sp.out.length).toFixed(1):null;
       ctx+=`\n- ${sp.name}: ${sp.notes} notes${stages?`, ${stages}`:''}${sp.contam?`, ${sp.contam} contam`:''}${avgOut?`, avg ${avgOut} cultures/transfer`:''}`;
     });
+  }
+
+  // PubMed species context (when a species is set on open note)
+  const curNote=S.cur?S.notes.find(n=>n.id===S.cur):null;
+  if(curNote?.species){
+    const pmCtx=await _fetchPubMedContext(curNote.species);
+    if(pmCtx) ctx+=pmCtx;
   }
 
   return ctx;
@@ -7751,6 +7850,11 @@ function openBottle(id){
       <canvas id="bot-qr-${id}"></canvas>
       <div>
         <div style="font-size:12px;color:var(--mu);margin-bottom:6px">Scan to open this bottle record</div>
+        <div class="label-size-sel">
+          <button class="label-size-btn active" data-sz="58mm" onclick="_setLabelSize('58mm');this.parentNode.querySelectorAll('.label-size-btn').forEach(b=>b.classList.toggle('active',b===this))">58mm</button>
+          <button class="label-size-btn" data-sz="62mm" onclick="_setLabelSize('62mm');this.parentNode.querySelectorAll('.label-size-btn').forEach(b=>b.classList.toggle('active',b===this))">62mm</button>
+          <button class="label-size-btn" data-sz="a4" onclick="_setLabelSize('a4');this.parentNode.querySelectorAll('.label-size-btn').forEach(b=>b.classList.toggle('active',b===this))">A4 sheet</button>
+        </div>
         <button class="btn sm ghost" onclick="printBottleLabel('${id}')">🖨 Print label</button>
         ${b.batch_id?`<br><button class="btn sm ghost" style="margin-top:6px" onclick="printBatchLabels('${b.batch_id}')">🖨 Print batch</button>`:''}
       </div>
@@ -8336,7 +8440,9 @@ function renderReminders(){
     .map(b=>({...b, title:b.code, type:_botStatusLabel(b.status), days:daysFrom(b.next_review), isBottle:true, isGH:false}));
   const ghItems=(S.greenhouse||[]).filter(p=>p.next_inspection)
     .map(p=>({...p, title:p.species||'Unknown plant', type:`Inspect · ${GH_HEALTH_LABEL[p.health]||'Healthy'}`, days:daysFrom(p.next_inspection), next_review:p.next_inspection, isBottle:false, isGH:true}));
-  const all=[...notes,...botItems,...ghItems];
+  // Subculture auto-reminders
+  const subcultItems=_getSubcultureReminders().filter(r=>r.days<=14);
+  const all=[...notes,...botItems,...ghItems,...subcultItems];
   const overdue=all.filter(n=>n.days<=0).sort((a,b)=>a.days-b.days);
   const week=all.filter(n=>n.days>0&&n.days<=7).sort((a,b)=>a.days-b.days);
   const month=all.filter(n=>n.days>7&&n.days<=30).sort((a,b)=>a.days-b.days);
@@ -8489,6 +8595,7 @@ function switchSection(name){
   if(name==='contam') renderContamDashboard();
   if(name==='analytics') renderAnalytics();
   if(name==='sterilise'){ if(_sterilActiveId===undefined) loadCustomSterilProtocol(); else renderSterilPage(); }
+  if(name==='stock'){ loadInv().then(renderInv); }
   if(name==='species') renderSpecies();
   if(name==='news' && document.getElementById('news-toggle').checked && !_newsData) handleNewsToggle(true);
   if(name==='calendar') renderCalendar();
@@ -8616,6 +8723,13 @@ async function login(){
       document.getElementById('trust-banner').classList.add('on');
     }
     loadTaxonomy();
+    // Restore Telegram settings to settings panel
+    const _tgTok=localStorage.getItem('tcplants_tg_token'); if(_tgTok){const el=document.getElementById('set-tg-token');if(el)el.value=_tgTok;}
+    const _tgCid=localStorage.getItem('tcplants_tg_chatid'); if(_tgCid){const el=document.getElementById('set-tg-chatid');if(el)el.value=_tgCid;}
+    const _tgOd=document.getElementById('set-tg-overdue'); if(_tgOd) _tgOd.checked=localStorage.getItem('tcplants_tg_overdue')==='1';
+    const _tgCo=document.getElementById('set-tg-contam'); if(_tgCo) _tgCo.checked=localStorage.getItem('tcplants_tg_contam')==='1';
+    // Fire alerts after data load
+    setTimeout(_checkAlerts, 3000);
     if(window._pendingBottle){ const pid=window._pendingBottle; window._pendingBottle=null; navTo('bottles'); setTimeout(()=>openBottle(pid),50); }
     fetchWeather();
     if(window._wxInterval) clearInterval(window._wxInterval);
@@ -9834,6 +9948,314 @@ function _loginToggleTheme(){
   document.getElementById('theme-btn').textContent = icon;
   document.getElementById('login-theme-btn').textContent = icon;
   document.querySelector('meta[name="theme-color"]').setAttribute('content', next === 'dark' ? '#161b22' : '#f6f8fa');
+}
+
+// ════════════════════════════════════════════════════════════
+// 1. GBIF SPECIES LOOKUP
+// ════════════════════════════════════════════════════════════
+async function _taxGBIFLookup(){
+  const name=document.getElementById('tc-fullname').value.trim();
+  if(!name){toast('Enter a scientific name first','fail');return;}
+  const res=document.getElementById('tc-gbif-result');
+  if(res){res.style.display='';res.textContent='Fetching from GBIF…';}
+  try{
+    const r=await fetch(`https://api.gbif.org/v1/species/match?name=${encodeURIComponent(name)}&verbose=true`);
+    const d=await r.json();
+    if(!d.usageKey){if(res){res.textContent='No GBIF match found for this name.';}return;}
+    // Pull IUCN status from species info
+    const r2=await fetch(`https://api.gbif.org/v1/species/${d.usageKey}/iucnRedListCategory`);
+    let iucn='';
+    if(r2.ok){const d2=await r2.json();iucn=d2.category||'';}
+    const kingdom=d.kingdom||'';const phylum=d.phylum||'';const family=d.family||'';
+    const rank=d.rank||'';const status=d.status||'';
+    // Auto-set conservation status
+    const iucnMap={'LC':'least_concern','NT':'near_threatened','VU':'vulnerable','EN':'endangered','CR':'critically_endangered','DD':'data_deficient'};
+    if(iucn&&iucnMap[iucn]) document.getElementById('tc-status').value=iucnMap[iucn];
+    const cls=iucn?iucn.toLowerCase():'';
+    if(res){
+      res.style.display='';
+      res.innerHTML=`<strong>GBIF match:</strong> ${esc(d.scientificName||name)}<br>
+        ${kingdom?`<span style="color:var(--mu)">${esc(kingdom)} › ${esc(phylum||'')} › ${esc(family||'')}</span><br>`:''}
+        ${iucn?`<span class="gbif-badge ${cls}">🌍 IUCN ${iucn}</span>`:''}
+        ${status?`<span style="margin-left:6px;font-size:11px">${esc(status)}</span>`:''}
+        <br><a href="https://www.gbif.org/species/${d.usageKey}" target="_blank" rel="noopener" style="color:var(--ac);font-size:11px">View on GBIF ↗</a>`;
+    }
+    toast('GBIF data loaded');
+  }catch(e){if(res){res.textContent='GBIF fetch failed: '+e.message;} toast('GBIF error','fail');}
+}
+
+// ════════════════════════════════════════════════════════════
+// 2. PUBMED SPECIES CONTEXT FOR AI
+// ════════════════════════════════════════════════════════════
+async function _fetchPubMedContext(species){
+  if(!species) return '';
+  try{
+    const q=encodeURIComponent(`"${species}" tissue culture`);
+    const sr=await fetch(`https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=${q}&retmax=3&sort=date&retmode=json`);
+    if(!sr.ok) return '';
+    const sd=await sr.json();
+    const ids=sd.esearchresult?.idlist||[];
+    if(!ids.length) return '';
+    const fr=await fetch(`https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=${ids.join(',')}&rettype=abstract&retmode=xml`);
+    if(!fr.ok) return '';
+    const xml=await fr.text();
+    const parser=new DOMParser(); const doc=parser.parseFromString(xml,'application/xml');
+    let ctx=`\n\n## Recent PubMed Papers for ${species} (TC)`;
+    doc.querySelectorAll('PubmedArticle').forEach(art=>{
+      const title=art.querySelector('ArticleTitle')?.textContent||'';
+      const ab=[...art.querySelectorAll('AbstractText')].map(el=>el.textContent).join(' ').slice(0,600);
+      const year=art.querySelector('PubDate Year')?.textContent||'';
+      if(title) ctx+=`\n\n### ${title} (${year})\n${ab}`;
+    });
+    return ctx;
+  }catch(e){return '';}
+}
+
+// ════════════════════════════════════════════════════════════
+// 3. TELEGRAM ALERTS
+// ════════════════════════════════════════════════════════════
+function _saveTelegramSettings(){
+  const tok=document.getElementById('set-tg-token')?.value.trim();
+  const cid=document.getElementById('set-tg-chatid')?.value.trim();
+  if(tok) localStorage.setItem('tcplants_tg_token',tok);
+  if(cid) localStorage.setItem('tcplants_tg_chatid',cid);
+  toast('Telegram settings saved ✓');
+}
+async function _sendTelegram(text){
+  const tok=localStorage.getItem('tcplants_tg_token');
+  const cid=localStorage.getItem('tcplants_tg_chatid');
+  if(!tok||!cid) return false;
+  try{
+    await fetch(`https://api.telegram.org/bot${tok}/sendMessage`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({chat_id:cid,text,parse_mode:'HTML'})
+    });
+    return true;
+  }catch(e){console.warn('Telegram:',e.message);return false;}
+}
+async function _testTelegram(){
+  const ok=await _sendTelegram('🌿 <b>TC Plants</b> — Telegram alerts connected! Your lab notifications will appear here.');
+  toast(ok?'Telegram test sent ✓':'Check token/chat ID — send failed','fail'[+!ok]);
+}
+async function _checkAlerts(){
+  if(!localStorage.getItem('tcplants_tg_token')) return;
+  const labName=localStorage.getItem('tcplants_lab_name')||'TC Plants';
+  const msgs=[];
+  // Overdue bottles
+  if(localStorage.getItem('tcplants_tg_overdue')==='1'){
+    const overdue=(S.bottles||[]).filter(b=>b.next_review&&['inoculated','growing'].includes(b.status)&&daysFrom(b.next_review)<=0);
+    if(overdue.length) msgs.push(`🫙 <b>${overdue.length} bottle${overdue.length!==1?'s':''} overdue for review</b>\n${overdue.slice(0,5).map(b=>`• ${b.code} — ${b.species||'?'} (${Math.abs(daysFrom(b.next_review))}d)`).join('\n')}`);
+    const overdueGH=(S.greenhouse||[]).filter(p=>p.next_inspection&&daysFrom(p.next_inspection)<=0);
+    if(overdueGH.length) msgs.push(`🏡 <b>${overdueGH.length} GH plant${overdueGH.length!==1?'s':''} overdue for inspection</b>\n${overdueGH.slice(0,5).map(p=>`• ${p.species||'?'} (${Math.abs(daysFrom(p.next_inspection))}d)`).join('\n')}`);
+  }
+  if(msgs.length){
+    const full=`🌿 <b>${esc(labName)} — Lab Alerts</b>\n${new Date().toLocaleDateString('en-IN')}\n\n${msgs.join('\n\n')}`;
+    await _sendTelegram(full);
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// 4. SUBCULTURE CALENDAR — derive from bottles + species interval
+// ════════════════════════════════════════════════════════════
+function _getSubcultureInterval(speciesName){
+  if(!speciesName) return 28;
+  const sp=(S.taxCustom?.species||[]).find(s=>s.full_name?.toLowerCase()===speciesName.toLowerCase());
+  return sp?.subculture_interval_days||28;
+}
+function _getSubcultureReminders(){
+  // Returns virtual reminder entries from active bottles past their subculture window
+  return (S.bottles||[]).filter(b=>{
+    if(!['inoculated','growing'].includes(b.status)||!b.date_inoculated) return false;
+    const interval=_getSubcultureInterval(b.species);
+    const dueDate=new Date(b.date_inoculated); dueDate.setDate(dueDate.getDate()+interval);
+    return true;
+  }).map(b=>{
+    const interval=_getSubcultureInterval(b.species);
+    const dueDate=new Date(b.date_inoculated); dueDate.setDate(dueDate.getDate()+interval);
+    const daysUntil=Math.floor((dueDate-new Date())/(86400000));
+    return {id:'sc-'+b.id,title:`✂️ Subculture: ${b.code}`,species:b.species||'',days:daysUntil,next_review:dueDate.toISOString().slice(0,10),isBottle:true,isGH:false,isSubcult:true,type:`${interval}d interval`};
+  });
+}
+
+// ════════════════════════════════════════════════════════════
+// 5. LAB INVENTORY MODULE
+// ════════════════════════════════════════════════════════════
+const INV_FILE='inventory/data.enc';
+let S_inv={items:[]}, S_invSha=null;
+
+async function loadInv(){
+  try{
+    const f=await ghGet(INV_FILE);
+    if(f){const raw=await dec(f.content);S_inv=JSON.parse(raw);S_invSha=f.sha;}
+    else{S_inv={items:[]};S_invSha=null;}
+  }catch(e){S_inv={items:[]};S_invSha=null;}
+}
+async function saveInv(){
+  const res=await ghPut(INV_FILE,await enc(JSON.stringify(S_inv)),S_invSha,`lab: inventory — ${S_inv.items.length} items`);
+  S_invSha=res.content.sha;
+}
+
+const INV_CATS=['Media Salts','Growth Regulators','Gelling Agents','Sugars & Vitamins','Sterilisation','Glassware & Plastics','Equipment','Other'];
+
+function renderInv(){
+  const summary=document.getElementById('inv-summary');
+  const catList=document.getElementById('inv-cat-list');
+  const itemsEl=document.getElementById('inv-items');
+  if(!summary||!catList||!itemsEl) return;
+  const items=S_inv.items||[];
+  const low=items.filter(i=>i.quantity<=i.low_threshold&&i.low_threshold>0);
+  summary.innerHTML=`<div style="font-size:13px;font-weight:700;margin-bottom:6px">📊 Stock Summary</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div style="text-align:center"><div style="font-size:20px;font-weight:800">${items.length}</div><div style="font-size:10px;color:var(--mu)">items</div></div>
+      <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:${low.length?'var(--rd)':'var(--gn)'}">${low.length}</div><div style="font-size:10px;color:var(--mu)">low stock</div></div>
+    </div>
+    ${low.length?`<div style="margin-top:8px;font-size:11px;color:var(--rd);font-weight:600">⚠️ Low: ${low.slice(0,3).map(i=>esc(i.name)).join(', ')}${low.length>3?'…':''}</div>`:''}`;
+  let activeCat=localStorage.getItem('tcplants_inv_cat')||'';
+  catList.innerHTML=['All',...INV_CATS].map(c=>`<div onclick="_setInvCat('${c==='All'?'':c}')" style="padding:5px 10px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:${activeCat===(c==='All'?'':c)?'700':'400'};background:${activeCat===(c==='All'?'':c)?'var(--ac)':'transparent'};color:${activeCat===(c==='All'?'':c)?'#0d1117':'var(--tx)'}">${c}</div>`).join('');
+  const filtered=activeCat?items.filter(i=>i.category===activeCat):items;
+  if(!filtered.length){itemsEl.innerHTML='<div style="padding:20px;text-align:center;color:var(--mu);font-size:13px">No items. Click ＋ Add Item to begin.</div>';return;}
+  const bycat={};
+  filtered.forEach(i=>{const c=i.category||'Other';if(!bycat[c])bycat[c]=[];bycat[c].push(i);});
+  itemsEl.innerHTML=Object.entries(bycat).map(([cat,its])=>`
+    <div class="inv-cat">${esc(cat)}</div>
+    ${its.map(i=>{
+      const pct=i.low_threshold>0?Math.min(100,Math.round(i.quantity/Math.max(i.low_threshold*2,1)*100)):null;
+      const cls=pct!==null&&pct<=25?'inv-low':pct!==null&&pct<=60?'inv-warn':'inv-ok';
+      return `<div class="inv-row">
+        <div style="flex:1;min-width:0">
+          <div class="inv-name">${esc(i.name)}${i.location?` <span style="font-size:11px;color:var(--mu)">📍${esc(i.location)}</span>`:''}</div>
+          ${i.expiry_date?`<div style="font-size:10px;color:${daysFrom(i.expiry_date)<30?'var(--rd)':'var(--mu)'}">Expires ${fmtDateShort(i.expiry_date)}</div>`:''}
+          ${pct!==null?`<div style="height:3px;background:var(--bd);border-radius:2px;margin-top:4px;width:100px"><div style="height:100%;background:${cls==='inv-low'?'var(--rd)':cls==='inv-warn'?'var(--yw)':'var(--gn)'};border-radius:2px;width:${pct}%"></div></div>`:''}
+        </div>
+        <div class="${cls} inv-qty">${i.quantity} ${esc(i.unit||'')}</div>
+        <button class="btn xs ghost" onclick="_invOpenEditor('${i.id}')">✏️</button>
+        <button class="btn xs ghost" onclick="_invDelete('${i.id}')" style="color:var(--rd)">✕</button>
+      </div>`;
+    }).join('')}`).join('');
+}
+function _setInvCat(cat){localStorage.setItem('tcplants_inv_cat',cat);renderInv();}
+function _invOpenEditor(id){
+  const item=id?(S_inv.items||[]).find(i=>i.id===id):null;
+  const el=document.getElementById('inv-editor'); if(!el) return;
+  el.style.display='';
+  el.innerHTML=`<div style="font-size:14px;font-weight:700;margin-bottom:12px">${item?'✏️ Edit Item':'＋ New Item'}</div>
+    <div class="row2" style="margin-bottom:10px">
+      <div class="field" style="margin:0"><label>Name *</label><input type="text" id="inv-name" value="${esc(item?.name||'')}" placeholder="e.g. Murashige & Skoog salts"></div>
+      <div class="field" style="margin:0"><label>Category</label><select id="inv-cat">${INV_CATS.map(c=>`<option${item?.category===c?' selected':''}>${c}</option>`).join('')}</select></div>
+    </div>
+    <div class="row3" style="margin-bottom:10px">
+      <div class="field" style="margin:0"><label>Quantity</label><input type="number" id="inv-qty" value="${item?.quantity??''}" min="0" step="0.1" placeholder="0"></div>
+      <div class="field" style="margin:0"><label>Unit</label><input type="text" id="inv-unit" value="${esc(item?.unit||'')}" placeholder="g / mL / pcs"></div>
+      <div class="field" style="margin:0"><label>Low Stock Alert ≤</label><input type="number" id="inv-low" value="${item?.low_threshold??''}" min="0" step="0.1" placeholder="0 = off"></div>
+    </div>
+    <div class="row2" style="margin-bottom:10px">
+      <div class="field" style="margin:0"><label>Location</label><input type="text" id="inv-loc" value="${esc(item?.location||'')}" placeholder="e.g. Fridge, Shelf B3"></div>
+      <div class="field" style="margin:0"><label>Expiry Date</label><input type="date" id="inv-exp" value="${item?.expiry_date||''}"></div>
+    </div>
+    <div class="field" style="margin-bottom:10px"><label>Notes</label><textarea id="inv-note" rows="2" style="height:auto">${esc(item?.notes||'')}</textarea></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn sm green" onclick="_invSave('${id||''}')">💾 Save</button>
+      <button class="btn sm ghost" onclick="document.getElementById('inv-editor').style.display='none'">Cancel</button>
+      ${item?`<button class="btn sm ghost" style="margin-left:auto;color:var(--ac)" onclick="_invAdjust('${id}')">＋/− Adjust stock</button>`:''}
+    </div>`;
+}
+async function _invSave(id){
+  const name=document.getElementById('inv-name').value.trim();
+  if(!name){toast('Name required','fail');return;}
+  const item={
+    id:id||uid(),name,category:document.getElementById('inv-cat').value,
+    quantity:parseFloat(document.getElementById('inv-qty').value)||0,
+    unit:document.getElementById('inv-unit').value.trim(),
+    low_threshold:parseFloat(document.getElementById('inv-low').value)||0,
+    location:document.getElementById('inv-loc').value.trim(),
+    expiry_date:document.getElementById('inv-exp').value||null,
+    notes:document.getElementById('inv-note').value.trim(),
+    updated_at:new Date().toISOString()
+  };
+  if(id){const idx=(S_inv.items||[]).findIndex(i=>i.id===id);if(idx!==-1)S_inv.items[idx]=item;else S_inv.items.push(item);}
+  else{if(!S_inv.items)S_inv.items=[];S_inv.items.push(item);}
+  try{await saveInv();document.getElementById('inv-editor').style.display='none';renderInv();toast('Item saved ✓');}
+  catch(e){toast('Save failed: '+e.message,'fail');}
+}
+function _invAdjust(id){
+  const item=(S_inv.items||[]).find(i=>i.id===id); if(!item) return;
+  const delta=parseFloat(prompt(`Adjust stock for "${item.name}" (current: ${item.quantity} ${item.unit||''})\nEnter change (e.g. +50 or -10):`)||'0');
+  if(!delta||isNaN(delta)){toast('Enter a valid number','fail');return;}
+  item.quantity=Math.max(0,item.quantity+delta);
+  item.updated_at=new Date().toISOString();
+  saveInv().then(()=>{renderInv();toast(`Stock updated: ${item.quantity} ${item.unit||''}`);}).catch(e=>toast('Save failed','fail'));
+}
+async function _invDelete(id){
+  if(!confirm('Remove this item?')) return;
+  S_inv.items=(S_inv.items||[]).filter(i=>i.id!==id);
+  try{await saveInv();renderInv();toast('Item removed');}catch(e){toast('Delete failed','fail');}
+}
+
+// ════════════════════════════════════════════════════════════
+// 6. IMPROVED LABEL PRINTING — size options
+// ════════════════════════════════════════════════════════════
+let _labelSize='58mm';
+function _setLabelSize(sz){
+  _labelSize=sz;
+  document.querySelectorAll('.label-size-btn').forEach(b=>b.classList.toggle('active',b.dataset.sz===sz));
+}
+
+// Override _openPrintWindow with size-aware version
+const _origOpenPrintWindow=_openPrintWindow;
+function _openPrintWindow(bottles){
+  const sz=_labelSize||'58mm';
+  const w=window.open('','_blank','width=400,height=600');
+  const labelsHtml=bottles.map(b=>_botLabelHtml(b)).join('');
+  const isSheet=sz==='a4';
+  const labelCss=isSheet?
+    `.bot-label{width:62mm;padding:3mm;border:1px solid #ccc;display:inline-flex;align-items:flex-start;gap:3mm;margin:2mm;page-break-inside:avoid;vertical-align:top}`
+    :`.bot-label{width:${sz};padding:3mm 2mm;border-bottom:1px dashed #000;display:flex;align-items:flex-start;gap:3mm;page-break-inside:avoid}`;
+  const pageCss=isSheet?`@page{size:A4;margin:10mm}`:`@page{size:${sz} auto;margin:0}`;
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Labels</title>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{background:#fff;font-family:Arial,sans-serif}
+${labelCss}
+.bot-label canvas{width:22mm!important;height:22mm!important;flex-shrink:0}
+.bot-label-right{flex:1;min-width:0}
+.bot-lbl-code{font-size:11pt;font-weight:700;display:block;line-height:1.2}
+.bot-lbl-sp{font-size:9pt;display:block;line-height:1.3;font-style:italic}
+.bot-lbl-stage,.bot-lbl-flair,.bot-lbl-ts{font-size:8pt;display:block;color:#333}
+${pageCss}
+${!isSheet?'@media print{body{width:'+sz+'}}':""}
+</style><script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"><\/script>
+</head><body>${labelsHtml}<\/body><\/html>`);
+  w.document.close();
+  w.addEventListener('load',()=>{
+    bottles.forEach(b=>{
+      const canvas=w.document.getElementById(`print-qr-${b.id}`);
+      if(canvas&&w.QRCode) w.QRCode.toCanvas(canvas,`https://notes.tcplants.in?bottle=${b.id}`,{width:88,margin:0,color:{dark:'#000000',light:'#ffffff'}});
+    });
+    setTimeout(()=>{w.focus();w.print();},600);
+  });
+}
+
+// ════════════════════════════════════════════════════════════
+// 7. PHOTO STORAGE — GitHub-backed (taxa photos stored as files)
+// ════════════════════════════════════════════════════════════
+async function _storePhotoInRepo(id, base64DataUrl){
+  // Strip data URL header, store as binary in GitHub
+  const b64=base64DataUrl.split(',')[1]; if(!b64) return base64DataUrl;
+  const path=`photos/taxonomy/${id}.jpg`;
+  try{
+    const existing=await ghGet(path);
+    await ghPut(path,b64,existing?.sha||null,`lab: photo — taxonomy species ${id}`);
+    return path; // return path instead of base64
+  }catch(e){
+    console.warn('Photo repo store failed, keeping base64:',e.message);
+    return base64DataUrl; // fallback
+  }
+}
+async function _loadPhotoFromRepo(pathOrData){
+  if(!pathOrData||pathOrData.startsWith('data:')) return pathOrData;
+  try{
+    const f=await ghGet(pathOrData);
+    if(f) return `data:image/jpeg;base64,${f.content.replace(/\s/g,'')}`;
+  }catch(e){}
+  return null;
 }
 
 // ════════════════════════════════════════════════════════════
