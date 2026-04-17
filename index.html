@@ -3380,6 +3380,10 @@ main > .dview, main > .editor{ margin:0 auto; }
   </div>
   <div id="ai-msgs"><div class="ai-msg ai">Hello! I can help with TC protocols, species info, PGR doses, contamination, and note summaries. What would you like to know?</div></div>
   <!-- Voice log tab -->
+  <div id="ai-voice-log-toolbar" style="display:none;padding:6px 10px;border-bottom:1px solid var(--bd);gap:6px;flex-shrink:0">
+    <button class="btn xs ghost" onclick="_exportVoiceDump()" style="flex:1">⬇ Export</button>
+    <button class="btn xs ghost" onclick="_clearVoiceDump()" style="color:var(--rd)">🗑 Clear</button>
+  </div>
   <div id="ai-voice-log"></div>
   <div id="ai-input-row" style="padding:10px 12px;border-top:1px solid var(--bd);display:flex;gap:8px;flex-shrink:0;align-items:flex-end">
     <textarea id="ai-input" placeholder="Ask anything about TC, media, PGRs, sterilisation…" rows="2" style="flex:1;font-size:13px;padding:8px 11px;resize:none;min-height:40px;max-height:120px;overflow-y:auto;line-height:1.5"></textarea>
@@ -3725,6 +3729,13 @@ main > .dview, main > .editor{ margin:0 auto; }
             <div class="set-row-sub">Clear feature usage metrics</div>
           </div>
           <button class="btn xs ghost" onclick="_resetUsageStats()">Reset</button>
+        </div>
+        <div class="set-row">
+          <div class="set-row-info">
+            <div class="set-row-label">Clear Voice Transcripts</div>
+            <div class="set-row-sub">Deletes local voice session dump (last 200 entries)</div>
+          </div>
+          <button class="btn xs ghost" onclick="_clearVoiceDump()" style="color:var(--rd)">Clear</button>
         </div>
       </div>
     </div>
@@ -7055,10 +7066,13 @@ function _switchAITab(tab){
   const isChat=tab==='chat';
   document.getElementById('ai-msgs').style.display=isChat?'flex':'none';
   document.getElementById('ai-voice-log').style.display=isChat?'none':'flex';
+  document.getElementById('ai-voice-log-toolbar').style.display=isChat?'none':'flex';
   document.getElementById('ai-chips').style.display=isChat?'flex':'none';
   document.getElementById('ai-input-row').style.display=isChat?'flex':'none';
   document.getElementById('ai-tab-chat').classList.toggle('active',isChat);
-  document.getElementById('ai-tab-voice').classList.toggle('active',!isChat);
+  const vTab=document.getElementById('ai-tab-voice');
+  vTab.classList.toggle('active',!isChat);
+  if(!isChat){ vTab.textContent='🎤 Voice'; vTab.style.color=''; _restoreVoiceLog(); }
 }
 function _toggleAIPanel(){
   const p=document.getElementById('ai-panel');
@@ -7069,7 +7083,38 @@ function _closeAIPanel(){
 }
 
 // ── Voice log ─────────────────────────────────────────────────
+// ── Transcript dump — localStorage, rolling 200 entries ──────
+const _VDUMP_KEY='tcplants_voice_dump';
+function _dumpVoiceTranscript(transcript, result){
+  try{
+    const dump=JSON.parse(localStorage.getItem(_VDUMP_KEY)||'[]');
+    dump.push({ts:new Date().toISOString(),text:transcript,result:result||null});
+    if(dump.length>200) dump.splice(0,dump.length-200);
+    localStorage.setItem(_VDUMP_KEY,JSON.stringify(dump));
+  }catch{}
+}
+function _getVoiceDump(){
+  try{ return JSON.parse(localStorage.getItem(_VDUMP_KEY)||'[]'); }catch{ return []; }
+}
+function _clearVoiceDump(){
+  localStorage.removeItem(_VDUMP_KEY);
+  document.getElementById('ai-voice-log').innerHTML='';
+  toast('Voice transcript cleared');
+}
+function _exportVoiceDump(){
+  const d=_getVoiceDump();
+  if(!d.length){ toast('No transcripts yet','fail'); return; }
+  const txt=d.map(e=>`[${e.ts}] ${e.text}${e.result?' → '+e.result:''}`).join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/plain;charset=utf-8,'+encodeURIComponent(txt);
+  a.download='tcplants_voice_'+new Date().toISOString().slice(0,10)+'.txt';
+  a.click();
+}
+
 function _voiceLog(transcript, result, isError){
+  // Save to persistent dump
+  _dumpVoiceTranscript(transcript, result);
+  // Update panel UI
   const ts=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
   const log=document.getElementById('ai-voice-log');
   if(!log) return;
@@ -7078,12 +7123,25 @@ function _voiceLog(transcript, result, isError){
   el.innerHTML=`<div class="vl-ts">${ts}</div><div class="vl-transcript">${esc(transcript)}</div>${result?`<div class="${isError?'vl-err':'vl-cmd'}">${esc(result)}</div>`:''}`;
   log.appendChild(el);
   log.scrollTop=log.scrollHeight;
-  // Badge on Voice tab if panel minimised or on Chat tab
+  // Badge on Voice tab if panel is on Chat tab
   const tab=document.getElementById('ai-tab-voice');
   if(tab&&!tab.classList.contains('active')){
     tab.textContent='🎤 Voice •';
     tab.style.color='var(--ac)';
   }
+}
+// Restore voice log from dump on panel open
+function _restoreVoiceLog(){
+  const log=document.getElementById('ai-voice-log');
+  if(!log||log.children.length>0) return; // already populated
+  const dump=_getVoiceDump().slice(-50); // show last 50
+  dump.forEach(e=>{
+    const ts=new Date(e.ts).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    const el=document.createElement('div');
+    el.className='vl-entry';
+    el.innerHTML=`<div class="vl-ts">${ts}</div><div class="vl-transcript">${esc(e.text)}</div>${e.result?`<div class="vl-cmd">${esc(e.result)}</div>`:''}`;
+    log.appendChild(el);
+  });
 }
 
 // ── Command parser ────────────────────────────────────────────
@@ -7131,9 +7189,10 @@ function _parseVoiceCommand(text){
 
 // ── Native STT ───────────────────────────────────────────────
 let _nativeSR=null, _nativePending='';
-function _startNativeSTT(isWake){
+function _startNativeSTT(isWake, onDone){
   if(!('SpeechRecognition' in window||'webkitSpeechRecognition' in window)){
-    toast('Speech recognition not supported in this browser','fail'); return;
+    toast('Speech recognition not supported in this browser','fail');
+    if(onDone) onDone(); return;
   }
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   _nativeSR=new SR();
@@ -7142,10 +7201,11 @@ function _startNativeSTT(isWake){
   _nativeSR.onresult=e=>{
     const transcript=e.results[0][0].transcript.trim();
     _nativePending=transcript;
+    _nativeDoneCallback=onDone||null;
     document.getElementById('lfb-mic').classList.remove('listening');
+    _dumpVoiceTranscript(transcript); // save to local dump
     const c=_voiceCfg();
     if(c.confirm){
-      // Show confirm overlay
       document.getElementById('vc-heard-text').textContent=transcript;
       document.getElementById('ai-voice-confirm').classList.add('on');
       document.getElementById('ai-panel').classList.add('on');
@@ -7157,12 +7217,20 @@ function _startNativeSTT(isWake){
       }
     } else {
       _voiceExecute(transcript);
+      if(onDone) onDone();
     }
   };
-  _nativeSR.onerror=e=>{ document.getElementById('lfb-mic').classList.remove('listening'); if(e.error!=='aborted') toast('Mic error: '+e.error,'fail'); };
-  _nativeSR.onend=()=>document.getElementById('lfb-mic').classList.remove('listening');
+  _nativeSR.onerror=e=>{
+    document.getElementById('lfb-mic').classList.remove('listening');
+    if(e.error!=='aborted') toast('Mic error: '+e.error,'fail');
+    if(onDone) onDone();
+  };
+  _nativeSR.onend=()=>{
+    document.getElementById('lfb-mic').classList.remove('listening');
+  };
   _nativeSR.start();
 }
+let _nativeDoneCallback=null;
 let _confirmSR=null;
 function _startConfirmListener(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
@@ -7181,14 +7249,18 @@ function _voiceConfirmSend(){
   if(_confirmSR){ try{_confirmSR.stop();}catch{} _confirmSR=null; }
   document.getElementById('ai-voice-confirm').classList.remove('on');
   const t=_nativePending; _nativePending='';
+  const cb=_nativeDoneCallback; _nativeDoneCallback=null;
   _voiceExecute(t);
+  if(cb) cb();
 }
 function _voiceRetry(){
   _ttsStop();
   if(_confirmSR){ try{_confirmSR.stop();}catch{} _confirmSR=null; }
   document.getElementById('ai-voice-confirm').classList.remove('on');
   _nativePending='';
-  _startNativeSTT(false);
+  // keep _nativeDoneCallback, will be passed to new session
+  const cb=_nativeDoneCallback; _nativeDoneCallback=null;
+  _startNativeSTT(false, cb);
 }
 
 // ── Whisper STT ───────────────────────────────────────────────
@@ -7284,39 +7356,62 @@ function _voiceTap(){
 }
 
 // ── Wake word ─────────────────────────────────────────────────
-let _wakeLoop=null, _wakeActive=false;
+// ── Wake word — single continuous instance, no loop, no RAM leak ──
+let _wakeSR=null, _wakeActive=false, _wakeHandingOff=false;
 function _startWakeListener(){
   if(!('SpeechRecognition' in window||'webkitSpeechRecognition' in window)) return;
+  if(_wakeSR) return; // already running
   _wakeActive=true;
   document.getElementById('wake-indicator').classList.add('on');
-  _wakeLoop=()=>{
-    if(!_wakeActive) return;
-    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-    const sr=new SR(); sr.lang='en-IN'; sr.interimResults=false; sr.maxAlternatives=1;
-    sr.onresult=e=>{
-      const t=e.results[0][0].transcript.toLowerCase();
-      if(t.includes('bye lab')||t.includes('by lab')){
-        _stopWakeListener();
-        // also save preference off so it doesn't re-arm on next settings open
-        const c=_voiceCfg(); c.wake=false; localStorage.setItem(VOICE_KEY,JSON.stringify(c));
-        const wi=document.getElementById('set-voice-wake'); if(wi) wi.checked=false;
-        _ttsSpeak('Bye. Wake word off.');
-        toast('Wake word disarmed — say Hey Lab or re-enable in Settings');
-        return;
-      }
-      if(t.includes('hey lab')){
-        document.getElementById('ai-panel').classList.add('on');
-        setTimeout(()=>_startNativeSTT(true),300);
-      }
-    };
-    sr.onend=()=>{ if(_wakeActive) setTimeout(_wakeLoop,500); };
-    sr.onerror=()=>{ if(_wakeActive) setTimeout(_wakeLoop,2000); };
-    try{ sr.start(); }catch{}
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  _wakeSR=new SR();
+  _wakeSR.continuous=true;       // one instance, stays open — no new allocations
+  _wakeSR.interimResults=false;
+  _wakeSR.maxAlternatives=1;
+  _wakeSR.lang='en-IN';
+  _wakeSR.onresult=e=>{
+    if(_wakeHandingOff) return;   // already triggered, ignore until handoff done
+    const t=Array.from(e.results).pop()[0].transcript.toLowerCase().trim();
+    if(t.includes('bye lab')||t.includes('by lab')){
+      _stopWakeListener();
+      const c=_voiceCfg(); c.wake=false; localStorage.setItem(VOICE_KEY,JSON.stringify(c));
+      const wi=document.getElementById('set-voice-wake'); if(wi) wi.checked=false;
+      _ttsSpeak('Bye. Wake word off.');
+      toast('Wake word disarmed — re-enable in Settings → Voice');
+      return;
+    }
+    if(t.includes('hey lab')){
+      _wakeHandingOff=true;
+      // Pause continuous SR, hand mic to native STT, re-arm after
+      _wakeSR.stop();
+      document.getElementById('ai-panel').classList.add('on');
+      setTimeout(()=>{
+        _startNativeSTT(true, ()=>{
+          // callback when native session ends — re-arm wake if still enabled
+          if(_wakeActive){ _wakeSR=null; _startWakeListener(); }
+          _wakeHandingOff=false;
+        });
+      }, 400);
+    }
   };
-  _wakeLoop();
+  _wakeSR.onerror=e=>{
+    // aborted = expected when we stop it for handoff; others log quietly
+    if(e.error==='aborted'||e.error==='no-speech') return;
+    console.warn('Wake SR error:',e.error);
+  };
+  _wakeSR.onend=()=>{
+    // If ended without us stopping it (e.g. Chrome timeout), restart
+    if(_wakeActive&&!_wakeHandingOff){
+      _wakeSR=null;
+      setTimeout(_startWakeListener, 1000);
+    }
+  };
+  try{ _wakeSR.start(); }catch(e){ console.warn('Wake start failed:',e); }
 }
 function _stopWakeListener(){
   _wakeActive=false;
+  _wakeHandingOff=false;
+  if(_wakeSR){ try{ _wakeSR.stop(); }catch{} _wakeSR=null; }
   document.getElementById('wake-indicator')?.classList.remove('on');
 }
 
