@@ -579,9 +579,20 @@ main > .dview, main > .editor{ margin:0 auto; }
 
 /* ── TOOLS ── */
 .tools-layout{max-width:960px;margin:0 auto;width:100%}
-.tools-widgets{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:20px}
+.tools-widgets{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:20px;align-items:start}
 .tool-card{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.tool-card-head{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.tool-card-head h3{font-size:13px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;flex:1;margin:0}
 .tool-card h3{font-size:13px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
+.widget-min-btn{background:transparent;border:1px solid var(--bd);border-radius:5px;color:var(--mu);cursor:pointer;font-size:11px;line-height:1;padding:2px 6px;flex-shrink:0}
+.widget-min-btn:hover{border-color:var(--ac);color:var(--ac)}
+/* widget tray */
+#widget-tray{position:fixed;bottom:0;left:0;right:0;display:none;flex-wrap:wrap;gap:6px;padding:6px 12px;background:var(--sf);border-top:1px solid var(--bd);z-index:900;align-items:center}
+.widget-chip{display:flex;align-items:center;gap:6px;background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:4px 10px 4px 10px;font-size:12px;font-weight:600;cursor:pointer;user-select:none}
+.widget-chip:hover{border-color:var(--ac)}
+.widget-chip-label{flex:1;white-space:nowrap}
+.widget-chip-close{background:transparent;border:none;color:var(--mu);cursor:pointer;font-size:13px;padding:0 2px;line-height:1}
+.widget-chip-close:hover{color:var(--rd)}
 /* timers */
 .timer-grid{display:flex;flex-direction:column;gap:10px}
 .tmr{background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:12px;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
@@ -1523,8 +1534,8 @@ main > .dview, main > .editor{ margin:0 auto; }
             <input type="number" id="re-sucrose" placeholder="30" step="0.1" min="0">
           </div>
           <div class="field">
-            <label>Agar/Gelrite (g/L)</label>
-            <input type="number" id="re-agar" placeholder="7" step="0.1" min="0">
+            <label>Gelrite (g/L)</label>
+            <input type="number" id="re-agar" placeholder="1.9" step="0.1" min="0">
           </div>
           <div class="field">
             <label>pH (before autoclave)</label>
@@ -1564,6 +1575,10 @@ main > .dview, main > .editor{ margin:0 auto; }
               oninput="_taxSuggest(this)" onkeydown="_taxDropdownKeyNav(event)" autocomplete="off" style="flex:1">
             <button type="button" class="browse-btn" onclick="openSpeciesPicker('re-target')">🌿 Browse</button>
           </div>
+        </div>
+        <div class="field" id="re-flair-field">
+          <label>Flairs <span style="font-weight:400;color:var(--mu)">(optional — tag recipe stage, type, etc.)</span></label>
+          <div id="re-flair-pills" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px"></div>
         </div>
         <div class="field">
           <label>Preparation Notes <span style="font-weight:400;color:var(--mu)">(Markdown)</span></label>
@@ -1804,10 +1819,18 @@ main > .dview, main > .editor{ margin:0 auto; }
         <div class="field">
           <label>Source</label>
           <select id="gh-source">
-            <option value="wild">Wild collected</option>
-            <option value="lab">Lab output</option>
-            <option value="nursery">Nursery</option>
-            <option value="trade">Trade / Exchange</option>
+            <option value="lab">🧪 Lab output (in-house)</option>
+            <option value="own-cultivar">🌿 Own cultivar / selection</option>
+            <option value="wild">🌍 Wild collected</option>
+            <option value="sister-lab">🔬 Sister lab / research exchange</option>
+            <option value="swap">🤝 Swap / barter</option>
+            <option value="commercial">🏪 Commercial vendor / shop</option>
+            <option value="nursery">🌱 Nursery / garden centre</option>
+            <option value="botanical-garden">🏛 Botanical garden</option>
+            <option value="donated">🎁 Donated / gift</option>
+            <option value="rescue">♻️ Rescue / adoption</option>
+            <option value="seeds">🌾 Seeds / spores</option>
+            <option value="trade">↔️ Trade / exchange (general)</option>
           </select>
         </div>
       </div>
@@ -1819,6 +1842,7 @@ main > .dview, main > .editor{ margin:0 auto; }
         <div class="field">
           <label>Greenhouse location</label>
           <input type="text" id="gh-location" placeholder="e.g. Bench 3A, Shade house">
+          <div class="hint" style="margin-top:3px">Default: <a href="https://share.google/Wp7qh3cZMXTCOWFSG" target="_blank" rel="noopener" style="color:var(--ac);text-decoration:none" title="Open map & climate data">📍 Q5JV+2X Kelambakkam, Tamil Nadu ↗</a></div>
         </div>
       </div>
       <div class="field">
@@ -1860,19 +1884,28 @@ main > .dview, main > .editor{ margin:0 auto; }
     <p style="font-size:13px;color:var(--mu);margin-bottom:20px">Timers, stopwatches and lab utilities — all run locally, no data saved.</p>
     <div class="tools-layout">
       <div class="tools-widgets">
-        <div class="tool-card">
-          <h3>Countdown Timers</h3>
+        <div class="tool-card" id="widget-timers">
+          <div class="tool-card-head">
+            <h3>Countdown Timers</h3>
+            <button class="widget-min-btn" title="Minimise to tray" onclick="minimizeWidget('timers')">▂</button>
+          </div>
           <div class="timer-grid" id="timer-grid"></div>
           <button class="btn ghost sm" id="add-timer-btn" style="margin-top:10px;width:100%">＋ Add Timer</button>
         </div>
-        <div class="tool-card">
-          <h3>Stopwatches</h3>
+        <div class="tool-card" id="widget-sw">
+          <div class="tool-card-head">
+            <h3>Stopwatches</h3>
+            <button class="widget-min-btn" title="Minimise to tray" onclick="minimizeWidget('sw')">▂</button>
+          </div>
           <div class="sw-grid" id="sw-grid"></div>
           <button class="btn ghost sm" id="add-sw-btn" style="margin-top:10px;width:100%">＋ Add Stopwatch</button>
         </div>
         <!-- ── Sterilisation Stepper ── -->
-        <div class="tool-card">
-          <h3>🧫 Sterilisation Stepper</h3>
+        <div class="tool-card" id="widget-stepper">
+          <div class="tool-card-head">
+            <h3>🧫 Sterilisation Stepper</h3>
+            <button class="widget-min-btn" title="Minimise to tray" onclick="minimizeWidget('stepper')">▂</button>
+          </div>
           <div class="stepper-steps" id="stepper-steps"></div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
             <button class="btn xs ghost" id="stepper-add-btn">＋ Step</button>
@@ -4900,15 +4933,17 @@ function _renderTaxonomyPanel(){
     </div>
     <div class="tax-section-body">
       ${customs.map(sp=>{
-        const srcLabel={greenhouse:'🏡 GH',seeds:'🌱 Seeds',wild:'Wild','other-lab':'Other lab'}[sp.source]||sp.source||'';
+        const srcLabel={greenhouse:'🏡 GH',seeds:'🌱 Seeds',wild:'🌍 Wild','other-lab':'🔬 Lab exchange','own-cultivar':'🌿 Own cultivar',swap:'🤝 Swap',commercial:'🏪 Vendor',nursery:'🌱 Nursery','botanical-garden':'🏛 Bot. Garden',donated:'🎁 Donated',rescue:'♻️ Rescue'}[sp.source]||sp.source||'';
         const isHybrid=sp.full_name&&(sp.full_name.includes('×')||sp.full_name.toLowerCase().includes(' x '));
-        return `<div class="tax-custom-row">
-          <span class="tax-sp-sci" style="flex:1">${esc(sp.full_name)}${isHybrid?'<span style="color:var(--pu);font-size:10px;margin-left:5px;border:1px solid var(--pu);border-radius:3px;padding:0 3px">HYBRID</span>':''}</span>
+        const spFlairs=(sp.flair_ids||[]).map(fid=>{const f=(S.taxFlairs||[]).find(x=>x.id===fid);return f?`<span class="flair-pill ${f.color}" style="font-size:10px;padding:1px 5px">${esc(f.name)}</span>`:''}).join('');
+        return `<div class="tax-custom-row" style="flex-wrap:wrap;row-gap:4px">
+          <span class="tax-sp-sci" style="flex:1;min-width:120px">${esc(sp.full_name)}${isHybrid?'<span style="color:var(--pu);font-size:10px;margin-left:5px;border:1px solid var(--pu);border-radius:3px;padding:0 3px">HYBRID</span>':''}</span>
           <span class="tax-sp-com" style="flex:1;color:var(--mu)">${esc(sp.common_name||'')}</span>
+          ${spFlairs?`<span style="display:flex;flex-wrap:wrap;gap:3px;align-items:center">${spFlairs}</span>`:''}
           ${srcLabel?`<span style="font-size:10px;font-weight:600;padding:1px 7px;border-radius:10px;border:1px solid var(--bd);color:var(--mu);flex-shrink:0">${esc(srcLabel)}</span>`:''}
           ${_taxConBadge(sp.conservation_status)}
-          <button class="btn xs ghost" onclick="_taxEditCustomSpecies(${JSON.stringify(sp.id)})" title="Edit">✏️</button>
-          <button class="btn xs ghost" onclick="_taxDeleteCustomSpecies(${JSON.stringify(sp.id)})" title="Delete">✕</button>
+          <button class="btn xs ghost" onclick="_taxEditCustomSpecies('${sp.id}')" title="Edit">✏️</button>
+          <button class="btn xs ghost" onclick="_taxDeleteCustomSpecies('${sp.id}')" title="Delete">✕</button>
         </div>`;
       }).join('')}
       <div id="tax-custom-form" style="display:none;margin-top:10px;padding:14px;background:var(--sf2);border-radius:8px;border:1px solid var(--bd)">
@@ -4928,9 +4963,16 @@ function _renderTaxonomyPanel(){
             <select id="tc-source" onchange="_tcSourceChange(this.value)">
               <option value="">— select —</option>
               <option value="greenhouse">🏡 Greenhouse (own plants)</option>
-              <option value="seeds">🌱 Seeds</option>
-              <option value="wild">Wild collection</option>
-              <option value="other-lab">Other lab / Exchange</option>
+              <option value="own-cultivar">🌿 Own cultivar / selection</option>
+              <option value="seeds">🌱 Seeds / spores</option>
+              <option value="wild">🌍 Wild collected</option>
+              <option value="other-lab">🔬 Sister lab / exchange</option>
+              <option value="swap">🤝 Swap / barter</option>
+              <option value="commercial">🏪 Commercial vendor</option>
+              <option value="nursery">🌱 Nursery / garden centre</option>
+              <option value="botanical-garden">🏛 Botanical garden</option>
+              <option value="donated">🎁 Donated / gift</option>
+              <option value="rescue">♻️ Rescue / adoption</option>
               <option value="custom">Custom…</option>
             </select>
             <div id="tc-source-custom-wrap" style="display:none;margin-top:5px">
@@ -4950,6 +4992,11 @@ function _renderTaxonomyPanel(){
               <option value="cultivar">Cultivar (CV)</option>
             </select>
           </div>
+        </div>
+        <div class="field" style="margin-bottom:10px" id="tc-flair-field">
+          <label>Flairs <span style="font-weight:400;color:var(--mu);font-size:11px">— required, select at least one</span></label>
+          <div id="tc-flair-pills" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px"></div>
+          <div id="tc-flair-empty" style="font-size:12px;color:var(--mu);display:none">No flairs defined — add flairs in the Flairs tab first.</div>
         </div>
         <div style="display:flex;gap:8px">
           <button class="btn sm green" id="tc-save-btn" onclick="_taxSaveCustomSpecies()">Add Species</button>
@@ -5029,10 +5076,27 @@ function _tcSourceChange(val){
   document.getElementById('tc-source-custom-wrap').style.display=val==='custom'?'':'none';
 }
 
+function _renderTcFlairPills(selectedIds){
+  const flairs=S.taxFlairs||[];
+  const cont=document.getElementById('tc-flair-pills');
+  const empty=document.getElementById('tc-flair-empty');
+  if(!cont) return;
+  if(!flairs.length){if(empty) empty.style.display='';cont.innerHTML='';return;}
+  if(empty) empty.style.display='none';
+  cont.innerHTML=flairs.map(f=>{
+    const active=(selectedIds||[]).includes(f.id);
+    return `<span class="flair-pill flair-toggle ${f.color} ${active?'active':''}" data-fid="${f.id}" onclick="this.classList.toggle('active')" style="cursor:pointer">${f.emoji?esc(f.emoji)+' ':''}${esc(f.name)}</span>`;
+  }).join('');
+}
+function _getTcFlairIds(){
+  return [...document.querySelectorAll('#tc-flair-pills .flair-toggle.active')].map(el=>el.dataset.fid);
+}
+
 function _taxOpenAddForm(){
   _taxEditingSpeciesId=null;
   const form=document.getElementById('tax-custom-form');
   form.style.display='block';
+  _renderTcFlairPills([]);
   document.getElementById('tc-save-btn').textContent='Add Species';
   document.getElementById('tc-fullname').focus();
 }
@@ -5044,6 +5108,7 @@ function _taxResetForm(){
   document.getElementById('tc-source').value='';
   document.getElementById('tc-source-custom-wrap').style.display='none';
   document.getElementById('tax-custom-form').style.display='none';
+  _renderTcFlairPills([]);
   const btn=document.getElementById('tc-save-btn');
   if(btn) btn.textContent='Add Species';
 }
@@ -5056,8 +5121,9 @@ function _taxEditCustomSpecies(id){
   document.getElementById('tc-fullname').value=sp.full_name||'';
   document.getElementById('tc-common').value=sp.common_name||'';
   document.getElementById('tc-status').value=sp.conservation_status||'';
+  _renderTcFlairPills(sp.flair_ids||[]);
   // Restore source
-  const knownSrc=['greenhouse','seeds','wild','other-lab'];
+  const knownSrc=['greenhouse','seeds','wild','other-lab','own-cultivar','swap','commercial','nursery','botanical-garden','donated','rescue'];
   if(knownSrc.includes(sp.source||'')){
     document.getElementById('tc-source').value=sp.source;
     document.getElementById('tc-source-custom-wrap').style.display='none';
@@ -5085,6 +5151,7 @@ async function _taxSaveCustomSpecies(){
     common_name:document.getElementById('tc-common').value.trim(),
     conservation_status:document.getElementById('tc-status').value,
     source,
+    flair_ids:_getTcFlairIds(),
   };
 
   if(_taxEditingSpeciesId){
@@ -5147,7 +5214,7 @@ function _renderFlairsPanel(){
     return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--sf2)">
       <span class="flair-pill ${f.color}">${esc(f.name)}</span>
       <span style="font-size:11px;color:var(--mu);flex:1">${inUse?'In use':'Unused'}</span>
-      <button class="btn xs ghost" ${inUse?'disabled title="Remove from accessions first"':''} onclick="_taxDeleteFlair(${JSON.stringify(f.id)})">✕</button>
+      <button class="btn xs ghost" ${inUse?'disabled title="Remove from accessions first"':''} onclick="_taxDeleteFlair('${f.id}')">✕</button>
     </div>`;
   }).join('');
 
@@ -6003,7 +6070,7 @@ function _botCode(){
 // ════════════════════════════════════════════════════════════
 const GH_HEALTH_COLOR={healthy:'var(--gn)',stressed:'var(--yw)',dormant:'var(--mu)',declined:'var(--rd)'};
 const GH_HEALTH_LABEL={healthy:'Healthy',stressed:'Stressed',dormant:'Dormant',declined:'Declined'};
-const GH_SOURCE_LABEL={lab:'Lab output',wild:'Wild',nursery:'Nursery',trade:'Trade'};
+const GH_SOURCE_LABEL={lab:'🧪 Lab output','own-cultivar':'🌿 Own cultivar',wild:'🌍 Wild','sister-lab':'🔬 Sister lab',swap:'🤝 Swap',commercial:'🏪 Commercial vendor',nursery:'🌱 Nursery','botanical-garden':'🏛 Botanical garden',donated:'🎁 Donated',rescue:'♻️ Rescue',seeds:'🌾 Seeds',trade:'↔️ Trade'};
 
 // ── GH FLAIR SYSTEM ────────────────────────────────────────────
 async function _ensureGHFlair(){
@@ -6083,7 +6150,7 @@ function parseGHCsv(){
   const colIdx={};
   Object.entries(colMap).forEach(([key,aliases])=>{ colIdx[key]=headerRaw.findIndex(h=>aliases.includes(h)); });
   const VALID_HEALTH=new Set(['healthy','stressed','dormant','declined']);
-  const VALID_SOURCE=new Set(['greenhouse','wild','lab','nursery','trade','lab-propagated','other-lab']);
+  const VALID_SOURCE=new Set(['greenhouse','wild','lab','nursery','trade','lab-propagated','other-lab','own-cultivar','sister-lab','swap','commercial','botanical-garden','donated','rescue','seeds']);
   const rows=[];
   for(let i=1;i<lines.length;i++){
     const vals=_parseCSVLine(lines[i]);
@@ -6167,9 +6234,30 @@ async function saveGHImport(){
     });
     S.greenhouse=[...(S.greenhouse||[]),...newPlants];
     S.greenhouseSha=await saveGreenhouse(S.greenhouse,S.greenhouseSha);
+    // Auto-register unknown species into Custom taxonomy as GH species
+    if(!S.taxCustom) S.taxCustom={species:[],flairs:[]};
+    if(!S.taxCustom.species) S.taxCustom.species=[];
+    const knownNames=new Set(S.taxSpecies.map(s=>(s.full_name||'').toLowerCase()));
+    const toRegister=[];
+    const seen=new Set();
+    for(const r of rows){
+      const key=r.species.toLowerCase();
+      if(!knownNames.has(key)&&!seen.has(key)){
+        seen.add(key);
+        const isH=r.isHybrid;
+        const sp={id:uid(),full_name:r.species,common_name:'',conservation_status:isH?'cultivar':'',source:'greenhouse',flair_ids:ghFid?[ghFid]:[],created_at:now};
+        toRegister.push(sp);
+      }
+    }
+    if(toRegister.length){
+      S.taxCustom.species.push(...toRegister);
+      S.taxSpecies.push(...toRegister.map(s=>({...s,is_custom:true})));
+      try{ await saveCustomTaxonomy(); }catch(e){ console.warn('Taxonomy auto-register:',e.message); }
+    }
     _writeCache(); renderGHList();
     closeGHImport();
-    toast(`🌱 ${newPlants.length} plant${newPlants.length!==1?'s':''} imported · 🏡 GH flair applied`,'ok',4000);
+    const regMsg=toRegister.length?` · ${toRegister.length} species added to taxonomy`:'';
+    toast(`🌱 ${newPlants.length} plant${newPlants.length!==1?'s':''} imported · 🏡 GH flair applied${regMsg}`,'ok',5000);
     window._ghImportRows=null;
     navTo('greenhouse'); showGHEmpty();
   }catch(e){ toast('Import failed: '+e.message,'fail'); }
@@ -6358,7 +6446,7 @@ function renderGHList(){
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
         ${inspBadge}
-        ${p.source==='lab'?`<span class="gh-source-badge lab">LAB</span>`:(p.source==='wild'?`<span class="gh-source-badge wild">WILD</span>`:'')}
+        ${(()=>{const _sm={lab:'LAB',wild:'WILD','sister-lab':'EXCH',swap:'SWAP',commercial:'SHOP',nursery:'NURS','botanical-garden':'BOT',donated:'GIFT',rescue:'RESC','own-cultivar':'OWN',seeds:'SEED',trade:'TRADE'};const _sc={lab:'lab',wild:'wild','sister-lab':'lab','own-cultivar':'lab',swap:'trade',commercial:'nursery','botanical-garden':'nursery',donated:'lab',rescue:'lab',seeds:'wild',trade:'trade'};const lbl=_sm[p.source];return lbl?`<span class="gh-source-badge ${_sc[p.source]||''}">${lbl}</span>`:''})()}
       </div>
     </div>`;
   }).join('');
@@ -6570,8 +6658,8 @@ function _populateGHEditor(p){
   document.getElementById('gh-species').value=p?p.species||'':'';
   document.getElementById('gh-quantity').value=p?p.quantity||1:1;
   document.getElementById('gh-health').value=p?p.health||'healthy':'healthy';
-  document.getElementById('gh-source').value=p?p.source||'wild':'wild';
-  document.getElementById('gh-location').value=p?p.location||'':'';
+  document.getElementById('gh-source').value=p?p.source||'lab':'lab';
+  document.getElementById('gh-location').value=p?p.location||'':'Q5JV+2X Kelambakkam, Tamil Nadu';
   document.getElementById('gh-notes-text').value=p?p.notes||'':'';
   document.getElementById('gh-date-added').value=p?p.date_added||new Date().toISOString().slice(0,10):new Date().toISOString().slice(0,10);
   document.getElementById('gh-next-inspection').value=p?p.next_inspection||'':'';
@@ -7238,6 +7326,23 @@ async function deleteBottle(id){
   }catch(e){ S.bottles.push(b); toast('Delete failed: '+e.message,'fail'); }
 }
 
+let _recFlairIds=[];
+function _renderRecFlairs(selectedIds){
+  const cont=document.getElementById('re-flair-pills');
+  const field=document.getElementById('re-flair-field');
+  if(!cont) return;
+  const flairs=S.taxFlairs||[];
+  if(!flairs.length){if(field) field.style.display='none';return;}
+  if(field) field.style.display='';
+  cont.innerHTML=flairs.map(f=>{
+    const active=(selectedIds||[]).includes(f.id);
+    return `<span class="flair-pill flair-toggle ${f.color} ${active?'active':''}" data-fid="${f.id}" onclick="this.classList.toggle('active')" style="cursor:pointer">${f.emoji?esc(f.emoji)+' ':''}${esc(f.name)}</span>`;
+  }).join('');
+}
+function _getRecFlairIds(){
+  return [...document.querySelectorAll('#re-flair-pills .flair-toggle.active')].map(el=>el.dataset.fid);
+}
+
 function openRecipe(id){
   S.curRec=id; renderRecList();
   const r=S.recs.find(x=>x.id===id); if(!r) return;
@@ -7254,11 +7359,16 @@ function openRecipe(id){
       badges.push(`<span class="sbadge species">${esc(r.target)}</span>`);
     }
   }
+  // Add flair pills to badges
+  (r.flair_ids||[]).forEach(fid=>{
+    const f=(S.taxFlairs||[]).find(x=>x.id===fid);
+    if(f) badges.push(`<span class="flair-pill ${f.color}" style="font-size:11px">${f.emoji?esc(f.emoji)+' ':''}${esc(f.name)}</span>`);
+  });
   document.getElementById('rv-badges').innerHTML=badges.join('');
   // Spec table
   const rows=[
     ['Base Medium', r.base],['Sucrose', r.sucrose?(r.sucrose+' g/L'):''],
-    ['Agar / Gelrite', r.agar?(r.agar+' g/L'):''],['pH (before autoclave)', r.ph],
+    ['Gelrite', r.agar?(r.agar+' g/L'):''],['pH (before autoclave)', r.ph],
     ['Growth Regulators', r.pgr],['Autoclave', r.autoclave],['Target', r.target],
   ].filter(([,v])=>v);
   const recBottles=S.bottles.filter(b=>b.recipe_id===id);
@@ -7301,7 +7411,9 @@ function _baseSet(val){
 function startNewRecipe(){
   S.editingRec=null; S.curRec=null; renderRecList();
   document.getElementById('re-head').textContent='New Media Recipe';
-  ['re-name','re-sucrose','re-agar','re-ph','re-pgr','re-target','rr-notes'].forEach(id=>document.getElementById(id).value='');
+  ['re-name','re-sucrose','re-ph','re-pgr','re-target','rr-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('re-agar').value='1.9';
+  _recFlairIds=[];_renderRecFlairs([]);
   _baseSet('');
   document.getElementById('re-ac-temp').value='121';
   document.getElementById('re-ac-time').value='15';
@@ -7321,6 +7433,7 @@ function startEditRecipe(){
   _acParse(r.autoclave);
   document.getElementById('re-target').value=r.target||'';
   document.getElementById('rr-notes').value=r.notes_md||'';
+  _renderRecFlairs(r.flair_ids||[]);
   showRec('editor');
 }
 
@@ -7337,6 +7450,7 @@ async function saveRecipe(){
     autoclave:_acStr(),
     target:document.getElementById('re-target').value.trim(),
     notes_md:document.getElementById('rr-notes').value,
+    flair_ids:_getRecFlairIds(),
     date_created:S.editingRec?(S.recs.find(r=>r.id===S.editingRec)?.date_created||new Date().toISOString()):new Date().toISOString(),
   };
   document.getElementById('save-rec-btn').disabled=true;
@@ -8019,6 +8133,8 @@ document.querySelectorAll('.ac-preset').forEach(btn=>{
 // ════════════════════════════════════════════════════════════
 // TOOLS — TIMERS
 // ════════════════════════════════════════════════════════════
+const _widgetMin={timers:false,sw:false,stepper:false};
+const _widgetLabels={timers:'⏱ Timers',sw:'⏱ Stopwatch',stepper:'🧫 Stepper'};
 let timerList=[], swList=[];
 
 let _audioCtx=null;
@@ -8051,6 +8167,7 @@ function fmtHMS(s){
 }
 
 function renderTimers(){
+  _updateWidgetTray&&_updateWidgetTray();
   const grid=document.getElementById('timer-grid');
   if(!timerList.length){grid.innerHTML='<p style="font-size:13px;color:var(--mu);text-align:center">No timers. Click + Add Timer.</p>';return;}
   grid.innerHTML=timerList.map((t,i)=>`
@@ -8128,6 +8245,7 @@ function fmtSW(ms){
 }
 
 function renderSWs(){
+  _updateWidgetTray&&_updateWidgetTray();
   const grid=document.getElementById('sw-grid');
   if(!swList.length){grid.innerHTML='<p style="font-size:13px;color:var(--mu);text-align:center">No stopwatches. Click + Add Stopwatch.</p>';return;}
   grid.innerHTML=swList.map((sw,i)=>`
@@ -8213,6 +8331,7 @@ function renderStepperEdit(){
     </div>`).join('');
 }
 function _stepperTick(){
+  _updateWidgetTray&&_updateWidgetTray();
   SS.elapsed++;
   const step=SS.steps[SS.cur];
   const rem=step.secs-SS.elapsed;
@@ -8677,6 +8796,57 @@ function _loginToggleTheme(){
   document.getElementById('login-theme-btn').textContent = icon;
   document.querySelector('meta[name="theme-color"]').setAttribute('content', next === 'dark' ? '#161b22' : '#f6f8fa');
 }
+
+// ════════════════════════════════════════════════════════════
+// WIDGET TRAY — minimise / restore
+// ════════════════════════════════════════════════════════════
+function minimizeWidget(wid){
+  _widgetMin[wid]=true;
+  const card=document.getElementById('widget-'+wid);
+  if(card) card.style.display='none';
+  _updateWidgetTray();
+}
+function restoreWidget(wid){
+  _widgetMin[wid]=false;
+  const card=document.getElementById('widget-'+wid);
+  if(card) card.style.display='';
+  _updateWidgetTray();
+  navTo('tools');
+}
+function closeWidget(wid){
+  _widgetMin[wid]=false;
+  const card=document.getElementById('widget-'+wid);
+  if(card) card.style.display='';
+  _updateWidgetTray();
+}
+function _updateWidgetTray(){
+  const tray=document.getElementById('widget-tray');
+  if(!tray) return;
+  const chips=[];
+  if(_widgetMin.timers){
+    const running=timerList.filter(t=>t.running);
+    const done=timerList.filter(t=>t.done&&!t.running);
+    let lbl=_widgetLabels.timers;
+    if(done.length) lbl+=' 🔔';
+    else if(running.length) lbl+=` · ${fmtHMS(running[0].remaining)}`;
+    chips.push(`<div class="widget-chip" onclick="restoreWidget('timers')"><span class="widget-chip-label">${lbl}</span><button class="widget-chip-close" title="Close" onclick="event.stopPropagation();closeWidget('timers')">✕</button></div>`);
+  }
+  if(_widgetMin.sw){
+    const running=swList.filter(s=>s.running);
+    let lbl=_widgetLabels.sw;
+    if(running.length) lbl+=` · ${fmtSW(running[0].elapsed+(Date.now()-running[0].startedAt))}`;
+    chips.push(`<div class="widget-chip" onclick="restoreWidget('sw')"><span class="widget-chip-label">${lbl}</span><button class="widget-chip-close" title="Close" onclick="event.stopPropagation();closeWidget('sw')">✕</button></div>`);
+  }
+  if(_widgetMin.stepper){
+    let lbl=_widgetLabels.stepper;
+    if(SS.running&&SS.cur>=0&&SS.steps[SS.cur]) lbl+=` · Step ${SS.cur+1}/${SS.steps.length}`;
+    chips.push(`<div class="widget-chip" onclick="restoreWidget('stepper')"><span class="widget-chip-label">${lbl}</span><button class="widget-chip-close" title="Close" onclick="event.stopPropagation();closeWidget('stepper')">✕</button></div>`);
+  }
+  tray.innerHTML=chips.join('');
+  tray.style.display=chips.length?'flex':'none';
+}
 </script>
+<!-- Widget tray — fixed footer for minimised lab tools -->
+<div id="widget-tray"></div>
 </body>
 </html>
