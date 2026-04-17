@@ -1119,16 +1119,7 @@ main > .dview, main > .editor{ margin:0 auto; }
 }
 #ai-head{padding:10px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px;flex-shrink:0}
 #ai-head .ai-title{flex:1;font-weight:700;font-size:13px;background:linear-gradient(135deg,#4285f4,#8250df);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-#ai-tab-bar{display:flex;border-bottom:1px solid var(--bd);flex-shrink:0}
-.ai-tab{flex:1;padding:7px;font-size:11px;font-weight:700;color:var(--mu);background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
-.ai-tab.active{color:var(--ac);border-bottom-color:var(--ac)}
 #ai-msgs{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
-#ai-voice-log{flex:1;overflow-y:auto;padding:12px 14px;display:none;flex-direction:column;gap:8px}
-.vl-entry{border:1px solid var(--bd);border-radius:8px;padding:8px 10px;font-size:12px}
-.vl-entry .vl-ts{font-size:10px;color:var(--mu);margin-bottom:4px}
-.vl-entry .vl-transcript{color:var(--tx);font-weight:500}
-.vl-entry .vl-cmd{font-size:10px;color:var(--gn);margin-top:2px}
-.vl-entry .vl-err{font-size:10px;color:var(--rd);margin-top:2px}
 /* voice confirm overlay inside panel */
 #ai-voice-confirm{display:none;flex-direction:column;align-items:center;gap:10px;padding:16px;border-bottom:1px solid var(--bd);background:var(--sf2);flex-shrink:0;text-align:center}
 #ai-voice-confirm.on{display:flex}
@@ -1140,6 +1131,10 @@ main > .dview, main > .editor{ margin:0 auto; }
 .ai-msg.user{background:var(--ac);color:#fff;align-self:flex-end;border-radius:8px 8px 2px 8px}
 .ai-msg.ai{background:var(--sf2);color:var(--tx);align-self:flex-start;border-radius:8px 8px 8px 2px}
 .ai-msg.thinking{color:var(--mu);font-style:italic;font-size:12px}
+.ai-msg.voice{background:rgba(248,81,73,.10);color:var(--tx);align-self:flex-end;border-radius:8px 8px 2px 8px;border:1px solid rgba(248,81,73,.25)}
+.ai-msg.voice::before{content:'🎤 ';font-size:11px}
+#ai-mic-btn.listening{background:var(--rd);color:#fff;border-color:var(--rd)}
+#ai-mic-btn.processing{background:var(--yw);color:#0d1117;border-color:var(--yw)}
 #ai-input-row{padding:10px;border-top:1px solid var(--bd);display:flex;gap:6px;flex-shrink:0}
 #ai-input{flex:1;font-size:13px;padding:7px 10px;resize:none;height:36px;min-height:36px;max-height:100px;overflow-y:auto}
 .ai-chip{background:var(--sf2);border:1px solid var(--bd);border-radius:14px;color:var(--mu);cursor:pointer;font-size:11px;padding:3px 10px;white-space:nowrap;font-family:var(--font)}
@@ -3354,12 +3349,7 @@ main > .dview, main > .editor{ margin:0 auto; }
     <a id="ai-key-link" href="https://console.groq.com" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
   </div>
   <div id="ai-usage-bar" style="padding:6px 12px;border-bottom:1px solid var(--bd);background:var(--sf2);flex-shrink:0"></div>
-  <!-- Tab bar: Chat / Voice -->
-  <div id="ai-tab-bar">
-    <button class="ai-tab active" id="ai-tab-chat" onclick="_switchAITab('chat')">💬 Chat</button>
-    <button class="ai-tab" id="ai-tab-voice" onclick="_switchAITab('voice')">🎤 Voice</button>
-  </div>
-  <!-- Voice confirm overlay (native mode only) -->
+  <!-- Voice confirm overlay -->
   <div id="ai-voice-confirm">
     <div style="font-size:11px;color:var(--mu)">I heard:</div>
     <div class="vc-heard" id="vc-heard-text"></div>
@@ -3369,7 +3359,7 @@ main > .dview, main > .editor{ margin:0 auto; }
     </div>
     <div style="font-size:10px;color:var(--mu)">Say "send" or "re-listen"</div>
   </div>
-  <!-- Chat tab -->
+  <!-- Quick chips -->
   <div id="ai-chips" style="padding:8px 12px;display:flex;flex-wrap:wrap;gap:5px;border-bottom:1px solid var(--bd);flex-shrink:0">
     <button class="ai-chip" onclick="askAI('Summarise this note in 3-5 bullet points, highlighting key observations, results, and recommended next steps.')">Summarise note</button>
     <button class="ai-chip" onclick="askAI('Based on the species, stage, and media shown in context, what PGR concentrations and media modifications would you recommend? Cite typical ranges from literature.')">PGR advice</button>
@@ -3378,16 +3368,13 @@ main > .dview, main > .editor{ margin:0 auto; }
     <button class="ai-chip" onclick="askAI('What sterilisation protocol would you recommend for my current species and the contamination pattern I have shown?')">Sterilisation</button>
     <button class="ai-chip" onclick="askAI('Based on my bottle records and subculture history, what is the estimated multiplication rate and what should I optimise next?')">Multiplication rate</button>
   </div>
+  <!-- Single unified chat -->
   <div id="ai-msgs"><div class="ai-msg ai">Hello! I can help with TC protocols, species info, PGR doses, contamination, and note summaries. What would you like to know?</div></div>
-  <!-- Voice log tab -->
-  <div id="ai-voice-log-toolbar" style="display:none;padding:6px 10px;border-bottom:1px solid var(--bd);gap:6px;flex-shrink:0">
-    <button class="btn xs ghost" onclick="_exportVoiceDump()" style="flex:1">⬇ Export</button>
-    <button class="btn xs ghost" onclick="_clearVoiceDump()" style="color:var(--rd)">🗑 Clear</button>
-  </div>
-  <div id="ai-voice-log"></div>
-  <div id="ai-input-row" style="padding:10px 12px;border-top:1px solid var(--bd);display:flex;gap:8px;flex-shrink:0;align-items:flex-end">
-    <textarea id="ai-input" placeholder="Ask anything about TC, media, PGRs, sterilisation…" rows="2" style="flex:1;font-size:13px;padding:8px 11px;resize:none;min-height:40px;max-height:120px;overflow-y:auto;line-height:1.5"></textarea>
-    <button class="btn" id="ai-send-btn" style="height:40px;padding:0 16px;flex-shrink:0">→</button>
+  <!-- Input row: mic + textarea + send -->
+  <div id="ai-input-row" style="padding:8px 10px;border-top:1px solid var(--bd);display:flex;gap:6px;flex-shrink:0;align-items:flex-end">
+    <button id="ai-mic-btn" onclick="_voiceTap()" title="Voice input" style="width:36px;height:36px;border-radius:50%;border:1px solid var(--bd);background:var(--sf2);color:var(--tx);font-size:15px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .15s">🎤</button>
+    <textarea id="ai-input" placeholder="Ask or speak…" rows="1" style="flex:1;font-size:13px;padding:8px 10px;resize:none;min-height:36px;max-height:120px;overflow-y:auto;line-height:1.5"></textarea>
+    <button class="btn" id="ai-send-btn" style="height:36px;padding:0 14px;flex-shrink:0">→</button>
   </div>
 </div>
 
@@ -7062,17 +7049,11 @@ function _ttsSpeak(text, onEnd){
 function _ttsStop(){ speechSynthesis.cancel(); }
 
 // ── AI panel tab switch ───────────────────────────────────────
-function _switchAITab(tab){
-  const isChat=tab==='chat';
-  document.getElementById('ai-msgs').style.display=isChat?'flex':'none';
-  document.getElementById('ai-voice-log').style.display=isChat?'none':'flex';
-  document.getElementById('ai-voice-log-toolbar').style.display=isChat?'none':'flex';
-  document.getElementById('ai-chips').style.display=isChat?'flex':'none';
-  document.getElementById('ai-input-row').style.display=isChat?'flex':'none';
-  document.getElementById('ai-tab-chat').classList.toggle('active',isChat);
-  const vTab=document.getElementById('ai-tab-voice');
-  vTab.classList.toggle('active',!isChat);
-  if(!isChat){ vTab.textContent='🎤 Voice'; vTab.style.color=''; _restoreVoiceLog(); }
+function _switchAITab(){ /* tabs removed — single unified chat */ }
+function _setMicBtnState(state){
+  // sync both the footer bar mic and the in-panel mic button
+  const btns=[document.getElementById('lfb-mic'),document.getElementById('ai-mic-btn')];
+  btns.forEach(b=>{ if(!b) return; b.classList.toggle('listening',state==='listening'); b.classList.toggle('processing',state==='processing'); });
 }
 function _toggleAIPanel(){
   const p=document.getElementById('ai-panel');
@@ -7112,36 +7093,15 @@ function _exportVoiceDump(){
 }
 
 function _voiceLog(transcript, result, isError){
-  // Save to persistent dump
   _dumpVoiceTranscript(transcript, result);
-  // Update panel UI
-  const ts=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  const log=document.getElementById('ai-voice-log');
-  if(!log) return;
+  // Add voice bubble into main chat
+  const msgs=document.getElementById('ai-msgs');
+  if(!msgs) return;
   const el=document.createElement('div');
-  el.className='vl-entry';
-  el.innerHTML=`<div class="vl-ts">${ts}</div><div class="vl-transcript">${esc(transcript)}</div>${result?`<div class="${isError?'vl-err':'vl-cmd'}">${esc(result)}</div>`:''}`;
-  log.appendChild(el);
-  log.scrollTop=log.scrollHeight;
-  // Badge on Voice tab if panel is on Chat tab
-  const tab=document.getElementById('ai-tab-voice');
-  if(tab&&!tab.classList.contains('active')){
-    tab.textContent='🎤 Voice •';
-    tab.style.color='var(--ac)';
-  }
-}
-// Restore voice log from dump on panel open
-function _restoreVoiceLog(){
-  const log=document.getElementById('ai-voice-log');
-  if(!log||log.children.length>0) return; // already populated
-  const dump=_getVoiceDump().slice(-50); // show last 50
-  dump.forEach(e=>{
-    const ts=new Date(e.ts).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-    const el=document.createElement('div');
-    el.className='vl-entry';
-    el.innerHTML=`<div class="vl-ts">${ts}</div><div class="vl-transcript">${esc(e.text)}</div>${e.result?`<div class="vl-cmd">${esc(e.result)}</div>`:''}`;
-    log.appendChild(el);
-  });
+  el.className='ai-msg voice';
+  el.textContent=transcript+(result&&isError?' — '+result:'');
+  msgs.appendChild(el);
+  msgs.scrollTop=msgs.scrollHeight;
 }
 
 // ── Command parser ────────────────────────────────────────────
@@ -7197,12 +7157,12 @@ function _startNativeSTT(isWake, onDone){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   _nativeSR=new SR();
   _nativeSR.lang='en-IN'; _nativeSR.interimResults=false; _nativeSR.maxAlternatives=1;
-  document.getElementById('lfb-mic').classList.add('listening');
+  _setMicBtnState('listening');
   _nativeSR.onresult=e=>{
     const transcript=e.results[0][0].transcript.trim();
     _nativePending=transcript;
     _nativeDoneCallback=onDone||null;
-    document.getElementById('lfb-mic').classList.remove('listening');
+    _setMicBtnState('idle');
     _dumpVoiceTranscript(transcript); // save to local dump
     const c=_voiceCfg();
     if(c.confirm){
@@ -7221,12 +7181,12 @@ function _startNativeSTT(isWake, onDone){
     }
   };
   _nativeSR.onerror=e=>{
-    document.getElementById('lfb-mic').classList.remove('listening');
+    _setMicBtnState('idle');
     if(e.error!=='aborted') toast('Mic error: '+e.error,'fail');
     if(onDone) onDone();
   };
   _nativeSR.onend=()=>{
-    document.getElementById('lfb-mic').classList.remove('listening');
+    _setMicBtnState('idle');
   };
   _nativeSR.start();
 }
@@ -7276,14 +7236,14 @@ async function _startWhisperSTT(){
   _whisperRec.ondataavailable=e=>{ if(e.data.size>0) _whisperChunks.push(e.data); };
   _whisperRec.onstop=async()=>{
     stream.getTracks().forEach(t=>t.stop());
-    document.getElementById('lfb-mic').classList.remove('listening');
-    document.getElementById('lfb-mic').classList.add('processing');
+    _setMicBtnState('idle');
+    _setMicBtnState('processing');
     const blob=new Blob(_whisperChunks,{type:_whisperRec.mimeType});
     await _transcribeWhisper(blob);
-    document.getElementById('lfb-mic').classList.remove('processing');
+    _setMicBtnState('idle');
   };
   _whisperRec.start(100);
-  document.getElementById('lfb-mic').classList.add('listening');
+  _setMicBtnState('listening');
   // Silence detection via AnalyserNode
   const gate=c.gate??10;
   const silenceSec=c.whisperSilence||2;
