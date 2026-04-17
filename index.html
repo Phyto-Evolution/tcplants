@@ -7156,10 +7156,19 @@ function _startNativeSTT(isWake, onDone){
   }
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   _nativeSR=new SR();
-  _nativeSR.lang='en-IN'; _nativeSR.interimResults=false; _nativeSR.maxAlternatives=1;
+  _nativeSR.lang='en-IN';
+  _nativeSR.continuous=true;      // stay open until we explicitly stop
+  _nativeSR.interimResults=true;  // so we get interim feedback
+  _nativeSR.maxAlternatives=1;
   _setMicBtnState('listening');
   _nativeSR.onresult=e=>{
-    const transcript=e.results[0][0].transcript.trim();
+    // grab the latest final result only
+    const results=Array.from(e.results);
+    const final=results.filter(r=>r.isFinal);
+    if(!final.length) return; // still interim, keep listening
+    const transcript=final[final.length-1][0].transcript.trim();
+    if(!transcript) return;
+    try{ _nativeSR.stop(); }catch{} _nativeSR=null;
     _nativePending=transcript;
     _nativeDoneCallback=onDone||null;
     _setMicBtnState('idle');
@@ -7253,13 +7262,19 @@ async function _startWhisperSTT(){
   _whisperCtx.createMediaStreamSource(stream).connect(_whisperAnalyser);
   const buf=new Uint8Array(_whisperAnalyser.frequencyBinCount);
   let silenceStart=null;
+  let hasSpeech=false; // don't stop until user has actually spoken
+  const graceEnd=Date.now()+1500; // 1.5s grace — don't check silence at all on start
   const checkSilence=()=>{
     if(!_whisperRec||_whisperRec.state!=='recording') return;
     _whisperAnalyser.getByteFrequencyData(buf);
     const avg=buf.reduce((a,b)=>a+b,0)/buf.length;
+    if(Date.now()<graceEnd){ requestAnimationFrame(checkSilence); return; } // grace period
+    if(avg>gate+5) hasSpeech=true; // user has spoken
     if(avg<gate+5){
-      if(!silenceStart) silenceStart=Date.now();
-      else if(Date.now()-silenceStart>silenceSec*1000){ _stopWhisperSTT(); return; }
+      if(hasSpeech){ // only start silence timer after actual speech detected
+        if(!silenceStart) silenceStart=Date.now();
+        else if(Date.now()-silenceStart>silenceSec*1000){ _stopWhisperSTT(); return; }
+      }
     } else { silenceStart=null; }
     requestAnimationFrame(checkSilence);
   };
