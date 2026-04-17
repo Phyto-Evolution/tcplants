@@ -831,6 +831,10 @@ main > .dview, main > .editor{ margin:0 auto; }
 .tax-sp-sci{flex:1}
 .tax-sp-com{font-size:11px;color:var(--mu);flex:1}
 .tax-custom-row{display:flex;align-items:center;gap:8px;padding:5px 8px;border:1px solid var(--bd);border-radius:6px;margin-bottom:6px}
+.tax-sp-thumb{width:36px;height:36px;border-radius:5px;object-fit:cover;flex-shrink:0;border:1px solid var(--bd);cursor:pointer}
+.tax-sp-thumb-placeholder{width:36px;height:36px;border-radius:5px;flex-shrink:0;background:var(--sf2);border:1px dashed var(--bd);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;color:var(--mu)}
+.tc-photo-preview{width:80px;height:80px;border-radius:8px;object-fit:cover;border:1px solid var(--bd);cursor:pointer}
+.tc-photo-clear{background:transparent;border:none;color:var(--rd);cursor:pointer;font-size:12px;padding:2px 5px}
 .sp-tab-bar{display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--bd);padding-bottom:0}
 .sp-tab{background:transparent;border:none;color:var(--mu);cursor:pointer;font-family:var(--font);font-size:14px;font-weight:500;padding:8px 16px;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
 .sp-tab.active{color:var(--tx);border-bottom-color:var(--ac)}
@@ -1008,15 +1012,27 @@ main > .dview, main > .editor{ margin:0 auto; }
 .toggle-track::after{content:'';position:absolute;width:18px;height:18px;top:3px;left:3px;background:#fff;border-radius:50%;transition:transform .2s}
 .toggle-switch input:checked+.toggle-track{background:var(--gn)}
 .toggle-switch input:checked+.toggle-track::after{transform:translateX(20px)}
-.article-card{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:14px;margin-bottom:10px;transition:border-color .15s}
+.news-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;margin-top:4px}
+.article-card{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:16px;transition:border-color .15s;display:flex;flex-direction:column;gap:6px;position:relative}
 .article-card:hover{border-color:var(--ac)}
-.article-title{font-size:14px;font-weight:600;color:var(--ac);text-decoration:none;line-height:1.4;display:block;margin-bottom:6px}
+.article-card.pinned{border-color:var(--yw);background:rgba(210,153,34,.05)}
+.article-pin-btn{position:absolute;top:10px;right:10px;background:transparent;border:none;cursor:pointer;font-size:15px;opacity:.4;line-height:1;padding:2px 4px;border-radius:4px}
+.article-pin-btn:hover,.article-pin-btn.pinned{opacity:1}
+.article-title{font-size:13px;font-weight:600;color:var(--ac);text-decoration:none;line-height:1.45;display:block;padding-right:24px}
 .article-title:hover{text-decoration:underline}
-.article-meta{font-size:11px;color:var(--mu);display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px}
+.article-meta{font-size:11px;color:var(--mu);display:flex;flex-wrap:wrap;gap:6px}
+.article-abstract{font-size:12px;color:var(--mu);line-height:1.6;margin-top:4px;max-height:88px;overflow:hidden;position:relative;transition:max-height .3s}
+.article-abstract.expanded{max-height:800px}
+.article-abstract-fade{position:absolute;bottom:0;left:0;right:0;height:28px;background:linear-gradient(transparent,var(--sf));pointer-events:none;transition:opacity .3s}
+.article-card.pinned .article-abstract-fade{background:linear-gradient(transparent,rgba(22,27,34,.9))}
 .article-doi{font-size:11px;color:var(--mu)}
 .article-doi a{color:var(--pu);text-decoration:none}
 .article-doi a:hover{text-decoration:underline}
 .news-status{font-size:13px;color:var(--mu);padding:12px 0}
+.news-topic-bar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.news-topic-sel{background:var(--sf2);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-family:var(--font);font-size:13px;padding:5px 10px;cursor:pointer}
+.news-pins-section{margin-bottom:16px}
+.news-pins-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--yw);margin-bottom:8px}
 
 /* ── SPECIES PICKER MODAL ── */
 #species-picker-modal{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center}
@@ -1975,18 +1991,34 @@ main > .dview, main > .editor{ margin:0 auto; }
 
   <!-- ── NEWS ── -->
   <div class="section fullpage" id="sec-news">
-    <div style="max-width:900px;margin:0 auto;width:100%;padding-bottom:40px">
+    <div style="max-width:1200px;margin:0 auto;width:100%;padding-bottom:40px">
       <h2 style="font-size:20px;font-weight:700;margin-bottom:4px">📰 TC Research News</h2>
-      <p style="font-size:13px;color:var(--mu);margin-bottom:16px">Latest plant tissue culture publications from PubMed. Results are saved to your repo as dated JSON files for future reference.</p>
-      <div class="news-toggle-row">
-        <label class="toggle-switch">
+      <p style="font-size:13px;color:var(--mu);margin-bottom:14px">Latest publications from PubMed — full abstracts, card grid, pinnable. Archived to your repo.</p>
+      <div class="news-topic-bar">
+        <select class="news-topic-sel" id="news-topic" onchange="_newsTopicChange()">
+          <option value="general">🌿 General TC</option>
+          <option value="carnivorous">🪲 Carnivorous Plants</option>
+          <option value="nepenthes">🏔 Nepenthes</option>
+          <option value="orchids">🌸 Orchids</option>
+          <option value="banana">🍌 Banana / Musa</option>
+          <option value="vanilla">🌼 Vanilla</option>
+          <option value="embryogenesis">🔬 Somatic Embryogenesis</option>
+          <option value="contamination">☣️ Contamination</option>
+          <option value="media">⚗️ Media &amp; Hormones</option>
+        </select>
+        <label class="toggle-switch" style="flex-shrink:0">
           <input type="checkbox" id="news-toggle" onchange="handleNewsToggle(this.checked)">
           <div class="toggle-track"></div>
         </label>
-        <span id="news-toggle-label" style="font-size:14px;font-weight:500">Load latest research</span>
+        <span id="news-toggle-label" style="font-size:14px;font-weight:500">Load</span>
         <span id="news-count" style="font-size:12px;color:var(--mu);margin-left:auto"></span>
       </div>
-      <div id="news-content"><p class="news-status">Toggle on to load the latest 100 plant tissue culture papers from PubMed.</p></div>
+      <div id="news-pins-area" style="display:none">
+        <div class="news-pins-label">📌 Pinned</div>
+        <div class="news-grid" id="news-pins-grid"></div>
+        <div style="border-top:1px solid var(--bd);margin:16px 0 12px"></div>
+      </div>
+      <div id="news-content"><p class="news-status">Select a topic and toggle on to load papers from PubMed.</p></div>
     </div>
   </div>
 
@@ -3468,6 +3500,62 @@ function _renderDashboard(){
       </div>`;
     }
 
+    // ── Top species by activity ──
+    const spActMap={};
+    S.notes.forEach(n=>{if(n.species){const k=n.species.toLowerCase();spActMap[k]=(spActMap[k]||{name:n.species,notes:0,bottles:0});spActMap[k].notes++;}});
+    (S.bottles||[]).forEach(b=>{if(b.species){const k=b.species.toLowerCase();if(!spActMap[k])spActMap[k]={name:b.species,notes:0,bottles:0};spActMap[k].bottles++;}});
+    const topSp=Object.values(spActMap).sort((a,b)=>(b.notes+b.bottles)-(a.notes+a.bottles)).slice(0,6);
+    if(topSp.length){
+      pEl.innerHTML+=`<div style="grid-column:1/-1;margin-top:12px;padding-top:14px;border-top:1px solid var(--bd)">
+        <div class="dash-section-label"><span>🌱 Top Species in Culture</span><a onclick="navTo('species')" style="color:var(--ac);font-size:11px;cursor:pointer;font-weight:600">All species →</a></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px">
+          ${topSp.map(sp=>`<div onclick="navTo('species')" style="background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:8px 12px;cursor:pointer;display:flex;align-items:center;gap:8px" onmouseover="this.style.borderColor='var(--gn)'" onmouseout="this.style.borderColor='var(--bd)'">
+            <span style="flex:1;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><em>${esc(sp.name)}</em></span>
+            <span style="font-size:11px;color:var(--mu);flex-shrink:0">${sp.notes?`📋${sp.notes} `:''}${sp.bottles?`🫙${sp.bottles}`:''}</span>
+          </div>`).join('')}
+        </div>
+      </div>`;
+    }
+
+    // ── Recipes quick access ──
+    const recentRecs=(S.recs||[]).slice(0,4);
+    if(recentRecs.length){
+      pEl.innerHTML+=`<div style="grid-column:1/-1;margin-top:12px;padding-top:14px;border-top:1px solid var(--bd)">
+        <div class="dash-section-label"><span>🧪 Media Recipes</span><a onclick="navTo('recipes');startNewRecipe()" style="color:var(--pu);font-size:11px;cursor:pointer;font-weight:600">+ New recipe →</a></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          ${recentRecs.map(r=>`<div onclick="navTo('recipes');openRecipe('${r.id}')" style="background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:7px 12px;cursor:pointer;font-size:12px" onmouseover="this.style.borderColor='var(--pu)'" onmouseout="this.style.borderColor='var(--bd)'">
+            <div style="font-weight:600;margin-bottom:2px">${esc(r.name)}</div>
+            <div style="color:var(--mu);font-size:11px">${esc(r.base||'')}${r.agar?` · Gelrite ${r.agar}g/L`:''}</div>
+          </div>`).join('')}
+        </div>
+      </div>`;
+    }
+
+    // ── Contamination quick stat ──
+    const contamNotes=S.notes.filter(n=>n.type==='Contamination Log');
+    const totalNotes=S.notes.length;
+    const contamRate=totalNotes>0?Math.round(contamNotes.length/totalNotes*100):0;
+    const recentContam=contamNotes.filter(n=>{ const d=new Date(n.date); return (Date.now()-d)<30*24*3600*1000; });
+    if(contamNotes.length){
+      pEl.innerHTML+=`<div style="grid-column:1/-1;margin-top:12px;padding-top:14px;border-top:1px solid var(--bd)">
+        <div class="dash-section-label"><span>☣️ Contamination</span><a onclick="navTo('contam')" style="color:var(--rd);font-size:11px;cursor:pointer;font-weight:600">View log →</a></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <div style="background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.25);border-radius:8px;padding:10px 16px;min-width:120px;text-align:center">
+            <div style="font-size:22px;font-weight:700;color:var(--rd)">${contamRate}%</div>
+            <div style="font-size:11px;color:var(--mu)">overall rate</div>
+          </div>
+          <div style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:10px 16px;min-width:120px;text-align:center">
+            <div style="font-size:22px;font-weight:700;color:var(--yw)">${recentContam.length}</div>
+            <div style="font-size:11px;color:var(--mu)">last 30 days</div>
+          </div>
+          <div style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:10px 16px;min-width:120px;text-align:center">
+            <div style="font-size:22px;font-weight:700">${contamNotes.length}</div>
+            <div style="font-size:11px;color:var(--mu)">total events</div>
+          </div>
+        </div>
+      </div>`;
+    }
+
     // Greenhouse summary — stock plants + lab output potential
     const ghPlants=S.greenhouse||[];
     if(ghPlants.length){
@@ -4936,7 +5024,11 @@ function _renderTaxonomyPanel(){
         const srcLabel={greenhouse:'🏡 GH',seeds:'🌱 Seeds',wild:'🌍 Wild','other-lab':'🔬 Lab exchange','own-cultivar':'🌿 Own cultivar',swap:'🤝 Swap',commercial:'🏪 Vendor',nursery:'🌱 Nursery','botanical-garden':'🏛 Bot. Garden',donated:'🎁 Donated',rescue:'♻️ Rescue'}[sp.source]||sp.source||'';
         const isHybrid=sp.full_name&&(sp.full_name.includes('×')||sp.full_name.toLowerCase().includes(' x '));
         const spFlairs=(sp.flair_ids||[]).map(fid=>{const f=(S.taxFlairs||[]).find(x=>x.id===fid);return f?`<span class="flair-pill ${f.color}" style="font-size:10px;padding:1px 5px">${esc(f.name)}</span>`:''}).join('');
+        const thumbHtml=sp.photo
+          ?`<img src="${sp.photo}" class="tax-sp-thumb" alt="" onclick="_taxViewPhoto('${sp.id}')" title="View photo">`
+          :`<div class="tax-sp-thumb-placeholder" onclick="_taxEditCustomSpecies('${sp.id}')" title="Add photo">📷</div>`;
         return `<div class="tax-custom-row" style="flex-wrap:wrap;row-gap:4px">
+          ${thumbHtml}
           <span class="tax-sp-sci" style="flex:1;min-width:120px">${esc(sp.full_name)}${isHybrid?'<span style="color:var(--pu);font-size:10px;margin-left:5px;border:1px solid var(--pu);border-radius:3px;padding:0 3px">HYBRID</span>':''}</span>
           <span class="tax-sp-com" style="flex:1;color:var(--mu)">${esc(sp.common_name||'')}</span>
           ${spFlairs?`<span style="display:flex;flex-wrap:wrap;gap:3px;align-items:center">${spFlairs}</span>`:''}
@@ -4997,6 +5089,19 @@ function _renderTaxonomyPanel(){
           <label>Flairs <span style="font-weight:400;color:var(--mu);font-size:11px">— required, select at least one</span></label>
           <div id="tc-flair-pills" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px"></div>
           <div id="tc-flair-empty" style="font-size:12px;color:var(--mu);display:none">No flairs defined — add flairs in the Flairs tab first.</div>
+        </div>
+        <div class="field" style="margin-bottom:12px">
+          <label>Photo <span style="font-weight:400;color:var(--mu);font-size:11px">(optional — compressed automatically)</span></label>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
+            <div id="tc-photo-preview-wrap" style="display:none">
+              <img id="tc-photo-preview" class="tc-photo-preview" src="" alt="species photo" onclick="document.getElementById('tc-photo-input').click()">
+              <button type="button" class="tc-photo-clear" onclick="_tcClearPhoto()" title="Remove photo">✕ Remove</button>
+            </div>
+            <label id="tc-photo-placeholder" style="cursor:pointer;display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ac);font-weight:500" onclick="document.getElementById('tc-photo-input').click()">
+              📷 Add photo
+            </label>
+            <input type="file" id="tc-photo-input" accept="image/*" style="display:none" onchange="_tcHandlePhoto(this)">
+          </div>
         </div>
         <div style="display:flex;gap:8px">
           <button class="btn sm green" id="tc-save-btn" onclick="_taxSaveCustomSpecies()">Add Species</button>
@@ -5076,6 +5181,81 @@ function _tcSourceChange(val){
   document.getElementById('tc-source-custom-wrap').style.display=val==='custom'?'':'none';
 }
 
+// ── Taxonomy species photo handling ──────────────────────────
+let _tcPhotoData=null; // base64 data URL (compressed)
+
+async function _tcHandlePhoto(input){
+  const file=input.files?.[0]; if(!file) return;
+  try{
+    const compressed=await _compressImage(file,480,0.62);
+    _tcPhotoData=compressed;
+    const prev=document.getElementById('tc-photo-preview');
+    const wrap=document.getElementById('tc-photo-preview-wrap');
+    const placeholder=document.getElementById('tc-photo-placeholder');
+    if(prev) prev.src=compressed;
+    if(wrap) wrap.style.display='';
+    if(placeholder) placeholder.style.display='none';
+  }catch(e){ toast('Photo error: '+e.message,'fail'); }
+  input.value='';
+}
+function _tcClearPhoto(){
+  _tcPhotoData=null;
+  const prev=document.getElementById('tc-photo-preview');
+  const wrap=document.getElementById('tc-photo-preview-wrap');
+  const placeholder=document.getElementById('tc-photo-placeholder');
+  if(prev) prev.src='';
+  if(wrap) wrap.style.display='none';
+  if(placeholder) placeholder.style.display='';
+}
+function _tcSetPhotoUI(photoData){
+  _tcPhotoData=photoData||null;
+  const prev=document.getElementById('tc-photo-preview');
+  const wrap=document.getElementById('tc-photo-preview-wrap');
+  const placeholder=document.getElementById('tc-photo-placeholder');
+  if(photoData){
+    if(prev) prev.src=photoData;
+    if(wrap) wrap.style.display='';
+    if(placeholder) placeholder.style.display='none';
+  } else {
+    if(prev) prev.src='';
+    if(wrap) wrap.style.display='none';
+    if(placeholder) placeholder.style.display='';
+  }
+}
+
+function _taxViewPhoto(id){
+  const sp=(S.taxCustom.species||[]).find(x=>x.id===id); if(!sp?.photo) return;
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;cursor:zoom-out';
+  overlay.onclick=()=>overlay.remove();
+  const img=document.createElement('img');
+  img.src=sp.photo; img.style.cssText='max-width:90vw;max-height:90vh;border-radius:10px;box-shadow:0 8px 40px rgba(0,0,0,.4)';
+  overlay.appendChild(img); document.body.appendChild(overlay);
+}
+
+// Generic image compressor — canvas resize + JPEG quality
+function _compressImage(file, maxPx=480, quality=0.65){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onerror=reject;
+    reader.onload=e=>{
+      const img=new Image();
+      img.onerror=reject;
+      img.onload=()=>{
+        let w=img.width, h=img.height;
+        if(w>h){ if(w>maxPx){h=Math.round(h*maxPx/w);w=maxPx;} }
+        else { if(h>maxPx){w=Math.round(w*maxPx/h);h=maxPx;} }
+        const canvas=document.createElement('canvas');
+        canvas.width=w; canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        resolve(canvas.toDataURL('image/jpeg',quality));
+      };
+      img.src=e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 function _renderTcFlairPills(selectedIds){
   const flairs=S.taxFlairs||[];
   const cont=document.getElementById('tc-flair-pills');
@@ -5097,6 +5277,7 @@ function _taxOpenAddForm(){
   const form=document.getElementById('tax-custom-form');
   form.style.display='block';
   _renderTcFlairPills([]);
+  _tcSetPhotoUI(null);
   document.getElementById('tc-save-btn').textContent='Add Species';
   document.getElementById('tc-fullname').focus();
 }
@@ -5109,6 +5290,7 @@ function _taxResetForm(){
   document.getElementById('tc-source-custom-wrap').style.display='none';
   document.getElementById('tax-custom-form').style.display='none';
   _renderTcFlairPills([]);
+  _tcSetPhotoUI(null);
   const btn=document.getElementById('tc-save-btn');
   if(btn) btn.textContent='Add Species';
 }
@@ -5122,6 +5304,7 @@ function _taxEditCustomSpecies(id){
   document.getElementById('tc-common').value=sp.common_name||'';
   document.getElementById('tc-status').value=sp.conservation_status||'';
   _renderTcFlairPills(sp.flair_ids||[]);
+  _tcSetPhotoUI(sp.photo||null);
   // Restore source
   const knownSrc=['greenhouse','seeds','wild','other-lab','own-cultivar','swap','commercial','nursery','botanical-garden','donated','rescue'];
   if(knownSrc.includes(sp.source||'')){
@@ -5152,6 +5335,7 @@ async function _taxSaveCustomSpecies(){
     conservation_status:document.getElementById('tc-status').value,
     source,
     flair_ids:_getTcFlairIds(),
+    photo:_tcPhotoData||undefined,
   };
 
   if(_taxEditingSpeciesId){
@@ -5339,8 +5523,25 @@ function renderSpecies(){
 
 // ── NEWS (PUBMED) ─────────────────────────────────────────────
 let _newsData=null;
-const NEWS_QUERY='("plant+tissue+culture"[ti]+OR+"micropropagation"[ti]+OR+"in+vitro+propagation"[ti]+OR+"plant+cell+culture"[ti]+OR+"somatic+embryogenesis"[ti])';
-const NEWS_MAX=100;
+let _newsPins=new Set(JSON.parse(localStorage.getItem('tcplants_news_pins')||'[]'));
+
+const NEWS_TOPICS={
+  general:'("plant tissue culture"[ti] OR "micropropagation"[ti] OR "in vitro propagation"[ti] OR "plant cell culture"[ti])',
+  carnivorous:'("Nepenthes"[ti] OR "Drosera"[ti] OR "Sarracenia"[ti] OR "carnivorous plant"[ti] OR "Dionaea"[ti] OR "Pinguicula"[ti] OR "Heliamphora"[ti]) AND ("tissue culture"[tw] OR "in vitro"[tw] OR "micropropagation"[tw])',
+  nepenthes:'"Nepenthes"[ti] AND ("tissue culture"[tw] OR "in vitro"[tw] OR "micropropagation"[tw])',
+  orchids:'("Paphiopedilum"[ti] OR "Dendrobium"[ti] OR "Vanilla"[ti] OR "Phalaenopsis"[ti] OR "orchid"[ti]) AND ("tissue culture"[tw] OR "in vitro"[tw] OR "micropropagation"[tw])',
+  banana:'("Musa"[ti] OR "banana"[ti] OR "plantain"[ti]) AND ("tissue culture"[tw] OR "in vitro"[tw] OR "micropropagation"[tw])',
+  vanilla:'"Vanilla planifolia"[ti] OR ("Vanilla"[ti] AND ("tissue culture"[tw] OR "in vitro"[tw]))',
+  embryogenesis:'"somatic embryogenesis"[ti] AND "plant"[tw]',
+  contamination:'("contamination"[ti] OR "fungal contamination"[ti] OR "bacterial contamination"[ti]) AND ("tissue culture"[tw] OR "in vitro plant"[tw])',
+  media:'("plant growth regulator"[ti] OR "cytokinin"[ti] OR "auxin"[ti] OR "Murashige"[ti] OR "culture medium"[ti]) AND ("plant"[tw] OR "in vitro"[tw])',
+};
+const NEWS_MAX=60;
+
+function _newsTopicChange(){
+  const tog=document.getElementById('news-toggle');
+  if(tog.checked){ tog.checked=false; handleNewsToggle(false); }
+}
 
 async function handleNewsToggle(on){
   const label=document.getElementById('news-toggle-label');
@@ -5348,78 +5549,127 @@ async function handleNewsToggle(on){
   const countEl=document.getElementById('news-count');
   if(!on){
     _newsData=null;
-    content.innerHTML='<p class="news-status">Toggle on to load the latest 100 plant tissue culture papers from PubMed.</p>';
-    label.textContent='Load latest research';
+    content.innerHTML='<p class="news-status">Select a topic and toggle on to load papers from PubMed.</p>';
+    label.textContent='Load';
     countEl.textContent='';
     return;
   }
-  label.textContent='Loading…';
-  content.innerHTML='<p class="news-status">Fetching from PubMed…</p>';
+  const topic=document.getElementById('news-topic').value;
+  const query=NEWS_TOPICS[topic]||NEWS_TOPICS.general;
+  label.textContent='Fetching…';
+  content.innerHTML='<p class="news-status">🔍 Searching PubMed…</p>';
   countEl.textContent='';
   try{
-    // Step 1: Search PubMed for IDs
-    const searchUrl=`https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=${NEWS_QUERY}&retmax=${NEWS_MAX}&sort=date&retmode=json`;
+    const searchUrl=`https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=${encodeURIComponent(query)}&retmax=${NEWS_MAX}&sort=date&retmode=json`;
     const searchRes=await fetch(searchUrl);
     if(!searchRes.ok) throw new Error('PubMed search failed '+searchRes.status);
     const searchData=await searchRes.json();
     const ids=searchData.esearchresult?.idlist||[];
-    if(!ids.length){ content.innerHTML='<p class="news-status">No results found.</p>'; return; }
+    if(!ids.length){ content.innerHTML='<p class="news-status">No results found for this topic.</p>'; return; }
 
-    // Step 2: Fetch summaries
+    content.innerHTML='<p class="news-status">📄 Loading summaries + abstracts…</p>';
+
+    // Fetch summaries (title, authors, journal)
     const sumUrl=`https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=${ids.join(',')}&retmode=json`;
     const sumRes=await fetch(sumUrl);
-    if(!sumRes.ok) throw new Error('PubMed summary fetch failed '+sumRes.status);
+    if(!sumRes.ok) throw new Error('PubMed summary failed '+sumRes.status);
     const sumData=await sumRes.json();
 
-    // Step 3: Build articles array
+    // Fetch abstracts via efetch XML
+    const fetchUrl=`https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=${ids.join(',')}&rettype=abstract&retmode=xml`;
+    let abstractMap={};
+    try{
+      const fetchRes=await fetch(fetchUrl);
+      if(fetchRes.ok){
+        const xml=await fetchRes.text();
+        const parser=new DOMParser();
+        const doc=parser.parseFromString(xml,'application/xml');
+        doc.querySelectorAll('PubmedArticle').forEach(art=>{
+          const pmid=art.querySelector('PMID')?.textContent||'';
+          const abEls=art.querySelectorAll('AbstractText');
+          const ab=[...abEls].map(el=>{
+            const lbl=el.getAttribute('Label');
+            return (lbl&&lbl!=='UNLABELLED'?`${lbl}: `:'') + el.textContent;
+          }).join(' ').trim();
+          if(pmid&&ab) abstractMap[pmid]=ab;
+        });
+      }
+    }catch(e){ console.warn('Abstract fetch partial:',e.message); }
+
     const articles=ids.map(id=>{
-      const d=sumData.result?.[id];
-      if(!d) return null;
+      const d=sumData.result?.[id]; if(!d) return null;
       const doi=d.articleids?.find(a=>a.idtype==='doi')?.value||'';
-      const pmcid=d.articleids?.find(a=>a.idtype==='pmc')?.value||'';
       const authors=(d.authors||[]).slice(0,3).map(a=>a.name).join(', ')+(d.authors?.length>3?' et al.':'');
-      const journal=d.source||'';
-      const year=d.pubdate?.slice(0,4)||'';
       return {
-        id, title:d.title||'Untitled', authors, journal, year, doi,
-        pubdate:d.pubdate||'',
+        id, title:d.title||'Untitled', authors,
+        journal:d.source||'', year:d.pubdate?.slice(0,4)||'',
+        doi, pubdate:d.pubdate||'',
+        abstract:abstractMap[id]||'',
         url:doi?`https://doi.org/${doi}`:`https://pubmed.ncbi.nlm.nih.gov/${id}/`,
         pmid:id
       };
     }).filter(Boolean);
 
     _newsData=articles;
-
-    // Step 4: Render cards
     renderNewsCards(articles);
-    countEl.textContent=`${articles.length} articles`;
-    label.textContent='Research loaded';
-
-    // Step 5: Save to GitHub repo as dated JSON
+    countEl.textContent=`${articles.length} papers`;
+    label.textContent='Loaded ✓';
     _saveNewsToRepo(articles);
-
   }catch(e){
-    content.innerHTML=`<p class="news-status" style="color:var(--rd)">Error loading news: ${esc(e.message)}</p>`;
-    label.textContent='Load latest research';
+    content.innerHTML=`<p class="news-status" style="color:var(--rd)">Error: ${esc(e.message)}</p>`;
+    label.textContent='Load';
     document.getElementById('news-toggle').checked=false;
   }
 }
 
+function _newsCardHtml(a, inPinsArea){
+  const pinned=_newsPins.has(a.pmid);
+  return `<div class="article-card${pinned?' pinned':''}" id="nc-${a.pmid}">
+    <button class="article-pin-btn${pinned?' pinned':''}" title="${pinned?'Unpin':'Pin'}" onclick="_toggleNewsPin('${a.pmid}')">📌</button>
+    <a href="${esc(a.url)}" target="_blank" rel="noopener" class="article-title">${esc(a.title)}</a>
+    <div class="article-meta">
+      <span>${esc(a.authors)}</span>
+      <span style="color:var(--bd)">·</span>
+      <span><em>${esc(a.journal)}</em></span>
+      <span style="color:var(--bd)">·</span>
+      <span>${esc(a.year)}</span>
+    </div>
+    ${a.abstract?`<div class="article-abstract" id="nab-${a.pmid}">${esc(a.abstract)}<div class="article-abstract-fade" id="nab-fade-${a.pmid}"></div></div>
+    <a href="#" style="font-size:11px;color:var(--ac);text-decoration:none" onclick="event.preventDefault();_toggleAbstract('${a.pmid}')">Read more ↓</a>`:''}
+    ${a.doi?`<div class="article-doi" style="margin-top:2px">DOI: <a href="https://doi.org/${esc(a.doi)}" target="_blank" rel="noopener">${esc(a.doi)}</a></div>`:''}
+    <div style="margin-top:2px"><a href="https://pubmed.ncbi.nlm.nih.gov/${esc(a.pmid)}/" target="_blank" rel="noopener" style="font-size:11px;color:var(--mu)">PubMed ↗</a></div>
+  </div>`;
+}
+
+function _toggleAbstract(pmid){
+  const ab=document.getElementById('nab-'+pmid);
+  const fade=document.getElementById('nab-fade-'+pmid);
+  if(!ab) return;
+  const expanded=ab.classList.toggle('expanded');
+  if(fade) fade.style.opacity=expanded?'0':'1';
+  const link=ab.nextElementSibling;
+  if(link) link.textContent=expanded?'Show less ↑':'Read more ↓';
+}
+
+function _toggleNewsPin(pmid){
+  if(_newsPins.has(pmid)) _newsPins.delete(pmid);
+  else _newsPins.add(pmid);
+  localStorage.setItem('tcplants_news_pins',JSON.stringify([..._newsPins]));
+  if(_newsData) renderNewsCards(_newsData);
+}
+
 function renderNewsCards(articles){
   const el=document.getElementById('news-content');
-  el.innerHTML=articles.map(a=>`
-    <div class="article-card">
-      <a href="${esc(a.url)}" target="_blank" rel="noopener" class="article-title">${esc(a.title)}</a>
-      <div class="article-meta">
-        <span>${esc(a.authors)}</span>
-        <span style="color:var(--bd)">·</span>
-        <span><em>${esc(a.journal)}</em></span>
-        <span style="color:var(--bd)">·</span>
-        <span>${esc(a.year)}</span>
-      </div>
-      ${a.doi?`<div class="article-doi">DOI: <a href="https://doi.org/${esc(a.doi)}" target="_blank" rel="noopener">${esc(a.doi)}</a></div>`:''}
-      <div style="margin-top:4px"><a href="https://pubmed.ncbi.nlm.nih.gov/${esc(a.pmid)}/" target="_blank" rel="noopener" style="font-size:11px;color:var(--mu)">PubMed ↗</a></div>
-    </div>`).join('');
+  const pinned=articles.filter(a=>_newsPins.has(a.pmid));
+  const unpinned=articles.filter(a=>!_newsPins.has(a.pmid));
+  // Pins area
+  const pinsArea=document.getElementById('news-pins-area');
+  const pinsGrid=document.getElementById('news-pins-grid');
+  if(pinsArea&&pinsGrid){
+    pinsArea.style.display=pinned.length?'':'none';
+    pinsGrid.innerHTML=pinned.map(a=>_newsCardHtml(a,true)).join('');
+  }
+  el.innerHTML=`<div class="news-grid">${unpinned.map(a=>_newsCardHtml(a,false)).join('')}</div>`;
 }
 
 async function _saveNewsToRepo(articles){
