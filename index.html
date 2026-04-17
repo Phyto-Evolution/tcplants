@@ -2183,10 +2183,35 @@ main > .dview, main > .editor{ margin:0 auto; }
       <!-- VERSION HEADER -->
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
         <h1 style="font-size:22px;font-weight:800;margin:0">🌿 TC Plants Lab Notes</h1>
-        <span class="help-version-badge">v3.5</span>
+        <span class="help-version-badge">v3.6</span>
       </div>
       <p style="color:var(--mu);font-size:13px;margin-bottom:20px">April 2026 · Encrypted · GitHub-backed · Single-file PWA</p>
 
+      <!-- WHAT'S NEW v3.6 -->
+      <div style="background:linear-gradient(135deg,rgba(63,185,80,.1),rgba(88,166,255,.08));border:1px solid rgba(63,185,80,.3);border-radius:10px;padding:18px 20px;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v3.6</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
+          <div style="font-size:13px;line-height:1.6"><strong>🌍 GBIF Species Lookup</strong> — fetch IUCN conservation status, taxonomy hierarchy, and GBIF link from inside the custom species form</div>
+          <div style="font-size:13px;line-height:1.6"><strong>📚 PubMed AI Context</strong> — when a note has a species set, top 3 TC abstracts from PubMed are auto-fed to the AI for literature-backed answers</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🔔 Telegram Alerts</strong> — connect your Telegram bot to receive overdue review + GH inspection alerts on login</div>
+          <div style="font-size:13px;line-height:1.6"><strong>✂️ Subculture Calendar</strong> — set subculture interval per species in taxonomy; auto-reminders appear in ⏰ Reminders when bottles approach transfer window</div>
+          <div style="font-size:13px;line-height:1.6"><strong>📦 Lab Stock &amp; Inventory</strong> — new section to track reagents, gelling agents, glassware with low-stock alerts, expiry dates, and quantity adjustment log</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🖨 Label size selector</strong> — choose 58mm / 62mm thermal or A4 sheet before printing QR bottle labels</div>
+          <div style="font-size:13px;line-height:1.6"><strong>📷 GitHub photo storage</strong> — taxonomy species photos stored as binary files in the repo (photos/taxonomy/) to keep the taxonomy JSON small</div>
+        </div>
+      </div>
+      <!-- v3.5 release notes (collapsed) -->
+      <details style="margin-bottom:8px">
+        <summary style="cursor:pointer;font-size:12px;color:var(--mu);padding:6px 0;font-weight:600;letter-spacing:.04em">▸ v3.5 release notes</summary>
+        <div style="background:var(--sf2);border-radius:8px;padding:12px;margin-top:6px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px">
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">🧫 Sterilisation Lab</strong> — 10 protocol presets, custom builder, per-step timers</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">🏠 Dashboard rebuild</strong> — donut, 14-week heatmap, 3 sections, pinned notes</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">📝 Two-mode notes</strong> — Quick Note (generic, pinnable) + TC Lab Entry</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">🤖 Multi-model AI</strong> — Claude default + Gemini/GPT-4o/Grok, hardwired rulebook</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">📊 Heatmap widgets</strong> — Lab Activity, Bottle Prep, Contamination (expand 7/14/26 wk)</div>
+        </div>
+      </details>
+      <!-- WHAT'S NEW v3.5 (now collapsed above) -->
       <!-- WHAT'S NEW v3.5 -->
       <div style="background:linear-gradient(135deg,rgba(63,185,80,.1),rgba(88,166,255,.08));border:1px solid rgba(63,185,80,.3);border-radius:10px;padding:18px 20px;margin-bottom:14px">
         <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v3.5</div>
@@ -2263,6 +2288,7 @@ main > .dview, main > .editor{ margin:0 auto; }
         <a href="#h-calendar">Calendar</a>
         <a href="#h-tools">Tools</a>
         <a href="#h-sterilise">Sterilisation Lab</a>
+        <a href="#h-stock">Stock &amp; Inventory</a>
         <a href="#h-qr">QR Scan</a>
         <a href="#h-ai">AI Assistant</a>
         <a href="#h-news">News</a>
@@ -2448,8 +2474,14 @@ main > .dview, main > .editor{ margin:0 auto; }
         <p>Active bottles (Inoculated + Growing) appear in the dashboard Active Bottles strip and in ⏰ Reminders. Status changes are stamped with the date and shown in bottle detail.</p>
         <h3>FSL Code</h3>
         <p>Each bottle gets a unique auto-generated code: <code>FSL-YYYY-NNNN</code> (e.g. <code>FSL-2026-0042</code>). This code appears on the QR label and is searchable in the bottle list.</p>
-        <h3>QR Labels</h3>
-        <p>Every bottle detail shows a QR code encoding <code>https://notes.tcplants.in?bottle=ID</code>. Tap <strong>🖨 Print label</strong> for a 58 mm thermal-printer-ready label with QR, FSL code, species, and stage. For batches or sessions, tap <strong>🖨 Print batch</strong> to print all labels at once.</p>
+        <h3>QR Labels — Size Options</h3>
+        <p>Every bottle detail shows a QR code. Before printing, choose a label size:</p>
+        <table><tr><th>Size</th><th>Use case</th></tr>
+          <tr><td>58mm</td><td>Standard narrow thermal roll (Brother, Dymo, Zebra ZD220)</td></tr>
+          <tr><td>62mm</td><td>Wider thermal roll — more space for species name</td></tr>
+          <tr><td>A4 sheet</td><td>Print multiple labels on A4 — 2-up inline grid, cut to size</td></tr>
+        </table>
+        <p>Tap <strong>🖨 Print label</strong> — the browser print dialog opens with the correct <code>@page</code> size set automatically. For batches or sessions tap <strong>🖨 Print batch</strong> to print all labels at once.</p>
         <p>To scan a bottle in the greenhouse or lab, tap <strong>📷</strong> in the nav bar — the app auto-routes to that bottle record.</p>
         <h3>🔥 Autoclave Session (New)</h3>
         <p>A Session models one complete autoclave run: you plan all your media batches for that run in one place, set the capacity (default 120 bottles), and save everything at once.</p>
@@ -2666,7 +2698,9 @@ main > .dview, main > .editor{ margin:0 auto; }
           <tr><td>Source / Origin</td><td>12 options: 🏡 Greenhouse · 🌿 Own cultivar · 🌱 Seeds/spores · 🌍 Wild · 🔬 Sister lab/exchange · 🤝 Swap/barter · 🏪 Commercial vendor · 🌱 Nursery · 🏛 Botanical garden · 🎁 Donated · ♻️ Rescue · Custom. Choosing Greenhouse auto-creates the 🏡 GH flair.</td></tr>
           <tr><td>Conservation Status</td><td>LC · NT · VU · EN · CR · DD · <strong>CV (Cultivar)</strong> — shows as a coloured badge in autocomplete. CV appears purple.</td></tr>
           <tr><td>Flairs</td><td><strong>Required</strong> — select at least one flair to label this species (provenance, clone ID, form, etc.). Flairs must be defined first in the Flairs tab.</td></tr>
-          <tr><td>Photo</td><td>Optional — upload any image. Automatically compressed to max 480 px JPEG at ~0.62 quality (~30–50 KB). Displayed as a thumbnail in the species list row. Click thumbnail for full-screen lightbox. Click the 📷 placeholder in the list to open the edit form.</td></tr>
+          <tr><td>Subculture Interval</td><td>Days between subcultures for this species (e.g. 28 = monthly). Auto-generates ✂️ subculture reminders in ⏰ Reminders when active bottles approach that age.</td></tr>
+          <tr><td>Photo</td><td>Optional — compressed to max 480 px JPEG (~30–50 KB). Stored as a binary file in <code>photos/taxonomy/</code> in your repo (keeps the taxonomy JSON small). Thumbnail in species list; click for lightbox.</td></tr>
+          <tr><td>🌍 GBIF Lookup</td><td>After entering the scientific name, click <strong>Fetch conservation data ↗</strong>. Queries GBIF Species Match API (no key needed). Auto-fills Conservation Status from IUCN Red List, shows kingdom/phylum/family and direct GBIF link.</td></tr>
         </table>
         <p>Once saved, the species appears immediately in the autocomplete dropdown for all Species fields across the app (notes, bottles, accessions, greenhouse).</p>
         <p>Each row in the Custom Species list has an <strong>✏️ Edit</strong> button (opens form pre-filled, button changes to "Update Species") and <strong>✕ Delete</strong>. Editing does not affect existing notes or bottles that already use that name.</p>
@@ -2818,6 +2852,10 @@ main > .dview, main > .editor{ margin:0 auto; }
           <tr><td>Lab overview</td><td>Status summary across all species in culture</td></tr>
         </table>
         <p>Press <span class="kbd">Enter</span> to send free-text questions. The assistant has full context of your lab data for every question.</p>
+        <h3>📚 PubMed Species Context (automatic)</h3>
+        <p>When a note with a species set is open, the assistant automatically fetches the 3 most recent PubMed papers on <em>"[species] tissue culture"</em> and injects their abstracts (up to 600 chars each) into the context. This gives the AI literature-backed, species-specific knowledge without any extra steps from you.</p>
+        <h3>Hardwired Rulebook</h3>
+        <p>The AI is bound by an 8-rule system prompt baked into the app (not user-editable): TC-only scope, tropical climate context (Kelambakkam, Tamil Nadu), always cite mg/L and µM, use literature-based ranges only, never fabricate protocols. This ensures consistent, safe lab advice.</p>
       </div>
 
       <h2 id="h-news">📰 TC Research News</h2>
@@ -2860,6 +2898,26 @@ main > .dview, main > .editor{ margin:0 auto; }
         <p>Click any 🌱 or ✏️ commit to jump directly to that note. <strong>↻</strong> refreshes. Click <strong>✕</strong>, the Activity tab again, or anywhere outside the panel to close it.</p>
       </div>
 
+      <h2 id="h-stock">📦 Lab Stock &amp; Inventory</h2>
+      <div class="help-section-card">
+        <p>Click <strong>📦 Stock</strong> in the nav drawer. Track all lab reagents, glassware, and consumables with low-stock alerts and expiry date monitoring. Data is encrypted in your GitHub repo at <code>inventory/data.enc</code>.</p>
+        <h3>Item Fields</h3>
+        <table><tr><th>Field</th><th>Purpose</th></tr>
+          <tr><td>Name</td><td>Reagent or item name (e.g. "Murashige &amp; Skoog salts 10L kit")</td></tr>
+          <tr><td>Category</td><td>Media Salts · Growth Regulators · Gelling Agents · Sugars &amp; Vitamins · Sterilisation · Glassware &amp; Plastics · Equipment · Other</td></tr>
+          <tr><td>Quantity + Unit</td><td>Current stock with unit (g, mL, pcs, pack, L, etc.)</td></tr>
+          <tr><td>Low Stock Alert ≤</td><td>When quantity falls to or below this threshold, the item shows red in the list and appears in the Summary warning. Set 0 to disable.</td></tr>
+          <tr><td>Location</td><td>Where it's stored: Fridge, -20°C freezer, Shelf B3, etc.</td></tr>
+          <tr><td>Expiry Date</td><td>Shown in red when within 30 days. Useful for hormones, enzymes, antibiotics.</td></tr>
+          <tr><td>Notes</td><td>Supplier name, catalogue number, lot number, preparation notes</td></tr>
+        </table>
+        <h3>Stock Adjustments</h3>
+        <p>Click <strong>✏️ Edit</strong> on any item → <strong>＋/− Adjust stock</strong>. Enter a positive number (received new stock) or negative (consumed). The current quantity updates immediately.</p>
+        <h3>Low-Stock Summary</h3>
+        <p>The left panel shows total item count and number of low-stock items. When anything is low, a red warning lists the item names. Sort by category using the left category filter.</p>
+        <div class="help-tip">💡 Check stock before every media prep session. Link item names to your recipe notes so you know which reagents each formulation needs.</div>
+      </div>
+
       <h2 id="h-settings">⚙️ Settings</h2>
       <div class="help-section-card">
         <p>Click <strong>⚙️</strong> in the top bar. All changes persist in <code>localStorage</code>.</p>
@@ -2867,13 +2925,24 @@ main > .dview, main > .editor{ margin:0 auto; }
           <tr><td>Theme</td><td>Dark / Light mode toggle</td></tr>
           <tr><td>Lab Name</td><td>Shown in the dashboard header and Vanakkam greeting</td></tr>
           <tr><td>Weather Location</td><td>City name for the weather widget</td></tr>
-          <tr><td>Gemini API Key</td><td>Powers the ✦ AI assistant. Free key at aistudio.google.com</td></tr>
+          <tr><td>AI Keys (4 models)</td><td>Claude (default), Gemini, GPT-4o, Grok — each has a separate key input and enable toggle. Claude is always on.</td></tr>
+          <tr><td>Telegram Bot Token</td><td>From @BotFather. Required for alert notifications.</td></tr>
+          <tr><td>Telegram Chat ID</td><td>Your personal or group chat ID. Use @userinfobot to find yours.</td></tr>
+          <tr><td>Alert on overdue review</td><td>Fires on each login if bottles or GH plants have past-due dates</td></tr>
+          <tr><td>Alert on contamination</td><td>Fires when a Contamination Log entry is saved</td></tr>
           <tr><td>Scan Enhancement</td><td>Adds contrast/brightness sliders in camera scan mode</td></tr>
           <tr><td>Try Harder Mode</td><td>Slower but more thorough QR/barcode decoder</td></tr>
           <tr><td>Clear Local Cache</td><td>Forces a full reload from GitHub on next login</td></tr>
           <tr><td>Forget Trusted Device</td><td>Removes the encrypted saved token from this device</td></tr>
           <tr><td>Reset Usage Stats</td><td>Clears section-visit counts shown in Analytics</td></tr>
         </table>
+        <h3>🔔 Telegram Alerts Setup</h3>
+        <ol style="font-size:13px;line-height:1.9;padding-left:18px">
+          <li>Open Telegram → search <strong>@BotFather</strong> → <code>/newbot</code> → follow steps → copy the API token</li>
+          <li>Search <strong>@userinfobot</strong> → it replies with your Chat ID (a number, possibly negative for groups)</li>
+          <li>Paste both into Settings → <strong>Test 🔔</strong> to verify</li>
+          <li>Enable the alert toggles you want (overdue reviews, contamination)</li>
+        </ol>
       </div>
 
       <h2 id="h-export">Export &amp; Backup</h2>
