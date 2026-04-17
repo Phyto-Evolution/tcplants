@@ -9697,8 +9697,6 @@ async function login(){
     // const _tgCid=localStorage.getItem('tcplants_tg_chatid'); if(_tgCid){const el=document.getElementById('set-tg-chatid');if(el)el.value=_tgCid;}
     // const _tgOd=document.getElementById('set-tg-overdue'); if(_tgOd) _tgOd.checked=localStorage.getItem('tcplants_tg_overdue')==='1';
     // const _tgCo=document.getElementById('set-tg-contam'); if(_tgCo) _tgCo.checked=localStorage.getItem('tcplants_tg_contam')==='1';
-    // Fire alerts after data load
-    setTimeout(_checkAlerts, 3000);
     setTimeout(_doWriteSummary, 5000); // write summary on login
     if(window._pendingBottle){ const pid=window._pendingBottle; window._pendingBottle=null; navTo('bottles'); setTimeout(()=>openBottle(pid),50); }
     fetchWeather();
@@ -10968,11 +10966,7 @@ async function _fetchPubMedContext(species){
 // ════════════════════════════════════════════════════════════
 // 3. TELEGRAM ALERTS
 // ════════════════════════════════════════════════════════════
-// Telegram — frozen, stubs only
-async function _checkAlerts(){ return; }
-function _saveTelegramSettings(){ return; }
-async function _sendTelegram(){ return false; }
-async function _testTelegram(){ return; }
+// Telegram removed
 
 // ════════════════════════════════════════════════════════════
 // 4. SUBCULTURE CALENDAR — derive from bottles + species interval
@@ -11513,9 +11507,7 @@ function _twaOpenFull(){
   TG?.openLink?.(location.href.replace('?twa=1',''));
 }
 
-// Telegram TWA + bot config — frozen, stubs only
-function _twaLinkSetup(){ return; }
-async function _configureTelegramBot(){ return; }
+
 </script>
 <!-- Widget tray — fixed footer for minimised lab tools -->
 <div id="widget-tray"></div>
