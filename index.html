@@ -3697,7 +3697,65 @@ async function loadNotesIndex(){
 }
 async function saveNotesIndex(notes,sha){
   const res=await ghPut(IDX, await enc(JSON.stringify(notes)), sha, `lab: index — ${notes.length} entries`);
+  _writeSummary(); // fire-and-forget
   return res.content.sha;
+}
+
+// ── Lab Summary — plain JSON, readable by Telegram bot ──────
+// Contains only non-sensitive metadata (counts, codes, dates)
+let _summaryDebounce=null;
+function _writeSummary(){
+  clearTimeout(_summaryDebounce);
+  _summaryDebounce=setTimeout(_doWriteSummary, 3000); // debounce 3s
+}
+async function _doWriteSummary(){
+  if(!S.tok||!S.notes) return;
+  try{
+    const now=new Date();
+    const allBots=S.bottles||[];
+    const active=allBots.filter(b=>['inoculated','growing'].includes(b.status));
+    const overdue=[
+      ...S.notes.filter(n=>n.next_review&&daysFrom(n.next_review)<=0),
+      ...active.filter(b=>b.next_review&&daysFrom(b.next_review)<=0),
+      ...(S.greenhouse||[]).filter(p=>p.next_inspection&&daysFrom(p.next_inspection)<=0),
+    ].length;
+    const due7=[
+      ...S.notes.filter(n=>n.next_review&&daysFrom(n.next_review)>0&&daysFrom(n.next_review)<=7),
+      ...active.filter(b=>b.next_review&&daysFrom(b.next_review)>0&&daysFrom(b.next_review)<=7),
+    ].length;
+    const nextReviews=[
+      ...active.filter(b=>b.next_review).map(b=>({code:b.code,species:b.species||'',due:b.next_review,type:'bottle'})),
+      ...(S.greenhouse||[]).filter(p=>p.next_inspection).map(p=>({code:'GH',species:p.species||'',due:p.next_inspection,type:'gh'})),
+    ].sort((a,b)=>new Date(a.due)-new Date(b.due)).slice(0,5);
+    const contamNotes=S.notes.filter(n=>n.type==='Contamination Log');
+    const recent30=contamNotes.filter(n=>new Date(n.date)>new Date(Date.now()-30*864e5)).length;
+    const lowStock=(S_inv?.items||[]).filter(i=>i.quantity<=i.low_threshold&&i.low_threshold>0).map(i=>i.name);
+    const recentActivity=[...S.notes].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5).map(n=>({
+      type:n.note_type==='generic'?'note':n.type==='Contamination Log'?'contamination':'tc',
+      title:n.title,date:n.date?.slice(0,10)||''
+    }));
+    const summary={
+      updated:now.toISOString(),
+      lab_name:localStorage.getItem('tcplants_lab_name')||'TC Plants',
+      active_bottles:active.length,
+      total_bottles:allBots.length,
+      overdue,
+      due_this_week:due7,
+      gh_plants:(S.greenhouse||[]).reduce((s,p)=>s+(p.quantity||1),0),
+      accessions:S.accs?.length||0,
+      notes_total:S.notes.length,
+      contam_30d:recent30,
+      contam_rate:S.notes.length?Math.round(contamNotes.length/S.notes.length*100):0,
+      low_stock:lowStock,
+      next_reviews:nextReviews,
+      recent_activity:recentActivity,
+    };
+    const existing=await ghGet('lab-summary.json').catch(()=>null);
+    await ghPut('lab-summary.json',
+      btoa(unescape(encodeURIComponent(JSON.stringify(summary,null,2)))),
+      existing?.sha||null,
+      'lab: summary update');
+  }catch(e){ console.warn('Summary write:',e.message); }
 }
 async function loadNote(id){
   const f=await ghGet(`${DIR}/${id}.enc`);
@@ -3742,6 +3800,7 @@ async function loadBottles(){
 async function saveBottles(bottles, sha, sessions){
   const data={bottles, sessions:sessions!==undefined?sessions:(S.sessions||[])};
   const res=await ghPut(BOT_F, await enc(JSON.stringify(data)), sha, `lab: bottles — ${bottles.length} bottles`);
+  _writeSummary();
   return res.content.sha;
 }
 async function loadGreenhouse(){
@@ -3753,6 +3812,7 @@ async function loadGreenhouse(){
 async function saveGreenhouse(plants, sha, transfers){
   const data={plants, transfers:transfers!==undefined?transfers:(S.ghTransfers||[])};
   const res=await ghPut(GH_F, await enc(JSON.stringify(data)), sha, `lab: greenhouse — ${plants.length} plants`);
+  _writeSummary();
   return res.content.sha;
 }
 
@@ -8842,6 +8902,7 @@ async function login(){
     const _tgCo=document.getElementById('set-tg-contam'); if(_tgCo) _tgCo.checked=localStorage.getItem('tcplants_tg_contam')==='1';
     // Fire alerts after data load
     setTimeout(_checkAlerts, 3000);
+    setTimeout(_doWriteSummary, 5000); // write summary on login
     if(window._pendingBottle){ const pid=window._pendingBottle; window._pendingBottle=null; navTo('bottles'); setTimeout(()=>openBottle(pid),50); }
     fetchWeather();
     if(window._wxInterval) clearInterval(window._wxInterval);
