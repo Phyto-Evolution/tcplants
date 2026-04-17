@@ -3397,17 +3397,6 @@ main > .dview, main > .editor{ margin:0 auto; }
       </div>
     </div>
     <div class="set-section">
-      <div class="set-section-title" onclick="_toggleSetSection(this)">Lab Identity</div>
-      <div class="set-section-body">
-        <div class="set-row set-row-full">
-          <div class="set-row-label">Lab Name</div>
-          <div class="set-row-sub">Shown on dashboard header</div>
-          <input type="text" id="set-lab-name" placeholder="e.g. PhytoLabs TC Room 1" style="margin-top:6px">
-          <button class="btn xs ghost" onclick="_setLabName()" style="margin-top:6px;width:100%">Save Lab Name</button>
-        </div>
-      </div>
-    </div>
-    <div class="set-section">
       <div class="set-section-title" onclick="_toggleSetSection(this)">AI Assistant</div>
       <div class="set-section-body">
         <!-- Groq key -->
@@ -9950,11 +9939,8 @@ function goHome(){
 // SETTINGS PANEL
 // ════════════════════════════════════════════════════════════
 function openSettings(){
-  // Populate fields from localStorage
-  const labName=localStorage.getItem('tcplants_lab_name')||'';
   const enhance=localStorage.getItem('tcplants_qr_enhance')==='1';
   const harder=localStorage.getItem('tcplants_qr_harder')==='1';
-  document.getElementById('set-lab-name').value=labName;
   // Sync compact AI panel
   _syncAISettingsPanel();
   document.getElementById('set-qr-enhance').checked=enhance;
@@ -9975,12 +9961,6 @@ function _setToggleTheme(){
   document.getElementById('theme-btn').textContent=next==='dark'?'☀️':'🌙';
   document.querySelector('meta[name="theme-color"]').setAttribute('content',next==='dark'?'#161b22':'#f6f8fa');
   document.getElementById('set-theme-btn').textContent=next==='dark'?'☀️ Switch Light':'🌙 Switch Dark';
-}
-function _setLabName(){
-  const v=document.getElementById('set-lab-name').value.trim();
-  localStorage.setItem('tcplants_lab_name',v);
-  toast(v?`Lab name saved: ${v}`:'Lab name cleared');
-  _renderDashboard();
 }
 function _setWeatherCity(){
   // Weather city setting removed — function kept for backward compat
@@ -10329,47 +10309,7 @@ async function _fetchPubMedContext(species){
 // ════════════════════════════════════════════════════════════
 // 3. TELEGRAM ALERTS
 // ════════════════════════════════════════════════════════════
-/* FROZEN: Telegram functions — paused for redesign, all logic preserved
-function _saveTelegramSettings(){
-  const tok=document.getElementById('set-tg-token')?.value.trim();
-  const cid=document.getElementById('set-tg-chatid')?.value.trim();
-  if(tok) localStorage.setItem('tcplants_tg_token',tok);
-  if(cid) localStorage.setItem('tcplants_tg_chatid',cid);
-  toast('Telegram settings saved ✓');
-}
-async function _sendTelegram(text){
-  const tok=localStorage.getItem('tcplants_tg_token');
-  const cid=localStorage.getItem('tcplants_tg_chatid');
-  if(!tok||!cid) return false;
-  try{
-    await fetch(`https://api.telegram.org/bot${tok}/sendMessage`,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({chat_id:cid,text,parse_mode:'HTML'})
-    });
-    return true;
-  }catch(e){console.warn('Telegram:',e.message);return false;}
-}
-async function _testTelegram(){
-  const ok=await _sendTelegram('🌿 <b>TC Plants</b> — Telegram alerts connected! Your lab notifications will appear here.');
-  toast(ok?'Telegram test sent ✓':'Check token/chat ID — send failed','fail'[+!ok]);
-}
-async function _checkAlerts(){
-  if(!localStorage.getItem('tcplants_tg_token')) return;
-  const labName=localStorage.getItem('tcplants_lab_name')||'TC Plants';
-  const msgs=[];
-  if(localStorage.getItem('tcplants_tg_overdue')==='1'){
-    const overdue=(S.bottles||[]).filter(b=>b.next_review&&['inoculated','growing'].includes(b.status)&&daysFrom(b.next_review)<=0);
-    if(overdue.length) msgs.push(`🫙 <b>${overdue.length} bottle${overdue.length!==1?'s':''} overdue for review</b>\n${overdue.slice(0,5).map(b=>`• ${b.code} — ${b.species||'?'} (${Math.abs(daysFrom(b.next_review))}d)`).join('\n')}`);
-    const overdueGH=(S.greenhouse||[]).filter(p=>p.next_inspection&&daysFrom(p.next_inspection)<=0);
-    if(overdueGH.length) msgs.push(`🏡 <b>${overdueGH.length} GH plant${overdueGH.length!==1?'s':''} overdue for inspection</b>\n${overdueGH.slice(0,5).map(p=>`• ${p.species||'?'} (${Math.abs(daysFrom(p.next_inspection))}d)`).join('\n')}`);
-  }
-  if(msgs.length){
-    const full=`🌿 <b>${esc(labName)} — Lab Alerts</b>\n${new Date().toLocaleDateString('en-IN')}\n\n${msgs.join('\n\n')}`;
-    await _sendTelegram(full);
-  }
-}
-END FROZEN: Telegram functions */
-// Stub so login flow doesn't break if _checkAlerts is still called
+// Telegram — frozen, stubs only
 async function _checkAlerts(){ return; }
 function _saveTelegramSettings(){ return; }
 async function _sendTelegram(){ return false; }
@@ -10914,46 +10854,7 @@ function _twaOpenFull(){
   TG?.openLink?.(location.href.replace('?twa=1',''));
 }
 
-/* FROZEN: Telegram TWA + bot config — preserved for future use
-function _twaLinkSetup(){
-  if(!S.pw||!S.tok){toast('Log in to TC Plants first','fail');return;}
-  const payload=btoa(JSON.stringify({pw:S.pw,tok:S.tok})).replace(/=/g,'');
-  const deeplink=`https://t.me/notestcp1bot?start=link_${payload}`;
-  window.open(deeplink,'_blank');
-  toast('Opening Telegram… tap Start, then Open Lab to complete setup','ok',5000);
-}
-async function _configureTelegramBot(){
-  const tok=localStorage.getItem('tcplants_tg_token');
-  if(!tok){toast('Save your bot token in Settings → Telegram first','fail');return;}
-  const api=`https://api.telegram.org/bot${tok}`;
-  const TWA=location.origin+'?twa=1';
-  load('Configuring bot…');
-  try{
-    await fetch(`${api}/setMyCommands`,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({commands:[
-        {command:'start',description:'🌿 Open TC Plants Lab'},
-        {command:'status',description:'📊 Lab dashboard'},
-        {command:'note',description:'📝 Create quick note'},
-        {command:'contam',description:'☣️ Log contamination event'},
-        {command:'bottles',description:'🫙 View active cultures'},
-        {command:'reminders',description:'⏰ Due reviews & inspections'},
-        {command:'stock',description:'📦 Low inventory check'},
-        {command:'sterilise',description:'🧫 Sterilisation timer'},
-        {command:'timer',description:'⏱ Countdown timer [secs] [label]'},
-        {command:'checklist',description:'✅ Today\'s lab tasks'},
-        {command:'help',description:'❓ All commands'},
-      ]})});
-    await fetch(`${api}/setChatMenuButton`,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({menu_button:{type:'web_app',text:'🌿 Open Lab',web_app:{url:TWA}}})});
-    await fetch(`${api}/setMyDescription`,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({description:'🌿 TC Plants Lab — encrypted tissue culture lab notebook. Track cultures, log notes, get alerts, and run sterilisation protocols.'})});
-    await fetch(`${api}/setMyShortDescription`,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({short_description:'Encrypted TC lab notebook & assistant'})});
-    toast('Bot configured ✓ — commands, menu button, and description set','ok',4000);
-  }catch(e){toast('Config error: '+e.message,'fail');}
-  unload();
-}
-END FROZEN: Telegram TWA + bot config */
+// Telegram TWA + bot config — frozen, stubs only
 function _twaLinkSetup(){ return; }
 async function _configureTelegramBot(){ return; }
 </script>
