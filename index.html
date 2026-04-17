@@ -2377,7 +2377,7 @@ main > .dview, main > .editor{ margin:0 auto; }
           <tr><td>⬇ ZIP</td><td>Export all notes as decrypted Markdown + accessions &amp; recipes as JSON</td></tr>
           <tr><td>CSV</td><td>Export notes and accessions as spreadsheet files</td></tr>
           <tr><td>🔒 Lock</td><td>Wipe token &amp; passphrase from memory, return to login</td></tr>
-          <tr><td>⚙️ Settings</td><td>Lab name, weather city, AI key, scan options, cache &amp; device management</td></tr>
+          <tr><td>⚙️ Settings</td><td>Lab name, AI key, scan options, cache &amp; device management</td></tr>
           <tr><td>☀️/🌙 Theme</td><td>Toggle dark/light mode</td></tr>
         </table>
         <h3>Navigation Drawer</h3>
@@ -3390,12 +3390,6 @@ main > .dview, main > .editor{ margin:0 auto; }
         <div class="set-row-sub">Shown on dashboard header</div>
         <input type="text" id="set-lab-name" placeholder="e.g. PhytoLabs TC Room 1" style="margin-top:6px">
         <button class="btn xs ghost" onclick="_setLabName()" style="margin-top:6px;width:100%">Save Lab Name</button>
-      </div>
-      <div class="set-row set-row-full" style="margin-top:10px">
-        <div class="set-row-label">Weather Location</div>
-        <div class="set-row-sub">City for lab environment monitoring</div>
-        <input type="text" id="set-weather-city" placeholder="e.g. Bengaluru" style="margin-top:6px">
-        <button class="btn xs ghost" onclick="_setWeatherCity()" style="margin-top:6px;width:100%">Save City</button>
       </div>
     </div>
     <div class="set-section">
@@ -9778,11 +9772,9 @@ function goHome(){
 function openSettings(){
   // Populate fields from localStorage
   const labName=localStorage.getItem('tcplants_lab_name')||'';
-  const city=localStorage.getItem('tcplants_weather_city')||'';
   const enhance=localStorage.getItem('tcplants_qr_enhance')==='1';
   const harder=localStorage.getItem('tcplants_qr_harder')==='1';
   document.getElementById('set-lab-name').value=labName;
-  document.getElementById('set-weather-city').value=city;
   // Sync compact AI panel
   _syncAISettingsPanel();
   document.getElementById('set-qr-enhance').checked=enhance;
@@ -9811,9 +9803,8 @@ function _setLabName(){
   _renderDashboard();
 }
 function _setWeatherCity(){
-  const v=document.getElementById('set-weather-city').value.trim();
-  if(v){ localStorage.setItem('tcplants_weather_city',v); toast('Weather city saved: '+v); fetchWeather(); }
-  else { localStorage.removeItem('tcplants_weather_city'); toast('Weather city cleared'); }
+  // Weather city setting removed — function kept for backward compat
+  return;
 }
 
 function _setScanEnhance(on){ localStorage.setItem('tcplants_qr_enhance',on?'1':'0'); }
