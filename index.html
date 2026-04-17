@@ -682,10 +682,12 @@ main > .dview, main > .editor{ margin:0 auto; }
 /* scaler */
 .scaler-result{background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:10px;font-family:var(--mono);font-size:13px;margin-top:8px;white-space:pre-wrap;min-height:40px;line-height:1.8}
 /* dashboard */
-.dash-hero{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px}
-@media(max-width:860px){.dash-hero{grid-template-columns:1fr 1fr}}
-@media(max-width:520px){.dash-hero{grid-template-columns:1fr}}
-.dash-hero-card{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:6px}
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;align-items:start}
+.dash-card{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.dash-card-wide{grid-column:1/-1}
+/* legacy kept for anything still using it */
+.dash-hero{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:12px;align-items:start}
+.dash-hero-card{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
 .dash-heatmap-cell{width:11px;height:11px;border-radius:2px;flex-shrink:0}
 .dash-qr-btn{background:var(--sf2);border:2px dashed var(--bd);border-radius:10px;padding:18px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;transition:all .15s;text-align:center}
 .dash-qr-btn:hover{border-color:var(--ac);background:rgba(88,166,255,.05)}
@@ -1356,7 +1358,7 @@ main > .dview, main > .editor{ margin:0 auto; }
         <!-- Quick Stats -->
         <div id="dash-stats" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;margin-bottom:20px"></div>
         <!-- Dynamic panels rendered by _renderDashboard() -->
-        <div style="display:grid;grid-template-columns:1fr;gap:16px" id="dash-panels">
+        <div class="dash-grid" id="dash-panels">
           <div>
             <div id="dash-recent"></div>
           </div>
@@ -4275,255 +4277,195 @@ function _renderDashboard(){
 
   const pEl=document.getElementById('dash-panels');
   if(pEl){
-    pEl.innerHTML=`
-    <!-- ══ THREE VERTICAL COLUMNS ══ -->
-    <div style="grid-column:1/-1;display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">
+    // ── helper: compact card wrapper ──────────────────────────
+    const card=(content,wide=false)=>`<div class="dash-card${wide?' dash-card-wide':''}">${content}</div>`;
+    const sec=(label)=>`<div class="dash-card-wide" style="padding:6px 0 2px"><div class="dash-section-divider">${label}</div></div>`;
+    const lnk=(label,fn,col='var(--ac)')=>`<a onclick="${fn}" style="color:${col};font-size:11px;cursor:pointer;font-weight:600">${label}</a>`;
+    const row=(a,b)=>`<div style="display:flex;align-items:center;justify-content:space-between">${a}${b}</div>`;
 
-    <!-- ▌COL 1: Lab Status ▐ -->
-    <div style="flex:1;min-width:260px;display:flex;flex-direction:column;gap:10px">
-      <div class="dash-section-divider">Lab Status</div>
-      <div style="display:flex;flex-direction:column;gap:10px">
+    // ── Cards ──────────────────────────────────────────────────
 
-        <!-- Donut: TC Stage Distribution -->
-        <div class="dash-hero-card">
-          <div class="dash-section-label"><span>⚗️ TC Stage Distribution</span><a onclick="navTo('bottles')" style="color:var(--ac);font-size:11px;cursor:pointer;font-weight:600">All →</a></div>
-          ${allBots.length?`<div style="display:flex;align-items:center;gap:16px">
-            <div style="flex-shrink:0">${_donutSvg(donutSegs)}</div>
-            <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:0">
-              ${stageOrder.filter(s=>stageCounts[s]).map(s=>`
-                <div onclick="navTo('bottles');setBotFilter('${s}');renderBottleList()" style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:2px 0" onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">
-                  <div style="width:9px;height:9px;border-radius:2px;flex-shrink:0;background:${stageCols[s]}"></div>
-                  <span style="font-size:11px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--mu)">${stageLabel[s].replace(/^\S+\s/,'')}</span>
-                  <span style="font-size:12px;font-weight:700;flex-shrink:0">${stageCounts[s]}</span>
-                </div>`).join('')}
-            </div>
-          </div>`:`<div style="font-size:12px;color:var(--mu);padding:12px 0">No bottles yet. <a onclick="navTo('bottles');startNewBottle('single')" style="color:var(--ac);cursor:pointer">Add one →</a></div>`}
+    // 1. TC Stage Donut
+    const donutCard=card(`
+      ${row('<span style="font-size:12px;font-weight:700">⚗️ TC Stages</span>',lnk('All →',"navTo('bottles')"))}
+      ${allBots.length?`<div style="display:flex;align-items:center;gap:12px;margin-top:6px">
+        <div style="flex-shrink:0">${_donutSvg(donutSegs)}</div>
+        <div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0">
+          ${stageOrder.filter(s=>stageCounts[s]).map(s=>`<div onclick="navTo('bottles');setBotFilter('${s}');renderBottleList()" style="display:flex;align-items:center;gap:5px;cursor:pointer" onmouseover="this.style.opacity='.6'" onmouseout="this.style.opacity='1'">
+            <div style="width:8px;height:8px;border-radius:2px;flex-shrink:0;background:${stageCols[s]}"></div>
+            <span style="font-size:11px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--mu)">${stageLabel[s].replace(/^\S+\s/,'')}</span>
+            <span style="font-size:11px;font-weight:700">${stageCounts[s]}</span>
+          </div>`).join('')}
         </div>
+      </div>`:'<div style="font-size:12px;color:var(--mu);padding:8px 0">No bottles yet. <a onclick="navTo(\'bottles\');startNewBottle(\'single\')" style="color:var(--ac);cursor:pointer">Add one →</a></div>'}`);
 
-        <!-- Contamination Heatmap -->
-        <div class="dash-hero-card">
-          <div class="dash-section-label">
-            <span>☣️ Contamination</span>
-            <span style="font-weight:700;color:${contamRate>10?'var(--rd)':contamRate>5?'var(--yw)':'var(--gn)'}">${contamRate}%</span>
-            <a onclick="navTo('contam')" style="color:var(--rd);font-size:11px;cursor:pointer;font-weight:600;margin-left:auto">Log →</a>
-          </div>
-          <div style="display:flex;gap:14px;align-items:center;margin-bottom:8px">
-            <div style="text-align:center">
-              <div style="font-size:24px;font-weight:800;color:${contamRate>10?'var(--rd)':contamRate>5?'var(--yw)':'var(--gn)'}">${contamRate}%</div>
-              <div style="font-size:10px;color:var(--mu)">overall</div>
-            </div>
-            <div style="text-align:center">
-              <div style="font-size:24px;font-weight:800;color:${recentContam30.length>3?'var(--yw)':'var(--tx)'}">${recentContam30.length}</div>
-              <div style="font-size:10px;color:var(--mu)">30 days</div>
-            </div>
-            <div style="text-align:center">
-              <div style="font-size:24px;font-weight:800">${contamNotes.length}</div>
-              <div style="font-size:10px;color:var(--mu)">total</div>
-            </div>
-          </div>
-          ${_contamHeatmap(S.notes)}
-        </div>
-
-        <!-- Pinned News + Transfer Window -->
-        <div class="dash-hero-card" style="gap:8px">
-          ${(()=>{
-            const pinnedArticles=(_newsData||[]).filter(a=>_newsPins.has(a.pmid)).slice(0,3);
-            if(pinnedArticles.length) return `<div class="dash-section-label"><span>📌 Pinned Research</span><a onclick="navTo('news')" style="color:var(--ac);font-size:11px;cursor:pointer;font-weight:600">News →</a></div>
-              ${pinnedArticles.map(a=>`<div onclick="window.open('${esc(a.url)}','_blank')" style="padding:6px 8px;border-radius:6px;background:rgba(210,153,34,.07);border:1px solid rgba(210,153,34,.25);cursor:pointer;margin-bottom:5px" onmouseover="this.style.background='rgba(210,153,34,.12)'" onmouseout="this.style.background='rgba(210,153,34,.07)'">
-                <div style="font-size:11px;font-weight:600;line-height:1.4;color:var(--ac)">${esc(a.title.slice(0,80))}${a.title.length>80?'…':''}</div>
-                <div style="font-size:10px;color:var(--mu);margin-top:2px">${esc(a.authors.split(',')[0]||'')} · ${esc(a.journal)} ${esc(a.year)}</div>
-              </div>`).join('')}`;
-            return `<div class="dash-section-label"><span>📌 Pinned Research</span><a onclick="navTo('news')" style="color:var(--ac);font-size:11px;cursor:pointer;font-weight:600">Load News →</a></div>
-              <div style="font-size:12px;color:var(--mu);padding:8px 0;text-align:center">No pinned articles yet.<br>Browse News and pin papers 📌 to see them here.</div>`;
-          })()}
-          ${transferDue.length?`<div style="margin-top:4px">
-            <div class="dash-section-label"><span>✂️ Transfer Due</span><span style="color:var(--yw);font-weight:700">${transferDue.length}</span></div>
-            ${transferDue.slice(0,3).map(b=>{
-              const di=Math.floor((now-new Date(b.date_inoculated))/86400000);
-              const urg=di>=56?'var(--rd)':di>=42?'var(--yw)':'var(--ac)';
-              return`<div onclick="navTo('bottles');openBottle('${b.id}')" style="display:flex;align-items:center;gap:7px;padding:4px 8px;border-radius:5px;cursor:pointer;border:1px solid var(--bd);margin-bottom:4px;border-left:2px solid ${urg}" onmouseover="this.style.background='var(--sf2)'" onmouseout="this.style.background=''">
-                <span style="font-family:var(--mono);font-size:11px;font-weight:700">${esc(b.code)}</span>
-                <span style="font-size:11px;color:var(--mu);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><em>${esc(b.species||'')}</em></span>
-                <span style="font-size:10px;font-weight:700;color:${urg};flex-shrink:0">${di}d</span>
-              </div>`;}).join('')}
-          </div>`:''}
-        </div>
+    // 2. Contamination
+    const contamCard=card(`
+      ${row(`<span style="font-size:12px;font-weight:700">☣️ Contamination</span>`,lnk('Log →',"navTo('contam')","var(--rd)"))}
+      <div style="display:flex;gap:16px;margin-top:4px">
+        <div style="text-align:center"><div style="font-size:22px;font-weight:800;color:${contamRate>10?'var(--rd)':contamRate>5?'var(--yw)':'var(--gn)'}">${contamRate}%</div><div style="font-size:10px;color:var(--mu)">overall</div></div>
+        <div style="text-align:center"><div style="font-size:22px;font-weight:800;color:${recentContam30.length>3?'var(--yw)':'var(--tx)'}">${recentContam30.length}</div><div style="font-size:10px;color:var(--mu)">30 days</div></div>
+        <div style="text-align:center"><div style="font-size:22px;font-weight:800">${contamNotes.length}</div><div style="font-size:10px;color:var(--mu)">total</div></div>
       </div>
-    </div>
-    </div><!-- end col 1 inner -->
-    </div><!-- end col 1 -->
+      <div style="margin-top:8px">${_contamHeatmap(S.notes)}</div>`);
 
-    <!-- ▌COL 2: Activity & Trends ▐ -->
-    <div style="flex:1;min-width:260px;display:flex;flex-direction:column;gap:10px">
-      <div class="dash-section-divider">Activity &amp; Trends</div>
-      <div style="display:flex;flex-direction:column;gap:10px">
-      <!-- 7-day activity -->
-      <div>
-        <div class="dash-section-label"><span>📊 7-day Activity</span><span style="color:var(--ac);font-weight:700">${totalLast7} entries</span></div>
-        <div class="dash-activity-bar">
-          ${days7.map(d=>`<div class="dab-col" title="${esc(d.label)}: ${d.cnt} entries" style="height:${Math.max(8,Math.round(d.cnt/maxCnt*100))}%;${d.cnt===0?'opacity:.15':'opacity:.8'}"></div>`).join('')}
-        </div>
-        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--mu);margin-top:2px"><span>${days7[0].ds.slice(5)}</span><span>Today</span></div>
-      </div>
-      <!-- Reviews due -->
-      <div>
-        <div class="dash-section-label"><span>⏰ Reviews Due</span>${overdueCount?`<span style="color:var(--rd)">${overdueCount} overdue</span>`:''}</div>
+    // 3. Reviews due
+    const reviewCard=card(`
+      ${row(`<span style="font-size:12px;font-weight:700">⏰ Reviews Due</span>`,overdueCount?`<span style="font-size:11px;color:var(--rd);font-weight:700">${overdueCount} overdue</span>`:'')}
+      <div style="display:flex;flex-direction:column;gap:4px;margin-top:4px">
         ${upcoming.length?upcoming.map(r=>{
           const cls=r.days<=0?'var(--rd)':r.days<=3?'var(--yw)':'var(--mu)';
           const dl=r.days<0?`${Math.abs(r.days)}d late`:r.days===0?'Today':`${r.days}d`;
           const act=r.isBot?`navTo('bottles');openBottle('${r.id}')`:`openNote('${r.id}')`;
-          return`<div onclick="${act}" style="padding:5px 8px;border-radius:5px;cursor:pointer;background:var(--sf);border:1px solid var(--bd);margin-bottom:4px;display:flex;align-items:center;gap:6px" onmouseover="this.style.borderColor='${cls}'" onmouseout="this.style.borderColor='var(--bd)'">
-            <span>${r.icon}</span>
-            <div style="flex:1;min-width:0;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.title)}</div>
-            <span style="font-size:11px;font-weight:700;color:${cls};flex-shrink:0">${dl}</span>
-          </div>`;}).join(''):`<div style="font-size:12px;color:var(--mu)">All clear 🎉</div>`}
-      </div>
-      <!-- Recent entries -->
-      <div>
-        <div class="dash-section-label"><span>📋 Recent Entries</span></div>
-        ${recent.map(n=>`<div onclick="openNote('${n.id}')" style="padding:5px 8px;border-radius:5px;cursor:pointer;background:var(--sf);border:1px solid var(--bd);margin-bottom:4px" onmouseover="this.style.borderColor='var(--ac)'" onmouseout="this.style.borderColor='var(--bd)'">
-          <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(n.title)}</div>
-          <div style="font-size:10px;color:var(--mu);margin-top:1px">${fmtDateShort(n.date)}${n.species?` · <em>${esc(n.species)}</em>`:''}</div>
-        </div>`).join('')||`<div style="font-size:12px;color:var(--mu)">No notes yet.</div>`}
-      </div>
-    </div><!-- end col 2 inner -->
-    </div><!-- end col 2 -->
+          return`<div onclick="${act}" style="display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:5px;cursor:pointer;background:var(--sf2)" onmouseover="this.style.background='var(--sf3)'" onmouseout="this.style.background='var(--sf2)'">
+            <span>${r.icon}</span><div style="flex:1;font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.title)}</div>
+            <span style="font-size:10px;font-weight:700;color:${cls};flex-shrink:0">${dl}</span>
+          </div>`;}).join(''):'<div style="font-size:12px;color:var(--gn)">All clear ✓</div>'}
+      </div>`);
 
-    <!-- ▌COL 3: Lab Intelligence ▐ -->
-    <div style="flex:1;min-width:260px;display:flex;flex-direction:column;gap:10px">
-      <div class="dash-section-divider">Lab Intelligence</div>
-      <div style="display:flex;flex-direction:column;gap:10px">
+    // 4. Transfer due
+    const xferCard=transferDue.length?card(`
+      ${row(`<span style="font-size:12px;font-weight:700">✂️ Transfer Due</span>`,`<span style="font-size:11px;color:var(--yw);font-weight:700">${transferDue.length}</span>`)}
+      <div style="display:flex;flex-direction:column;gap:4px;margin-top:4px">
+        ${transferDue.slice(0,5).map(b=>{
+          const di=Math.floor((now-new Date(b.date_inoculated))/86400000);
+          const urg=di>=56?'var(--rd)':di>=42?'var(--yw)':'var(--ac)';
+          return`<div onclick="navTo('bottles');openBottle('${b.id}')" style="display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:5px;cursor:pointer;background:var(--sf2);border-left:2px solid ${urg}" onmouseover="this.style.background='var(--sf3)'" onmouseout="this.style.background='var(--sf2)'">
+            <span style="font-family:var(--mono);font-size:11px;font-weight:700">${esc(b.code)}</span>
+            <span style="font-size:11px;color:var(--mu);flex:1;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(b.species||'')}</span>
+            <span style="font-size:10px;font-weight:700;color:${urg};flex-shrink:0">${di}d</span>
+          </div>`;}).join('')}
+      </div>`):'';
 
-    <!-- Pinned Notes -->
-    ${(()=>{const pinned=S.notes.filter(n=>n.pinned).slice(0,4);return pinned.length?`<div>
-      <div class="dash-section-label"><span>📌 Pinned Notes</span><a onclick="navTo('notes');_setNoteTypeFilter('pinned',document.querySelector('[data-ntype=pinned]'))" style="color:var(--yw);font-size:11px;cursor:pointer;font-weight:600">All →</a></div>
-      <div style="display:flex;flex-direction:column;gap:5px">
-        ${pinned.map(n=>`<div class="dash-pin-card" onclick="openNote('${n.id}')">
-          <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(n.title)}</div>
-          <div style="font-size:10px;color:var(--mu);margin-top:2px">${fmtDateShort(n.date)}</div>
-        </div>`).join('')}
+    // 5. 7-day activity bar
+    const actCard=card(`
+      ${row(`<span style="font-size:12px;font-weight:700">📊 7-day Activity</span>`,`<span style="font-size:11px;color:var(--ac);font-weight:700">${totalLast7} entries</span>`)}
+      <div class="dash-activity-bar" style="margin-top:6px">
+        ${days7.map(d=>`<div class="dab-col" title="${esc(d.label)}: ${d.cnt}" style="height:${Math.max(8,Math.round(d.cnt/maxCnt*100))}%;${d.cnt===0?'opacity:.15':'opacity:.8'}"></div>`).join('')}
       </div>
-    </div>`:'';})()}
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--mu);margin-top:2px"><span>${days7[0].ds.slice(5)}</span><span>Today</span></div>`);
 
-    <!-- Activity heatmaps -->
-    ${(()=>{
-      const wk=_hwState['lab']||14;
-      const eMap={};
-      S.notes.forEach(n=>{if(n.date){const d=n.date.slice(0,10);eMap[d]=(eMap[d]||0)+1;}});
-      const tot7=S.notes.filter(n=>n.date&&n.date.slice(0,10)>=new Date(Date.now()-6*864e5).toISOString().slice(0,10)).length;
-      return `<div class="hw-card">
-        <div class="hw-head"><span class="hw-title">📋 Lab Activity</span><span class="hw-meta" style="color:var(--gn)">${tot7} this week</span>
-          <button class="hw-toggle" onclick="_hwState['lab']=${wk<26?wk*2:7};_renderDashboard()">${wk===7?'▼ Expand':wk===14?'▼ More':'▲ Collapse'}</button></div>
-        ${_genericHeatmap(eMap,wk,_hmGreen,todayStr)}
-      </div>`;
-    })()}
-    ${(()=>{
-      const wk=_hwState['bots']||14;
-      const bMap={};
-      allBots.forEach(b=>{if(b.date_prepared){const d=b.date_prepared.slice(0,10);bMap[d]=(bMap[d]||0)+1;}});
-      const tot=allBots.filter(b=>b.date_prepared&&b.date_prepared.slice(0,10)>=new Date(Date.now()-6*864e5).toISOString().slice(0,10)).length;
-      return `<div class="hw-card">
-        <div class="hw-head"><span class="hw-title">🫙 Bottle Prep</span><span class="hw-meta" style="color:var(--ac)">${tot} this week</span>
-          <button class="hw-toggle" onclick="_hwState['bots']=${wk<26?wk*2:7};_renderDashboard()">${wk===7?'▼ Expand':wk===14?'▼ More':'▲ Collapse'}</button></div>
-        ${_genericHeatmap(bMap,wk,_hmBlue,todayStr)}
-      </div>`;
-    })()}
-    <!-- Species -->
-    ${topSp.length?`<div class="hw-card">
-      <div class="hw-head"><span class="hw-title">🌱 Species Active</span><a onclick="navTo('species')" style="color:var(--ac);font-size:11px;cursor:pointer;font-weight:600">All →</a></div>
-      <div style="display:flex;flex-direction:column;gap:4px">
-        ${topSp.slice(0,6).map(sp=>`<div onclick="navTo('species')" style="display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer;border-bottom:1px solid var(--sf2)" onmouseover="this.style.color='var(--ac)'" onmouseout="this.style.color=''">
-          <span style="flex:1;font-size:12px;font-weight:600;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(sp.name)}</span>
+    // 6. Recent entries
+    const recentCard=card(`
+      ${row(`<span style="font-size:12px;font-weight:700">📋 Recent</span>`,lnk('All →',"navTo('notes')"))}
+      <div style="display:flex;flex-direction:column;gap:4px;margin-top:4px">
+        ${recent.map(n=>`<div onclick="openNote('${n.id}')" style="padding:4px 6px;border-radius:5px;cursor:pointer;background:var(--sf2)" onmouseover="this.style.background='var(--sf3)'" onmouseout="this.style.background='var(--sf2)'">
+          <div style="font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(n.title)}</div>
+          <div style="font-size:10px;color:var(--mu)">${fmtDateShort(n.date)}${n.species?` · <em>${esc(n.species)}</em>`:''}</div>
+        </div>`).join('')||'<div style="font-size:12px;color:var(--mu)">No notes yet.</div>'}
+      </div>`);
+
+    // 7. Species
+    const spCard=topSp.length?card(`
+      ${row(`<span style="font-size:12px;font-weight:700">🌱 Species</span>`,lnk('All →',"navTo('species')"))}
+      <div style="display:flex;flex-direction:column;gap:3px;margin-top:4px">
+        ${topSp.slice(0,7).map(sp=>`<div onclick="navTo('species')" style="display:flex;align-items:center;gap:8px;padding:3px 0;cursor:pointer;border-bottom:1px solid var(--sf2)" onmouseover="this.style.color='var(--ac)'" onmouseout="this.style.color=''">
+          <span style="flex:1;font-size:11px;font-weight:600;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(sp.name)}</span>
           <span style="font-size:10px;color:var(--mu);flex-shrink:0">${sp.notes?`📋${sp.notes} `:''}${sp.bottles?`🫙${sp.bottles}`:''}</span>
         </div>`).join('')}
-      </div>
-    </div>`:''}
-    <!-- Recipes -->
-    ${recentRecs.length?`<div class="hw-card">
-      <div class="hw-head"><span class="hw-title">🧪 Media Recipes</span><a onclick="navTo('recipes');startNewRecipe()" style="color:var(--pu);font-size:11px;cursor:pointer;font-weight:600">+ New →</a></div>
-      <div style="display:flex;flex-direction:column;gap:5px">
-        ${recentRecs.map(r=>`<div onclick="navTo('recipes');openRecipe('${r.id}')" style="background:var(--sf2);border-radius:6px;padding:7px 10px;cursor:pointer">
-          <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.name)}</div>
-          <div style="color:var(--mu);font-size:10px">${esc(r.base||'')}${r.agar?` · Gelrite ${r.agar}g/L`:''}</div>
+      </div>`):'';
+
+    // 8. Recipes
+    const recCard=recentRecs.length?card(`
+      ${row(`<span style="font-size:12px;font-weight:700">🧪 Recipes</span>`,lnk('+ New →',"navTo('recipes');startNewRecipe()","var(--pu)"))}
+      <div style="display:flex;flex-direction:column;gap:4px;margin-top:4px">
+        ${recentRecs.map(r=>`<div onclick="navTo('recipes');openRecipe('${r.id}')" style="padding:5px 8px;border-radius:6px;cursor:pointer;background:var(--sf2)" onmouseover="this.style.background='var(--sf3)'" onmouseout="this.style.background='var(--sf2)'">
+          <div style="font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.name)}</div>
+          <div style="color:var(--mu);font-size:10px">${esc(r.base||'')}${r.agar?` · ${r.agar}g/L`:''}</div>
         </div>`).join('')}
-      </div>
-    </div>`:''}
-    <!-- GH plants -->
-    ${ghPlants.length?`<div class="hw-card">
-      <div class="hw-head"><span class="hw-title">🏡 Greenhouse</span><span class="hw-meta">${ghTotal} plants</span><a onclick="navTo('greenhouse')" style="color:var(--ac);font-size:11px;cursor:pointer;font-weight:600">All →</a></div>
-      <div style="display:flex;flex-direction:column;gap:4px">
-        ${ghHealthy.slice(0,5).map(p=>`<div onclick="navTo('greenhouse');openGHPlant('${p.id}')" style="display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer;border-bottom:1px solid var(--sf2)">
+      </div>`):'';
+
+    // 9. GH plants
+    const ghCard=ghPlants.length?card(`
+      ${row(`<span style="font-size:12px;font-weight:700">🏡 Greenhouse</span>`,`<span style="font-size:11px;color:var(--gn)">${ghTotal} plants</span>`)}
+      <div style="display:flex;flex-direction:column;gap:3px;margin-top:4px">
+        ${ghHealthy.slice(0,5).map(p=>`<div onclick="navTo('greenhouse');openGHPlant('${p.id}')" style="display:flex;align-items:center;gap:6px;padding:3px 0;cursor:pointer;border-bottom:1px solid var(--sf2)">
           <div class="gh-health-dot healthy"></div>
-          <span style="flex:1;font-size:12px;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.species||'?')}</span>
-          <span style="color:var(--mu);font-size:11px">${p.quantity||1}×</span>
+          <span style="flex:1;font-size:11px;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.species||'?')}</span>
+          <span style="color:var(--mu);font-size:10px">${p.quantity||1}×</span>
         </div>`).join('')}
-        ${spWithSubcult.length?`<div style="font-size:11px;color:var(--yw);margin-top:6px">⚗️ Lab → GH: ${spWithSubcult.slice(0,2).map(s=>esc(s)).join(', ')}${spWithSubcult.length>2?'…':''}</div>`:''}
+        ${spWithSubcult.length?`<div style="font-size:10px;color:var(--yw);margin-top:4px">⚗️ → GH: ${spWithSubcult.slice(0,2).map(s=>esc(s)).join(', ')}${spWithSubcult.length>2?'…':''}</div>`:''}
+      </div>`):'';
+
+    // 10. Pinned notes
+    const pinned=S.notes.filter(n=>n.pinned).slice(0,4);
+    const pinnedCard=pinned.length?card(`
+      ${row(`<span style="font-size:12px;font-weight:700">📌 Pinned</span>`,lnk('All →',"navTo('notes');_setNoteTypeFilter('pinned',document.querySelector('[data-ntype=pinned]'))","var(--yw)"))}
+      <div style="display:flex;flex-direction:column;gap:4px;margin-top:4px">
+        ${pinned.map(n=>`<div class="dash-pin-card" onclick="openNote('${n.id}')">
+          <div style="font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(n.title)}</div>
+          <div style="font-size:10px;color:var(--mu)">${fmtDateShort(n.date)}</div>
+        </div>`).join('')}
+      </div>`):'';
+
+    // 11. Pinned research
+    const pinnedArticles=(_newsData||_getPinnedArticles()).filter(a=>_newsPins.has(a.pmid)).slice(0,3);
+    const researchCard=pinnedArticles.length?card(`
+      ${row(`<span style="font-size:12px;font-weight:700">📌 Research</span>`,lnk('News →',"navTo('news')"))}
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+        ${pinnedArticles.map(a=>`<div onclick="window.open('${esc(a.url)}','_blank')" style="padding:5px 8px;border-radius:6px;cursor:pointer;background:rgba(210,153,34,.07);border:1px solid rgba(210,153,34,.2)">
+          <div style="font-size:11px;font-weight:600;line-height:1.4;color:var(--ac)">${esc(a.title.slice(0,70))}${a.title.length>70?'…':''}</div>
+          <div style="font-size:10px;color:var(--mu);margin-top:2px">${esc(a.authors.split(',')[0]||'')} · ${esc(a.year)}</div>
+        </div>`).join('')}
+      </div>`):'';
+
+    // 12. AI Usage (full-width)
+    const today=new Date().toISOString().slice(0,10);
+    const u=_aiUsage();
+    const aiMs=[
+      {key:'llama-3.1-8b-instant',  label:'⚡ 8B',  lim:AI_LIMITS['llama-3.1-8b-instant'],    col:'#1abc9c'},
+      {key:'llama-3.3-70b-versatile',label:'🔬 70B', lim:AI_LIMITS['llama-3.3-70b-versatile'], col:'var(--ac)'},
+      {key:'claude',                 label:'◇',      lim:AI_LIMITS['claude'],                   col:'var(--pu)'},
+      {key:'whisper-large-v3',       label:'🎤',      lim:AI_LIMITS['whisper-large-v3'],         col:'var(--yw)'},
+    ];
+    const last30=Object.keys(u).filter(d=>d<=today).sort().slice(-30);
+    const heatCols=['#161b22','#0d4429','#006d32','#26a641','#39d353'];
+    const heatMap=last30.map(d=>{
+      const tot=aiMs.reduce((s,m)=>s+((u[d]||{})[m.key]?.req||0),0);
+      const i=tot===0?0:tot<5?1:tot<20?2:tot<50?3:4;
+      return`<div title="${d}: ${tot} req" style="width:11px;height:11px;border-radius:2px;background:${heatCols[i]}"></div>`;
+    }).join('');
+    const aiUsageCard=card(`
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:12px;font-weight:700">🤖 AI Usage today</span>
+        <div style="display:flex;gap:12px">
+          ${aiMs.map(m=>{
+            const d=(u[today]||{})[m.key]||{req:0};
+            const pct=Math.min(d.req/m.lim.reqDay*100,100);
+            const warn=pct>80?'var(--rd)':pct>50?'var(--yw)':m.col;
+            return`<div style="text-align:center;min-width:44px">
+              <div style="font-size:10px;color:${warn};font-weight:700">${d.req}<span style="font-weight:400;color:var(--mu)">/${m.lim.reqDay<1000?m.lim.reqDay:Math.round(m.lim.reqDay/1000)+'k'}</span></div>
+              <div style="font-size:10px;color:var(--mu)">${m.label}</div>
+              <div style="height:3px;background:var(--sf3);border-radius:2px;margin-top:2px"><div style="height:3px;border-radius:2px;background:${warn};width:${pct}%"></div></div>
+            </div>`;
+          }).join('')}
+        </div>
       </div>
-    </div>`:''}
-      </div><!-- end col 3 inner -->
-    </div><!-- end col 3 -->
-    </div><!-- end 3-col flex row -->
+      <div style="display:flex;flex-wrap:wrap;gap:2px">${heatMap||'<span style="font-size:11px;color:var(--mu)">No usage yet</span>'}</div>`,true);
 
-    <!-- ── AI Usage (full width, horizontal) ── -->
-    ${(()=>{
-      const today=new Date().toISOString().slice(0,10);
-      const u=_aiUsage();
-      const aiModels=[
-        {key:'llama-3.1-8b-instant',   label:'⚡ Quick 8B',   lim:AI_LIMITS['llama-3.1-8b-instant'],    col:'#1abc9c', tokLabel:true},
-        {key:'llama-3.3-70b-versatile', label:'🔬 Deep 70B',  lim:AI_LIMITS['llama-3.3-70b-versatile'], col:'var(--ac)', tokLabel:true},
-        {key:'claude',                  label:'◇ Claude',     lim:AI_LIMITS['claude'],                   col:'var(--pu)', tokLabel:true},
-        {key:'whisper-large-v3',        label:'🎤 Whisper',   lim:AI_LIMITS['whisper-large-v3'],         col:'var(--yw)', tokLabel:false},
-      ];
-      const last30=Object.keys(u).filter(d=>d<=today).sort().slice(-30);
-      const heatCols=['#161b22','#0d4429','#006d32','#26a641','#39d353'];
-      const heatMap=last30.map(d=>{
-        const dayTok=aiModels.filter(m=>m.tokLabel).reduce((s,m)=>s+((u[d]||{})[m.key]?.tok||0),0);
-        const dayReq=aiModels.reduce((s,m)=>s+((u[d]||{})[m.key]?.req||0),0);
-        const intensity=dayReq===0?0:dayReq<5?1:dayReq<20?2:dayReq<50?3:4;
-        return `<div title="${d}: ${dayReq} req · ${dayTok.toLocaleString()} tokens" style="width:12px;height:12px;border-radius:2px;background:${heatCols[intensity]}"></div>`;
-      }).join('');
-      return `<div style="grid-column:1/-1"><div class="dash-section-divider">AI Usage</div></div>
-      <div style="grid-column:1/-1;background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px 16px">
-        <div style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:14px">
-          ${aiModels.map(m=>{
-            const d=(u[today]||{})[m.key]||{req:0,tok:0};
-            const reqPct=Math.min(d.req/m.lim.reqDay*100,100);
-            const tokPct=m.lim.tokDay?Math.min(d.tok/m.lim.tokDay*100,100):0;
-            const warnCol=reqPct>80?'var(--rd)':reqPct>50?'var(--yw)':m.col;
-            return `<div style="flex:1;min-width:130px">
-              <div style="font-size:11px;font-weight:700;margin-bottom:6px;color:${m.col}">${m.label}</div>
-              <div style="font-size:10px;color:var(--mu);display:flex;justify-content:space-between;margin-bottom:2px"><span>Req today</span><span>${d.req} / ${m.lim.reqDay.toLocaleString()}</span></div>
-              <div style="height:4px;background:var(--sf3);border-radius:2px;margin-bottom:${m.tokLabel?6:0}px"><div style="height:4px;border-radius:2px;background:${warnCol};width:${reqPct}%;transition:width .4s"></div></div>
-              ${m.tokLabel&&m.lim.tokDay?`<div style="font-size:10px;color:var(--mu);display:flex;justify-content:space-between;margin-bottom:2px"><span>Tokens</span><span>${(d.tok/1000).toFixed(1)}k/${(m.lim.tokDay/1000).toFixed(0)}k</span></div>
-              <div style="height:4px;background:var(--sf3);border-radius:2px"><div style="height:4px;border-radius:2px;background:${warnCol};width:${tokPct}%;transition:width .4s"></div></div>`:''}
-            </div>`;
-          }).join('')}
-        </div>
-        <div style="font-size:10px;color:var(--mu);margin-bottom:5px;font-weight:700;letter-spacing:.06em">30-DAY ACTIVITY (requests)</div>
-        <div style="display:flex;flex-wrap:wrap;gap:2px">${heatMap||'<span style="font-size:11px;color:var(--mu)">No usage yet</span>'}</div>
-      </div>`;
-    })()}
+    // 13. Voice transcripts (full-width, only if any)
+    const dump=_getVoiceDump().slice(-8).reverse();
+    const voiceCard=dump.length?card(`
+      <div style="font-size:12px;font-weight:700;margin-bottom:6px">🎤 Voice Transcripts</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        ${dump.map(e=>{
+          const ts=new Date(e.ts).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+          return`<div style="background:var(--sf2);border-radius:6px;padding:4px 8px;font-size:11px;max-width:260px">
+            <span style="color:var(--mu);font-size:10px;margin-right:4px">${ts}</span>${esc(e.text)}
+          </div>`;
+        }).join('')}
+      </div>
+      <button class="btn xs ghost" onclick="_exportVoiceDump()" style="margin-top:6px;align-self:flex-start">⬇ Export</button>`,true):'';
 
-    <!-- ── Voice Transcripts ── -->
-    ${(()=>{
-      const dump=_getVoiceDump().slice(-12).reverse();
-      if(!dump.length) return '';
-      return `<div style="grid-column:1/-1"><div class="dash-section-divider">Voice Transcripts</div></div>
-      <div style="grid-column:1/-1;background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:12px 14px">
-        <div style="display:flex;flex-direction:column;gap:6px">
-          ${dump.map(e=>{
-            const ts=new Date(e.ts).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
-            return `<div style="display:flex;align-items:baseline;gap:10px;padding:5px 0;border-bottom:1px solid var(--sf2)">
-              <span style="font-size:10px;color:var(--mu);white-space:nowrap;flex-shrink:0">🎤 ${ts}</span>
-              <span style="font-size:12px;color:var(--tx);flex:1">${esc(e.text)}</span>
-              ${e.result?`<span style="font-size:10px;color:var(--gn);white-space:nowrap">${esc(e.result)}</span>`:''}
-            </div>`;
-          }).join('')}
-        </div>
-        <button class="btn xs ghost" onclick="_exportVoiceDump()" style="margin-top:8px">⬇ Export all</button>
-      </div>`;
-    })()}
-    `;}
+    // ── Assemble ────────────────────────────────────────────────
+    pEl.className='dash-grid';
+    pEl.innerHTML=
+      donutCard+contamCard+reviewCard+
+      (xferCard||'')+actCard+recentCard+
+      (spCard||'')+(recCard||'')+(ghCard||'')+
+      (pinnedCard||'')+(researchCard||'')+
+      aiUsageCard+(voiceCard||'');
+  }
 }
 
 function showReg(name){
@@ -6541,7 +6483,12 @@ async function handleNewsToggle(on){
   if(topic==='custom'){
     const kw=document.getElementById('news-custom-kw')?.value.trim();
     if(!kw){ content.innerHTML='<p class="news-status">Enter a keyword first.</p>'; document.getElementById('news-toggle').checked=false; return; }
-    query=`"${kw}"[ti] OR "${kw}"[tw]`;
+    // Build flexible query: each word as a separate [tw] term ANDed together
+    // e.g. "nepenthes inoculation" → nepenthes[tw] AND inoculation[tw]
+    const words=kw.split(/\s+/).filter(Boolean);
+    query=words.length===1
+      ?`${words[0]}[tiab]`
+      :words.map(w=>`${w}[tiab]`).join(' AND ');
   }
   label.textContent='Fetching…';
   content.innerHTML='<p class="news-status">🔍 Searching PubMed…</p>';
