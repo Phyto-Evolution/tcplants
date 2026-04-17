@@ -2262,7 +2262,7 @@ main > .dview, main > .editor{ margin:0 auto; }
           <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">🧫 Sterilisation Lab</strong> — 10 protocol presets, custom builder, per-step timers</div>
           <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">🏠 Dashboard rebuild</strong> — donut, 14-week heatmap, 3 sections, pinned notes</div>
           <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">📝 Two-mode notes</strong> — Quick Note (generic, pinnable) + TC Lab Entry</div>
-          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">🤖 Multi-model AI</strong> — Claude default + Gemini/GPT-4o/Grok, hardwired rulebook</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">🤖 Claude AI</strong> — Powered by Claude (Anthropic), hardwired TC lab rulebook</div>
           <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">📊 Heatmap widgets</strong> — Lab Activity, Bottle Prep, Contamination (expand 7/14/26 wk)</div>
         </div>
       </details>
@@ -2889,9 +2889,9 @@ main > .dview, main > .editor{ margin:0 auto; }
         <p>Enable <strong>Scan Enhancement</strong> in ⚙️ Settings. When active, contrast and brightness sliders appear during scanning — drag to boost image clarity. Enable <strong>Try Harder Mode</strong> for a slower but more thorough decoder pass.</p>
       </div>
 
-      <h2 id="h-ai">✦ Gemini AI Assistant</h2>
+      <h2 id="h-ai">◇ Claude AI Assistant</h2>
       <div class="help-section-card">
-        <p>Tap <strong>✦</strong> (bottom-right, above the Quick Log FAB) to open the assistant powered by Google Gemini (free Gemini API key required — set in ⚙️ Settings).</p>
+        <p>Tap <strong>✦</strong> (bottom-right, above the Quick Log FAB) to open the assistant powered by Claude (Anthropic). Add your API key once in ⚙️ Settings — it is encrypted and synced to your GitHub repo so it loads automatically on any device.</p>
         <h3>Context Automatically Sent</h3>
         <table><tr><th>Context</th><th>Detail</th></tr>
           <tr><td>Open note</td><td>Title, type, stage, species, date, full decrypted body</td></tr>
@@ -2980,7 +2980,7 @@ main > .dview, main > .editor{ margin:0 auto; }
           <tr><td>Theme</td><td>Dark / Light mode toggle</td></tr>
           <tr><td>Lab Name</td><td>Shown in the dashboard header and Vanakkam greeting</td></tr>
           <tr><td>Weather Location</td><td>City name for the weather widget</td></tr>
-          <tr><td>AI Keys (4 models)</td><td>Claude (default), Gemini, GPT-4o, Grok — each has a separate key input and enable toggle. Claude is always on.</td></tr>
+          <tr><td>AI Key</td><td>Claude (Anthropic) — paste your API key in Settings → AI Assistant. Get a free key at console.anthropic.com.</td></tr>
           <tr><td>Telegram Bot Token</td><td>From @BotFather. Required for alert notifications.</td></tr>
           <tr><td>Telegram Chat ID</td><td>Your personal or group chat ID. Use @userinfobot to find yours.</td></tr>
           <tr><td>Alert on overdue review</td><td>Fires on each login if bottles or GH plants have past-due dates</td></tr>
@@ -3271,12 +3271,7 @@ main > .dview, main > .editor{ margin:0 auto; }
 <div id="ai-panel">
   <div id="ai-head">
     <div class="ai-title" id="ai-title-label">✦ Lab AI</div>
-    <select class="ai-model-sel" id="ai-model-sel" onchange="_onAIModelChange(this.value)" title="Select AI model">
-      <option value="claude">◇ Claude</option>
-      <option value="gemini">✦ Gemini</option>
-      <option value="gpt">◎ GPT-4o</option>
-      <option value="grok">𝕏 Grok</option>
-    </select>
+    <span style="font-size:12px;font-weight:700;color:var(--mu);padding:0 4px">◇ Claude</span>
     <button class="al-hbtn" onclick="_toggleAIKeyRow()" title="API key">⚙️</button>
     <button class="al-hbtn" onclick="_toggleAIMaximise()" id="ai-max-btn" title="Expand">⛶</button>
     <button class="al-hbtn" onclick="document.getElementById('ai-panel').classList.remove('on')" title="Close">✕</button>
@@ -3284,7 +3279,7 @@ main > .dview, main > .editor{ margin:0 auto; }
   <div id="ai-key-row" style="display:none;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid var(--bd);background:var(--sf2)">
     <input type="password" id="ai-key-input" placeholder="API key for selected model…" style="flex:1;font-size:12px;padding:5px 8px">
     <button class="btn xs green" onclick="_saveCurrentModelKey()">Save</button>
-    <a id="ai-key-link" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
+    <a id="ai-key-link" href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
   </div>
   <div id="ai-chips" style="padding:8px 12px;display:flex;flex-wrap:wrap;gap:5px;border-bottom:1px solid var(--bd);flex-shrink:0">
     <button class="ai-chip" onclick="askAI('Summarise this note in 3-5 bullet points, highlighting key observations, results, and recommended next steps.')">Summarise note</button>
@@ -3410,50 +3405,22 @@ main > .dview, main > .editor{ margin:0 auto; }
         <!-- Model selector row -->
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
           <span style="font-size:12px;font-weight:700;color:var(--mu);white-space:nowrap">Active model</span>
-          <select id="set-ai-model-pick" style="flex:1;font-size:12px;padding:5px 8px;background:var(--bg);border:1px solid var(--bd);border-radius:6px;color:var(--tx)" onchange="_setAISettingsModel(this.value)">
-            <option value="claude">◇ Claude (Anthropic) — DEFAULT</option>
-            <option value="gemini">✦ Gemini (Google)</option>
-            <option value="gpt">◎ GPT-4o (OpenAI)</option>
-            <option value="grok">𝕏 Grok (xAI)</option>
-          </select>
+          <span style="font-size:12px;font-weight:700;color:var(--tx)">◇ Claude (Anthropic)</span>
         </div>
-        <!-- Per-model enable toggles -->
-        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">
-          <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-size:12px;flex:1">◇ Claude</span>
-            <span style="font-size:10px;background:var(--ac);color:#0d1117;padding:1px 6px;border-radius:8px;font-weight:700">Always On</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-size:12px;flex:1">✦ Gemini</span>
-            <label class="toggle-switch" style="width:36px;height:20px;flex-shrink:0">
-              <input type="checkbox" id="set-en-gemini" onchange="_setAIEnabled('gemini',this.checked)" ${_getAIEnabled('gemini')?'checked':''}>
-              <div class="toggle-track"></div>
-            </label>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-size:12px;flex:1">◎ GPT-4o</span>
-            <label class="toggle-switch" style="width:36px;height:20px;flex-shrink:0">
-              <input type="checkbox" id="set-en-gpt" onchange="_setAIEnabled('gpt',this.checked)" ${_getAIEnabled('gpt')?'checked':''}>
-              <div class="toggle-track"></div>
-            </label>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-size:12px;flex:1">𝕏 Grok (xAI)</span>
-            <label class="toggle-switch" style="width:36px;height:20px;flex-shrink:0">
-              <input type="checkbox" id="set-en-grok" onchange="_setAIEnabled('grok',this.checked)" ${_getAIEnabled('grok')?'checked':''}>
-              <div class="toggle-track"></div>
-            </label>
-          </div>
+        <!-- Claude always on indicator -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <span style="font-size:12px;flex:1">◇ Claude</span>
+          <span style="font-size:10px;background:var(--ac);color:#0d1117;padding:1px 6px;border-radius:8px;font-weight:700">Always On</span>
         </div>
-        <!-- Key input (changes label based on selected model) -->
-        <div style="font-size:11px;font-weight:700;color:var(--mu);margin-bottom:4px" id="set-ai-key-label">API Key — Claude (Anthropic)</div>
-        <input type="password" id="set-ai-key-input" placeholder="Paste API key…" style="width:100%;margin-bottom:6px">
+        <!-- Claude API key input -->
+        <div style="font-size:11px;font-weight:700;color:var(--mu);margin-bottom:4px">Claude API Key</div>
+        <div style="font-size:11px;color:var(--mu);margin-bottom:6px;line-height:1.5">Get your free key at <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener" style="color:var(--ac)">console.anthropic.com</a> → sign up → API Keys → Create Key</div>
+        <input type="password" id="set-ai-key-input" placeholder="Paste Claude API key (sk-ant-…)" style="width:100%;margin-bottom:6px">
         <div style="display:flex;gap:6px">
           <button class="btn xs ghost" onclick="_setAIKeyFromSettings()" style="flex:1">💾 Save Key</button>
-          <a id="set-ai-key-link" href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
+          <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
         </div>
-        <!-- Hidden legacy inputs for compatibility -->
-        <input type="hidden" id="set-claude-key"><input type="hidden" id="set-gemini-key"><input type="hidden" id="set-openai-key"><input type="hidden" id="set-grok-key">
+        <input type="hidden" id="set-claude-key">
       </div>
     </div>
     <div class="set-section">
@@ -3587,6 +3554,7 @@ const ACC_F  = 'accessions/data.enc';
 const REC_F  = 'recipes/data.enc';
 const BOT_F  = 'bottles/data.enc';
 const GH_F   = 'greenhouse/data.enc';
+const KEYS_F = 'settings/keys.enc';
 const API    = 'https://api.github.com';
 
 // ════════════════════════════════════════════════════════════
@@ -3696,6 +3664,26 @@ async function ghDel(path,sha,msg){
   if(!r.ok) throw new Error(`GitHub ${r.status}`);
 }
 const ghDec = c => decodeURIComponent(escape(atob(c.replace(/\n/g,''))));
+
+// ════════════════════════════════════════════════════════════
+// ENCRYPTED KEY STORE  (settings/keys.enc in GitHub)
+// ════════════════════════════════════════════════════════════
+let _keysSha=null;
+async function loadEncryptedKeys(){
+  try{
+    const f=await ghGet(KEYS_F);
+    if(!f) return;
+    _keysSha=f.sha;
+    const obj=JSON.parse(await dec(ghDec(f.content)));
+    if(obj.claudeKey){ localStorage.setItem('tcplants_claude_key',obj.claudeKey); }
+  }catch(e){ console.warn('keys.enc load failed:',e.message); }
+}
+async function saveEncryptedKeys(){
+  const obj={claudeKey:localStorage.getItem('tcplants_claude_key')||''};
+  await ghPut(KEYS_F, await enc(JSON.stringify(obj)), _keysSha, 'lab: update api keys');
+  // refresh sha for next save
+  const f=await ghGet(KEYS_F); if(f) _keysSha=f.sha;
+}
 
 // ════════════════════════════════════════════════════════════
 // DATA LAYER
@@ -6410,8 +6398,7 @@ async function _saveNewsToRepo(articles){
   }
 }
 
-// ── GEMINI AI ────────────────────────────────────────────────
-// ── AI Model system ──────────────────────────────────────────
+// ── AI (Claude) ──────────────────────────────────────────────
 // Hardwired system prompt — not user-editable
 const AI_RULEBOOK=`You are an expert plant tissue culture (TC) lab assistant for TC Plants Lab Notes.
 
@@ -6427,34 +6414,9 @@ RULES YOU MUST FOLLOW AT ALL TIMES:
 
 const AI_MODELS={
   claude:{name:'Claude',icon:'◇',lsKey:'tcplants_claude_key',getKey:()=>localStorage.getItem('tcplants_claude_key')||'',getLink:'https://console.anthropic.com/settings/keys'},
-  gemini:{name:'Gemini',icon:'✦',lsKey:'tcplants_gemini_key',getKey:()=>localStorage.getItem('tcplants_gemini_key')||'',getLink:'https://aistudio.google.com/app/apikey'},
-  gpt:{name:'GPT-4o',icon:'◎',lsKey:'tcplants_openai_key',getKey:()=>localStorage.getItem('tcplants_openai_key')||'',getLink:'https://platform.openai.com/api-keys'},
-  grok:{name:'Grok',icon:'𝕏',lsKey:'tcplants_grok_key',getKey:()=>localStorage.getItem('tcplants_grok_key')||'',getLink:'https://console.x.ai/'},
 };
-// Enabled state — Claude on by default, others off until explicitly enabled
-const _getAIEnabled=m=>m==='claude'||localStorage.getItem('tcplants_ai_en_'+m)==='1';
-const _setAIEnabled=(m,on)=>localStorage.setItem('tcplants_ai_en_'+m,on?'1':'0');
-let _aiModel='claude'; // always start on Claude
-(()=>{
-  const sel=document.getElementById('ai-model-sel');
-  if(sel) sel.value=_aiModel;
-})();
-function _onAIModelChange(m){
-  if(m!=='claude'&&!_getAIEnabled(m)){
-    const mi=AI_MODELS[m]||AI_MODELS.claude;
-    toast(`${mi.name} not enabled — turn it on in ⚙️ Settings → AI Assistant`,'fail');
-    document.getElementById('ai-model-sel').value=_aiModel; // revert
-    return;
-  }
-  _aiModel=m;
-  const mi=AI_MODELS[m]||AI_MODELS.claude;
-  const title=document.getElementById('ai-title-label');
-  if(title) title.textContent=`${mi.icon} ${mi.name} AI`;
-  const lnk=document.getElementById('ai-key-link');
-  if(lnk) lnk.href=mi.getLink;
-  document.getElementById('ai-key-input').value='';
-  document.getElementById('ai-key-row').style.display='none';
-}
+const _getAIEnabled=m=>m==='claude';
+let _aiModel='claude';
 function _toggleAIKeyRow(){
   const row=document.getElementById('ai-key-row');
   const showing=row.style.display==='flex';
@@ -6466,14 +6428,19 @@ function _toggleAIKeyRow(){
     document.getElementById('ai-key-input').placeholder=`Paste ${mi.name} API key…`;
   }
 }
-function _saveCurrentModelKey(){
+async function _saveCurrentModelKey(){
   const k=document.getElementById('ai-key-input').value.trim();
   if(!k){toast('Paste an API key first','fail');return;}
-  const mi=AI_MODELS[_aiModel]||AI_MODELS.claude;
-  localStorage.setItem(mi.lsKey,k);
+  localStorage.setItem('tcplants_claude_key',k);
   document.getElementById('ai-key-row').style.display='none';
   document.getElementById('ai-key-input').value='';
-  toast(`${mi.name} API key saved ✓`);
+  toast('Saving key to encrypted vault…');
+  try{
+    await saveEncryptedKeys();
+    toast('Claude key saved & encrypted in GitHub ✓');
+  }catch(e){
+    toast('Key saved locally — GitHub sync failed: '+e.message,'fail');
+  }
 }
 function _setModelKey(model,inputId){
   const k=document.getElementById(inputId)?.value.trim();
@@ -6482,36 +6449,23 @@ function _setModelKey(model,inputId){
   if(mi) localStorage.setItem(mi.lsKey,k);
   toast(`${mi?.name||model} key saved ✓`);
 }
-// Legacy compat
-const _getGeminiKey=()=>localStorage.getItem('tcplants_gemini_key')||'';
-function _saveGeminiKey(){ _saveCurrentModelKey(); }
-function _setGeminiKey(){ _setModelKey('gemini','set-gemini-key'); }
-
-// ── Compact AI settings panel helpers ────────────────────────
-const _aiKeyLinks={claude:'https://console.anthropic.com/settings/keys',gemini:'https://aistudio.google.com/app/apikey',gpt:'https://platform.openai.com/api-keys',grok:'https://console.x.ai/'};
-const _aiKeyLabels={claude:'Claude (Anthropic)',gemini:'Gemini (Google)',gpt:'GPT-4o (OpenAI)',grok:'Grok (xAI)'};
-function _setAISettingsModel(m){
-  const lbl=document.getElementById('set-ai-key-label');
-  const lnk=document.getElementById('set-ai-key-link');
-  const inp=document.getElementById('set-ai-key-input');
-  if(lbl) lbl.textContent='API Key — '+(_aiKeyLabels[m]||m);
-  if(lnk) lnk.href=_aiKeyLinks[m]||'#';
-  if(inp){ inp.value=''; inp.placeholder='Paste '+(_aiKeyLabels[m]||m)+' API key…'; }
-}
-function _setAIKeyFromSettings(){
-  const m=document.getElementById('set-ai-model-pick')?.value||'claude';
+// ── AI settings panel helpers ─────────────────────────────────
+async function _setAIKeyFromSettings(){
   const k=document.getElementById('set-ai-key-input')?.value.trim();
   if(!k){toast('Paste an API key first','fail');return;}
-  const mi=AI_MODELS[m]; if(!mi) return;
-  localStorage.setItem(mi.lsKey,k);
+  localStorage.setItem('tcplants_claude_key',k);
   document.getElementById('set-ai-key-input').value='';
-  toast((_aiKeyLabels[m]||m)+' key saved ✓');
+  toast('Saving key to encrypted vault…');
+  try{
+    await saveEncryptedKeys();
+    toast('Claude key saved & encrypted in GitHub ✓');
+  }catch(e){
+    toast('Key saved locally — GitHub sync failed: '+e.message,'fail');
+  }
 }
 // Sync settings panel dropdown with active model on open
 function _syncAISettingsPanel(){
-  const sel=document.getElementById('set-ai-model-pick');
-  if(sel) sel.value=_aiModel;
-  _setAISettingsModel(_aiModel);
+  // Claude only — nothing dynamic to sync
 }
 
 // ── AI panel maximize ─────────────────────────────────────────
@@ -6527,11 +6481,10 @@ function _initAIKeyHint(){
   const mi=AI_MODELS[_aiModel]||AI_MODELS.claude;
   if(!mi.getKey()){
     const msg=document.getElementById('ai-msgs');
-    if(msg) msg.innerHTML=`<div class="ai-msg ai">👋 No ${mi.name} API key set. Tap ⚙️ above to add one, or switch model in the dropdown.</div>`;
+    if(msg) msg.innerHTML=`<div class="ai-msg ai">👋 No Claude API key set. Tap ⚙️ above to add one. Get a free key at <strong>console.anthropic.com</strong> → API Keys.</div>`;
     document.getElementById('ai-key-row').style.display='flex';
   }
 }
-const GEMINI_SYS=`You are a plant tissue culture lab assistant for TC Plants Lab Notes. You help with: TC protocols, media formulations, PGR concentrations, contamination prevention, species-specific cultivation notes, and lab management. Be concise, practical, and scientific. When mentioning concentrations use mg/L or µM. The lab is based in Chennai, India.`;
 
 async function _buildAIContext(){
   let ctx='';
@@ -6635,37 +6588,13 @@ async function askAI(prompt){
   }
   const fullPrompt=AI_RULEBOOK+'\n\n---\n## Lab Data Context'+context+'\n\n---\nUser question: '+prompt;
   try{
-    let text='';
-    if(_aiModel==='claude'){
-      const r=await fetch('https://api.anthropic.com/v1/messages',{
-        method:'POST',
-        headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-        body:JSON.stringify({model:'claude-opus-4-5',max_tokens:1024,messages:[{role:'user',content:fullPrompt}]})
-      });
-      if(!r.ok) throw new Error(`Claude API error ${r.status}`);
-      const d=await r.json(); text=d.content?.[0]?.text||'No response.';
-    } else if(_aiModel==='gemini'){
-      const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,{
-        method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({contents:[{role:'user',parts:[{text:fullPrompt}]}]})
-      });
-      if(!r.ok){if(r.status===429) throw new Error('Gemini rate limit (429). Try again in a minute.'); throw new Error('Gemini error '+r.status);}
-      const d=await r.json(); text=d.candidates?.[0]?.content?.parts?.[0]?.text||'No response.';
-    } else if(_aiModel==='gpt'){
-      const r=await fetch('https://api.openai.com/v1/chat/completions',{
-        method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-        body:JSON.stringify({model:'gpt-4o',messages:[{role:'user',content:fullPrompt}],max_tokens:1024})
-      });
-      if(!r.ok) throw new Error(`OpenAI error ${r.status}`);
-      const d=await r.json(); text=d.choices?.[0]?.message?.content||'No response.';
-    } else if(_aiModel==='grok'){
-      const r=await fetch('https://api.x.ai/v1/chat/completions',{
-        method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-        body:JSON.stringify({model:'grok-3',messages:[{role:'user',content:fullPrompt}],max_tokens:1024})
-      });
-      if(!r.ok) throw new Error(`Grok error ${r.status}`);
-      const d=await r.json(); text=d.choices?.[0]?.message?.content||'No response.';
-    }
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-opus-4-5',max_tokens:1024,messages:[{role:'user',content:fullPrompt}]})
+    });
+    if(!r.ok) throw new Error(`Claude API error ${r.status}`);
+    const d=await r.json(); let text=d.content?.[0]?.text||'No response.';
     thinking.remove();
     msgs.innerHTML+=`<div class="ai-msg ai">${esc(text).replace(/\n/g,'<br>')}</div>`;
   }catch(e){
@@ -8935,7 +8864,7 @@ async function login(){
     setTimeout(()=>showVanakkam(_labN||''), 350);
     document.getElementById('ql-fab').classList.add('on');
     document.getElementById('ai-btn').classList.add('on');
-    _initAIKeyHint();
+    loadEncryptedKeys().then(()=>_initAIKeyHint());
     document.getElementById('actlog-tab').classList.add('on');
     fetchActivityLog();
     // Offer to save device if not already saved
@@ -9850,7 +9779,6 @@ function openSettings(){
   // Populate fields from localStorage
   const labName=localStorage.getItem('tcplants_lab_name')||'';
   const city=localStorage.getItem('tcplants_weather_city')||'';
-  const gemKey=localStorage.getItem('tcplants_gemini_key')||'';
   const enhance=localStorage.getItem('tcplants_qr_enhance')==='1';
   const harder=localStorage.getItem('tcplants_qr_harder')==='1';
   document.getElementById('set-lab-name').value=labName;
@@ -9887,11 +9815,7 @@ function _setWeatherCity(){
   if(v){ localStorage.setItem('tcplants_weather_city',v); toast('Weather city saved: '+v); fetchWeather(); }
   else { localStorage.removeItem('tcplants_weather_city'); toast('Weather city cleared'); }
 }
-function _setGeminiKey(){
-  const v=document.getElementById('set-gemini-key').value.trim();
-  if(v){ localStorage.setItem('tcplants_gemini_key',v); document.getElementById('ai-key-input').value=v; _saveGeminiKey(); toast('Gemini key saved'); }
-  else { localStorage.removeItem('tcplants_gemini_key'); toast('Gemini key cleared'); }
-}
+
 function _setScanEnhance(on){ localStorage.setItem('tcplants_qr_enhance',on?'1':'0'); }
 function _setScanHarder(on){ localStorage.setItem('tcplants_qr_harder',on?'1':'0'); }
 function _clearCache(){
@@ -10115,8 +10039,6 @@ document.addEventListener('click', function(e){
 // ── SETTINGS INIT ────────────────────────────────────────────
 // Restore theme button label in settings
 (function(){
-  const gemKey=localStorage.getItem('tcplants_gemini_key');
-  if(gemKey) document.getElementById('ai-key-input').value=gemKey;
   const enhance=localStorage.getItem('tcplants_qr_enhance')==='1';
   const harder=localStorage.getItem('tcplants_qr_harder')==='1';
   // Set defaults on first use
