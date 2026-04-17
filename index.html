@@ -3330,7 +3330,7 @@ main > .dview, main > .editor{ margin:0 auto; }
 </div>
 
 <!-- ═══════════ LAB FOOTER BAR ═══════════ -->
-<div id="wake-indicator" title="Listening for 'Hey Lab'">Hey Lab</div>
+<div id="wake-indicator" title="Listening for 'Hey Lab' / say 'Bye Lab' to disarm">Hey Lab</div>
 <div id="lab-footer-bar">
   <button class="lfb-btn" id="lfb-mic" onclick="_voiceTap()" title="Voice input (tap or say Hey Lab)">🎤</button>
   <button class="lfb-btn" id="lfb-model" onclick="_cycleAIModel()" title="Cycle AI model">⚡ Quick</button>
@@ -7295,7 +7295,16 @@ function _startWakeListener(){
     const sr=new SR(); sr.lang='en-IN'; sr.interimResults=false; sr.maxAlternatives=1;
     sr.onresult=e=>{
       const t=e.results[0][0].transcript.toLowerCase();
-      if(t.includes('hey lab')||t.includes('hey lab')){
+      if(t.includes('bye lab')||t.includes('by lab')){
+        _stopWakeListener();
+        // also save preference off so it doesn't re-arm on next settings open
+        const c=_voiceCfg(); c.wake=false; localStorage.setItem(VOICE_KEY,JSON.stringify(c));
+        const wi=document.getElementById('set-voice-wake'); if(wi) wi.checked=false;
+        _ttsSpeak('Bye. Wake word off.');
+        toast('Wake word disarmed — say Hey Lab or re-enable in Settings');
+        return;
+      }
+      if(t.includes('hey lab')){
         document.getElementById('ai-panel').classList.add('on');
         setTimeout(()=>_startNativeSTT(true),300);
       }
