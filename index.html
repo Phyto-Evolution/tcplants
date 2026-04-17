@@ -3280,7 +3280,7 @@ main > .dview, main > .editor{ margin:0 auto; }
 <div id="ai-panel">
   <div id="ai-head">
     <div class="ai-title" id="ai-title-label">⚡ Lab AI</div>
-    <button class="al-hbtn" id="ai-model-toggle" onclick="_toggleAIModel()" title="Switch model" style="font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px;background:var(--sf2);border:1px solid var(--bd)">⚡ Groq</button>
+    <button class="al-hbtn" id="ai-model-toggle" onclick="_cycleAIModel()" title="Tap to cycle: Quick → Deep → Claude" style="font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px;background:var(--sf2);border:1px solid var(--bd)">⚡ Quick</button>
     <button class="al-hbtn" onclick="_toggleAIKeyRow()" title="API key">⚙️</button>
     <button class="al-hbtn" onclick="_toggleAIMaximise()" id="ai-max-btn" title="Expand">⛶</button>
     <button class="al-hbtn" onclick="document.getElementById('ai-panel').classList.remove('on')" title="Close">✕</button>
@@ -3290,6 +3290,7 @@ main > .dview, main > .editor{ margin:0 auto; }
     <button class="btn xs green" onclick="_saveCurrentModelKey()">Save</button>
     <a id="ai-key-link" href="https://console.groq.com" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
   </div>
+  <div id="ai-usage-bar" style="padding:6px 12px;border-bottom:1px solid var(--bd);background:var(--sf2);flex-shrink:0"></div>
   <div id="ai-chips" style="padding:8px 12px;display:flex;flex-wrap:wrap;gap:5px;border-bottom:1px solid var(--bd);flex-shrink:0">
     <button class="ai-chip" onclick="askAI('Summarise this note in 3-5 bullet points, highlighting key observations, results, and recommended next steps.')">Summarise note</button>
     <button class="ai-chip" onclick="askAI('Based on the species, stage, and media shown in context, what PGR concentrations and media modifications would you recommend? Cite typical ranges from literature.')">PGR advice</button>
@@ -4285,7 +4286,47 @@ function _renderDashboard(){
           </div>`:''}
         </div>
       </div>
-    </div>`;}
+    </div>
+
+    <!-- ── SECTION 4: AI Usage ── -->
+    ${(()=>{
+      const today=new Date().toISOString().slice(0,10);
+      const u=_aiUsage();
+      const aiModels=[
+        {key:'llama-3.1-8b-instant',   label:'⚡ Quick (8B)',  lim:AI_LIMITS['llama-3.1-8b-instant'],    col:'#1abc9c'},
+        {key:'llama-3.3-70b-versatile', label:'🔬 Deep (70B)', lim:AI_LIMITS['llama-3.3-70b-versatile'], col:'var(--ac)'},
+        {key:'claude',                  label:'◇ Claude',      lim:AI_LIMITS['claude'],                   col:'var(--pu)'},
+      ];
+      const hasAnyUsage=aiModels.some(m=>(u[today]||{})[m.key]?.req>0);
+      const last30=Object.keys(u).filter(d=>d<=today).sort().slice(-30);
+      const heatCols=['#161b22','#0d4429','#006d32','#26a641','#39d353'];
+      const heatMap=last30.map(d=>{
+        const dayTok=aiModels.reduce((s,m)=>s+((u[d]||{})[m.key]?.tok||0),0);
+        const intensity=dayTok===0?0:dayTok<500?1:dayTok<2000?2:dayTok<5000?3:4;
+        return `<div title="${d}: ${dayTok.toLocaleString()} tokens" style="width:12px;height:12px;border-radius:2px;background:${heatCols[intensity]}"></div>`;
+      }).join('');
+      return `<div style="grid-column:1/-1"><div class="dash-section-divider">AI Usage</div></div>
+      <div style="grid-column:1/-1;background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px 16px">
+        <div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:14px">
+          ${aiModels.map(m=>{
+            const d=(u[today]||{})[m.key]||{req:0,tok:0};
+            const reqPct=Math.min(d.req/m.lim.reqDay*100,100);
+            const tokPct=Math.min(d.tok/m.lim.tokDay*100,100);
+            const warnCol=reqPct>80||tokPct>80?'var(--rd)':reqPct>50?'var(--yw)':m.col;
+            return `<div style="flex:1;min-width:150px">
+              <div style="font-size:11px;font-weight:700;margin-bottom:6px;color:${m.col}">${m.label}</div>
+              <div style="font-size:10px;color:var(--mu);display:flex;justify-content:space-between;margin-bottom:2px"><span>Req today</span><span>${d.req} / ${m.lim.reqDay.toLocaleString()}</span></div>
+              <div style="height:4px;background:var(--sf3);border-radius:2px;margin-bottom:6px"><div style="height:4px;border-radius:2px;background:${warnCol};width:${reqPct}%;transition:width .4s"></div></div>
+              <div style="font-size:10px;color:var(--mu);display:flex;justify-content:space-between;margin-bottom:2px"><span>Tokens today</span><span>${(d.tok/1000).toFixed(1)}k / ${(m.lim.tokDay/1000).toFixed(0)}k</span></div>
+              <div style="height:4px;background:var(--sf3);border-radius:2px"><div style="height:4px;border-radius:2px;background:${warnCol};width:${tokPct}%;transition:width .4s"></div></div>
+            </div>`;
+          }).join('')}
+        </div>
+        <div style="font-size:10px;color:var(--mu);margin-bottom:5px;font-weight:700;letter-spacing:.06em">30-DAY TOKEN ACTIVITY</div>
+        <div style="display:flex;flex-wrap:wrap;gap:2px">${heatMap||'<span style="font-size:11px;color:var(--mu)">No usage yet — start a chat in the AI panel</span>'}</div>
+      </div>`;
+    })()}
+    `;}
 }
 
 function showReg(name){
@@ -6435,30 +6476,85 @@ RULES YOU MUST FOLLOW AT ALL TIMES:
 8. Never make up unpublished protocols — flag if information is from general extrapolation.`;
 
 const AI_MODELS={
-  groq:  {name:'Groq',  icon:'⚡', lsKey:'tcplants_groq_key',  getKey:()=>localStorage.getItem('tcplants_groq_key')||'',  getLink:'https://console.groq.com'},
-  claude:{name:'Claude',icon:'◇', lsKey:'tcplants_claude_key',getKey:()=>localStorage.getItem('tcplants_claude_key')||'',getLink:'https://console.anthropic.com/settings/keys'},
+  groq8: {name:'Quick',  icon:'⚡', lsKey:'tcplants_groq_key', getKey:()=>localStorage.getItem('tcplants_groq_key')||'', getLink:'https://console.groq.com', groqModel:'llama-3.1-8b-instant',  label:'Groq 8B'},
+  groq70:{name:'Deep',   icon:'🔬', lsKey:'tcplants_groq_key', getKey:()=>localStorage.getItem('tcplants_groq_key')||'', getLink:'https://console.groq.com', groqModel:'llama-3.3-70b-versatile',label:'Groq 70B'},
+  claude:{name:'Claude', icon:'◇',  lsKey:'tcplants_claude_key',getKey:()=>localStorage.getItem('tcplants_claude_key')||'',getLink:'https://console.anthropic.com/settings/keys', label:'Claude'},
 };
-let _aiModel=localStorage.getItem('tcplants_ai_model')||'groq';
-function _toggleAIModel(){
-  _aiModel=_aiModel==='groq'?'claude':'groq';
-  localStorage.setItem('tcplants_ai_model',_aiModel);
+const AI_MODEL_ORDER=['groq8','groq70','claude'];
+let _aiModel=localStorage.getItem('tcplants_ai_model')||'groq70';
+
+// ── Usage tracking ────────────────────────────────────────────
+const _AI_USAGE_KEY='tcplants_ai_usage';
+function _aiUsage(){
+  try{ return JSON.parse(localStorage.getItem(_AI_USAGE_KEY)||'{}'); }catch{ return {}; }
+}
+function _aiUsageSave(o){ localStorage.setItem(_AI_USAGE_KEY,JSON.stringify(o)); }
+function _aiRecordUsage(model, reqRem, tokRem, tokUsed){
+  const today=new Date().toISOString().slice(0,10);
+  const u=_aiUsage();
+  if(!u[today]) u[today]={};
+  if(!u[today][model]) u[today][model]={req:0,tok:0};
+  u[today][model].tok+=(tokUsed||0);
+  u[today][model].req+=1;
+  if(reqRem!==null) u[today][model].reqRem=reqRem;
+  if(tokRem!==null) u[today][model].tokRem=tokRem;
+  // keep 30 days only
+  const cutoff=new Date(); cutoff.setDate(cutoff.getDate()-30);
+  Object.keys(u).forEach(k=>{ if(new Date(k)<cutoff) delete u[k]; });
+  _aiUsageSave(u);
+  _renderAIUsageBar();
+  _renderDashboard();
+}
+
+const AI_LIMITS={
+  'llama-3.3-70b-versatile':{reqDay:1000,  tokDay:100000},
+  'llama-3.1-8b-instant':   {reqDay:14400, tokDay:500000},
+  claude:                   {reqDay:1000,  tokDay:100000},
+};
+
+function _renderAIUsageBar(){
+  const bar=document.getElementById('ai-usage-bar'); if(!bar) return;
+  const today=new Date().toISOString().slice(0,10);
+  const u=_aiUsage()[today]||{};
   const mi=AI_MODELS[_aiModel];
+  const isGroq=_aiModel!=='claude';
+  const modelKey=isGroq?mi.groqModel:'claude';
+  const lim=AI_LIMITS[modelKey]||{reqDay:1000,tokDay:100000};
+  const d=u[modelKey]||{req:0,tok:0};
+  const reqPct=Math.min(d.req/lim.reqDay*100,100);
+  const tokPct=Math.min(d.tok/lim.tokDay*100,100);
+  const col=reqPct>80||tokPct>80?'var(--rd)':reqPct>50||tokPct>50?'var(--yw)':'var(--gn)';
+  bar.innerHTML=`
+    <div style="display:flex;gap:8px;align-items:center;font-size:10px;color:var(--mu)">
+      <span style="white-space:nowrap">${mi.icon} ${mi.label}</span>
+      <div style="flex:1">
+        <div style="display:flex;justify-content:space-between;margin-bottom:2px"><span>Req</span><span>${d.req}/${lim.reqDay}</span></div>
+        <div style="height:3px;background:var(--sf3);border-radius:2px"><div style="height:3px;border-radius:2px;background:${col};width:${reqPct}%;transition:width .4s"></div></div>
+      </div>
+      <div style="flex:1">
+        <div style="display:flex;justify-content:space-between;margin-bottom:2px"><span>Tokens</span><span>${(d.tok/1000).toFixed(1)}k/${(lim.tokDay/1000).toFixed(0)}k</span></div>
+        <div style="height:3px;background:var(--sf3);border-radius:2px"><div style="height:3px;border-radius:2px;background:${col};width:${tokPct}%;transition:width .4s"></div></div>
+      </div>
+    </div>`;
+}
+
+function _cycleAIModel(){
+  const idx=(AI_MODEL_ORDER.indexOf(_aiModel)+1)%AI_MODEL_ORDER.length;
+  _aiModel=AI_MODEL_ORDER[idx];
+  localStorage.setItem('tcplants_ai_model',_aiModel);
+  _updateAIModelUI();
+}
+function _updateAIModelUI(){
+  const mi=AI_MODELS[_aiModel]||AI_MODELS.groq70;
   const btn=document.getElementById('ai-model-toggle');
   const title=document.getElementById('ai-title-label');
   const lnk=document.getElementById('ai-key-link');
-  if(btn) btn.textContent=mi.icon+' '+mi.name;
+  if(btn) btn.textContent=mi.icon+' '+mi.label;
   if(title) title.textContent=mi.icon+' Lab AI';
   if(lnk) lnk.href=mi.getLink;
-  document.getElementById('ai-key-input').placeholder='Paste '+mi.name+' key…';
-  document.getElementById('ai-key-row').style.display='none';
+  _renderAIUsageBar();
 }
-(()=>{
-  const mi=AI_MODELS[_aiModel]||AI_MODELS.groq;
-  const btn=document.getElementById('ai-model-toggle');
-  const title=document.getElementById('ai-title-label');
-  if(btn) btn.textContent=mi.icon+' '+mi.name;
-  if(title) title.textContent=mi.icon+' Lab AI';
-})();
+(()=>{ _updateAIModelUI(); })();
 function _toggleAIKeyRow(){
   const row=document.getElementById('ai-key-row');
   const showing=row.style.display==='flex';
@@ -6522,10 +6618,11 @@ function _toggleAIMaximise(){
   if(btn) btn.title=_aiMaximised?'Restore':'Expand', btn.textContent=_aiMaximised?'⊡':'⛶';
 }
 function _initAIKeyHint(){
-  const mi=AI_MODELS[_aiModel]||AI_MODELS.groq;
+  const mi=AI_MODELS[_aiModel]||AI_MODELS.groq70;
+  _renderAIUsageBar();
   if(!mi.getKey()){
     const msg=document.getElementById('ai-msgs');
-    const hint=_aiModel==='groq'
+    const hint=_aiModel!=='claude'
       ?'👋 No Groq key set. Tap ⚙️ above or go to Settings → AI Assistant. Free key at <strong>console.groq.com</strong>'
       :'👋 No Claude key set. Tap ⚙️ above or go to Settings → AI Assistant.';
     if(msg) msg.innerHTML=`<div class="ai-msg ai">${hint}</div>`;
@@ -6630,11 +6727,11 @@ async function askAI(prompt){
   thinking.className='ai-msg thinking'; thinking.textContent='Thinking…';
   msgs.appendChild(thinking); msgs.scrollTop=msgs.scrollHeight;
   const context=await _buildAIContext();
-  const mi=AI_MODELS[_aiModel]||AI_MODELS.claude;
+  const mi=AI_MODELS[_aiModel]||AI_MODELS.groq70;
   const key=mi.getKey();
   if(!key){
     thinking.remove();
-    msgs.innerHTML+=`<div class="ai-msg ai">⚙️ No ${mi.name} API key set. Tap ⚙️ above to add one.</div>`;
+    msgs.innerHTML+=`<div class="ai-msg ai">⚙️ No ${mi.label} key set. Tap ⚙️ above to add one.</div>`;
     document.getElementById('ai-key-row').style.display='flex';
     return;
   }
@@ -6648,15 +6745,25 @@ async function askAI(prompt){
         body:JSON.stringify({model:'claude-opus-4-5',max_tokens:1024,messages:[{role:'user',content:fullPrompt}]})
       });
       if(!r.ok) throw new Error(`Claude error ${r.status}`);
-      const d=await r.json(); text=d.content?.[0]?.text||'No response.';
+      const d=await r.json();
+      text=d.content?.[0]?.text||'No response.';
+      const tokUsed=(d.usage?.input_tokens||0)+(d.usage?.output_tokens||0);
+      const reqRem=parseInt(r.headers.get('anthropic-ratelimit-requests-remaining'))||null;
+      _aiRecordUsage('claude', reqRem, null, tokUsed);
     } else {
+      const groqModel=mi.groqModel;
       const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
         method:'POST',
         headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-        body:JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:1024,messages:[{role:'user',content:fullPrompt}]})
+        body:JSON.stringify({model:groqModel,max_tokens:1024,messages:[{role:'user',content:fullPrompt}]})
       });
       if(!r.ok) throw new Error(`Groq error ${r.status}`);
-      const d=await r.json(); text=d.choices?.[0]?.message?.content||'No response.';
+      const d=await r.json();
+      text=d.choices?.[0]?.message?.content||'No response.';
+      const tokUsed=d.usage?.total_tokens||0;
+      const reqRem=parseInt(r.headers.get('x-ratelimit-remaining-requests'))||null;
+      const tokRem=parseInt(r.headers.get('x-ratelimit-remaining-tokens'))||null;
+      _aiRecordUsage(groqModel, reqRem, tokRem, tokUsed);
     }
     thinking.remove();
     msgs.innerHTML+=`<div class="ai-msg ai">${esc(text).replace(/\n/g,'<br>')}</div>`;
