@@ -2897,7 +2897,7 @@ main > .dview, main > .editor{ margin:0 auto; }
       <div class="help-section-card">
         <p>Tap <strong>✦</strong> (bottom-right) to open the AI assistant. Two models available — tap the model badge in the panel header to switch:</p>
         <table><tr><th>Model</th><th>When to use</th></tr>
-          <tr><td>⚡ Groq (default)</td><td>Everyday queries — free, fast, no billing. Runs Llama 3.1 8B. Get a free key at console.groq.com</td></tr>
+          <tr><td>⚡ Groq (default)</td><td>Everyday queries — free, no billing. Runs Llama 3.1 70B. Get a free key at console.groq.com</td></tr>
           <tr><td>◇ Claude (optional)</td><td>Complex multi-part questions needing deeper reasoning. Requires Anthropic key.</td></tr>
         </table>
         <p>Both keys are encrypted with your passphrase and stored in your GitHub repo — enter once, auto-loads on any device after login.</p>
@@ -3414,7 +3414,7 @@ main > .dview, main > .editor{ margin:0 auto; }
             <span style="font-size:13px;font-weight:700">⚡ Groq</span>
             <span style="font-size:10px;background:var(--gn);color:#0d1117;padding:1px 7px;border-radius:8px;font-weight:700">Default · Free</span>
           </div>
-          <div style="font-size:11px;color:var(--mu);margin-bottom:6px;line-height:1.5">Runs Llama 3.1 8B — free tier, no billing. Get key at <a href="https://console.groq.com" target="_blank" rel="noopener" style="color:var(--ac)">console.groq.com</a> → API Keys</div>
+          <div style="font-size:11px;color:var(--mu);margin-bottom:6px;line-height:1.5">Runs Llama 3.1 70B — free tier, no billing. Get key at <a href="https://console.groq.com" target="_blank" rel="noopener" style="color:var(--ac)">console.groq.com</a> → API Keys</div>
           <input type="password" id="set-groq-key-input" placeholder="Paste Groq key (gsk_…)" style="width:100%;margin-bottom:6px">
           <div style="display:flex;gap:6px">
             <button class="btn xs ghost" onclick="_setGroqKeyFromSettings()" style="flex:1">💾 Save Key</button>
@@ -6653,7 +6653,7 @@ async function askAI(prompt){
       const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
         method:'POST',
         headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-        body:JSON.stringify({model:'llama-3.1-8b-instant',max_tokens:1024,messages:[{role:'user',content:fullPrompt}]})
+        body:JSON.stringify({model:'llama-3.1-70b-versatile',max_tokens:1024,messages:[{role:'user',content:fullPrompt}]})
       });
       if(!r.ok) throw new Error(`Groq error ${r.status}`);
       const d=await r.json(); text=d.choices?.[0]?.message?.content||'No response.';
