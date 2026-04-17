@@ -4268,12 +4268,13 @@ function _renderDashboard(){
   const pEl=document.getElementById('dash-panels');
   if(pEl){
     pEl.innerHTML=`
-    <!-- ── SECTION 1: Lab Status ── -->
-    <div style="grid-column:1/-1"><div class="dash-section-divider">Lab Status</div></div>
+    <!-- ══ THREE VERTICAL COLUMNS ══ -->
+    <div style="grid-column:1/-1;display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">
 
-    <!-- ═══ ROW 1: HERO TRIO ═══ -->
-    <div style="grid-column:1/-1">
-      <div class="dash-hero">
+    <!-- ▌COL 1: Lab Status ▐ -->
+    <div style="flex:1;min-width:260px;display:flex;flex-direction:column;gap:10px">
+      <div class="dash-section-divider">Lab Status</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
 
         <!-- Donut: TC Stage Distribution -->
         <div class="dash-hero-card">
@@ -4341,12 +4342,13 @@ function _renderDashboard(){
         </div>
       </div>
     </div>
+    </div><!-- end col 1 inner -->
+    </div><!-- end col 1 -->
 
-    <!-- ── SECTION 2: Activity & Trends ── -->
-    <div style="grid-column:1/-1"><div class="dash-section-divider">Activity &amp; Trends</div></div>
-
-    <!-- ═══ ROW 2: Activity + Reviews + Recent ═══ -->
-    <div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:4px">
+    <!-- ▌COL 2: Activity & Trends ▐ -->
+    <div style="flex:1;min-width:260px;display:flex;flex-direction:column;gap:10px">
+      <div class="dash-section-divider">Activity &amp; Trends</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
       <!-- 7-day activity -->
       <div>
         <div class="dash-section-label"><span>📊 7-day Activity</span><span style="color:var(--ac);font-weight:700">${totalLast7} entries</span></div>
@@ -4376,15 +4378,18 @@ function _renderDashboard(){
           <div style="font-size:10px;color:var(--mu);margin-top:1px">${fmtDateShort(n.date)}${n.species?` · <em>${esc(n.species)}</em>`:''}</div>
         </div>`).join('')||`<div style="font-size:12px;color:var(--mu)">No notes yet.</div>`}
       </div>
-    </div>
+    </div><!-- end col 2 inner -->
+    </div><!-- end col 2 -->
 
-    <!-- ── SECTION 3: Lab Intelligence ── -->
-    <div style="grid-column:1/-1"><div class="dash-section-divider">Lab Intelligence</div></div>
+    <!-- ▌COL 3: Lab Intelligence ▐ -->
+    <div style="flex:1;min-width:260px;display:flex;flex-direction:column;gap:10px">
+      <div class="dash-section-divider">Lab Intelligence</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
 
-    <!-- Pinned Notes strip -->
-    ${(()=>{const pinned=S.notes.filter(n=>n.pinned).slice(0,4);return pinned.length?`<div style="grid-column:1/-1;margin-bottom:4px">
-      <div class="dash-section-label"><span>📌 Pinned Notes</span><a onclick="navTo('notes');_setNoteTypeFilter('pinned',document.querySelector('[data-ntype=pinned]'))" style="color:var(--yw);font-size:11px;cursor:pointer;font-weight:600">All pinned →</a></div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px">
+    <!-- Pinned Notes -->
+    ${(()=>{const pinned=S.notes.filter(n=>n.pinned).slice(0,4);return pinned.length?`<div>
+      <div class="dash-section-label"><span>📌 Pinned Notes</span><a onclick="navTo('notes');_setNoteTypeFilter('pinned',document.querySelector('[data-ntype=pinned]'))" style="color:var(--yw);font-size:11px;cursor:pointer;font-weight:600">All →</a></div>
+      <div style="display:flex;flex-direction:column;gap:5px">
         ${pinned.map(n=>`<div class="dash-pin-card" onclick="openNote('${n.id}')">
           <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(n.title)}</div>
           <div style="font-size:10px;color:var(--mu);margin-top:2px">${fmtDateShort(n.date)}</div>
@@ -4392,12 +4397,8 @@ function _renderDashboard(){
       </div>
     </div>`:'';})()}
 
-    <!-- ═══ ROW 3: Heatmap + Species + Media/GH widgets (independent columns) ═══ -->
-    <div style="grid-column:1/-1;margin-top:4px">
-      <div class="dash-cols">
-
-        <!-- COL A: Lab Activity + Bottle Activity heatmaps -->
-        <div class="dash-col">
+    <!-- Heatmaps, Species, Media/GH inline in col 3 -->
+    <div>
           ${(()=>{
             const wk=_hwState['lab']||14;
             const eMap={};
@@ -4479,46 +4480,68 @@ function _renderDashboard(){
               ${spWithSubcult.length?`<div style="font-size:11px;color:var(--yw);margin-top:6px">⚗️ Lab → GH: ${spWithSubcult.slice(0,2).map(s=>esc(s)).join(', ')}${spWithSubcult.length>2?'…':''}</div>`:''}
             </div>
           </div>`:''}
-        </div>
-      </div>
-    </div>
+    </div><!-- end heatmaps/species/media div -->
+      </div><!-- end col 3 inner -->
+    </div><!-- end col 3 -->
+    </div><!-- end 3-col flex row -->
 
-    <!-- ── SECTION 4: AI Usage ── -->
+    <!-- ── AI Usage (full width, horizontal) ── -->
     ${(()=>{
       const today=new Date().toISOString().slice(0,10);
       const u=_aiUsage();
       const aiModels=[
-        {key:'llama-3.1-8b-instant',   label:'⚡ Quick (8B)',  lim:AI_LIMITS['llama-3.1-8b-instant'],    col:'#1abc9c'},
-        {key:'llama-3.3-70b-versatile', label:'🔬 Deep (70B)', lim:AI_LIMITS['llama-3.3-70b-versatile'], col:'var(--ac)'},
-        {key:'claude',                  label:'◇ Claude',      lim:AI_LIMITS['claude'],                   col:'var(--pu)'},
+        {key:'llama-3.1-8b-instant',   label:'⚡ Quick 8B',   lim:AI_LIMITS['llama-3.1-8b-instant'],    col:'#1abc9c', tokLabel:true},
+        {key:'llama-3.3-70b-versatile', label:'🔬 Deep 70B',  lim:AI_LIMITS['llama-3.3-70b-versatile'], col:'var(--ac)', tokLabel:true},
+        {key:'claude',                  label:'◇ Claude',     lim:AI_LIMITS['claude'],                   col:'var(--pu)', tokLabel:true},
+        {key:'whisper-large-v3',        label:'🎤 Whisper',   lim:AI_LIMITS['whisper-large-v3'],         col:'var(--yw)', tokLabel:false},
       ];
-      const hasAnyUsage=aiModels.some(m=>(u[today]||{})[m.key]?.req>0);
       const last30=Object.keys(u).filter(d=>d<=today).sort().slice(-30);
       const heatCols=['#161b22','#0d4429','#006d32','#26a641','#39d353'];
       const heatMap=last30.map(d=>{
-        const dayTok=aiModels.reduce((s,m)=>s+((u[d]||{})[m.key]?.tok||0),0);
-        const intensity=dayTok===0?0:dayTok<500?1:dayTok<2000?2:dayTok<5000?3:4;
-        return `<div title="${d}: ${dayTok.toLocaleString()} tokens" style="width:12px;height:12px;border-radius:2px;background:${heatCols[intensity]}"></div>`;
+        const dayTok=aiModels.filter(m=>m.tokLabel).reduce((s,m)=>s+((u[d]||{})[m.key]?.tok||0),0);
+        const dayReq=aiModels.reduce((s,m)=>s+((u[d]||{})[m.key]?.req||0),0);
+        const intensity=dayReq===0?0:dayReq<5?1:dayReq<20?2:dayReq<50?3:4;
+        return `<div title="${d}: ${dayReq} req · ${dayTok.toLocaleString()} tokens" style="width:12px;height:12px;border-radius:2px;background:${heatCols[intensity]}"></div>`;
       }).join('');
       return `<div style="grid-column:1/-1"><div class="dash-section-divider">AI Usage</div></div>
       <div style="grid-column:1/-1;background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px 16px">
-        <div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:14px">
+        <div style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:14px">
           ${aiModels.map(m=>{
             const d=(u[today]||{})[m.key]||{req:0,tok:0};
             const reqPct=Math.min(d.req/m.lim.reqDay*100,100);
-            const tokPct=Math.min(d.tok/m.lim.tokDay*100,100);
-            const warnCol=reqPct>80||tokPct>80?'var(--rd)':reqPct>50?'var(--yw)':m.col;
-            return `<div style="flex:1;min-width:150px">
+            const tokPct=m.lim.tokDay?Math.min(d.tok/m.lim.tokDay*100,100):0;
+            const warnCol=reqPct>80?'var(--rd)':reqPct>50?'var(--yw)':m.col;
+            return `<div style="flex:1;min-width:130px">
               <div style="font-size:11px;font-weight:700;margin-bottom:6px;color:${m.col}">${m.label}</div>
               <div style="font-size:10px;color:var(--mu);display:flex;justify-content:space-between;margin-bottom:2px"><span>Req today</span><span>${d.req} / ${m.lim.reqDay.toLocaleString()}</span></div>
-              <div style="height:4px;background:var(--sf3);border-radius:2px;margin-bottom:6px"><div style="height:4px;border-radius:2px;background:${warnCol};width:${reqPct}%;transition:width .4s"></div></div>
-              <div style="font-size:10px;color:var(--mu);display:flex;justify-content:space-between;margin-bottom:2px"><span>Tokens today</span><span>${(d.tok/1000).toFixed(1)}k / ${(m.lim.tokDay/1000).toFixed(0)}k</span></div>
-              <div style="height:4px;background:var(--sf3);border-radius:2px"><div style="height:4px;border-radius:2px;background:${warnCol};width:${tokPct}%;transition:width .4s"></div></div>
+              <div style="height:4px;background:var(--sf3);border-radius:2px;margin-bottom:${m.tokLabel?6:0}px"><div style="height:4px;border-radius:2px;background:${warnCol};width:${reqPct}%;transition:width .4s"></div></div>
+              ${m.tokLabel&&m.lim.tokDay?`<div style="font-size:10px;color:var(--mu);display:flex;justify-content:space-between;margin-bottom:2px"><span>Tokens</span><span>${(d.tok/1000).toFixed(1)}k/${(m.lim.tokDay/1000).toFixed(0)}k</span></div>
+              <div style="height:4px;background:var(--sf3);border-radius:2px"><div style="height:4px;border-radius:2px;background:${warnCol};width:${tokPct}%;transition:width .4s"></div></div>`:''}
             </div>`;
           }).join('')}
         </div>
-        <div style="font-size:10px;color:var(--mu);margin-bottom:5px;font-weight:700;letter-spacing:.06em">30-DAY TOKEN ACTIVITY</div>
-        <div style="display:flex;flex-wrap:wrap;gap:2px">${heatMap||'<span style="font-size:11px;color:var(--mu)">No usage yet — start a chat in the AI panel</span>'}</div>
+        <div style="font-size:10px;color:var(--mu);margin-bottom:5px;font-weight:700;letter-spacing:.06em">30-DAY ACTIVITY (requests)</div>
+        <div style="display:flex;flex-wrap:wrap;gap:2px">${heatMap||'<span style="font-size:11px;color:var(--mu)">No usage yet</span>'}</div>
+      </div>`;
+    })()}
+
+    <!-- ── Voice Transcripts ── -->
+    ${(()=>{
+      const dump=_getVoiceDump().slice(-12).reverse();
+      if(!dump.length) return '';
+      return `<div style="grid-column:1/-1"><div class="dash-section-divider">Voice Transcripts</div></div>
+      <div style="grid-column:1/-1;background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:12px 14px">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          ${dump.map(e=>{
+            const ts=new Date(e.ts).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+            return `<div style="display:flex;align-items:baseline;gap:10px;padding:5px 0;border-bottom:1px solid var(--sf2)">
+              <span style="font-size:10px;color:var(--mu);white-space:nowrap;flex-shrink:0">🎤 ${ts}</span>
+              <span style="font-size:12px;color:var(--tx);flex:1">${esc(e.text)}</span>
+              ${e.result?`<span style="font-size:10px;color:var(--gn);white-space:nowrap">${esc(e.result)}</span>`:''}
+            </div>`;
+          }).join('')}
+        </div>
+        <button class="btn xs ghost" onclick="_exportVoiceDump()" style="margin-top:8px">⬇ Export all</button>
       </div>`;
     })()}
     `;}
@@ -6705,6 +6728,7 @@ const AI_LIMITS={
   'llama-3.3-70b-versatile':{reqDay:1000,  tokDay:100000},
   'llama-3.1-8b-instant':   {reqDay:14400, tokDay:500000},
   claude:                   {reqDay:1000,  tokDay:100000},
+  'whisper-large-v3':       {reqDay:2000,  tokDay:null},   // Groq Whisper — req only, no token limit
 };
 
 function _renderAIUsageBar(){
@@ -7320,6 +7344,7 @@ async function _transcribeWhisper(blob){
     const r=await fetch('https://api.groq.com/openai/v1/audio/transcriptions',{method:'POST',headers:{Authorization:'Bearer '+key},body:fd});
     if(!r.ok) throw new Error('Whisper error '+r.status);
     const d=await r.json();
+    _aiRecordUsage('whisper-large-v3', null, null, 0); // track req count
     const t=d.text?.trim();
     if(!t){ toast('No speech detected','fail'); return; }
     const c=_voiceCfg();
