@@ -7147,7 +7147,10 @@ function _parseVoiceCommand(text){
   return null;
 }
 
-// ── Native STT ── simple, reliable, no continuous mode ────────
+// ── Native STT ────────────────────────────────────────────────
+// continuous:false = one utterance, reliable across Chrome versions
+// interimResults:true = words appear live in textarea as you speak (visual feedback)
+// Only the isFinal result is actually processed
 let _nativeSR=null, _nativePending='', _nativeDoneCallback=null;
 function _startNativeSTT(isWake, onDone){
   if(!('SpeechRecognition' in window||'webkitSpeechRecognition' in window)){
@@ -7159,18 +7162,27 @@ function _startNativeSTT(isWake, onDone){
   _nativeSR=new SR();
   _nativeSR.lang='en-US';
   _nativeSR.continuous=false;
-  _nativeSR.interimResults=false;
+  _nativeSR.interimResults=true; // live words in textarea while speaking
   _nativeSR.maxAlternatives=1;
   _nativeDoneCallback=onDone||null;
   _setMicBtnState('listening');
-  // Show hint in textarea
   const inp=document.getElementById('ai-input');
-  const prevPH=inp.placeholder;
-  inp.placeholder='Listening… speak now';
+  const prevVal=inp.value;
+  inp.value='';
+  inp.placeholder='Listening…';
+  inp.style.color='var(--mu)'; // dim while interim
   _nativeSR.onresult=e=>{
-    inp.placeholder=prevPH;
-    const transcript=e.results[0][0].transcript.trim();
-    if(!transcript){ _setMicBtnState('idle'); return; }
+    const results=Array.from(e.results);
+    // Show interim live in textarea
+    const interim=results.filter(r=>!r.isFinal).map(r=>r[0].transcript).join('');
+    const finals=results.filter(r=>r.isFinal).map(r=>r[0].transcript).join('');
+    inp.value=finals+interim;
+    // Process only when we have a final result
+    const lastResult=results[results.length-1];
+    if(!lastResult.isFinal) return;
+    const transcript=(finals+interim).trim();
+    inp.value=''; inp.placeholder=prevVal||'Ask or speak…'; inp.style.color='';
+    if(!transcript){ _setMicBtnState('idle'); inp.value=prevVal; return; }
     _nativePending=transcript;
     _setMicBtnState('idle');
     _dumpVoiceTranscript(transcript);
@@ -7179,20 +7191,25 @@ function _startNativeSTT(isWake, onDone){
       document.getElementById('vc-heard-text').textContent=transcript;
       document.getElementById('ai-voice-confirm').classList.add('on');
       document.getElementById('ai-panel').classList.add('on');
+      if(c.cmdConfirm!==false) _startConfirmListener();
     } else {
       _voiceExecute(transcript);
       const cb=_nativeDoneCallback; _nativeDoneCallback=null; if(cb) cb();
     }
   };
   _nativeSR.onerror=e=>{
-    inp.placeholder=prevPH;
-    _setMicBtnState('idle');
-    _nativeSR=null;
-    if(e.error==='no-speech') toast('No speech detected — tap mic and speak','fail');
-    else if(e.error!=='aborted') toast('Mic: '+e.error,'fail');
+    inp.value=prevVal; inp.placeholder='Ask or speak…'; inp.style.color='';
+    _setMicBtnState('idle'); _nativeSR=null;
+    if(e.error==='no-speech') toast('Nothing heard — tap mic and speak clearly','fail');
+    else if(e.error==='not-allowed') toast('Mic permission denied','fail');
+    else if(e.error!=='aborted') toast('Mic error: '+e.error,'fail');
     const cb=_nativeDoneCallback; _nativeDoneCallback=null; if(cb) cb();
   };
-  _nativeSR.onend=()=>{ inp.placeholder=prevPH; _setMicBtnState('idle'); _nativeSR=null; };
+  _nativeSR.onend=()=>{
+    inp.placeholder='Ask or speak…'; inp.style.color='';
+    if(!_nativePending) inp.value=prevVal; // restore if no result
+    _setMicBtnState('idle'); _nativeSR=null;
+  };
   _nativeSR.start();
 }
 let _confirmSR=null;
