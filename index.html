@@ -1278,6 +1278,231 @@ main > .dview, main > .editor{ margin:0 auto; }
   .bot-lbl-stage{font-size:8pt;display:block;color:#333}
   .bot-lbl-ts{font-size:8pt;font-family:monospace;display:block;color:#555}
 }
+
+/* ════════════════════════════════════════════════════════════
+   MOBILE & TABLET OPTIMIZATION (Task #19)
+   Touch-friendly, efficient for smaller screens, voice-optimized
+   ════════════════════════════════════════════════════════════ */
+
+@media(max-width:600px){
+  /* Root font sizing — more readable on small screens */
+  body { font-size: 15px; }
+
+  /* Navigation: prioritize touch targets */
+  .nav-icon-btn {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+  }
+
+  /* Buttons: 44x44 minimum touch target */
+  .btn, button {
+    min-height: 44px !important;
+    min-width: 44px !important;
+    padding: 10px 16px !important;
+  }
+
+  /* Voice/mic button: prominent on mobile */
+  #lfb-mic {
+    width: 52px !important;
+    height: 52px !important;
+    font-size: 20px !important;
+  }
+
+  #ai-mic-btn {
+    width: 44px !important;
+    height: 44px !important;
+    font-size: 18px !important;
+  }
+
+  /* AI panel: full-width on mobile, less padding */
+  #ai-panel {
+    width: calc(100vw - 16px) !important;
+    right: 8px !important;
+    bottom: 8px !important;
+    max-height: 70vh !important;
+    border-radius: 12px !important;
+  }
+
+  #ai-panel.maximised {
+    width: calc(100vw - 16px) !important;
+    height: calc(100vh - 70px) !important;
+    bottom: 8px !important;
+    right: 8px !important;
+    border-radius: 12px !important;
+  }
+
+  /* Voice confirm dialog: bigger, clearer */
+  #ai-voice-confirm {
+    padding: 16px 12px !important;
+    gap: 12px !important;
+  }
+
+  #ai-voice-confirm .vc-heard {
+    font-size: 14px !important;
+    padding: 12px !important;
+    max-height: 80px;
+    overflow-y: auto;
+  }
+
+  #ai-voice-confirm .vc-btns button {
+    min-height: 44px !important;
+    font-size: 14px !important;
+  }
+
+  /* Text input: larger on mobile */
+  #ai-input {
+    font-size: 16px !important;
+    min-height: 44px !important;
+    padding: 10px 12px !important;
+  }
+
+  /* AI chips: scrollable horizontally, bigger touch targets */
+  #ai-chips {
+    gap: 8px !important;
+    padding: 12px !important;
+  }
+
+  .ai-chip {
+    padding: 8px 14px !important;
+    font-size: 13px !important;
+    min-height: 40px !important;
+  }
+
+  /* Textarea in forms */
+  textarea {
+    font-size: 16px !important; /* Prevents zoom on iOS focus */
+    padding: 12px !important;
+  }
+
+  /* List items: bigger padding for touch */
+  .note-item, .bot-item, .recipe-item, .acc-item {
+    padding: 14px 12px !important;
+    min-height: 50px !important;
+  }
+
+  /* Form fields: better spacing */
+  input[type="text"], input[type="email"], input[type="date"],
+  select, .form-input {
+    padding: 10px 12px !important;
+    font-size: 16px !important;
+    margin: 8px 0 !important;
+  }
+
+  /* Reduce dashboard widget sizes slightly */
+  #dash-panels {
+    padding: 8px !important;
+    gap: 8px !important;
+  }
+
+  .dash-card {
+    padding: 12px !important;
+  }
+
+  /* Settings: full-width inputs on mobile */
+  .set-row {
+    padding: 12px 10px !important;
+    flex-direction: column !important;
+  }
+
+  .set-row input, .set-row select {
+    width: 100% !important;
+    margin-top: 6px !important;
+  }
+
+  /* Hide overflow on mobile, prioritize vertical scroll */
+  #ai-msgs {
+    max-height: calc(100vh - 300px) !important;
+  }
+
+  /* Reduce modal width on small screens */
+  #wiki-modal > div {
+    width: 100% !important;
+    max-width: 95vw !important;
+    max-height: 80vh !important;
+  }
+
+  /* Badges and labels: bigger on mobile */
+  .badge, .label, .tag {
+    padding: 4px 10px !important;
+    font-size: 12px !important;
+  }
+
+  /* Bottom action bar: sticky, thumb-friendly */
+  #tools-status-bar {
+    min-height: 50px !important;
+  }
+}
+
+/* Tablet optimizations (600px to 1000px) */
+@media(min-width:601px) and (max-width:1000px){
+  body { font-size: 14px; }
+
+  /* Slightly less aggressive than phone, but still touch-friendly */
+  .btn, button {
+    min-height: 40px !important;
+    padding: 8px 14px !important;
+  }
+
+  #ai-mic-btn {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  /* AI panel: tab-optimized width */
+  #ai-panel {
+    width: 400px;
+    max-width: 95vw;
+  }
+}
+
+/* Landscape mode optimization */
+@media(max-height:500px){
+  /* Reduce vertical space usage in landscape */
+  #ai-panel {
+    max-height: 90vh !important;
+  }
+
+  #ai-msgs {
+    max-height: 50vh !important;
+  }
+
+  .nav-icon-btn {
+    padding: 6px !important;
+  }
+}
+
+/* Prevent zoom on input focus (iOS) */
+input, textarea, select {
+  font-size: 16px !important;
+}
+
+/* Smooth scrolling for touch devices */
+.scroll-smooth, #ai-msgs, #ai-chips {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Optimize for Android voice input */
+@supports(margin:0){
+  /* Android typically needs explicit font sizing */
+  body {
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+  }
+
+  /* Improve readability on low-res Android devices */
+  .ai-msg {
+    line-height: 1.8;
+  }
+
+  input, textarea {
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: 4px;
+  }
+}
 </style>
 <script>(function(){var t=localStorage.getItem('tcplants_theme')||'dark';document.documentElement.dataset.theme=t;}());</script>
 </head>
@@ -3367,7 +3592,7 @@ main > .dview, main > .editor{ margin:0 auto; }
 <button id="ai-btn" title="Ask AI assistant">✦</button>
 <div id="ai-panel">
   <div id="ai-head">
-    <div class="ai-title" id="ai-title-label">⚡ Lab AI</div>
+    <div class="ai-title" id="ai-title-label">⚡ Ravana</div>
     <button class="al-hbtn" id="ai-model-toggle" onclick="_cycleAIModel()" title="Tap to cycle: Quick → Deep → Claude" style="font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px;background:var(--sf2);border:1px solid var(--bd)">⚡ Quick</button>
     <button class="al-hbtn" onclick="_toggleAIKeyRow()" title="API key">⚙️</button>
     <button class="al-hbtn" onclick="_toggleAIMaximise()" id="ai-max-btn" title="Expand">⛶</button>
@@ -3399,7 +3624,7 @@ main > .dview, main > .editor{ margin:0 auto; }
     <button class="ai-chip" onclick="askAI('Based on my bottle records and subculture history, what is the estimated multiplication rate and what should I optimise next?')">Multiplication rate</button>
   </div>
   <!-- Single unified chat -->
-  <div id="ai-msgs"><div class="ai-msg ai">Hello! I can help with TC protocols, species info, PGR doses, contamination, and note summaries. What would you like to know?</div></div>
+  <div id="ai-msgs"><div class="ai-msg ai">Greetings! I am Ravana, your TC lab assistant. I can help with protocols, species info, PGR doses, contamination analysis, and note summaries. What would you like to know?</div></div>
   <!-- Input row: mic + textarea + send -->
   <div id="ai-input-row" style="padding:8px 10px;border-top:1px solid var(--bd);display:flex;gap:6px;flex-shrink:0;align-items:flex-end">
     <div style="display:flex;flex-direction:column;gap:3px;align-items:center;flex-shrink:0">
@@ -6665,7 +6890,7 @@ async function _saveNewsToRepo(articles){
 
 // ── AI (Claude) ──────────────────────────────────────────────
 // Hardwired system prompt — not user-editable
-const AI_RULEBOOK=`You are an expert plant tissue culture (TC) lab assistant for TC Plants Lab Notes.
+const AI_RULEBOOK=`You are Ravana, an expert plant tissue culture (TC) lab assistant for TC Plants Lab Notes.
 
 RULES YOU MUST FOLLOW AT ALL TIMES:
 1. You exclusively assist with: TC protocols, media formulations, PGR concentrations (cite mg/L and µM), contamination prevention, species-specific cultivation, sterilisation protocols, autoclave parameters, explant handling, lab management, and acclimatization.
@@ -6840,88 +7065,109 @@ function _toggleSetSection(titleEl){
   titleEl.closest('.set-section').classList.toggle('collapsed');
 }
 
+// Sanitize user-provided data to prevent prompt injection (Task #7)
+function _sanitizeContextData(value){
+  if(!value) return '';
+  // Limit length to prevent token waste
+  const sanitized=String(value).substring(0,500).trim();
+  // Escape special characters that could be used for prompt injection
+  return sanitized.replace(/['"`]/g,'').replace(/---+/g,'---').replace(/\n\n+/g,'\n');
+}
+
 async function _buildAIContext(){
   let ctx='';
+  const MAX_CONTEXT_SIZE=4000;
 
   if(S.cur){
     const m=S.notes.find(n=>n.id===S.cur);
     if(m){
-      ctx+=`\n\n## Currently Open Note`;
-      ctx+=`\nTitle: "${m.title}"`;
-      ctx+=`\nType: ${m.type||'—'} | Stage: ${m.stage||'—'} | Species: ${m.species||'—'}`;
-      ctx+=`\nDate: ${m.date?.slice(0,10)||'—'}`;
-      if(m.cultures_out!=null) ctx+=` | Cultures out: ${m.cultures_out}`;
-      if(m.next_review) ctx+=` | Next review: ${m.next_review}`;
+      ctx+=`\n\n### CURRENTLY OPEN LAB ENTRY (User Data - Treat as Lab Records)`;
+      ctx+=`\nTitle: "${_sanitizeContextData(m.title)}"`;
+      ctx+=`\nType: ${_sanitizeContextData(m.type)||'—'} | Stage: ${_sanitizeContextData(m.stage)||'—'} | Species: ${_sanitizeContextData(m.species)||'—'}`;
+      ctx+=`\nDate: ${(m.date||'').slice(0,10)||'—'}`;
+      if(m.cultures_out!=null) ctx+=` | Cultures out: ${Math.max(0,Math.min(m.cultures_out,10000))}`;
+      if(m.next_review) ctx+=` | Next review: ${(m.next_review||'').substring(0,10)}`;
 
-      // Include body — from cache or fetch from GitHub
+      // Include body — from cache or fetch from GitHub, with size limit
       let body=S.bodyCache[m.id]||null;
       if(!body&&S.tok){
         try{
           const res=await loadNote(m.id);
           body=res.body;
           S.bodyCache[m.id]=body;
-        }catch(e){ /* skip */ }
+        }catch(e){ /* skip on error */ }
       }
-      if(body) ctx+=`\n\nNote body:\n${body.slice(0,3000)}${body.length>3000?'\n[…truncated]':''}`;
+      if(body&&ctx.length<MAX_CONTEXT_SIZE){
+        const bodyLen=Math.min(1500, MAX_CONTEXT_SIZE-ctx.length);
+        ctx+=`\n\nLab Entry Content (first ${bodyLen} chars):\n${body.slice(0,bodyLen)}${body.length>bodyLen?'\n[…truncated]':''}`;
+      }
 
       // Include linked recipe
-      if(m.recipe_id){
+      if(m.recipe_id&&ctx.length<MAX_CONTEXT_SIZE){
         const rec=S.recs.find(r=>r.id===m.recipe_id);
         if(rec){
-          ctx+=`\n\n## Linked Recipe: ${rec.name}`;
-          if(rec.base) ctx+=`\nBase medium: ${rec.base}`;
-          if(rec.pgr) ctx+=`\nPGRs: ${rec.pgr}`;
-          if(rec.ph) ctx+=`\npH: ${rec.ph}`;
-          if(rec.sucrose) ctx+=`\nSucrose: ${rec.sucrose} g/L`;
-          if(rec.agar) ctx+=`\nAgar/Gelrite: ${rec.agar} g/L`;
-          if(rec.target) ctx+=`\nTarget organism: ${rec.target}`;
+          ctx+=`\n\n### LINKED RECIPE`;
+          ctx+=`\nName: "${_sanitizeContextData(rec.name)}"`;
+          if(rec.base) ctx+=`\nBase medium: ${_sanitizeContextData(rec.base)}`;
+          if(rec.pgr) ctx+=`\nPGRs: ${_sanitizeContextData(rec.pgr)}`;
+          if(rec.ph) ctx+=`\npH: ${_sanitizeContextData(rec.ph)}`;
+          if(rec.sucrose) ctx+=`\nSucrose: ${_sanitizeContextData(rec.sucrose)}`;
+          if(rec.agar) ctx+=`\nAgar/Gelrite: ${_sanitizeContextData(rec.agar)}`;
+          if(rec.target) ctx+=`\nTarget: ${_sanitizeContextData(rec.target)}`;
         }
       }
 
       // Include accession for this species
-      if(m.species){
+      if(m.species&&ctx.length<MAX_CONTEXT_SIZE){
         const acc=S.accs.find(a=>(a.species||'').toLowerCase()===m.species.toLowerCase());
         if(acc){
-          ctx+=`\n\n## Accession for ${m.species}`;
-          if(acc.num) ctx+=`\nAccession #: ${acc.num}`;
-          if(acc.status) ctx+=`\nStatus: ${acc.status}`;
-          if(acc.source) ctx+=`\nSource: ${acc.source}`;
-          if(acc.origin) ctx+=`\nOrigin: ${acc.origin}`;
+          ctx+=`\n\n### ACCESSION RECORD`;
+          ctx+=`\nSpecies: ${_sanitizeContextData(m.species)}`;
+          if(acc.num) ctx+=`\nAccession #: ${_sanitizeContextData(acc.num)}`;
+          if(acc.status) ctx+=`\nStatus: ${_sanitizeContextData(acc.status)}`;
+          if(acc.source) ctx+=`\nSource: ${_sanitizeContextData(acc.source)}`;
+          if(acc.origin) ctx+=`\nOrigin: ${_sanitizeContextData(acc.origin)}`;
         }
       }
     }
   }
 
   // Species in culture summary (top 10 by note count)
-  const spMap={};
-  S.notes.forEach(n=>{
-    if(!n.species) return;
-    const k=n.species.toLowerCase();
-    if(!spMap[k]) spMap[k]={name:n.species,notes:0,stages:{},contam:0,out:[]};
-    spMap[k].notes++;
-    if(n.stage) spMap[k].stages[n.stage]=(spMap[k].stages[n.stage]||0)+1;
-    if(n.type==='Contamination Log') spMap[k].contam++;
-    if(n.cultures_out!=null) spMap[k].out.push(n.cultures_out);
-  });
-  const spList=Object.values(spMap).sort((a,b)=>b.notes-a.notes).slice(0,10);
-  if(spList.length){
-    ctx+=`\n\n## Lab Species Summary`;
-    spList.forEach(sp=>{
-      const stages=Object.entries(sp.stages).map(([s,c])=>`${s.replace('Stage ','S').replace(/ — .*/,'')}×${c}`).join(', ');
-      const avgOut=sp.out.length?(sp.out.reduce((a,b)=>a+b,0)/sp.out.length).toFixed(1):null;
-      ctx+=`\n- ${sp.name}: ${sp.notes} notes${stages?`, ${stages}`:''}${sp.contam?`, ${sp.contam} contam`:''}${avgOut?`, avg ${avgOut} cultures/transfer`:''}`;
+  if(ctx.length<MAX_CONTEXT_SIZE){
+    const spMap={};
+    S.notes.forEach(n=>{
+      if(!n.species) return;
+      const k=(n.species||'').toLowerCase();
+      if(!spMap[k]) spMap[k]={name:n.species,notes:0,stages:{},contam:0,out:[]};
+      spMap[k].notes++;
+      if(n.stage) spMap[k].stages[_sanitizeContextData(n.stage)]=(spMap[k].stages[_sanitizeContextData(n.stage)]||0)+1;
+      if(n.type==='Contamination Log') spMap[k].contam++;
+      if(n.cultures_out!=null) spMap[k].out.push(Math.min(n.cultures_out,10000));
     });
+    const spList=Object.values(spMap).sort((a,b)=>b.notes-a.notes).slice(0,5);
+    if(spList.length){
+      ctx+=`\n\n### LAB SPECIES SUMMARY (Top ${spList.length})`;
+      spList.forEach(sp=>{
+        const stages=Object.entries(sp.stages).map(([s,c])=>`${(s||'').replace('Stage ','S').substring(0,20)}×${c}`).join(', ');
+        const avgOut=sp.out.length?(sp.out.reduce((a,b)=>a+b,0)/sp.out.length).toFixed(1):null;
+        const line=`- ${_sanitizeContextData(sp.name)}: ${sp.notes} notes${stages?`, ${stages}`:''}${sp.contam?`, ${sp.contam} contaminations`:''}${avgOut?`, avg ${avgOut}/transfer`:''}`;
+        if(ctx.length+line.length<MAX_CONTEXT_SIZE) ctx+='\n'+line;
+      });
+    }
   }
 
   // PubMed species context (when a species is set on open note)
   const curNote=S.cur?S.notes.find(n=>n.id===S.cur):null;
-  if(curNote?.species){
+  if(curNote?.species&&ctx.length<MAX_CONTEXT_SIZE){
     const pmCtx=await _fetchPubMedContext(curNote.species);
-    if(pmCtx) ctx+=pmCtx;
+    if(pmCtx&&ctx.length+pmCtx.length<MAX_CONTEXT_SIZE) ctx+=pmCtx;
   }
 
   return ctx;
 }
+
+// Configure API proxy (set via settings or detect from environment)
+let _aiProxyURL = localStorage.getItem('tcplants_ai_proxy_url') || '';
 
 async function askAI(prompt){
   const panel=document.getElementById('ai-panel');
@@ -6929,54 +7175,129 @@ async function askAI(prompt){
   const msgs=document.getElementById('ai-msgs');
   msgs.innerHTML+=`<div class="ai-msg user">${esc(prompt)}</div>`;
   const thinking=document.createElement('div');
-  thinking.className='ai-msg thinking'; thinking.textContent='Thinking…';
+  thinking.className='ai-msg thinking'; thinking.textContent='🔬 Ravana is thinking…';
   msgs.appendChild(thinking); msgs.scrollTop=msgs.scrollHeight;
+
   const context=await _buildAIContext();
   const mi=AI_MODELS[_aiModel]||AI_MODELS.groq70;
   const key=mi.getKey();
   if(!key){
     thinking.remove();
-    msgs.innerHTML+=`<div class="ai-msg ai">⚙️ No ${mi.label} key set. Tap ⚙️ above to add one.</div>`;
+    msgs.innerHTML+=`<div class="ai-msg ai">⚙️ No ${mi.label} key configured. Tap ⚙️ to set one.</div>`;
     document.getElementById('ai-key-row').style.display='flex';
     return;
   }
-  const fullPrompt=AI_RULEBOOK+'\n\n---\n## Lab Data Context'+context+'\n\n---\nUser question: '+prompt;
+
+  // Sanitize prompt to prevent injection
+  const sanitizedPrompt=prompt.replace(/[^\w\s\.\,\!\?\'\"\-\(\)]/g,'').substring(0,2000);
+  const fullPrompt=AI_RULEBOOK+'\n\n---\n## Lab Data Context'+context+'\n\n---\nUser question: '+sanitizedPrompt;
+
   try{
     let text='';
-    if(_aiModel==='claude'){
-      const r=await fetch('https://api.anthropic.com/v1/messages',{
-        method:'POST',
-        headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-        body:JSON.stringify({model:'claude-opus-4-5',max_tokens:1024,messages:[{role:'user',content:fullPrompt}]})
-      });
-      if(!r.ok) throw new Error(`Claude error ${r.status}`);
-      const d=await r.json();
-      text=d.content?.[0]?.text||'No response.';
-      const tokUsed=(d.usage?.input_tokens||0)+(d.usage?.output_tokens||0);
-      const reqRem=parseInt(r.headers.get('anthropic-ratelimit-requests-remaining'))||null;
-      _aiRecordUsage('claude', reqRem, null, tokUsed);
+    let tokUsed=0;
+    let reqRem=null;
+    let tokRem=null;
+
+    // Determine provider and model
+    const provider=(_aiModel==='claude')?'claude':'groq';
+    const model=(_aiModel==='claude')?'claude-opus-4-5':mi.groqModel;
+
+    // Try backend proxy first (if configured), fall back to direct API
+    if(_aiProxyURL){
+      text=await _callAIProxy(provider, model, fullPrompt, key);
     } else {
-      const groqModel=mi.groqModel;
-      const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
-        method:'POST',
-        headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-        body:JSON.stringify({model:groqModel,max_tokens:1024,messages:[{role:'user',content:fullPrompt}]})
-      });
-      if(!r.ok) throw new Error(`Groq error ${r.status}`);
-      const d=await r.json();
-      text=d.choices?.[0]?.message?.content||'No response.';
-      const tokUsed=d.usage?.total_tokens||0;
-      const reqRem=parseInt(r.headers.get('x-ratelimit-remaining-requests'))||null;
-      const tokRem=parseInt(r.headers.get('x-ratelimit-remaining-tokens'))||null;
-      _aiRecordUsage(groqModel, reqRem, tokRem, tokUsed);
+      // Direct API call (user-provided key only, no dangerous header)
+      const result=await _callAIDirect(provider, model, fullPrompt, key);
+      text=result.text;
+      tokUsed=result.tokUsed;
+      reqRem=result.reqRem;
+      tokRem=result.tokRem;
     }
+
+    if(!text) text='No response from Ravana.';
+    _aiRecordUsage(model, reqRem, tokRem, tokUsed);
     thinking.remove();
     msgs.innerHTML+=`<div class="ai-msg ai">${esc(text).replace(/\n/g,'<br>')}</div>`;
   }catch(e){
     thinking.remove();
-    msgs.innerHTML+=`<div class="ai-msg ai" style="color:var(--rd)">Error: ${esc(e.message)}</div>`;
+    const errMsg=e.status===429?'Rate limited. Try again in a minute.':e.message||'Unknown error';
+    msgs.innerHTML+=`<div class="ai-msg ai" style="color:var(--rd)">⚠️ ${esc(errMsg)}</div>`;
+    toast('Ravana error: '+errMsg, 'fail');
   }
   msgs.scrollTop=msgs.scrollHeight;
+}
+
+// Backend proxy call (secure, server-side API keys)
+async function _callAIProxy(provider, model, prompt, clientKey){
+  const r=await fetch(_aiProxyURL+'/api/ai/chat',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      provider: provider,
+      model: model,
+      messages: [{role:'user',content:prompt}],
+      max_tokens: 1024,
+      client_key: clientKey  // optional, if server doesn't have its own keys
+    }),
+    signal: AbortSignal.timeout(30000)
+  });
+
+  if(!r.ok){
+    const err=new Error(`Proxy error ${r.status}`);
+    err.status=r.status;
+    throw err;
+  }
+
+  const d=await r.json();
+  if(d.error) throw new Error(d.error);
+  return d.text||'';
+}
+
+// Direct API call (client key, no dangerous Anthropic header, proper error handling)
+async function _callAIDirect(provider, model, prompt, key){
+  let url, headers, body;
+
+  if(provider==='groq'){
+    url='https://api.groq.com/openai/v1/chat/completions';
+    headers={'Content-Type':'application/json','Authorization':'Bearer '+key};
+    body={model:model,max_tokens:1024,messages:[{role:'user',content:prompt}],temperature:0.7};
+  } else {
+    url='https://api.anthropic.com/v1/messages';
+    headers={'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01'};
+    body={model:model,max_tokens:1024,messages:[{role:'user',content:prompt}]};
+  }
+
+  const r=await fetch(url,{
+    method:'POST',
+    headers:headers,
+    body:JSON.stringify(body),
+    signal: AbortSignal.timeout(30000)
+  });
+
+  if(!r.ok){
+    const err=new Error(`API error ${r.status}`);
+    err.status=r.status;
+    throw err;
+  }
+
+  const d=await r.json();
+  let text='';
+  let tokUsed=0;
+  let reqRem=null;
+  let tokRem=null;
+
+  if(provider==='groq'){
+    text=d.choices?.[0]?.message?.content||'';
+    tokUsed=d.usage?.total_tokens||0;
+    reqRem=parseInt(r.headers.get('x-ratelimit-remaining-requests'))||null;
+    tokRem=parseInt(r.headers.get('x-ratelimit-remaining-tokens'))||null;
+  } else {
+    text=d.content?.[0]?.text||'';
+    tokUsed=(d.usage?.input_tokens||0)+(d.usage?.output_tokens||0);
+    reqRem=parseInt(r.headers.get('anthropic-ratelimit-requests-remaining'))||null;
+  }
+
+  return {text, tokUsed, reqRem, tokRem};
 }
 
 // ════════════════════════════════════════════════════════════
@@ -7325,16 +7646,29 @@ async function _transcribeWhisper(blob){
   fd.append('model','whisper-large-v3');
   fd.append('language','en');
   try{
-    const r=await fetch('https://api.groq.com/openai/v1/audio/transcriptions',{method:'POST',headers:{Authorization:'Bearer '+key},body:fd});
-    if(!r.ok) throw new Error('Whisper error '+r.status);
+    const r=await fetch('https://api.groq.com/openai/v1/audio/transcriptions',{
+      method:'POST',
+      headers:{Authorization:'Bearer '+key},
+      body:fd,
+      signal: AbortSignal.timeout(30000)
+    });
+    if(!r.ok) throw new Error(`Whisper error ${r.status}`);
     const d=await r.json();
-    _aiRecordUsage('whisper-large-v3', null, null, 0); // track req count
+    _aiRecordUsage('whisper-large-v3', null, null, 0);
     const t=d.text?.trim();
     if(!t){ toast('No speech detected','fail'); return; }
+    // ALWAYS show confirmation before sending (Task #5)
+    _nativePending=t;
+    document.getElementById('vc-heard-text').textContent=t;
+    document.getElementById('ai-voice-confirm').classList.add('on');
+    document.getElementById('ai-panel').classList.add('on');
+    // Optional TTS readback
     const c=_voiceCfg();
-    if(c.whisperAutoSend??true){ _voiceExecute(t); }
-    else { document.getElementById('ai-input').value=t; document.getElementById('ai-panel').classList.add('on'); }
-  }catch(e){ toast('Transcription failed: '+e.message,'fail'); }
+    if(c.tts) _ttsSpeak('I heard: '+t);
+  }catch(e){
+    const msg=e.name==='AbortError'?'Transcription timeout':e.message;
+    toast('Transcription failed: '+msg,'fail');
+  }
 }
 
 // ── Execute voice input ───────────────────────────────────────
@@ -7381,15 +7715,15 @@ function _startWakeListener(){
   _wakeSR.onresult=e=>{
     if(_wakeHandingOff) return;   // already triggered, ignore until handoff done
     const t=Array.from(e.results).pop()[0].transcript.toLowerCase().trim();
-    if(t.includes('bye lab')||t.includes('by lab')){
+    if(t.includes('bye lab')||t.includes('by lab')||t.includes('bye ravana')){
       _stopWakeListener();
       const c=_voiceCfg(); c.wake=false; localStorage.setItem(VOICE_KEY,JSON.stringify(c));
       const wi=document.getElementById('set-voice-wake'); if(wi) wi.checked=false;
-      _ttsSpeak('Bye. Wake word off.');
+      _ttsSpeak('Farewell.');
       toast('Wake word disarmed — re-enable in Settings → Voice');
       return;
     }
-    if(t.includes('hey lab')){
+    if(t.includes('hey lab')||t.includes('hey ravana')||t.includes('hi ravana')){
       _wakeHandingOff=true;
       // Pause continuous SR, hand mic to native STT, re-arm after
       _wakeSR.stop();
