@@ -590,6 +590,25 @@ main > .dview, main > .editor{ margin:0 auto; }
 .dqa-btn:hover{border-color:var(--ac);background:rgba(88,166,255,.06)}
 .dqa-btn.primary{background:var(--ac);color:#0d1117;border-color:var(--ac)}
 .dqa-btn.primary:hover{opacity:.88}
+/* ── Journal ── */
+#journal-layout{display:flex;height:100%;overflow:hidden}
+#journal-list-panel{width:220px;flex-shrink:0;border-right:1px solid var(--bd);overflow-y:auto;display:flex;flex-direction:column}
+#journal-editor-panel{flex:1;overflow:hidden;display:flex;flex-direction:column}
+#journal-view,#journal-editor{height:100%;display:flex;flex-direction:column}
+.j-list-item{padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--sf2);transition:background .12s}
+.j-list-item:hover{background:var(--sf2)}
+.j-list-item.active{background:var(--sf3)}
+.j-list-title{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.j-list-date{font-size:11px;color:var(--mu);margin-top:2px}
+.j-list-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.j-tag{font-size:10px;background:var(--sf3);border-radius:8px;padding:1px 7px;color:var(--mu)}
+.j-extract-card{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:12px;margin-bottom:8px}
+.j-extract-card h4{font-size:12px;font-weight:700;color:var(--ac);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+@media(max-width:600px){
+  #journal-list-panel{width:100%;height:200px;border-right:none;border-bottom:1px solid var(--bd)}
+  #journal-layout{flex-direction:column}
+}
+/* ── End Journal ── */
 .dash-alert-strip{display:flex;flex-wrap:wrap;gap:6px}
 .dash-alert-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid;transition:opacity .15s}
 .dash-alert-pill:hover{opacity:.8}
@@ -3502,8 +3521,63 @@ input, textarea, select {
   </div>
 
   <!-- ── LAB JOURNAL / BLOG ── -->
-  <div class="section" id="sec-blog">
-    <main id="blog-main" style="flex:1;overflow-y:auto"></main>
+  <!-- ── LAB JOURNAL ── -->
+  <div class="section fullpage" id="sec-journal">
+    <div id="journal-layout">
+      <!-- List panel -->
+      <div id="journal-list-panel">
+        <div style="padding:12px 12px 8px">
+          <button class="btn sm green" style="width:100%" onclick="startNewJournalEntry()">✏️ New Entry</button>
+          <input type="text" id="journal-search" placeholder="Search journal…" oninput="renderJournalList()" style="width:100%;margin-top:8px;padding:6px 10px;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-size:12px">
+        </div>
+        <div id="journal-list"></div>
+      </div>
+      <!-- Editor / viewer panel -->
+      <div id="journal-editor-panel">
+        <div id="journal-empty-state" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--mu)">
+          <div style="font-size:40px;margin-bottom:12px">📓</div>
+          <div style="font-size:15px;font-weight:600;margin-bottom:6px">Lab Journal</div>
+          <div style="font-size:13px;text-align:center;max-width:280px;line-height:1.6">Write freely. Ravana reads it and extracts recipes, species, and lab notes from your words.</div>
+          <button class="btn sm green" style="margin-top:20px" onclick="startNewJournalEntry()">✏️ Start writing</button>
+        </div>
+        <!-- Entry viewer -->
+        <div id="journal-view" style="display:none;height:100%;display:flex;flex-direction:column">
+          <div id="journal-view-header" style="padding:20px 24px 12px;border-bottom:1px solid var(--bd);flex-shrink:0">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+              <div>
+                <div id="jv-title" style="font-size:20px;font-weight:700;margin-bottom:4px"></div>
+                <div id="jv-meta" style="font-size:12px;color:var(--mu)"></div>
+              </div>
+              <div style="display:flex;gap:6px;flex-shrink:0">
+                <button class="btn xs ghost" onclick="editJournalEntry()">✏️ Edit</button>
+                <button class="btn xs danger" onclick="deleteJournalEntry()">🗑</button>
+              </div>
+            </div>
+          </div>
+          <div id="jv-body" style="flex:1;overflow-y:auto;padding:20px 24px;line-height:1.8;font-size:14px"></div>
+          <!-- Ravana Parse bar -->
+          <div style="border-top:1px solid var(--bd);padding:14px 24px;flex-shrink:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <button class="btn sm" onclick="parseJournalWithRavana()" id="journal-parse-btn" style="background:linear-gradient(135deg,var(--ac),var(--pu));color:#fff;border:none">✨ Parse with Ravana</button>
+            <span style="font-size:12px;color:var(--mu)">Extract recipes, species, and notes from this entry</span>
+          </div>
+          <!-- Parse results -->
+          <div id="journal-parse-results" style="display:none;border-top:1px solid var(--bd);padding:16px 24px;background:var(--sf2);flex-shrink:0"></div>
+        </div>
+        <!-- Entry editor -->
+        <div id="journal-editor" style="display:none;height:100%;display:flex;flex-direction:column">
+          <div style="padding:16px 20px;border-bottom:1px solid var(--bd);flex-shrink:0;display:flex;gap:10px;align-items:center">
+            <input type="text" id="je-title" placeholder="Entry title (optional)" style="flex:1;padding:8px 12px;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-size:14px;font-weight:600">
+            <input type="text" id="je-tags" placeholder="tags, comma-separated" style="width:200px;padding:8px 12px;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-size:12px">
+            <button class="btn sm green" onclick="saveJournalEntry()">Save</button>
+            <button class="btn sm ghost" onclick="cancelJournalEdit()">Cancel</button>
+          </div>
+          <textarea id="je-body" placeholder="Write freely…
+
+Ideas, observations, protocol thoughts, species notes — anything.
+Use Ravana to extract structured data once you're done writing." style="flex:1;padding:20px 24px;background:transparent;border:none;outline:none;resize:none;font-size:14px;line-height:1.8;color:var(--tx);font-family:var(--font)"></textarea>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- ── SCHEDULE & TRANSFERS ── -->
@@ -3553,7 +3627,7 @@ input, textarea, select {
       <button class="ndtab" data-sec="news" onclick="navTo('news')"><span class="nd-icon">📰</span>News</button>
       <button class="ndtab" data-sec="help" onclick="navTo('help')"><span class="nd-icon">❓</span>Help</button>
       <div class="nd-divider"></div>
-      <button class="ndtab" data-sec="blog" onclick="navTo('blog')"><span class="nd-icon">📔</span>Lab Journal</button>
+      <button class="ndtab" data-sec="journal" onclick="navTo('journal')"><span class="nd-icon">📔</span>Lab Journal</button>
       <button class="ndtab" data-sec="schedule" onclick="navTo('schedule')"><span class="nd-icon">📅</span>Schedule</button>
       <button class="ndtab" data-sec="insights" onclick="navTo('insights')"><span class="nd-icon">✨</span>Insights</button>
       <button class="ndtab" data-sec="supply" onclick="navTo('supply')"><span class="nd-icon">📦</span>Supplies</button>
@@ -4219,7 +4293,8 @@ const ACC_F  = 'accessions/data.enc';
 const REC_F  = 'recipes/data.enc';
 const BOT_F    = 'bottles/data.enc';
 const GH_F     = 'greenhouse/data.enc';
-const SUPPLY_F = 'supplies/data.enc';
+const SUPPLY_F  = 'supplies/data.enc';
+const JOURNAL_F = 'journal/entries.enc';
 const KEYS_F = 'settings/keys.enc';
 const API    = 'https://api.github.com';
 
@@ -4255,6 +4330,8 @@ const S = {
   calSelDate: null,
   // supplies
   supplies: [], suppliesSha: null,
+  // journal
+  journal: [], journalSha: null, curJournal: null, editingJournal: null,
   // ui state
   analytics: null,
   blogPosts: [],
@@ -4501,6 +4578,16 @@ async function saveSupplies(items, sha){
   const res=await ghPut(SUPPLY_F, await enc(JSON.stringify({items})), sha, `lab: supplies — ${items.length} items`);
   return res.content.sha;
 }
+async function loadJournal(){
+  const f=await ghGet(JOURNAL_F);
+  if(!f) return {entries:[],sha:null};
+  const raw=JSON.parse(await dec(ghDec(f.content)));
+  return {entries:raw.entries||[], sha:f.sha};
+}
+async function saveJournal(entries, sha){
+  const res=await ghPut(JOURNAL_F, await enc(JSON.stringify({entries})), sha, `lab: journal — ${entries.length} entries`);
+  return res.content.sha;
+}
 
 // ════════════════════════════════════════════════════════════
 // UTILS
@@ -4559,8 +4646,272 @@ function validateAccessionData(accession) {
 // 1. LAB ANALYTICS ENGINE
 const LabAnalytics={async calculate(){const a={contamination:{},success_rate:{},multiplication:{},culture_timeline:{},alerts:[]};const contam={};S.notes.forEach(n=>{if(!n.species)return;const sp=n.species.toLowerCase();if(!contam[sp])contam[sp]={total:0,contaminated:0};contam[sp].total++;if(n.type==='Contamination Log')contam[sp].contaminated++});a.contamination={by_species:Object.entries(contam).reduce((acc,[sp,d])=>{acc[sp]=d.total>0?Math.round(d.contaminated/d.total*1000)/10:0;return acc},{}),recent_30d:this._calcContam30(),trend:this._getTrend('contamination')};const success={};S.notes.forEach(n=>{if(!n.species)return;const sp=n.species.toLowerCase();if(!success[sp])success[sp]={total:0,success:0};success[sp].total++;if(!['Contamination Log','Failed Experiment'].includes(n.type))success[sp].success++});a.success_rate={by_species:Object.entries(success).reduce((acc,[sp,d])=>{acc[sp]=d.total>0?Math.round(d.success/d.total*1000)/10:0;return acc},{}),overall:S.notes.length>0?Math.round(S.notes.filter(n=>!['Contamination Log','Failed Experiment'].includes(n.type)).length/S.notes.length*1000)/10:0,trend:this._getTrend('success')};const multi={};S.notes.forEach(n=>{if(!n.species||n.cultures_out===null)return;const sp=n.species.toLowerCase();if(!multi[sp])multi[sp]=[];multi[sp].push(n.cultures_out)});a.multiplication={by_species:Object.entries(multi).reduce((acc,[sp,vals])=>{const avg=vals.length>0?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length*10)/10:0;acc[sp]=avg;return acc},{})};a.culture_timeline={by_species:this._buildTimeline()};a.alerts=this._genAlerts(a);S.analytics=a;S.analyticsLastCalc=new Date();return a},_calcContam30(){const d=new Date();d.setDate(d.getDate()-30);const rc=S.notes.filter(n=>n.type==='Contamination Log'&&new Date(n.date)>=d);const rt=S.notes.filter(n=>new Date(n.date)>=d).length;return rt>0?Math.round(rc.length/rt*1000)/10:0},_getTrend(m){const n=new Date();const tm=S.notes.filter(n=>{const d=new Date(n.date);return d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear()});const lm=S.notes.filter(n=>{const d=new Date(n.date);const l=new Date(n);l.setMonth(l.getMonth()-1);return d.getMonth()===l.getMonth()&&d.getFullYear()===l.getFullYear()});if(m==='contamination'){const tr=tm.filter(n=>n.type==='Contamination Log').length/(tm.length||1);const lr=lm.filter(n=>n.type==='Contamination Log').length/(lm.length||1);const d=Math.round((tr-lr)*1000)/10;return d<0?'↓ '+Math.abs(d)+'%':'↑ '+d+'%'}return '→ stable'},_buildTimeline(){const t={};S.notes.forEach(n=>{if(!n.species)return;const sp=n.species;if(!t[sp])t[sp]=[];t[sp].push({id:n.id,date:n.date,stage:n.stage,cultures:n.cultures_out,status:n.type==='Contamination Log'?'contaminated':'growing'})});return t},_genAlerts(a){const al=[];(S.bottles||[]).forEach(b=>{if(b.next_review&&new Date(b.next_review)<new Date())al.push({type:'overdue_review',bottle_id:b.id,species:b.species,days:Math.floor((Date.now()-new Date(b.next_review))/86400000)})});Object.entries(a.contamination.by_species||{}).forEach(([sp,r])=>{if(r>10)al.push({type:'high_contamination',species:sp,rate:r})});return al}};
 
-// 2. LAB BLOG
-const LabBlog={async fetchPosts(f={}){try{const r=await fetch('https://tcplants-blog.github.io/posts.json').catch(()=>null);if(!r||!r.ok)return S.blogPosts||[];const p=await r.json();S.blogPosts=p;return p}catch(e){return S.blogPosts||[]}},async createPost(t,m,sp,tgs,mf=[]){const ts=new Date().toISOString().split('T')[0].replace(/-/g,'')+'-'+Date.now().toString(36);const fn=`${ts}-${t.toLowerCase().replace(/\s+/g,'-').slice(0,30)}.md`;const fm=`---\ntitle: "${t}"\ndate: ${new Date().toISOString()}\ntimestamp: "${ts}"\nspecies: "${sp||'General'}"\ntags: [${tgs.map(x=>`"${x}"`).join(', ')}]\nmedia: [${mf.map(x=>`"${x}"`).join(', ')}]\ntc_plants_sync: true\n---\n\n${m}`;const p={id:ts,title:t,date:new Date().toISOString(),species:sp,tags:tgs,media:mf,filename:fn};if(!S.blogPosts)S.blogPosts=[];S.blogPosts.unshift(p);toast('📝 Lab entry: "'+t+'"');return p},renderBlogPage(){const c=document.getElementById('blog-main');if(!c)return;const p=S.blogPosts||[];c.innerHTML=p.length===0?'<div style="padding:40px;text-align:center;color:var(--mu)"><div style="font-size:28px;margin-bottom:12px">📔</div><p>No entries yet</p><button class="btn" onclick="LabBlog.createPost(prompt(\"Title:\"),prompt(\"Notes:\"),prompt(\"Species:\"),[])">Create Entry</button></div>':p.map(x=>'<div style="padding:16px;background:var(--sf);border:1px solid var(--bd);border-radius:8px;margin-bottom:12px;cursor:pointer" onclick="toast(\''+esc(x.title)+'\')"><div style="font-weight:600;margin-bottom:4px">'+esc(x.title)+'</div><div style="font-size:12px;color:var(--mu)">'+new Date(x.date).toLocaleDateString('en-IN')+' • '+x.species+'</div></div>').join('')}};
+// ════════════════════════════════════════════════════════════
+// LAB JOURNAL
+// ════════════════════════════════════════════════════════════
+
+function renderJournalList(){
+  const el=document.getElementById('journal-list'); if(!el) return;
+  const q=(document.getElementById('journal-search')?.value||'').toLowerCase();
+  let list=[...(S.journal||[])].sort((a,b)=>b.date.localeCompare(a.date));
+  if(q) list=list.filter(e=>(e.title||'').toLowerCase().includes(q)||(e.body||'').toLowerCase().includes(q)||(e.tags||[]).some(t=>t.toLowerCase().includes(q)));
+  if(!list.length){
+    el.innerHTML=`<div style="padding:20px 12px;font-size:12px;color:var(--mu);text-align:center">${q?'No matches':'No entries yet'}</div>`;
+    return;
+  }
+  el.innerHTML=list.map(e=>`
+    <div class="j-list-item${S.curJournal===e.id?' active':''}" onclick="openJournalEntry('${e.id}')">
+      <div class="j-list-title">${esc(e.title||'Untitled')}</div>
+      <div class="j-list-date">${fmtDateShort(e.date)}</div>
+      ${e.tags?.length?`<div class="j-list-tags">${e.tags.slice(0,3).map(t=>`<span class="j-tag">${esc(t)}</span>`).join('')}</div>`:''}
+    </div>`).join('');
+}
+
+function showJournalEmpty(){
+  document.getElementById('journal-empty-state').style.display='flex';
+  document.getElementById('journal-view').style.display='none';
+  document.getElementById('journal-editor').style.display='none';
+  S.curJournal=null;
+}
+
+function openJournalEntry(id){
+  const e=S.journal.find(x=>x.id===id); if(!e) return;
+  S.curJournal=id; S.editingJournal=null;
+  renderJournalList();
+  document.getElementById('journal-empty-state').style.display='none';
+  document.getElementById('journal-editor').style.display='none';
+  const view=document.getElementById('journal-view');
+  view.style.display='flex';
+  document.getElementById('jv-title').textContent=e.title||'Untitled';
+  const tags=e.tags?.length?` · ${e.tags.map(t=>`#${t}`).join(' ')}`:'';
+  document.getElementById('jv-meta').textContent=fmtDateShort(e.date)+tags;
+  document.getElementById('jv-body').innerHTML=sanitizeMarkdown(e.body||'');
+  // Clear any previous parse results
+  const pr=document.getElementById('journal-parse-results');
+  pr.style.display='none'; pr.innerHTML='';
+}
+
+function startNewJournalEntry(){
+  S.editingJournal=null; S.curJournal=null;
+  renderJournalList();
+  document.getElementById('journal-empty-state').style.display='none';
+  document.getElementById('journal-view').style.display='none';
+  const ed=document.getElementById('journal-editor');
+  ed.style.display='flex';
+  document.getElementById('je-title').value='';
+  document.getElementById('je-tags').value='';
+  document.getElementById('je-body').value='';
+  setTimeout(()=>document.getElementById('je-body').focus(),50);
+}
+
+function editJournalEntry(){
+  const e=S.journal.find(x=>x.id===S.curJournal); if(!e) return;
+  S.editingJournal=e.id;
+  document.getElementById('journal-view').style.display='none';
+  const ed=document.getElementById('journal-editor');
+  ed.style.display='flex';
+  document.getElementById('je-title').value=e.title||'';
+  document.getElementById('je-tags').value=(e.tags||[]).join(', ');
+  document.getElementById('je-body').value=e.body||'';
+  setTimeout(()=>document.getElementById('je-body').focus(),50);
+}
+
+function cancelJournalEdit(){
+  if(S.curJournal) openJournalEntry(S.curJournal);
+  else showJournalEmpty();
+}
+
+async function saveJournalEntry(){
+  const title=document.getElementById('je-title').value.trim();
+  const body=document.getElementById('je-body').value.trim();
+  const tags=document.getElementById('je-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  if(!body){ toast('Write something first','fail'); return; }
+  const today=new Date().toISOString().slice(0,10);
+  let entry;
+  if(S.editingJournal){
+    entry=S.journal.find(x=>x.id===S.editingJournal);
+    if(entry){ entry.title=title||today; entry.body=body; entry.tags=tags; }
+  } else {
+    entry={id:'j-'+uid(), date:today, title:title||today, body, tags};
+    S.journal.unshift(entry);
+  }
+  load('Saving journal…');
+  try{
+    S.journalSha=await saveJournal(S.journal, S.journalSha);
+    toast('📓 Journal saved');
+    S.curJournal=entry.id; S.editingJournal=null;
+    renderJournalList();
+    openJournalEntry(entry.id);
+  }catch(e){ toast('Save failed: '+e.message,'fail'); }
+  unload();
+}
+
+async function deleteJournalEntry(){
+  if(!S.curJournal||!confirm('Delete this journal entry?')) return;
+  S.journal=S.journal.filter(x=>x.id!==S.curJournal);
+  load('Deleting…');
+  try{ S.journalSha=await saveJournal(S.journal,S.journalSha); toast('Entry deleted'); }
+  catch(e){ toast('Delete failed: '+e.message,'fail'); }
+  unload();
+  S.curJournal=null;
+  renderJournalList();
+  showJournalEmpty();
+}
+
+// ── Ravana Parse ────────────────────────────────────────────
+async function parseJournalWithRavana(){
+  const e=S.journal.find(x=>x.id===S.curJournal); if(!e) return;
+  const btn=document.getElementById('journal-parse-btn');
+  const pr=document.getElementById('journal-parse-results');
+  btn.disabled=true; btn.textContent='✨ Parsing…';
+  pr.style.display='none'; pr.innerHTML='';
+
+  const prompt=`Parse this lab journal entry and extract structured data.
+Return ONLY a JSON object (no markdown, no explanation) with these optional arrays:
+{
+  "summary": "1 sentence summary of the entry",
+  "recipes": [{"name":"","base":"","pgr":"","ph":5.8,"sucrose":30,"gelrite":1.9,"autoclave":"","target":"","notes":""}],
+  "species": [{"name":"","family":"","category":"carnivorous|orchids|banana|other","notes":""}],
+  "notes": [{"title":"","type":"TC Observation","species":"","stage":"","body":""}]
+}
+Omit any array if nothing relevant found. Only include fields that have actual values.
+
+Journal entry title: ${e.title||'Untitled'}
+Date: ${e.date}
+
+${e.body}`;
+
+  try{
+    const raw=await askAI(prompt);
+    // Extract JSON from response (Ravana might wrap it in markdown)
+    const jsonMatch=raw.match(/\{[\s\S]*\}/);
+    if(!jsonMatch) throw new Error('No structured data found in this entry');
+    const data=JSON.parse(jsonMatch[0]);
+    _renderJournalExtracts(data);
+  }catch(err){
+    pr.style.display='block';
+    pr.innerHTML=`<div style="color:var(--mu);font-size:13px">No extractable data found, or entry needs more specific details. ${esc(err.message||'')}</div>`;
+  }
+  btn.disabled=false; btn.textContent='✨ Parse with Ravana';
+}
+
+function _renderJournalExtracts(data){
+  const pr=document.getElementById('journal-parse-results');
+  const cards=[];
+
+  if(data.summary){
+    cards.push(`<div style="font-size:13px;color:var(--mu);margin-bottom:12px;padding:10px 12px;background:rgba(88,166,255,.06);border-left:3px solid var(--ac);border-radius:0 6px 6px 0"><strong>Summary:</strong> ${esc(data.summary)}</div>`);
+  }
+
+  (data.recipes||[]).forEach((r,i)=>{
+    const preview=[r.base,r.pgr?`PGRs: ${r.pgr}`:'',r.ph?`pH ${r.ph}`:''].filter(Boolean).join(' · ');
+    cards.push(`<div class="j-extract-card">
+      <h4>🧪 Recipe found</h4>
+      <div style="font-size:13px;font-weight:600;margin-bottom:4px">${esc(r.name||'Unnamed recipe')}</div>
+      <div style="font-size:12px;color:var(--mu);margin-bottom:10px">${esc(preview)}</div>
+      <button class="btn xs green" onclick="_journalCreateRecipe(${i})">Create Recipe →</button>
+    </div>`);
+  });
+
+  (data.species||[]).forEach((sp,i)=>{
+    cards.push(`<div class="j-extract-card">
+      <h4>🌿 Species found</h4>
+      <div style="font-size:13px;font-weight:600;margin-bottom:4px">${esc(sp.name)}</div>
+      <div style="font-size:12px;color:var(--mu);margin-bottom:10px">${esc([sp.family,sp.category].filter(Boolean).join(' · '))}</div>
+      <button class="btn xs green" onclick="_journalAddSpecies(${i})">Add to Taxonomy →</button>
+    </div>`);
+  });
+
+  (data.notes||[]).forEach((n,i)=>{
+    cards.push(`<div class="j-extract-card">
+      <h4>📋 Lab note found</h4>
+      <div style="font-size:13px;font-weight:600;margin-bottom:4px">${esc(n.title||'Observation')}</div>
+      <div style="font-size:12px;color:var(--mu);margin-bottom:10px">${esc([n.type,n.species,n.stage].filter(Boolean).join(' · '))}</div>
+      <button class="btn xs green" onclick="_journalCreateNote(${i})">Create Lab Note →</button>
+    </div>`);
+  });
+
+  if(!cards.length){
+    pr.innerHTML=`<div style="font-size:13px;color:var(--mu)">No recipes, species, or note-worthy observations found. Try being more specific — mention media compositions, species names, or protocol steps.</div>`;
+  } else {
+    pr.innerHTML=cards.join('');
+    // Stash parse results for action handlers
+    window._journalParseData=data;
+  }
+  pr.style.display='block';
+}
+
+// Stash so action handlers can access it
+window._journalParseData=null;
+
+function _journalCreateRecipe(idx){
+  const r=(window._journalParseData?.recipes||[])[idx]; if(!r) return;
+  navTo('recipes');
+  setTimeout(()=>{
+    startNewRecipe();
+    setTimeout(()=>{
+      const s=(id,v)=>{const el=document.getElementById(id);if(el&&v!=null&&v!=='')el.value=v;};
+      s('re-name',r.name);
+      s('re-pgr',r.pgr);
+      s('re-ph',r.ph);
+      s('re-sucrose',r.sucrose);
+      s('re-agar',r.gelrite);
+      if(r.autoclave){ const el=document.getElementById('re-autoclave'); if(el) el.value=r.autoclave; }
+      if(r.target){ const el=document.getElementById('re-target'); if(el) el.value=r.target; }
+      if(r.notes){ const el=document.getElementById('re-notes'); if(el) el.value=r.notes; }
+      // Try to match base medium in select
+      if(r.base){
+        const sel=document.getElementById('re-base');
+        if(sel){
+          const opt=[...sel.options].find(o=>o.text.toLowerCase().includes(r.base.toLowerCase().slice(0,8)));
+          if(opt) sel.value=opt.value; else { sel.value='__custom'; s('re-base-custom',r.base); }
+        }
+      }
+      toast('Recipe pre-filled from journal ✓');
+    },200);
+  },200);
+}
+
+function _journalCreateNote(idx){
+  const n=(window._journalParseData?.notes||[])[idx]; if(!n) return;
+  navTo('notes');
+  setTimeout(()=>{
+    startNewNote('tc');
+    setTimeout(()=>{
+      const s=(id,v)=>{const el=document.getElementById(id);if(el&&v!=null&&v!=='')el.value=v;};
+      s('ne-title',n.title);
+      s('ne-species',n.species);
+      s('ne-body',n.body);
+      if(n.type){const sel=document.getElementById('ne-type');if(sel)sel.value=n.type;}
+      if(n.stage){const sel=document.getElementById('ne-stage');if(sel)sel.value=n.stage;}
+      toast('Lab note pre-filled from journal ✓');
+    },200);
+  },200);
+}
+
+function _journalAddSpecies(idx){
+  const sp=(window._journalParseData?.species||[])[idx]; if(!sp) return;
+  navTo('species');
+  setTimeout(()=>{
+    // Try to open the custom species add form
+    const addBtn=document.querySelector('[onclick*="addCustomSpecies"], [onclick*="showAddSpecies"], #add-custom-sp-btn');
+    if(addBtn) addBtn.click();
+    setTimeout(()=>{
+      const s=(id,v)=>{const el=document.getElementById(id);if(el&&v!=null&&v!=='')el.value=v;};
+      s('csp-name',sp.name);
+      s('csp-family',sp.family);
+      // category
+      if(sp.category){
+        const sel=document.getElementById('csp-category');
+        if(sel){
+          const opt=[...sel.options].find(o=>o.value.toLowerCase()===sp.category.toLowerCase());
+          if(opt) sel.value=opt.value;
+        }
+      }
+      toast('Species pre-filled from journal ✓');
+    },300);
+  },200);
+}
 
 // 3. LAB SCHEDULE
 const LabCalendar={
@@ -10889,7 +11240,7 @@ function navTo(sec){
     document.querySelectorAll('.nd-list-area').forEach(el=>el.classList.remove('on'));
     closeNavDrawer();
     // Render new feature sections
-    if(sec==='blog') LabBlog.renderBlogPage();
+    if(sec==='journal'){ renderJournalList(); showJournalEmpty(); }
     else if(sec==='schedule') LabCalendar.renderCalendarView();
     else if(sec==='insights') RavanaInsights.renderInsightsPage();
     else if(sec==='supply') SupplyInventory.renderInventoryPage();
@@ -10957,13 +11308,14 @@ async function login(){
       toast('⚡ Loaded from cache');
     }else{
       load('Loading all data…');
-      const [{notes,sha:nSha},{accs,sha:aSha},{recs,sha:rSha},{bottles,sessions:bSess,sha:bSha},{plants:ghPlants,transfers:ghTransf,sha:ghSha},{items:supItems,sha:supSha}]=await Promise.all([loadNotesIndex(),loadAccessions(),loadRecipes(),loadBottles(),loadGreenhouse(),loadSupplies()]);
+      const [{notes,sha:nSha},{accs,sha:aSha},{recs,sha:rSha},{bottles,sessions:bSess,sha:bSha},{plants:ghPlants,transfers:ghTransf,sha:ghSha},{items:supItems,sha:supSha},{entries:jEntries,sha:jSha}]=await Promise.all([loadNotesIndex(),loadAccessions(),loadRecipes(),loadBottles(),loadGreenhouse(),loadSupplies(),loadJournal()]);
       S.notes=notes; S.notesSha=nSha;
       S.accs=accs; S.accSha=aSha;
       S.recs=recs; S.recSha=rSha;
       S.bottles=bottles||[]; S.sessions=bSess||[]; S.bottlesSha=bSha;
       S.greenhouse=ghPlants||[]; S.ghTransfers=ghTransf||[]; S.greenhouseSha=ghSha;
       S.supplies=supItems||[]; S.suppliesSha=supSha;
+      S.journal=jEntries||[]; S.journalSha=jSha;
       _writeCache();
     }
     document.getElementById('login').style.display='none';
@@ -10994,7 +11346,7 @@ async function login(){
     if(window._pendingBottle){ const pid=window._pendingBottle; window._pendingBottle=null; navTo('bottles'); setTimeout(()=>openBottle(pid),50); }
     // Initialize 8 features
     LabAnalytics.calculate();
-    LabBlog.fetchPosts();
+    // journal loaded at login via loadJournal() in the data Promise.all above
     SupplyInventory.items = JSON.parse(localStorage.getItem('tcplants_supply') || '[]');
     // alerts render automatically via _renderDashboard() on login
     fetchWeather();
