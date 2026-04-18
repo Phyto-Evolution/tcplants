@@ -1510,6 +1510,7 @@ input, textarea, select {
 <body>
 
 <div id="overlay" aria-live="polite"><div class="spin"></div><p id="ovmsg">Working…</p></div>
+<div id="aria-live" aria-live="polite" aria-atomic="true" style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden"></div>
 <div id="toast"></div>
 <div id="vanakkam-greeting" style="display:none!important">
   <div class="vk-card">
@@ -1566,18 +1567,18 @@ input, textarea, select {
 <div id="sidebar-backdrop"></div>
 <div id="app">
   <nav>
-    <button id="nav-hamburger" title="Menu" onclick="toggleNavDrawer()">☰</button>
-    <button class="nav-home-btn" title="Home" onclick="goHome()">🏠</button>
-    <div class="brand">🌿 TC Plants <span>/ Lab</span></div>
+    <button id="nav-hamburger" title="Menu" aria-label="Toggle navigation menu" onclick="toggleNavDrawer()">☰</button>
+    <button class="nav-home-btn" title="Home" aria-label="Go to home" onclick="goHome()">🏠</button>
+    <div class="brand" role="banner">🌿 TC Plants <span>/ Lab</span></div>
     <span class="nav-spacer"></span>
-    <button id="weather-chip" title="Lab &amp; Greenhouse weather">🌡️ —</button>
-    <span id="offline-pill">● Offline</span>
-    <button class="nav-icon-btn" title="Scan QR / Barcode" onclick="openQRScan()" style="font-size:15px">📷</button>
-    <button class="nav-icon-btn" id="export-all-btn" title="Export ZIP">⬇</button>
-    <button class="nav-icon-btn" id="export-csv-btn" title="Export CSV">CSV</button>
-    <button class="nav-icon-btn" id="lock-btn" title="Lock" style="display:flex;align-items:center;gap:4px;font-size:13px;color:var(--mu);padding:4px 9px;border:1px solid var(--bd);border-radius:6px">🔒 <span class="lock-label">Lock</span></button>
-    <button class="nav-icon-btn" title="Settings" onclick="openSettings()" style="font-size:16px">⚙️</button>
-    <button id="theme-btn" title="Toggle theme">☀️</button>
+    <button id="weather-chip" title="Lab &amp; Greenhouse weather" aria-label="Lab and greenhouse weather">🌡️ —</button>
+    <span id="offline-pill" aria-label="Offline mode">● Offline</span>
+    <button class="nav-icon-btn" title="Scan QR / Barcode" aria-label="Scan QR code or barcode" onclick="openQRScan()" style="font-size:15px">📷</button>
+    <button class="nav-icon-btn" id="export-all-btn" title="Export ZIP" aria-label="Export all data as ZIP">⬇</button>
+    <button class="nav-icon-btn" id="export-csv-btn" title="Export CSV" aria-label="Export data as CSV">CSV</button>
+    <button class="nav-icon-btn" id="lock-btn" title="Lock" aria-label="Lock or unlock" style="display:flex;align-items:center;gap:4px;font-size:13px;color:var(--mu);padding:4px 9px;border:1px solid var(--bd);border-radius:6px">🔒 <span class="lock-label">Lock</span></button>
+    <button class="nav-icon-btn" title="Settings" aria-label="Open settings" onclick="openSettings()" style="font-size:16px">⚙️</button>
+    <button id="theme-btn" title="Toggle theme" aria-label="Toggle light or dark theme">☀️</button>
   </nav>
 
   <!-- ── NOTES ── -->
@@ -1593,13 +1594,13 @@ input, textarea, select {
         </div>
         <!-- Quick Actions -->
         <div class="dash-quick-actions" style="margin-bottom:16px">
-          <button class="dqa-btn primary" onclick="navTo('notes');startNewNote('generic')">📝 Quick Note</button>
-          <button class="dqa-btn primary" style="background:var(--ac)" onclick="navTo('notes');startNewNote('tc')">🧪 Lab Entry</button>
-          <button class="dqa-btn" onclick="navTo('bottles');startNewBottle('single')">🫙 New Bottle</button>
-          <button class="dqa-btn" onclick="navTo('greenhouse');startNewGHPlant()">🏡 GH Plant</button>
-          <button class="dqa-btn" onclick="navTo('sterilise')">🧫 Sterilise</button>
-          <button class="dqa-btn" onclick="openQRScan()">📷 QR Scan</button>
-          <button class="dqa-btn" onclick="navTo('analytics')">📊 Analytics</button>
+          <button class="dqa-btn primary" aria-label="Create a quick note (Ctrl+Shift+N)" onclick="navTo('notes');startNewNote('generic')">📝 Quick Note</button>
+          <button class="dqa-btn primary" style="background:var(--ac)" aria-label="Create a lab entry (Ctrl+N)" onclick="navTo('notes');startNewNote('tc')">🧪 Lab Entry</button>
+          <button class="dqa-btn" aria-label="Create a new bottle (Ctrl+Shift+B)" onclick="navTo('bottles');startNewBottle('single')">🫙 New Bottle</button>
+          <button class="dqa-btn" aria-label="Create a new greenhouse plant" onclick="navTo('greenhouse');startNewGHPlant()">🏡 GH Plant</button>
+          <button class="dqa-btn" aria-label="Go to sterilization records" onclick="navTo('sterilise')">🧫 Sterilise</button>
+          <button class="dqa-btn" aria-label="Scan QR or barcode" onclick="openQRScan()">📷 QR Scan</button>
+          <button class="dqa-btn" aria-label="View analytics and statistics" onclick="navTo('analytics')">📊 Analytics</button>
         </div>
         <!-- Quick Stats -->
         <div id="dash-stats" style="display:flex;gap:0;margin-bottom:16px;background:var(--sf);border:1px solid var(--bd);border-radius:12px;overflow:hidden"></div>
@@ -3583,46 +3584,46 @@ input, textarea, select {
 <!-- ═══════════ LAB FOOTER BAR ═══════════ -->
 <div id="wake-indicator" title="Listening for 'Hey Lab' / say 'Bye Lab' to disarm">Hey Lab</div>
 <div id="lab-footer-bar">
-  <button class="lfb-btn" id="lfb-mic" onclick="_voiceTap()" title="Voice input (tap or say Hey Lab)">🎤</button>
-  <button class="lfb-btn" id="lfb-model" onclick="_cycleAIModel()" title="Cycle AI model">⚡ Quick</button>
-  <button class="lfb-btn" id="lfb-ai" onclick="_toggleAIPanel()" title="AI assistant">✦</button>
-  <button class="lfb-btn" id="lfb-ql" onclick="showQuickLog()" title="Quick log">＋</button>
+  <button class="lfb-btn" id="lfb-mic" aria-label="Voice input (tap or say 'Hey Ravana')" onclick="_voiceTap()" title="Voice input (tap or say Hey Lab)">🎤</button>
+  <button class="lfb-btn" id="lfb-model" aria-label="Cycle AI model" onclick="_cycleAIModel()" title="Cycle AI model">⚡ Quick</button>
+  <button class="lfb-btn" id="lfb-ai" aria-label="Toggle Ravana AI assistant" onclick="_toggleAIPanel()" title="AI assistant">✦</button>
+  <button class="lfb-btn" id="lfb-ql" aria-label="Quick log" onclick="showQuickLog()" title="Quick log">＋</button>
 </div>
 
 <!-- ═══════════ AI ASSISTANT ═══════════ -->
-<button id="ai-btn" title="Ask AI assistant">✦</button>
-<div id="ai-panel">
+<button id="ai-btn" aria-label="Ask Ravana AI assistant" title="Ask AI assistant">✦</button>
+<div id="ai-panel" role="dialog" aria-label="Ravana AI Assistant">
   <div id="ai-head">
     <div class="ai-title" id="ai-title-label">⚡ Ravana</div>
-    <button class="al-hbtn" id="ai-model-toggle" onclick="_cycleAIModel()" title="Tap to cycle: Quick → Deep → Claude" style="font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px;background:var(--sf2);border:1px solid var(--bd)">⚡ Quick</button>
-    <button class="al-hbtn" onclick="_toggleAIKeyRow()" title="API key">⚙️</button>
-    <button class="al-hbtn" onclick="_toggleAIMaximise()" id="ai-max-btn" title="Expand">⛶</button>
-    <button class="al-hbtn" onclick="_closeAIPanel()" title="Close">✕</button>
+    <button class="al-hbtn" id="ai-model-toggle" aria-label="Cycle AI model: Quick, Deep, Claude" onclick="_cycleAIModel()" title="Tap to cycle: Quick → Deep → Claude" style="font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px;background:var(--sf2);border:1px solid var(--bd)">⚡ Quick</button>
+    <button class="al-hbtn" aria-label="API key settings" onclick="_toggleAIKeyRow()" title="API key">⚙️</button>
+    <button class="al-hbtn" aria-label="Maximize or restore Ravana panel" onclick="_toggleAIMaximise()" id="ai-max-btn" title="Expand">⛶</button>
+    <button class="al-hbtn" aria-label="Close Ravana panel" onclick="_closeAIPanel()" title="Close">✕</button>
   </div>
   <div id="ai-key-row" style="display:none;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid var(--bd);background:var(--sf2)">
-    <input type="password" id="ai-key-input" placeholder="Paste key…" style="flex:1;font-size:12px;padding:5px 8px">
-    <button class="btn xs green" onclick="_saveCurrentModelKey()">Save</button>
-    <a id="ai-key-link" href="https://console.groq.com" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
+    <input type="password" id="ai-key-input" aria-label="Paste API key" placeholder="Paste key…" style="flex:1;font-size:12px;padding:5px 8px">
+    <button class="btn xs green" aria-label="Save API key" onclick="_saveCurrentModelKey()">Save</button>
+    <a id="ai-key-link" href="https://console.groq.com" target="_blank" rel="noopener" class="btn xs ghost" aria-label="Get API key from provider">Get key ↗</a>
   </div>
   <div id="ai-usage-bar" style="padding:6px 12px;border-bottom:1px solid var(--bd);background:var(--sf2);flex-shrink:0"></div>
   <!-- Voice confirm overlay -->
-  <div id="ai-voice-confirm">
+  <div id="ai-voice-confirm" role="alert" aria-label="Voice transcription confirmation">
     <div style="font-size:11px;color:var(--mu)">I heard:</div>
-    <div class="vc-heard" id="vc-heard-text"></div>
+    <div class="vc-heard" id="vc-heard-text" aria-live="polite"></div>
     <div class="vc-btns">
-      <button class="btn xs ghost" style="flex:1" onclick="_voiceRetry()">↺ Re-listen</button>
-      <button class="btn xs green" style="flex:1" onclick="_voiceConfirmSend()">✓ Send</button>
+      <button class="btn xs ghost" style="flex:1" aria-label="Listen again" onclick="_voiceRetry()">↺ Re-listen</button>
+      <button class="btn xs green" style="flex:1" aria-label="Send transcription" onclick="_voiceConfirmSend()">✓ Send</button>
     </div>
     <div style="font-size:10px;color:var(--mu)">Say "send" or "re-listen"</div>
   </div>
   <!-- Quick chips -->
-  <div id="ai-chips" style="padding:8px 12px;display:flex;flex-wrap:wrap;gap:5px;border-bottom:1px solid var(--bd);flex-shrink:0">
-    <button class="ai-chip" onclick="askAI('Summarise this note in 3-5 bullet points, highlighting key observations, results, and recommended next steps.')">Summarise note</button>
-    <button class="ai-chip" onclick="askAI('Based on the species, stage, and media shown in context, what PGR concentrations and media modifications would you recommend? Cite typical ranges from literature.')">PGR advice</button>
-    <button class="ai-chip" onclick="askAI('Looking at the species and contamination data in context, what are the likely contamination sources and the most effective prevention strategies for this lab setup?')">Contam analysis</button>
-    <button class="ai-chip" onclick="askAI('Using the species summary and note history in context, give a brief cultivation assessment: which species are thriving, which are at risk, and what actions to prioritise.')">Lab overview</button>
-    <button class="ai-chip" onclick="askAI('What sterilisation protocol would you recommend for my current species and the contamination pattern I have shown?')">Sterilisation</button>
-    <button class="ai-chip" onclick="askAI('Based on my bottle records and subculture history, what is the estimated multiplication rate and what should I optimise next?')">Multiplication rate</button>
+  <div id="ai-chips" style="padding:8px 12px;display:flex;flex-wrap:wrap;gap:5px;border-bottom:1px solid var(--bd);flex-shrink:0" role="toolbar" aria-label="Quick Ravana prompts">
+    <button class="ai-chip" aria-label="Summarize note" onclick="askAI('Summarise this note in 3-5 bullet points, highlighting key observations, results, and recommended next steps.')">Summarise note</button>
+    <button class="ai-chip" aria-label="PGR advice" onclick="askAI('Based on the species, stage, and media shown in context, what PGR concentrations and media modifications would you recommend? Cite typical ranges from literature.')">PGR advice</button>
+    <button class="ai-chip" aria-label="Contamination analysis" onclick="askAI('Looking at the species and contamination data in context, what are the likely contamination sources and the most effective prevention strategies for this lab setup?')">Contam analysis</button>
+    <button class="ai-chip" aria-label="Lab overview" onclick="askAI('Using the species summary and note history in context, give a brief cultivation assessment: which species are thriving, which are at risk, and what actions to prioritise.')">Lab overview</button>
+    <button class="ai-chip" aria-label="Sterilization advice" onclick="askAI('What sterilisation protocol would you recommend for my current species and the contamination pattern I have shown?')">Sterilisation</button>
+    <button class="ai-chip" aria-label="Multiplication rate" onclick="askAI('Based on my bottle records and subculture history, what is the estimated multiplication rate and what should I optimise next?')">Multiplication rate</button>
   </div>
   <!-- Single unified chat -->
   <div id="ai-msgs"><div class="ai-msg ai">Greetings! I am Ravana, your TC lab assistant. I can help with protocols, species info, PGR doses, contamination analysis, and note summaries. What would you like to know?</div></div>
@@ -10406,7 +10407,119 @@ document.getElementById('ql-fab').onclick=showQuickLog;
 document.getElementById('ql-cancel-btn').onclick=hideQuickLog;
 document.getElementById('ql-save-btn').onclick=saveQuickLog;
 document.getElementById('ql-modal').addEventListener('click',e=>{ if(e.target===document.getElementById('ql-modal')) hideQuickLog(); });
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&document.getElementById('ql-modal').classList.contains('on')) hideQuickLog(); });
+// Task #20: Keyboard shortcuts (accessibility)
+document.addEventListener('keydown',e=>{
+  // Close modals on Escape
+  if(e.key==='Escape'){
+    if(document.getElementById('ql-modal')?.classList.contains('on')) hideQuickLog();
+    if(document.getElementById('species-picker-modal')?.classList.contains('on')) closeSpeciesPicker();
+    if(document.getElementById('wiki-modal')?.style.display==='flex') document.getElementById('wiki-modal').style.display='none';
+    return;
+  }
+
+  // Skip shortcuts if typing in textarea/input (except special cases)
+  const activeEl=document.activeElement;
+  const isInput=activeEl?.tagName==='INPUT'||activeEl?.tagName==='TEXTAREA';
+  const isSearchInput=activeEl?.id==='note-search';
+
+  // Ctrl+N: New lab entry
+  if(e.ctrlKey&&e.key==='n'){
+    e.preventDefault();
+    navTo('notes');
+    startNewNote('tc');
+    toast('⌨️ New lab entry (Ctrl+N)');
+    return;
+  }
+
+  // Ctrl+Shift+N: New quick note
+  if(e.ctrlKey&&e.shiftKey&&e.key==='N'){
+    e.preventDefault();
+    navTo('notes');
+    startNewNote('generic');
+    toast('⌨️ New quick note (Ctrl+Shift+N)');
+    return;
+  }
+
+  // Ctrl+Shift+B: New bottle
+  if(e.ctrlKey&&e.shiftKey&&e.key==='B'){
+    e.preventDefault();
+    navTo('bottles');
+    startNewBottle('single');
+    toast('⌨️ New bottle (Ctrl+Shift+B)');
+    return;
+  }
+
+  // Ctrl+K: Focus search (or open if not visible)
+  if(e.ctrlKey&&e.key==='k'){
+    e.preventDefault();
+    const search=document.getElementById('note-search');
+    if(search){
+      search.focus();
+      search.select();
+      toast('⌨️ Search (Ctrl+K)');
+    }
+    return;
+  }
+
+  // Ctrl+L: Lock/Unlock
+  if(e.ctrlKey&&e.key==='l'){
+    e.preventDefault();
+    const lockBtn=document.getElementById('lock-btn');
+    if(lockBtn){
+      lockBtn.click();
+      toast('⌨️ Lock toggle (Ctrl+L)');
+    }
+    return;
+  }
+
+  // Ctrl+S: Save (for note editor)
+  if(e.ctrlKey&&e.key==='s'){
+    e.preventDefault();
+    const saveBtn=document.getElementById('save-note-btn');
+    if(saveBtn&&!saveBtn.disabled){
+      saveBtn.click();
+      toast('⌨️ Save (Ctrl+S)');
+    }
+    return;
+  }
+
+  // Alt+E: Edit current note
+  if(e.altKey&&e.key==='e'){
+    e.preventDefault();
+    const editBtn=document.getElementById('edit-note-btn');
+    if(editBtn&&editBtn.style.display!=='none'){
+      editBtn.click();
+      toast('⌨️ Edit (Alt+E)');
+    }
+    return;
+  }
+
+  // Alt+H: Show help/shortcuts (could open modal)
+  if(e.altKey&&e.key==='h'){
+    e.preventDefault();
+    const shortcuts=`⌨️ KEYBOARD SHORTCUTS
+Ctrl+N: New lab entry
+Ctrl+Shift+N: New quick note
+Ctrl+Shift+B: New bottle
+Ctrl+K: Search
+Ctrl+L: Lock/Unlock
+Ctrl+S: Save note
+Alt+E: Edit note
+Alt+H: Help
+Escape: Close modals`;
+    alert(shortcuts);
+    return;
+  }
+});
+
+// Task #20: Announce important actions to screen readers
+function announceAction(message){
+  const ariaLive=document.getElementById('aria-live');
+  if(!ariaLive) return;
+  ariaLive.textContent=message;
+  setTimeout(()=>{ ariaLive.textContent=''; }, 3000);
+}
+
 document.getElementById('acc-view').addEventListener('click',e=>{
   const t=e.target.closest('.acc-tab');
   if(t) switchAccTab(t.dataset.atab);
