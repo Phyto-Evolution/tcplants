@@ -3913,34 +3913,14 @@ input, textarea, select {
       </div>
     </div>
     <div class="set-section">
-      <div class="set-section-title" onclick="_toggleSetSection(this)">AI Assistant</div>
+      <div class="set-section-title" onclick="_toggleSetSection(this)">AI — Ravana</div>
       <div class="set-section-body">
-        <!-- Groq key -->
-        <div style="background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:10px">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-            <span style="font-size:13px;font-weight:700">⚡ Groq</span>
-            <span style="font-size:10px;background:var(--gn);color:#0d1117;padding:1px 7px;border-radius:8px;font-weight:700">Default · Free</span>
-          </div>
-          <div style="font-size:11px;color:var(--mu);margin-bottom:6px;line-height:1.5">Runs Llama 3.1 70B — free tier, no billing. Get key at <a href="https://console.groq.com" target="_blank" rel="noopener" style="color:var(--ac)">console.groq.com</a> → API Keys</div>
-          <input type="password" id="set-groq-key-input" placeholder="Paste Groq key (gsk_…)" style="width:100%;margin-bottom:6px">
-          <div style="display:flex;gap:6px">
-            <button class="btn xs ghost" onclick="_setGroqKeyFromSettings()" style="flex:1">💾 Save Key</button>
-            <a href="https://console.groq.com" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
-          </div>
+        <div style="background:rgba(63,185,80,.08);border:1px solid rgba(63,185,80,.25);border-radius:10px;padding:12px;margin-bottom:12px;font-size:12px;line-height:1.7;color:var(--mu)">
+          <span style="color:var(--gn);font-weight:700">✓ Keys live in Cloudflare</span> — API keys are server-side in the <code>plantking</code> Worker. Nothing to manage here.
         </div>
-        <!-- Claude key -->
-        <div style="background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:12px">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-            <span style="font-size:13px;font-weight:700">◇ Claude</span>
-            <span style="font-size:10px;background:var(--pu);color:#fff;padding:1px 7px;border-radius:8px;font-weight:700">High Quality · Optional</span>
-          </div>
-          <div style="font-size:11px;color:var(--mu);margin-bottom:6px;line-height:1.5">Anthropic Claude — for complex queries. Get key at <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener" style="color:var(--ac)">console.anthropic.com</a></div>
-          <input type="password" id="set-ai-key-input" placeholder="Paste Claude key (sk-ant-…)" style="width:100%;margin-bottom:6px">
-          <div style="display:flex;gap:6px">
-            <button class="btn xs ghost" onclick="_setAIKeyFromSettings()" style="flex:1">💾 Save Key</button>
-            <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener" class="btn xs ghost">Get key ↗</a>
-          </div>
-        </div>
+        <div style="font-size:11px;color:var(--mu);margin-bottom:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase">Model</div>
+        <div style="display:flex;flex-direction:column;gap:6px" id="set-model-list"></div>
+        <div id="ai-key-row" style="display:none"></div>
       </div>
     </div>
     <!-- AI Proxy (Cloudflare Worker) -->
@@ -4012,6 +3992,16 @@ input, textarea, select {
     <div class="set-section collapsed">
       <div class="set-section-title" onclick="_toggleSetSection(this)">Voice &amp; Lab Mode</div>
       <div class="set-section-body">
+        <!-- Lab Mode -->
+        <div style="background:rgba(63,185,80,.08);border:1px solid rgba(63,185,80,.25);border-radius:10px;padding:12px;margin-bottom:14px">
+          <div class="set-row" style="margin:0">
+            <div class="set-row-info">
+              <div class="set-row-label" style="color:var(--gn)">🧪 Lab Mode</div>
+              <div class="set-row-sub">Hands-free. Skips confirmation, auto-speaks Ravana's answer, always Whisper, wake word on. Designed for gloves-on lab work.</div>
+            </div>
+            <label class="toggle-switch"><input type="checkbox" id="set-lab-mode" onchange="_toggleLabMode(this.checked)"><div class="toggle-track"></div></label>
+          </div>
+        </div>
         <!-- STT Mode -->
         <div style="font-size:11px;font-weight:700;color:var(--mu);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">Input</div>
         <div class="set-row">
@@ -7795,9 +7785,23 @@ function _initProxySettingsUI(){
   const st=document.getElementById('proxy-status');
   if(st&&_aiProxyURL) st.innerHTML=`Active: <code style="font-size:11px">${_aiProxyURL}</code>`;
 }
-// Sync settings panel dropdown with active model on open
+// Sync settings panel on open
 function _syncAISettingsPanel(){
   _initProxySettingsUI();
+  const list=document.getElementById('set-model-list'); if(!list) return;
+  list.innerHTML=AI_MODEL_ORDER.map(k=>{
+    const m=AI_MODELS[k];
+    const active=_aiModel===k;
+    return `<div onclick="_aiModel='${k}';localStorage.setItem('tcplants_ai_model','${k}');_syncAISettingsPanel();toast('Model: ${m.label}')"
+      style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:${active?'rgba(88,166,255,.1)':'var(--sf2)'};border:1px solid ${active?'var(--ac)':'var(--bd)'};border-radius:8px;cursor:pointer">
+      <span style="font-size:16px">${m.icon}</span>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600">${m.label}</div>
+        <div style="font-size:11px;color:var(--mu)">${k==='groq8'?'Fast, free — voice &amp; quick queries':k==='groq70'?'Deep — protocols, analysis, multi-species':'Best reasoning — hardest problems'}</div>
+      </div>
+      ${active?'<span style="font-size:11px;color:var(--ac);font-weight:700">active</span>':''}
+    </div>`;
+  }).join('');
 }
 
 // ── AI panel maximize ─────────────────────────────────────────
@@ -7990,13 +7994,16 @@ async function askAI(prompt){
     _aiRecordUsage(model, reqRem, tokRem, tokUsed);
     thinking.remove();
     msgs.innerHTML+=`<div class="ai-msg ai">${esc(text).replace(/\n/g,'<br>')}</div>`;
+    msgs.scrollTop=msgs.scrollHeight;
+    return text;
   }catch(e){
     thinking.remove();
     const errMsg=e.status===429?'Rate limited. Try again in a minute.':e.message||'Unknown error';
     msgs.innerHTML+=`<div class="ai-msg ai" style="color:var(--rd)">⚠️ ${esc(errMsg)}</div>`;
     toast('Ravana error: '+errMsg, 'fail');
+    msgs.scrollTop=msgs.scrollHeight;
+    return '';
   }
-  msgs.scrollTop=msgs.scrollHeight;
 }
 
 // Backend proxy call (secure, server-side API keys)
@@ -8093,12 +8100,33 @@ const VOICE_KEY='tcplants_voice_settings';
 function _voiceCfg(){
   try{ return JSON.parse(localStorage.getItem(VOICE_KEY)||'{}'); }catch{ return {}; }
 }
+function _toggleLabMode(on){
+  const c=_voiceCfg();
+  c.labMode=on;
+  if(on){
+    // Lab mode forces: Whisper, no confirm, TTS on, wake word on
+    c.mode='whisper'; c.confirm=false; c.tts=true; c.wake=true;
+    // Update UI to reflect forced settings
+    document.getElementById('set-stt-whisper')?.classList.add('active');
+    document.getElementById('set-stt-native')?.classList.remove('active');
+    const wk=document.getElementById('set-voice-wake'); if(wk) wk.checked=true;
+    const tts=document.getElementById('set-voice-tts'); if(tts) tts.checked=true;
+    const cf=document.getElementById('set-voice-confirm'); if(cf) cf.checked=false;
+    _startWakeListener();
+    toast('🧪 Lab Mode on — Hey Ravana to start');
+  } else {
+    c.labMode=false;
+    toast('Lab Mode off');
+  }
+  localStorage.setItem(VOICE_KEY,JSON.stringify(c));
+}
 function _saveVoiceSettings(){
   const c={
     mode: document.getElementById('set-stt-whisper')?.classList.contains('active')?'whisper':'native',
     confirm: document.getElementById('set-voice-confirm')?.checked??true,
     cmdConfirm: document.getElementById('set-voice-cmd-confirm')?.checked??true,
     wake: document.getElementById('set-voice-wake')?.checked??false,
+    labMode: document.getElementById('set-lab-mode')?.checked??false,
     whisperAutoSend: document.getElementById('set-whisper-autosend')?.checked??true,
     whisperSilence: parseFloat(document.getElementById('set-whisper-silence')?.value||2),
     tts: document.getElementById('set-voice-tts')?.checked??false,
@@ -8147,6 +8175,7 @@ function _initVoiceSettings(){
   if(si('set-voice-gate')){ si('set-voice-gate').value=c.gate??10; si('set-voice-gate').nextElementSibling.textContent=c.gate==0?'Off':(c.gate??10); }
   if(si('set-voice-noise')) si('set-voice-noise').checked=c.noise??true;
   if(si('set-voice-echo')) si('set-voice-echo').checked=c.echo??true;
+  if(si('set-lab-mode')) si('set-lab-mode').checked=c.labMode??false;
   if(si('set-voice-agc')) si('set-voice-agc').checked=c.agc??true;
   // Populate voice list
   const vSel=si('set-voice-voice');
@@ -8505,13 +8534,90 @@ async function _transcribeWhisper(blob){
 function _voiceExecute(transcript){
   const cmd=_parseVoiceCommand(transcript);
   _voiceLog(transcript, cmd?cmd.label:'→ AI', false);
-  if(cmd) return;
-  // Not a command — send to AI (8B Quick only)
+  if(cmd){ if(_voiceCfg().labMode) _ttsSpeak(cmd.label); return; }
+
+  // Lab action commands — check before sending to AI
+  const action=_parseVoiceAction(transcript);
+  if(action){ action(); return; }
+
+  // Send to AI
   const prevModel=_aiModel;
-  if(_aiModel!=='groq8') _aiModel='groq8'; // voice always uses 8B
+  const isLabMode=_voiceCfg().labMode;
+  if(_aiModel!=='groq8') _aiModel='groq8'; // voice always uses 8B Quick
   document.getElementById('ai-panel').classList.add('on');
   _switchAITab('chat');
-  askAI(transcript).then(()=>{ _aiModel=prevModel; });
+
+  // In lab mode: prepend a spoken-response hint so Ravana answers concisely
+  const prompt=isLabMode
+    ? '[VOICE — reply in 1-2 spoken sentences, no markdown, no lists] '+transcript
+    : transcript;
+
+  askAI(prompt).then(resp=>{
+    _aiModel=prevModel;
+    // In lab mode: auto-read the response aloud
+    if(isLabMode&&resp){
+      const clean=(resp||'').replace(/[#*`_~\[\]]/g,'').replace(/∿/g,'').trim();
+      if(clean) _ttsSpeak(clean);
+    }
+  });
+}
+
+// ── Voice lab actions (state-modifying commands) ──────────────
+function _parseVoiceAction(text){
+  const t=text.toLowerCase().trim();
+
+  // "contamination on [species]" / "log contamination [species]"
+  const contamMatch=t.match(/(?:log\s+)?contamin(?:ation|ated)(?:\s+(?:on|for|in))?\s+(.+)/);
+  if(contamMatch){
+    const sp=contamMatch[1].trim();
+    return ()=>{
+      navTo('notes');
+      startNewNote('tc');
+      setTimeout(()=>{
+        const typeEl=document.getElementById('ne-type');
+        if(typeEl){ typeEl.value='Contamination Log'; typeEl.dispatchEvent(new Event('change')); }
+        const spEl=document.getElementById('ne-species');
+        if(spEl){ spEl.value=sp; spEl.dispatchEvent(new Event('input')); }
+        toast('📋 Contamination log — fill details');
+        _ttsSpeak('Contamination log ready for '+sp);
+      }, 300);
+    };
+  }
+
+  // "what's overdue" / "show overdue" — already handled in _CMD_READ but add voice action variant
+  if(/what(?:'s|\s+is)\s+(?:overdue|due|on schedule)|show\s+(?:overdue|schedule)/.test(t)){
+    return ()=>{
+      navTo('schedule');
+      const overdue=[...(S.bottles||[]).filter(b=>b.next_review&&['inoculated','growing'].includes(b.status)&&b.next_review<new Date().toISOString().slice(0,10))];
+      if(!overdue.length){ _ttsSpeak('Nothing overdue. All reviews on track.'); return; }
+      _ttsSpeak(`${overdue.length} overdue. First: ${overdue[0].code}, ${overdue[0].species||'unknown species'}.`);
+    };
+  }
+
+  // "mark [this/bottle] as [status]" / "[status] this bottle"
+  const statusWords={subcultured:'subcultured',transferred:'subcultured',contaminated:'contaminated',contamination:'contaminated',discarded:'discarded',discard:'discarded',growing:'growing',rooting:'rooting'};
+  const markMatch=t.match(/(?:mark\s+(?:this\s+)?(?:bottle\s+)?(?:as\s+)?|set\s+(?:this\s+)?(?:to\s+)?)(\w+)|^(\w+)\s+this/);
+  if(markMatch&&S.curBot){
+    const word=(markMatch[1]||markMatch[2]||'').toLowerCase();
+    const status=statusWords[word];
+    if(status){
+      return async ()=>{
+        const b=S.bottles.find(x=>x.id===S.curBot); if(!b) return;
+        const old=b.status; b.status=status;
+        if(status==='subcultured') b.last_transfer=new Date().toISOString().slice(0,10);
+        load('Saving…');
+        try{
+          S.bottlesSha=await saveBottles(S.bottles,S.bottlesSha);
+          const msg=`${b.code} marked as ${status}`;
+          toast('✓ '+msg); _ttsSpeak(msg);
+          renderBottleList();
+        }catch(e){ b.status=old; toast('Save failed','fail'); }
+        unload();
+      };
+    }
+  }
+
+  return null;
 }
 
 // ── Mic tap handler ───────────────────────────────────────────
