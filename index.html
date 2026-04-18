@@ -3690,7 +3690,7 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
   </div>
 
   <!-- ── RAVANA INSIGHTS ── -->
-  <div class="section" id="sec-insights">
+  <div class="section fullpage" id="sec-insights">
     <main id="insights-main" style="flex:1;overflow-y:auto"></main>
   </div>
 
@@ -5249,7 +5249,425 @@ const LabCalendar={
 };
 
 // 4. RAVANA INSIGHTS
-const RavanaInsights={async analyze(sp){if(!S.analytics)await LabAnalytics.calculate();const a=S.analytics;const am={};Object.keys(a.success_rate.by_species||{}).forEach(s=>{am[s]={success_rate:a.success_rate.by_species[s],contamination:a.contamination.by_species[s]||0,multiplication:a.multiplication.by_species[s]||0}});const s2=sp.toLowerCase();const m=am[s2]||{success_rate:0,contamination:0,multiplication:0};return{species:sp,metrics:m,compared:m.success_rate-a.success_rate.overall,rank:Object.values(am).filter(x=>x.success_rate>m.success_rate).length+1}},async renderInsightsPage(){const c=document.getElementById('insights-main');if(!c)return;if(!S.analytics)await LabAnalytics.calculate();const a=S.analytics;const sl=Object.keys(a.success_rate.by_species||{});c.innerHTML='<div style="padding:20px"><h2>✨ Ravana Insights</h2><select id="ins-sel" onchange="RavanaInsights.showDetail(this.value)" style="width:100%;padding:8px;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;color:var(--tx);margin:12px 0"><option>Select species...</option>'+sl.map(s=>'<option value="'+s+'">'+s+'</option>').join('')+'</select><div id="ins-det"></div></div>'},showDetail(sp){if(!sp)return;RavanaInsights.analyze(sp).then(r=>{const d=document.getElementById('ins-det');d.innerHTML='<div style="padding:16px;background:var(--sf);border:1px solid var(--bd);border-radius:8px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px"><div style="text-align:center;padding:12px;background:var(--sf2);border-radius:6px"><div style="font-size:24px;font-weight:700;color:var(--ac)">'+r.metrics.success_rate+'%</div><div style="font-size:11px;color:var(--mu)">Success Rate</div></div><div style="text-align:center;padding:12px;background:var(--sf2);border-radius:6px"><div style="font-size:24px;font-weight:700;color:var(--gn)">'+r.metrics.multiplication+'x</div><div style="font-size:11px;color:var(--mu)">Multiplication</div></div></div><p style="color:var(--mu);font-size:12px">Rank: #'+r.rank+' in lab ('+Math.round(r.compared*10)/10+'% vs avg)</p></div>'})}};
+// ════════════════════════════════════════════════════════════
+// RAVANA INSIGHTS — Full species intelligence page
+// ════════════════════════════════════════════════════════════
+const RavanaInsights={
+  _sp: null,
+  _typeTimer: null,
+
+  // ── All species across all sections ──────────────────────
+  _allSpecies(){
+    const map={};
+    const add=(name,src)=>{
+      if(!name) return;
+      const k=name.toLowerCase();
+      if(!map[k]) map[k]={name,notes:0,bottles:0,accs:0,gh:0};
+      map[k][src]++;
+    };
+    (S.notes||[]).forEach(n=>add(n.species,'notes'));
+    (S.bottles||[]).forEach(b=>add(b.species,'bottles'));
+    (S.accs||[]).forEach(a=>add(a.species,'accs'));
+    (S.greenhouse||[]).forEach(p=>add(p.species,'gh'));
+    return Object.values(map).sort((a,b)=>(b.notes+b.bottles+b.accs+b.gh)-(a.notes+a.bottles+a.accs+a.gh));
+  },
+
+  // ── Per-species metric computation ───────────────────────
+  _computeMetrics(spName){
+    const k=spName.toLowerCase();
+    const allBots=S.bottles||[];
+    const allNotes=S.notes||[];
+    const now=new Date();
+
+    // Notes for this species
+    const spNotes=allNotes.filter(n=>(n.species||'').toLowerCase()===k);
+    const contamNotes=spNotes.filter(n=>n.type==='Contamination Log');
+    const successNotes=spNotes.filter(n=>!['Contamination Log','Failed Experiment'].includes(n.type));
+    const contamRate=spNotes.length?Math.round(contamNotes.length/spNotes.length*100):null;
+    const successRate=spNotes.length?Math.round(successNotes.length/spNotes.length*100):null;
+
+    // 30-day contamination
+    const recent30=spNotes.filter(n=>n.date&&(Date.now()-new Date(n.date))/86400000<=30);
+    const contam30=recent30.filter(n=>n.type==='Contamination Log');
+    const contamRate30=recent30.length?Math.round(contam30.length/recent30.length*100):null;
+
+    // Multiplication
+    const multiVals=spNotes.filter(n=>n.cultures_out!=null).map(n=>n.cultures_out);
+    const multiAvg=multiVals.length?+(multiVals.reduce((a,b)=>a+b,0)/multiVals.length).toFixed(1):null;
+
+    // Avg cycle days (from completed bottles)
+    const doneBots=allBots.filter(b=>(b.species||'').toLowerCase()===k&&b.status==='subcultured'&&b.date_inoculated&&b.last_transfer);
+    const cycleDays=doneBots.map(b=>Math.floor((new Date(b.last_transfer)-new Date(b.date_inoculated))/86400000)).filter(d=>d>2&&d<200);
+    const avgCycleDays=cycleDays.length?Math.round(cycleDays.reduce((a,b)=>a+b,0)/cycleDays.length):null;
+
+    // Active bottles
+    const activeBots=allBots.filter(b=>(b.species||'').toLowerCase()===k&&['inoculated','growing','subcultured','rooting','hardening'].includes(b.status));
+    const botWithLc=activeBots.map(b=>({b,lc:_calcBottleLifecycle(b)}));
+    const overdue=botWithLc.filter(x=>x.lc&&['transfer_due','delayed'].includes(x.lc?.status)).length;
+
+    // Lab-wide averages for comparison
+    const allSR=allNotes.length?Math.round(allNotes.filter(n=>!['Contamination Log','Failed Experiment'].includes(n.type)).length/allNotes.length*100):0;
+    const allCR=allNotes.length?Math.round(allNotes.filter(n=>n.type==='Contamination Log').length/allNotes.length*100):0;
+
+    // Health score 0-100
+    let score=50;
+    if(successRate!=null) score+=(successRate-allSR)*0.3;
+    if(contamRate!=null) score-=(contamRate-allCR)*0.4;
+    if(multiAvg!=null) score+=Math.min(15,(multiAvg-2)*5);
+    if(overdue===0&&activeBots.length>0) score+=10;
+    if(overdue>0) score-=overdue*5;
+    score=Math.max(0,Math.min(100,Math.round(score)));
+
+    // Contamination trend (month-on-month)
+    const lastMonth=spNotes.filter(n=>n.date&&(Date.now()-new Date(n.date))/86400000<=60&&(Date.now()-new Date(n.date))/86400000>30);
+    const lastMonthCR=lastMonth.length?Math.round(lastMonth.filter(n=>n.type==='Contamination Log').length/lastMonth.length*100):null;
+    const contamTrend=contamRate30!=null&&lastMonthCR!=null?contamRate30-lastMonthCR:null;
+
+    // Most used recipe
+    const recMap={};
+    spNotes.forEach(n=>{if(n.recipe_id)recMap[n.recipe_id]=(recMap[n.recipe_id]||0)+1;});
+    const topRecId=Object.entries(recMap).sort((a,b)=>b[1]-a[1])[0]?.[0];
+    const topRec=topRecId?(S.recs||[]).find(r=>r.id===topRecId):null;
+
+    return{spName,spNotes,contamNotes,contamRate,successRate,contamRate30,contamTrend,multiAvg,avgCycleDays,activeBots,botWithLc,overdue,allSR,allCR,score,topRec,cycleDaysCount:cycleDays.length,multiCount:multiVals.length};
+  },
+
+  // ── Health score badge ────────────────────────────────────
+  _scoreBadge(score){
+    const col=score>=75?'var(--gn)':score>=50?'var(--yw)':'var(--rd)';
+    const label=score>=75?'Healthy':score>=50?'Watch':'At Risk';
+    return `<span style="display:inline-flex;align-items:center;gap:5px;background:${col};color:#0d1117;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:800">${label} ${score}</span>`;
+  },
+
+  // ── Metric card ───────────────────────────────────────────
+  _metricCard(val,label,sub,col,trend){
+    const trendHtml=trend!=null?`<span style="font-size:10px;color:${trend<=0?'var(--gn)':'var(--rd)'}">${trend<=0?'↓':'↑'}${Math.abs(trend)}% vs last month</span>`:'';
+    return `<div style="background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:16px;text-align:center">
+      <div style="font-size:28px;font-weight:800;color:${col};line-height:1">${val??'—'}</div>
+      <div style="font-size:11px;color:var(--mu);margin-top:4px">${label}</div>
+      ${sub?`<div style="font-size:10px;color:var(--mu);margin-top:2px">${sub}</div>`:''}
+      ${trendHtml}
+    </div>`;
+  },
+
+  // ── Render the overview (no species selected) ─────────────
+  _renderOverview(container){
+    const species=this._allSpecies();
+    if(!species.length){
+      container.innerHTML=`<div style="padding:40px;text-align:center;color:var(--mu)">
+        <div style="font-size:48px;margin-bottom:16px">✦</div>
+        <div style="font-size:18px;font-weight:700;margin-bottom:8px">No lab data yet</div>
+        <p>Add notes, bottles, or accessions to unlock species insights.</p>
+      </div>`;
+      return;
+    }
+
+    // Compute metrics for top species
+    const withMetrics=species.slice(0,12).map(s=>({...s,m:this._computeMetrics(s.name)}));
+    const top3=withMetrics.filter(s=>s.m.successRate!=null).sort((a,b)=>b.m.score-a.m.score).slice(0,3);
+    const atRisk=withMetrics.filter(s=>s.m.score<50||(s.m.contamRate!=null&&s.m.contamRate>s.m.allCR+10)||(s.m.overdue>0));
+
+    const allNotes=S.notes||[];
+    const allBots=S.bottles||[];
+    const labContam=allNotes.length?Math.round(allNotes.filter(n=>n.type==='Contamination Log').length/allNotes.length*100):0;
+    const labSuccess=allNotes.length?Math.round(allNotes.filter(n=>!['Contamination Log','Failed Experiment'].includes(n.type)).length/allNotes.length*100):0;
+    const activeBots=allBots.filter(b=>['inoculated','growing'].includes(b.status)).length;
+
+    const spChip=(s,highlight)=>`
+      <div onclick="RavanaInsights.showSpecies('${esc(s.name)}')" style="background:var(--sf);border:1px solid ${highlight?'var(--ac)':'var(--bd)'};border-radius:8px;padding:10px 14px;cursor:pointer;transition:background .12s" onmouseover="this.style.background='var(--sf2)'" onmouseout="this.style.background='var(--sf)'">
+        <div style="font-size:13px;font-weight:600;font-style:italic">${esc(s.name)}</div>
+        <div style="display:flex;gap:8px;margin-top:4px;align-items:center">
+          ${s.m.score!=null?this._scoreBadge(s.m.score):''}
+          <span style="font-size:11px;color:var(--mu)">${s.m.activeBots.length} active${s.m.overdue?` · ⏰ ${s.m.overdue} overdue`:''}</span>
+        </div>
+      </div>`;
+
+    container.innerHTML=`
+      <div style="max-width:900px">
+        <!-- Lab stats strip -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px">
+          ${this._metricCard(species.length,'Species in lab',null,'var(--ac)',null)}
+          ${this._metricCard(activeBots,'Active cultures',null,'var(--gn)',null)}
+          ${this._metricCard(labSuccess+'%','Lab success rate',null,labSuccess>=80?'var(--gn)':'var(--yw)',null)}
+          ${this._metricCard(labContam+'%','Contamination rate',null,labContam<=5?'var(--gn)':'var(--rd)',null)}
+        </div>
+        <!-- Top performers -->
+        ${top3.length?`<div style="margin-bottom:20px">
+          <div style="font-size:10px;font-weight:800;letter-spacing:.1em;color:var(--gn);text-transform:uppercase;margin-bottom:10px">🏆 Top Performers</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">
+            ${top3.map(s=>spChip(s,true)).join('')}
+          </div>
+        </div>`:''}
+        <!-- At risk -->
+        ${atRisk.length?`<div style="margin-bottom:20px">
+          <div style="font-size:10px;font-weight:800;letter-spacing:.1em;color:var(--rd);text-transform:uppercase;margin-bottom:10px">⚠️ Needs Attention</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">
+            ${atRisk.slice(0,4).map(s=>spChip(s,false)).join('')}
+          </div>
+        </div>`:''}
+        <!-- All species -->
+        <div>
+          <div style="font-size:10px;font-weight:800;letter-spacing:.1em;color:var(--mu);text-transform:uppercase;margin-bottom:10px">All Species</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">
+            ${withMetrics.map(s=>spChip(s,false)).join('')}
+          </div>
+        </div>
+      </div>`;
+  },
+
+  // ── Render the full insights page ─────────────────────────
+  async renderInsightsPage(){
+    const c=document.getElementById('insights-main'); if(!c) return;
+    const species=this._allSpecies();
+
+    c.innerHTML=`<div style="height:100%;display:flex;flex-direction:column">
+      <!-- Header + selector -->
+      <div style="padding:16px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:12px;flex-shrink:0;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:20px">✦</span>
+          <h2 style="font-size:18px;font-weight:800;margin:0">Ravana Insights</h2>
+        </div>
+        <select id="ri-sel" onchange="RavanaInsights.showSpecies(this.value)"
+          style="flex:1;min-width:160px;max-width:320px;padding:8px 12px;background:var(--sf2);border:1px solid var(--bd);border-radius:8px;color:var(--tx);font-size:13px;font-style:italic">
+          <option value="">— Select a species —</option>
+          ${species.map(s=>`<option value="${esc(s.name)}"${s.name===this._sp?'selected':''}>${esc(s.name)}</option>`).join('')}
+        </select>
+        <button class="btn sm ghost" id="ri-refresh-btn" onclick="RavanaInsights.showSpecies(document.getElementById('ri-sel').value,true)" style="display:none">↺ Re-analyse</button>
+        <button class="btn sm ghost" onclick="RavanaInsights._sp=null;RavanaInsights.renderInsightsPage()">← Overview</button>
+      </div>
+      <!-- Content -->
+      <div id="ri-content" style="flex:1;overflow-y:auto;padding:20px"></div>
+    </div>`;
+
+    const content=document.getElementById('ri-content');
+    if(this._sp){
+      document.getElementById('ri-sel').value=this._sp;
+      document.getElementById('ri-refresh-btn').style.display='';
+      await this._renderSpecies(this._sp, content);
+    } else {
+      this._renderOverview(content);
+    }
+  },
+
+  // ── Show a species (from selector or chip click) ──────────
+  async showSpecies(name, forceRefresh=false){
+    if(!name) return;
+    this._sp=name;
+    const sel=document.getElementById('ri-sel');
+    if(sel) sel.value=name;
+    const refreshBtn=document.getElementById('ri-refresh-btn');
+    if(refreshBtn) refreshBtn.style.display='';
+    const content=document.getElementById('ri-content');
+    if(!content){ await this.renderInsightsPage(); return; }
+    await this._renderSpecies(name, content, forceRefresh);
+  },
+
+  // ── Full species analysis page ────────────────────────────
+  async _renderSpecies(spName, container, forceRefresh=false){
+    const m=this._computeMetrics(spName);
+    const acc=(S.accs||[]).find(a=>(a.species||'').toLowerCase()===spName.toLowerCase());
+    const recentNotes=[...(S.notes||[])].filter(n=>(n.species||'').toLowerCase()===spName.toLowerCase()).sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5);
+    const journalEntries=(S.journal||[]).filter(e=>(e.body||'').toLowerCase().includes(spName.toLowerCase())||(e.title||'').toLowerCase().includes(spName.toLowerCase())).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,3);
+
+    // Rank among all species
+    const allSp=this._allSpecies().map(s=>this._computeMetrics(s.name));
+    const rank=allSp.filter(x=>x.score>m.score).length+1;
+
+    // Contamination bar chart (last 6 months)
+    const barData=this._buildMonthlyBars(spName);
+
+    const contamCol=m.contamRate==null?'var(--mu)':m.contamRate<=m.allCR?'var(--gn)':m.contamRate<=m.allCR+10?'var(--yw)':'var(--rd)';
+    const successCol=m.successRate==null?'var(--mu)':m.successRate>=m.allSR?'var(--gn)':m.successRate>=m.allSR-10?'var(--yw)':'var(--rd)';
+    const multiCol=m.multiAvg==null?'var(--mu)':m.multiAvg>=4?'var(--gn)':m.multiAvg>=2?'var(--ac)':'var(--mu)';
+    const cycleCol=m.avgCycleDays==null?'var(--mu)':'var(--ac)';
+
+    container.innerHTML=`
+      <!-- Title + score -->
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px">
+        <div>
+          <div style="font-size:22px;font-weight:800;font-style:italic">${esc(spName)}</div>
+          <div style="font-size:12px;color:var(--mu);margin-top:4px">
+            Rank #${rank} in lab · ${m.spNotes.length} notes · ${m.activeBots.length} active bottle${m.activeBots.length!==1?'s':''}
+            ${acc?` · <a style="color:var(--ac);cursor:pointer" onclick="navTo('registry');openAccession('${acc.id}')">Accession ↗</a>`:''}
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          ${this._scoreBadge(m.score)}
+          <button class="btn xs ghost" onclick="navTo('bottles');setBotFilter('all');S.bottleSearch='${esc(spName)}';renderBottleList()" style="font-size:11px">🫙 Bottles →</button>
+          <button class="btn xs ghost" onclick="navTo('notes');document.getElementById('note-search').value='${esc(spName)}';S.searchQ='${esc(spName)}';renderNoteList()" style="font-size:11px">📋 Notes →</button>
+        </div>
+      </div>
+
+      <!-- Metric cards -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px">
+        ${this._metricCard(m.successRate!=null?m.successRate+'%':'—','Success rate',`Lab avg: ${m.allSR}%`,successCol,null)}
+        ${this._metricCard(m.contamRate!=null?m.contamRate+'%':'—','Contamination',`30d: ${m.contamRate30??'—'}%`,contamCol,m.contamTrend)}
+        ${this._metricCard(m.multiAvg!=null?m.multiAvg+'×':'—','Multiplication',m.multiCount>=2?`${m.multiCount} passages recorded`:'Need more data',multiCol,null)}
+        ${this._metricCard(m.avgCycleDays!=null?m.avgCycleDays+'d':'—','Avg cycle',m.cycleDaysCount>=2?`${m.cycleDaysCount} completed cycles`:'Insufficient data',cycleCol,null)}
+      </div>
+
+      <!-- 2-col layout: data left, Ravana right -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+
+        <!-- LEFT: Bottles + Monthly bars -->
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <!-- Contamination monthly bars -->
+          ${barData.length?`<div style="background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px">
+            <div style="font-size:10px;font-weight:800;letter-spacing:.08em;color:var(--mu);text-transform:uppercase;margin-bottom:10px">Contamination — 6 months</div>
+            <div style="display:flex;align-items:flex-end;gap:4px;height:48px">
+              ${barData.map(b=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+                <div style="width:100%;border-radius:2px 2px 0 0;background:${b.rate>10?'var(--rd)':b.rate>5?'var(--yw)':'var(--gn)'};height:${Math.max(4,Math.round(b.rate/Math.max(...barData.map(x=>x.rate),10)*44))}px" title="${b.label}: ${b.rate}%"></div>
+                <span style="font-size:8px;color:var(--mu)">${b.label}</span>
+              </div>`).join('')}
+            </div>
+          </div>`:''}
+
+          <!-- Active bottles -->
+          ${m.botWithLc.length?`<div style="background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px">
+            <div style="font-size:10px;font-weight:800;letter-spacing:.08em;color:var(--mu);text-transform:uppercase;margin-bottom:8px">Active Bottles (${m.botWithLc.length})</div>
+            ${m.botWithLc.sort((a,b)=>(b.lc?.pct??0)-(a.lc?.pct??0)).slice(0,6).map(({b,lc})=>`
+              <div onclick="navTo('bottles');openBottle('${b.id}')" style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--sf2);cursor:pointer">
+                <div style="flex:1;min-width:0">
+                  <span style="font-size:12px;font-weight:600">${esc(b.code)}</span>
+                  <span style="font-size:11px;color:var(--mu);margin-left:6px">${esc(b.stage||b.status)}</span>
+                </div>
+                ${lc&&!lc.terminal?`<div style="text-align:right;flex-shrink:0">
+                  <div style="width:60px;height:4px;background:var(--sf3);border-radius:2px">
+                    <div style="height:4px;border-radius:2px;background:${lc.col};width:${lc.pct}%"></div>
+                  </div>
+                  <div style="font-size:10px;color:${lc.col};margin-top:1px">${lc.label}</div>
+                </div>`:''}
+              </div>`).join('')}
+            ${m.botWithLc.length>6?`<div style="font-size:11px;color:var(--mu);margin-top:4px">+${m.botWithLc.length-6} more</div>`:''}
+          </div>`:'<div style="background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px;color:var(--mu);font-size:13px">No active bottles for this species.</div>'}
+
+          <!-- Recent notes -->
+          ${recentNotes.length?`<div style="background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px">
+            <div style="font-size:10px;font-weight:800;letter-spacing:.08em;color:var(--mu);text-transform:uppercase;margin-bottom:8px">Recent Notes</div>
+            ${recentNotes.map(n=>`<div onclick="navTo('notes');openNote('${n.id}')" style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid var(--sf2);cursor:pointer">
+              <div style="width:6px;height:6px;border-radius:50%;flex-shrink:0;background:${n.type==='Contamination Log'?'var(--rd)':'var(--ac)'}"></div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(n.title)}</div>
+                <div style="font-size:10px;color:var(--mu)">${fmtDateShort(n.date)}${n.type?` · ${esc(n.type)}`:''}</div>
+              </div>
+            </div>`).join('')}
+          </div>`:''}
+
+          <!-- Journal mentions -->
+          ${journalEntries.length?`<div style="background:var(--sf);border:1px solid rgba(188,140,255,.3);border-radius:10px;padding:14px">
+            <div style="font-size:10px;font-weight:800;letter-spacing:.08em;color:var(--pu);text-transform:uppercase;margin-bottom:8px">📓 Journal mentions</div>
+            ${journalEntries.map(e=>`<div onclick="navTo('journal');openJournalEntry('${e.id}')" style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid var(--sf2);cursor:pointer">
+              <span style="font-size:10px;color:${e.parsed?'var(--gn)':'var(--mu)'}">${e.parsed?'✦':'●'}</span>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(e.title||'Untitled')}</div>
+                <div style="font-size:10px;color:var(--mu)">${fmtJournalTs(e.date)}</div>
+              </div>
+            </div>`).join('')}
+          </div>`:''}
+        </div>
+
+        <!-- RIGHT: Ravana analysis -->
+        <div style="background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:16px;display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-shrink:0">
+            <div style="font-size:12px;font-weight:800;letter-spacing:.06em;color:var(--ac);text-transform:uppercase">✦ Ravana's Analysis</div>
+            <button class="btn xs ghost" id="ri-ask-btn" onclick="RavanaInsights._runAnalysis('${esc(spName)}')" style="font-size:11px">▶ Analyse</button>
+          </div>
+          <div id="ri-analysis" style="flex:1;font-size:13px;line-height:1.8;color:var(--mu);overflow-y:auto">
+            <em>Tap ▶ Analyse to have Ravana read your data and provide insights on this species.</em>
+          </div>
+          <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--sf2);flex-shrink:0">
+            <button class="btn xs green" onclick="askAI('Give me a detailed analysis of ${esc(spName)} in my TC lab. Focus on what is working, what risks exist, and what I should do next.')" style="width:100%;font-size:12px">💬 Ask Ravana directly</button>
+          </div>
+        </div>
+      </div>`;
+
+    // Auto-run analysis if fresh page load (not forced refresh = use cache)
+    if(!forceRefresh && !document.getElementById('ri-analysis').dataset.loaded){
+      // Don't auto-fire to save API calls — user taps Analyse
+    }
+    if(forceRefresh) this._runAnalysis(spName);
+  },
+
+  // ── Build 6-month contamination bar data ─────────────────
+  _buildMonthlyBars(spName){
+    const k=spName.toLowerCase();
+    const bars=[];
+    const now=new Date();
+    for(let i=5;i>=0;i--){
+      const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+      const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+      const label=d.toLocaleDateString('en-IN',{month:'short'});
+      const month=(S.notes||[]).filter(n=>(n.species||'').toLowerCase()===k&&n.date?.slice(0,7)===key);
+      const rate=month.length?Math.round(month.filter(n=>n.type==='Contamination Log').length/month.length*100):0;
+      bars.push({label,rate,count:month.length});
+    }
+    return bars;
+  },
+
+  // ── AI analysis with typewriter effect ───────────────────
+  async _runAnalysis(spName){
+    const el=document.getElementById('ri-analysis'); if(!el) return;
+    const btn=document.getElementById('ri-ask-btn'); if(btn){btn.disabled=true;btn.textContent='…';}
+    el.innerHTML=`<div style="color:var(--mu);font-style:italic">🔬 Ravana is reading your data…</div>`;
+
+    const m=this._computeMetrics(spName);
+    const topSupply=this._findBestSupplyForSpecies(spName);
+    const context=`Species under analysis: ${spName}
+
+YOUR LAB DATA FOR THIS SPECIES:
+- Notes: ${m.spNotes.length} total · ${m.contamNotes.length} contamination events
+- Success rate: ${m.successRate??'N/A'}% (lab average: ${m.allSR}%)
+- Contamination rate: ${m.contamRate??'N/A'}% (lab average: ${m.allCR}%)
+- 30-day contamination: ${m.contamRate30??'N/A'}% · Trend: ${m.contamTrend!=null?(m.contamTrend<=0?`↓ improving ${Math.abs(m.contamTrend)}%`:`↑ worsening ${m.contamTrend}%`):'unknown'}
+- Multiplication factor: ${m.multiAvg!=null?m.multiAvg+'× avg':'no data'} (${m.multiCount} passages)
+- Avg cycle days: ${m.avgCycleDays??'unknown'} (${m.cycleDaysCount} completed cycles)
+- Active bottles: ${m.activeBots.length} · Overdue: ${m.overdue}
+- Health score: ${m.score}/100 · Rank: #${this._allSpecies().map(s=>this._computeMetrics(s.name)).filter(x=>x.score>m.score).length+1} in lab
+${m.topRec?`- Best recipe: ${m.topRec.name}${m.topRec.pgr?` (${m.topRec.pgr})`:''}`:''}
+${topSupply?`- Best supply batch: ${topSupply.name} (${topSupply.p.contamRate}% contam)`:'' }
+
+RECENT CONTAMINATION EVENTS:
+${m.contamNotes.slice(-3).map(n=>`- ${fmtDateShort(n.date)}: "${n.title}"`).join('\n')||'None recent'}
+
+[VOICE RESPONSE OFF — full analysis mode. Use headers, be specific, cite actual numbers from the data. Format: Assessment → Observations → Recommendations → Watch For. End with ∿]`;
+
+    try{
+      const raw=await askAI(context);
+      if(!raw){ el.innerHTML='<em style="color:var(--mu)">No response from Ravana.</em>'; return; }
+      // Typewriter effect
+      el.innerHTML='';
+      el.dataset.loaded='1';
+      this._typeOut(el, raw);
+    }catch(e){
+      el.innerHTML=`<span style="color:var(--rd)">Analysis failed: ${esc(e.message)}</span>`;
+    }
+    if(btn){btn.disabled=false;btn.textContent='↺ Re-analyse';}
+  },
+
+  _typeOut(el, text){
+    if(this._typeTimer) clearInterval(this._typeTimer);
+    const words=text.split(/(\s+)/);
+    let i=0; let built='';
+    this._typeTimer=setInterval(()=>{
+      if(i>=words.length){ clearInterval(this._typeTimer); this._typeTimer=null;
+        // Render final as markdown
+        el.innerHTML=sanitizeMarkdown(text); return; }
+      built+=words[i++];
+      // Simple line-break preview while typing
+      el.textContent=built;
+      el.scrollTop=el.scrollHeight;
+    },18);
+  },
+
+  _findBestSupplyForSpecies(spName){
+    const supplies=S.supplies||[];
+    if(!supplies.length) return null;
+    const withPerf=supplies.map(s=>({s,p:SupplyInventory.calcPerformance(s)})).filter(x=>x.p&&x.p.bottles>=2);
+    if(!withPerf.length) return null;
+    const best=withPerf.sort((a,b)=>a.p.contamRate-b.p.contamRate)[0];
+    return best?{name:best.s.name,p:best.p}:null;
+  }
+};
 
 // 5. BATCH OPS
 const BatchOps={
