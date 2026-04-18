@@ -3567,7 +3567,8 @@ input, textarea, select {
         <div id="journal-editor" style="display:none;height:100%;display:flex;flex-direction:column">
           <div style="padding:16px 20px;border-bottom:1px solid var(--bd);flex-shrink:0;display:flex;gap:10px;align-items:center">
             <input type="text" id="je-title" placeholder="Entry title (optional)" style="flex:1;padding:8px 12px;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-size:14px;font-weight:600">
-            <input type="text" id="je-tags" placeholder="tags, comma-separated" style="width:200px;padding:8px 12px;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-size:12px">
+            <input type="text" id="je-tags" placeholder="tags, comma-separated" style="width:180px;padding:8px 12px;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-size:12px">
+            <button class="btn sm ghost" id="je-mic-btn" onclick="_journalMicTap()" title="Dictate into journal (Native or Whisper)" style="padding:8px 10px;font-size:16px">🎤</button>
             <button class="btn sm green" onclick="saveJournalEntry()">Save</button>
             <button class="btn sm ghost" onclick="cancelJournalEdit()">Cancel</button>
           </div>
@@ -4661,7 +4662,10 @@ function renderJournalList(){
   }
   el.innerHTML=list.map(e=>`
     <div class="j-list-item${S.curJournal===e.id?' active':''}" onclick="openJournalEntry('${e.id}')">
-      <div class="j-list-title">${esc(e.title||'Untitled')}</div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div class="j-list-title" style="flex:1">${esc(e.title||'Untitled')}</div>
+        <span title="${e.parsed?'Parsed by Ravana':'Not yet parsed'}" style="font-size:9px;flex-shrink:0;color:${e.parsed?'var(--gn)':'var(--sf3)'}">${e.parsed?'✦':'●'}</span>
+      </div>
       <div class="j-list-date">${fmtDateShort(e.date)}</div>
       ${e.tags?.length?`<div class="j-list-tags">${e.tags.slice(0,3).map(t=>`<span class="j-tag">${esc(t)}</span>`).join('')}</div>`:''}
     </div>`).join('');
@@ -4686,9 +4690,17 @@ function openJournalEntry(id){
   const tags=e.tags?.length?` · ${e.tags.map(t=>`#${t}`).join(' ')}`:'';
   document.getElementById('jv-meta').textContent=fmtDateShort(e.date)+tags;
   document.getElementById('jv-body').innerHTML=sanitizeMarkdown(e.body||'');
-  // Clear any previous parse results
+  // Show stored parse results if already parsed, clear otherwise
   const pr=document.getElementById('journal-parse-results');
-  pr.style.display='none'; pr.innerHTML='';
+  const parseBtn=document.getElementById('journal-parse-btn');
+  if(e.parsed && e.extracts && (e.extracts.recipes?.length||e.extracts.species?.length||e.extracts.notes?.length||e.extracts.summary)){
+    window._journalParseData=e.extracts;
+    _renderJournalExtracts(e.extracts);
+    if(parseBtn) parseBtn.textContent='✨ Re-parse with Ravana';
+  } else {
+    pr.style.display='none'; pr.innerHTML='';
+    if(parseBtn) parseBtn.textContent='✨ Parse with Ravana';
+  }
 }
 
 function startNewJournalEntry(){
@@ -4721,6 +4733,56 @@ function cancelJournalEdit(){
   else showJournalEmpty();
 }
 
+// ── Journal STT ───────────────────────────────────────────────
+let _journalSR=null;
+function _journalMicTap(){
+  const cfg=_voiceCfg();
+  const btn=document.getElementById('je-mic-btn');
+  const textarea=document.getElementById('je-body');
+  if(!textarea) return;
+
+  if(cfg.mode==='whisper'){
+    // Whisper mode — record then transcribe and APPEND
+    if(_whisperRec&&_whisperRec.state==='recording'){
+      _stopWhisperSTT();
+      btn.textContent='🎤'; btn.style.color='';
+      return;
+    }
+    // Override Whisper callback to append to journal textarea instead of AI panel
+    const origTranscribe=_transcribeWhisper.toString(); // keep reference
+    window._journalWhisperMode=true;
+    _startWhisperSTT();
+    btn.textContent='⏹ Stop'; btn.style.color='var(--rd)';
+    return;
+  }
+
+  // Native STT
+  if(_journalSR){ try{_journalSR.stop();}catch{} _journalSR=null; btn.textContent='🎤'; btn.style.color=''; return; }
+  if(!('SpeechRecognition' in window||'webkitSpeechRecognition' in window)){
+    toast('Speech recognition not available — try Whisper mode','fail'); return;
+  }
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  _journalSR=new SR();
+  _journalSR.lang=_getVoiceLanguage();
+  _journalSR.continuous=false;
+  _journalSR.interimResults=true;
+  btn.textContent='⏹ Stop'; btn.style.color='var(--rd)';
+  const before=textarea.value;
+  _journalSR.onresult=e=>{
+    const results=Array.from(e.results);
+    const finals=results.filter(r=>r.isFinal).map(r=>r[0].transcript).join('');
+    const interim=results.filter(r=>!r.isFinal).map(r=>r[0].transcript).join('');
+    textarea.value=before+(before&&!before.endsWith('\n')?'\n':'')+finals+interim;
+    if(results.some(r=>r.isFinal)){
+      _journalSR=null; btn.textContent='🎤'; btn.style.color='';
+    }
+  };
+  _journalSR.onerror=()=>{ _journalSR=null; btn.textContent='🎤'; btn.style.color=''; };
+  _journalSR.onend=()=>{ _journalSR=null; btn.textContent='🎤'; btn.style.color=''; };
+  try{ _journalSR.start(); }catch(e){ toast('Could not start microphone: '+e.message,'fail'); _journalSR=null; btn.textContent='🎤'; btn.style.color=''; }
+}
+
+
 async function saveJournalEntry(){
   const title=document.getElementById('je-title').value.trim();
   const body=document.getElementById('je-body').value.trim();
@@ -4730,9 +4792,13 @@ async function saveJournalEntry(){
   let entry;
   if(S.editingJournal){
     entry=S.journal.find(x=>x.id===S.editingJournal);
-    if(entry){ entry.title=title||today; entry.body=body; entry.tags=tags; }
+    if(entry){
+      const bodyChanged=entry.body!==body;
+      entry.title=title||today; entry.body=body; entry.tags=tags;
+      if(bodyChanged){ entry.parsed=false; entry.parsedAt=null; entry.summary=null; entry.extracts=[]; }
+    }
   } else {
-    entry={id:'j-'+uid(), date:today, title:title||today, body, tags};
+    entry={id:'j-'+uid(), date:today, title:title||today, body, tags, parsed:false, parsedAt:null, summary:null, extracts:[]};
     S.journal.unshift(entry);
   }
   load('Saving journal…');
@@ -4783,16 +4849,19 @@ ${e.body}`;
 
   try{
     const raw=await askAI(prompt);
-    // Extract JSON from response (Ravana might wrap it in markdown)
     const jsonMatch=raw.match(/\{[\s\S]*\}/);
     if(!jsonMatch) throw new Error('No structured data found in this entry');
     const data=JSON.parse(jsonMatch[0]);
+    // Save to entry
+    e.parsed=true; e.parsedAt=new Date().toISOString(); e.extracts=data; e.summary=data.summary||null;
+    S.journalSha=await saveJournal(S.journal, S.journalSha);
+    renderJournalList();
     _renderJournalExtracts(data);
   }catch(err){
     pr.style.display='block';
     pr.innerHTML=`<div style="color:var(--mu);font-size:13px">No extractable data found, or entry needs more specific details. ${esc(err.message||'')}</div>`;
   }
-  btn.disabled=false; btn.textContent='✨ Parse with Ravana';
+  btn.disabled=false; btn.textContent='✨ Re-parse with Ravana';
 }
 
 function _renderJournalExtracts(data){
@@ -4911,6 +4980,78 @@ function _journalAddSpecies(idx){
       toast('Species pre-filled from journal ✓');
     },300);
   },200);
+}
+
+// ── Overnight journal batch parser ────────────────────────────
+// Runs at 1am IST (UTC+5:30) = 19:30 UTC, or on first login after midnight
+// if there are unparsed entries.
+
+const JOURNAL_PARSE_KEY='tcplants_journal_last_batch';
+
+async function _batchParseUnparsedJournal(silent=false){
+  const unparsed=(S.journal||[]).filter(e=>!e.parsed && e.body && e.body.trim().length>30);
+  if(!unparsed.length){ if(!silent) toast('All journal entries already parsed'); return; }
+  if(!silent) toast(`📓 Parsing ${unparsed.length} journal entr${unparsed.length>1?'ies':'y'}…`);
+
+  let parsedCount=0;
+  for(const e of unparsed){
+    try{
+      const prompt=`Parse this lab journal entry and extract structured data.
+Return ONLY a JSON object with these optional arrays:
+{"summary":"1 sentence summary","recipes":[{"name":"","base":"","pgr":"","ph":null,"sucrose":null,"gelrite":null,"autoclave":"","target":"","notes":""}],"species":[{"name":"","family":"","category":"","notes":""}],"notes":[{"title":"","type":"TC Observation","species":"","stage":"","body":""}]}
+Omit arrays if nothing found. Title: ${e.title||'Untitled'}\nDate: ${e.date}\n\n${e.body.slice(0,2000)}`;
+      const raw=await askAI(prompt);
+      const jsonMatch=raw.match(/\{[\s\S]*\}/);
+      if(jsonMatch){
+        const data=JSON.parse(jsonMatch[0]);
+        e.parsed=true; e.parsedAt=new Date().toISOString(); e.extracts=data; e.summary=data.summary||null;
+        parsedCount++;
+      }
+    }catch(_){}
+    // Small delay between calls to respect rate limits
+    await new Promise(r=>setTimeout(r,600));
+  }
+
+  if(parsedCount>0){
+    try{ S.journalSha=await saveJournal(S.journal,S.journalSha); }catch(_){}
+    renderJournalList();
+    // Re-show current entry if it was just parsed
+    if(S.curJournal){const e=S.journal.find(x=>x.id===S.curJournal);if(e?.parsed) openJournalEntry(S.curJournal);}
+    // Stamp last batch run time
+    localStorage.setItem(JOURNAL_PARSE_KEY, new Date().toISOString());
+    // Trigger summary dump so lab-summary.json picks up parsed data
+    _doWriteSummary && _doWriteSummary();
+    toast(`✦ Ravana parsed ${parsedCount} journal entr${parsedCount>1?'ies':'y'}`);
+  } else if(!silent){
+    toast('Nothing parseable in unparsed entries');
+  }
+}
+
+function _scheduleOvernightJournalParse(){
+  // Check every minute if it's 1am IST (UTC+5:30 = UTC+330min)
+  // IST 01:00 = UTC 19:30 → fire when local IST hour===1 && minute<2
+  const check=()=>{
+    const now=new Date();
+    // IST offset: UTC+5:30
+    const istMs=now.getTime()+(5.5*3600000);
+    const ist=new Date(istMs);
+    if(ist.getHours()===1 && ist.getMinutes()<2){
+      const lastRun=localStorage.getItem(JOURNAL_PARSE_KEY);
+      const lastDate=lastRun?new Date(lastRun).toDateString():'';
+      if(lastDate!==ist.toDateString()){
+        _batchParseUnparsedJournal(true);
+      }
+    }
+  };
+  setInterval(check, 60000);
+  // Also check on login: if last run wasn't today and there are unparsed entries, run silently
+  const lastRun=localStorage.getItem(JOURNAL_PARSE_KEY);
+  const today=new Date().toDateString();
+  const hasUnparsed=(S.journal||[]).some(e=>!e.parsed&&e.body?.trim().length>30);
+  if(hasUnparsed && lastRun!==today){
+    // Run in background 8s after login — doesn't block the UI
+    setTimeout(()=>_batchParseUnparsedJournal(true), 8000);
+  }
 }
 
 // 3. LAB SCHEDULE
@@ -8867,6 +9008,14 @@ async function _transcribeWhisper(blob){
     _aiRecordUsage('whisper-large-v3', null, null, 0);
     const t=d.text?.trim();
     if(!t){ toast('No speech detected','fail'); return; }
+    // Journal mode: append to textarea instead of AI panel
+    if(window._journalWhisperMode){
+      window._journalWhisperMode=false;
+      const ta=document.getElementById('je-body');
+      if(ta){ ta.value=(ta.value+(ta.value&&!ta.value.endsWith('\n')?'\n':'')+t).trim()+'\n'; toast('📓 Added to journal'); }
+      const btn=document.getElementById('je-mic-btn'); if(btn){ btn.textContent='🎤'; btn.style.color=''; }
+      return;
+    }
     // ALWAYS show confirmation before sending (Task #5)
     _nativePending=t;
     document.getElementById('vc-heard-text').textContent=t;
@@ -11349,6 +11498,7 @@ async function login(){
     // journal loaded at login via loadJournal() in the data Promise.all above
     SupplyInventory.items = JSON.parse(localStorage.getItem('tcplants_supply') || '[]');
     // alerts render automatically via _renderDashboard() on login
+    _scheduleOvernightJournalParse();
     fetchWeather();
     if(window._wxInterval) clearInterval(window._wxInterval);
     window._wxInterval = setInterval(fetchWeather, 60000);
