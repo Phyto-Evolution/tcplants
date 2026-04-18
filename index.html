@@ -4357,14 +4357,16 @@ async function loadEncryptedKeys(){
     if(!f) return;
     _keysSha=f.sha;
     const obj=JSON.parse(await dec(ghDec(f.content)));
-    if(obj.claudeKey) localStorage.setItem('tcplants_claude_key',obj.claudeKey);
-    if(obj.groqKey)   localStorage.setItem('tcplants_groq_key',obj.groqKey);
+    if(obj.claudeKey)  localStorage.setItem('tcplants_claude_key',obj.claudeKey);
+    if(obj.groqKey)    localStorage.setItem('tcplants_groq_key',obj.groqKey);
+    if(obj.proxyURL)  { localStorage.setItem('tcplants_ai_proxy_url',obj.proxyURL); _aiProxyURL=obj.proxyURL; }
   }catch(e){ console.warn('keys.enc load failed:',e.message); }
 }
 async function saveEncryptedKeys(){
   const obj={
     claudeKey: localStorage.getItem('tcplants_claude_key')||'',
-    groqKey:   localStorage.getItem('tcplants_groq_key')||''
+    groqKey:   localStorage.getItem('tcplants_groq_key')||'',
+    proxyURL:  localStorage.getItem('tcplants_ai_proxy_url')||''
   };
   await ghPut(KEYS_F, await enc(JSON.stringify(obj)), _keysSha, 'lab: update api keys');
   const f=await ghGet(KEYS_F); if(f) _keysSha=f.sha;
@@ -7927,7 +7929,7 @@ async function _buildAIContext(){
 }
 
 // Configure API proxy (set via settings or detect from environment)
-let _aiProxyURL = localStorage.getItem('tcplants_ai_proxy_url') || '';
+let _aiProxyURL = localStorage.getItem('tcplants_ai_proxy_url') || 'https://plantking.ape.workers.dev';
 
 async function askAI(prompt){
   const panel=document.getElementById('ai-panel');
