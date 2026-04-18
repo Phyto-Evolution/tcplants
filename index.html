@@ -1295,6 +1295,21 @@ main > .dview, main > .editor{ margin:0 auto; }
 .bot-status-badge.discarded{background:rgba(48,54,61,.4);color:var(--mu)}
 .bot-qr-wrap{padding:14px 16px;display:flex;align-items:flex-start;gap:16px;border-bottom:1px solid var(--bd)}
 .bot-qr-wrap canvas{border-radius:6px;background:#fff;padding:6px}
+/* Label matrix panel */
+#bot-label-panel{display:none;padding:16px;border-bottom:1px solid var(--bd);background:var(--sf2)}
+#bot-label-panel.on{display:block}
+.lbl-cfg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.lbl-cfg-card{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:10px;cursor:pointer;transition:border-color .15s;position:relative}
+.lbl-cfg-card:hover{border-color:var(--ac)}
+.lbl-cfg-card.selected{border-color:var(--ac);background:rgba(88,166,255,.08)}
+.lbl-cfg-card input[type=checkbox]{position:absolute;top:8px;right:8px}
+.lbl-preview{background:#fff;border-radius:4px;margin-bottom:6px;display:flex;gap:4px;align-items:flex-start;padding:5px}
+.lbl-preview-qr{background:#333;border-radius:2px;flex-shrink:0}
+.lbl-preview-text{display:flex;flex-direction:column;gap:2px;min-width:0}
+.lbl-preview-line{background:#888;border-radius:1px;height:3px}
+.lbl-cfg-name{font-size:11px;font-weight:700;color:var(--tx)}
+.lbl-cfg-sub{font-size:10px;color:var(--mu)}
+@media(max-width:500px){.lbl-cfg-grid{grid-template-columns:repeat(2,1fr)}}
 .bot-spec-table{width:100%;border-collapse:collapse;font-size:13px}
 .bot-spec-table td{padding:5px 0;vertical-align:top}
 .bot-spec-table td:first-child{color:var(--mu);width:120px;padding-right:12px}
@@ -10993,11 +11008,13 @@ function openBottle(id){
           ${flairsHtml?`<div style="margin-top:6px">${flairsHtml}</div>`:''}
         </div>
         <div style="display:flex;gap:6px;flex-shrink:0">
+          <button class="btn sm ghost" onclick="_toggleLabelPanel('${id}')">🏷 Labels</button>
           <button class="btn sm ghost" onclick="startEditBottle('${id}')">✏️ Edit</button>
           <button class="btn sm danger" onclick="deleteBottle('${id}')">🗑</button>
         </div>
       </div>
     </div>
+    <div id="bot-label-panel"></div>
     <div class="bot-qr-wrap">
       <canvas id="bot-qr-${id}"></canvas>
       <div>
@@ -11352,6 +11369,191 @@ function _botLabelHtml(b){
         <span class="bot-lbl-ts">${_fmtTs(b.date_prepared)}</span>
       </div>
     </div>`;
+}
+
+// ════════════════════════════════════════════════════════════
+// BULK LABEL MATRIX
+// ════════════════════════════════════════════════════════════
+
+const LABEL_CONFIGS=[
+  {id:'t58-full',   name:'58mm Full',     sub:'Code · Species · Stage · Date',    w:'58mm', qr:88, fields:['code','species','flair','stage','date'],       perRow:1},
+  {id:'t58-compact',name:'58mm Compact',  sub:'Code · Species only',              w:'58mm', qr:66, fields:['code','species'],                              perRow:1},
+  {id:'t62-full',   name:'62mm Full',     sub:'All fields + recipe',              w:'62mm', qr:100,fields:['code','species','flair','stage','date'],        perRow:1},
+  {id:'a4-4up',     name:'A4 · 4-up',     sub:'4 labels per row',                 w:'a4',   qr:88, fields:['code','species','flair','stage','date'],        perRow:4},
+  {id:'a4-2up',     name:'A4 · 2-up',     sub:'2 per row + next review',          w:'a4',   qr:120,fields:['code','species','flair','stage','date','review'],perRow:2},
+  {id:'a4-qr',      name:'A4 · QR only',  sub:'QR + code, 4 per row',             w:'a4',   qr:150,fields:['code'],                                        perRow:4},
+];
+
+// Track selected configs per session
+let _lblSelected=new Set(['t58-full']);
+
+function _toggleLabelPanel(bottleId){
+  const panel=document.getElementById('bot-label-panel'); if(!panel) return;
+  if(panel.classList.contains('on')){ panel.classList.remove('on'); return; }
+  panel.classList.add('on');
+  _renderLabelPanel(bottleId);
+}
+
+function _renderLabelPanel(bottleId){
+  const panel=document.getElementById('bot-label-panel'); if(!panel) return;
+  const b=S.bottles.find(x=>x.id===bottleId); if(!b) return;
+  const hasBatch=!!(b.batch_id);
+  const batchCount=hasBatch?S.bottles.filter(x=>x.batch_id===b.batch_id).length:0;
+  const visCount=S.bottles.filter(x=>{
+    if(S.bottleFilter&&S.bottleFilter!=='all'&&x.status!==S.bottleFilter) return false;
+    const q=(S.bottleSearch||'').toLowerCase();
+    if(q&&!(x.code||'').toLowerCase().includes(q)&&!(x.species||'').toLowerCase().includes(q)) return false;
+    return true;
+  }).length;
+
+  // Config grid — each card shows a mini visual preview
+  const cfgCards=LABEL_CONFIGS.map(cfg=>{
+    const sel=_lblSelected.has(cfg.id);
+    // Mini preview: QR placeholder + text lines
+    const qrSz=cfg.w==='a4'?14:16;
+    const lines=cfg.fields.includes('species')?3:1;
+    const preview=`<div class="lbl-preview" style="height:${qrSz+10}px">
+      <div class="lbl-preview-qr" style="width:${qrSz}px;height:${qrSz}px"></div>
+      <div class="lbl-preview-text" style="flex:1;justify-content:center">
+        <div class="lbl-preview-line" style="width:90%"></div>
+        ${lines>1?`<div class="lbl-preview-line" style="width:70%;background:#aaa"></div>`:''}
+        ${lines>2?`<div class="lbl-preview-line" style="width:55%;background:#ccc"></div>`:''}
+      </div>
+    </div>`;
+    return `<label class="lbl-cfg-card${sel?' selected':''}" onclick="_toggleLblCfg('${cfg.id}',this)">
+      <input type="checkbox" ${sel?'checked':''} style="pointer-events:none">
+      ${preview}
+      <div class="lbl-cfg-name">${cfg.name}</div>
+      <div class="lbl-cfg-sub">${cfg.sub}</div>
+    </label>`;
+  }).join('');
+
+  panel.innerHTML=`
+    <div style="font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--mu);text-transform:uppercase;margin-bottom:10px">🏷 Label Matrix</div>
+    <div class="lbl-cfg-grid">${cfgCards}</div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:10px 0 12px">
+      <div>
+        <div style="font-size:11px;color:var(--mu);margin-bottom:4px;font-weight:600">Bottles to include</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <label style="font-size:12px;display:flex;align-items:center;gap:6px">
+            <input type="radio" name="lbl-scope" value="single" checked> This bottle (${esc(b.code)})
+          </label>
+          ${hasBatch?`<label style="font-size:12px;display:flex;align-items:center;gap:6px">
+            <input type="radio" name="lbl-scope" value="batch"> All in batch (${batchCount} bottles)
+          </label>`:''}
+          <label style="font-size:12px;display:flex;align-items:center;gap:6px">
+            <input type="radio" name="lbl-scope" value="visible"> All visible (${visCount} bottles)
+          </label>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--mu);margin-bottom:4px;font-weight:600">Copies per bottle</div>
+        <input type="number" id="lbl-copies" value="1" min="1" max="20" style="width:60px;padding:5px 8px;background:var(--sf);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-size:13px">
+      </div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn sm green" onclick="_printLabelMatrix('${bottleId}')" style="flex:1">🖨 Print selected</button>
+      <button class="btn sm ghost" onclick="_printLabelMatrix('${bottleId}',true)" style="flex:1">💾 Save as PDF</button>
+      <button class="btn sm ghost" onclick="document.getElementById('bot-label-panel').classList.remove('on')">✕</button>
+    </div>`;
+}
+
+function _toggleLblCfg(id,card){
+  if(_lblSelected.has(id)){ _lblSelected.delete(id); card.classList.remove('selected'); card.querySelector('input').checked=false; }
+  else{ _lblSelected.add(id); card.classList.add('selected'); card.querySelector('input').checked=true; }
+}
+
+function _getLabelBottles(bottleId){
+  const b=S.bottles.find(x=>x.id===bottleId); if(!b) return [b];
+  const scope=document.querySelector('input[name="lbl-scope"]:checked')?.value||'single';
+  const copies=parseInt(document.getElementById('lbl-copies')?.value)||1;
+  let list=[];
+  if(scope==='single') list=[b];
+  else if(scope==='batch'&&b.batch_id) list=S.bottles.filter(x=>x.batch_id===b.batch_id);
+  else if(scope==='visible') list=S.bottles.filter(x=>{
+    if(S.bottleFilter&&S.bottleFilter!=='all'&&x.status!==S.bottleFilter) return false;
+    const q=(S.bottleSearch||'').toLowerCase();
+    return !(q&&!(x.code||'').toLowerCase().includes(q)&&!(x.species||'').toLowerCase().includes(q));
+  });
+  // Repeat for copies
+  const result=[];
+  for(let i=0;i<copies;i++) result.push(...list);
+  return result;
+}
+
+function _printLabelMatrix(bottleId, saveMode=false){
+  const cfgs=LABEL_CONFIGS.filter(c=>_lblSelected.has(c.id));
+  if(!cfgs.length){ toast('Select at least one label format','fail'); return; }
+  const bottles=_getLabelBottles(bottleId);
+  if(!bottles.length){ toast('No bottles selected','fail'); return; }
+
+  const w=window.open('','_blank','width=900,height=700');
+  if(!w){ toast('Allow popups to print labels','fail'); return; }
+
+  // Build one section per selected config
+  const sections=cfgs.map(cfg=>{
+    const pageW=cfg.w==='58mm'?'58mm':cfg.w==='62mm'?'62mm':'210mm';
+    const labelsHtml=bottles.map(b=>_botLabelHtmlConfig(b,cfg)).join('');
+    const layoutStyle=cfg.w==='a4'
+      ?`display:grid;grid-template-columns:repeat(${cfg.perRow},1fr);gap:4mm;padding:8mm`
+      :`width:${pageW}`;
+    return `<div class="cfg-section" style="page-break-after:always">
+      <div style="font-size:10pt;color:#666;padding:3mm;border-bottom:1px solid #ddd">
+        ${cfg.name} · ${bottles.length} bottle${bottles.length>1?'s':''}</div>
+      <div style="${layoutStyle}">${labelsHtml}</div>
+    </div>`;
+  }).join('');
+
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>TC Plants Labels</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#fff;font-family:Arial,sans-serif;font-size:9pt}
+.bot-label{display:flex;align-items:flex-start;gap:2mm;padding:2mm;border:0.5px dashed #ccc;page-break-inside:avoid}
+.bot-label canvas{flex-shrink:0;background:#fff}
+.bot-label-right{flex:1;min-width:0;display:flex;flex-direction:column;gap:0.5mm}
+.bot-lbl-code{font-size:11pt;font-weight:700;line-height:1.2}
+.bot-lbl-sp{font-size:8pt;line-height:1.3;font-style:italic}
+.bot-lbl-flair,.bot-lbl-stage,.bot-lbl-ts,.bot-lbl-review{font-size:7.5pt;color:#333;line-height:1.3}
+.cfg-section{margin-bottom:8mm}
+@media print{.cfg-section{page-break-after:always}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"><\/script>
+</head><body>${sections}<\/body><\/html>`);
+  w.document.close();
+  w.addEventListener('load',()=>{
+    // Render all QR codes
+    const allIds=[...new Set(bottles.map(b=>b.id))];
+    cfgs.forEach(cfg=>{
+      allIds.forEach(id=>{
+        const canvases=w.document.querySelectorAll(`[id="print-qr-${cfg.id}-${id}"]`);
+        canvases.forEach(canvas=>{
+          if(canvas&&w.QRCode) w.QRCode.toCanvas(canvas,`https://notes.tcplants.in?bottle=${id}`,{width:cfg.qr,margin:0,color:{dark:'#000000',light:'#ffffff'}});
+        });
+      });
+    });
+    setTimeout(()=>{ w.focus(); w.print(); },800);
+  });
+}
+
+function _botLabelHtmlConfig(b, cfg){
+  const rec=S.recs.find(r=>r.id===b.recipe_id);
+  const flairNames=(b.flair_ids||[]).map(fid=>{
+    const f=(S.taxFlairs||[]).find(x=>x.id===fid)||(S.taxCustom?.flairs||[]).find(x=>x.id===fid);
+    return f?(f.emoji?f.emoji+' ':'')+f.name:'';
+  }).filter(Boolean).join(', ');
+  const label=b.flair_note||(flairNames?`[${flairNames}]`:'');
+  const f=cfg.fields;
+  return `<div class="bot-label">
+    <canvas id="print-qr-${cfg.id}-${b.id}" width="${cfg.qr}" height="${cfg.qr}"></canvas>
+    <div class="bot-label-right">
+      ${f.includes('code')?`<span class="bot-lbl-code">${esc(b.code)}</span>`:''}
+      ${f.includes('species')?`<span class="bot-lbl-sp">${esc(b.species||'Unknown')}</span>`:''}
+      ${f.includes('flair')&&label?`<span class="bot-lbl-flair">${esc(label)}</span>`:''}
+      ${f.includes('stage')?`<span class="bot-lbl-stage">${esc([b.stage,rec?.name].filter(Boolean).join(' · '))}</span>`:''}
+      ${f.includes('date')&&b.date_prepared?`<span class="bot-lbl-ts">${_fmtTs(b.date_prepared)}</span>`:''}
+      ${f.includes('review')&&b.next_review?`<span class="bot-lbl-review">Review: ${fmtDateShort(b.next_review)}</span>`:''}
+    </div>
+  </div>`;
 }
 
 function printBottleLabel(id){
