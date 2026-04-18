@@ -5,7 +5,6 @@
  * Environment variables to set in Cloudflare dashboard:
  *   GROQ_KEY      — your Groq API key
  *   CLAUDE_KEY    — your Anthropic API key (optional)
- *   PROXY_SECRET  — a strong random string, copy into app Settings → AI Proxy Secret
  *
  * Routes:
  *   POST /api/ai/chat     — text AI (Groq or Claude)
@@ -38,10 +37,8 @@ function err(msg, status = 400, origin = '') {
 }
 
 // ── Auth ──────────────────────────────────────────────────────
-function authenticated(request, env) {
-  const secret = request.headers.get('X-Lab-Secret');
-  return secret && env.PROXY_SECRET && secret === env.PROXY_SECRET;
-}
+// CORS restriction to notes.tcplants.in is the access control.
+// No shared secret needed — personal single-user lab app.
 
 // ── Main handler ──────────────────────────────────────────────
 export default {
@@ -62,11 +59,6 @@ export default {
         claude: !!env.CLAUDE_KEY,
         ts: new Date().toISOString(),
       }, 200, origin);
-    }
-
-    // All other routes require auth
-    if (!authenticated(request, env)) {
-      return err('Unauthorised', 401, origin);
     }
 
     // ── POST /api/ai/chat ─────────────────────────────────────
