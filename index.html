@@ -14786,88 +14786,167 @@ async function _invDelete(id){
 
 // ── Ravana Stock Insights ─────────────────────────────────────
 let _stockRavanaTimer=null;
+
 async function _stockRavanaInsight(){
   const btn=document.getElementById('stock-ravana-btn');
   const panel=document.getElementById('stock-ravana-panel');
   const body=document.getElementById('stock-ravana-body');
   if(!panel||!body) return;
-
   panel.style.display='block';
-  body.textContent='🔬 Ravana is reading your stock…';
-  if(btn){btn.disabled=true;btn.textContent='✦ Analysing…';}
+  if(btn){btn.disabled=true;btn.textContent='✦ Building report…';}
+  panel.scrollIntoView({behavior:'smooth',block:'start'});
 
   const items=S_inv.items||[];
   const today=new Date().toISOString().slice(0,10);
-  const low=items.filter(i=>i.quantity<=i.low_threshold&&i.low_threshold>0);
-  const expiring=items.filter(i=>i.expiry_date&&daysFrom(i.expiry_date)<30&&daysFrom(i.expiry_date)>=0);
+  const low=items.filter(i=>i.low_threshold>0&&i.quantity<=i.low_threshold);
+  const warn=items.filter(i=>i.low_threshold>0&&i.quantity>i.low_threshold&&i.quantity<=i.low_threshold*2);
+  const expiring90=items.filter(i=>i.expiry_date&&daysFrom(i.expiry_date)>=0&&daysFrom(i.expiry_date)<90).sort((a,b)=>a.expiry_date.localeCompare(b.expiry_date));
   const expired=items.filter(i=>i.expiry_date&&i.expiry_date<today);
   const noPrice=items.filter(i=>!i.price_per_unit&&!i.price_total);
   const noSupplier=items.filter(i=>!i.supplier);
+  const noInvoice=items.filter(i=>!i.invoice_num&&!i.invoice_link&&!i.invoice_data);
   const totalValue=items.reduce((s,i)=>{
     if(i.price_per_unit&&i.quantity) return s+i.price_per_unit*i.quantity;
     if(i.price_total) return s+i.price_total; return s;
   },0);
 
-  // Build category breakdown
   const byCat={};
   items.forEach(i=>{const c=i.category||'Other';if(!byCat[c])byCat[c]=[];byCat[c].push(i);});
-  const catSummary=Object.entries(byCat).map(([c,its])=>`${c}: ${its.length} item${its.length>1?'s':''}`).join(' · ');
+  const catColors=['#58a6ff','#3fb950','#d29922','#bc8cff','#1abc9c','#f4a261','#f85149','#52b788','#e07b54','#a8dadc','#457b9d','#e9c46a','#264653','#2a9d8f','#e76f51','#8ecae6','#219ebc'];
+  const catEntries=Object.entries(byCat).sort((a,b)=>b[1].length-a[1].length);
 
-  const context=`You are analysing the Lab Stock & Inventory for a plant tissue culture lab.
+  const sc=(v,l,c='var(--ac)')=>`<div style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:14px 16px;text-align:center"><div style="font-size:26px;font-weight:800;color:${c};line-height:1">${v}</div><div style="font-size:10px;color:var(--mu);margin-top:4px;text-transform:uppercase;letter-spacing:.06em">${l}</div></div>`;
 
-STOCK OVERVIEW:
-- Total items: ${items.length}
-- Estimated total value: ${totalValue>0?'₹'+totalValue.toFixed(0):'not priced'}
-- Categories covered: ${catSummary||'none'}
+  const donutSegs=catEntries.map(([c,its],i)=>({v:its.length,c:catColors[i%catColors.length],l:c}));
+  const donut=`<svg width="130" height="130" viewBox="0 0 130 130" style="display:block">${svgDonut(donutSegs,130)}</svg>`;
+  const donutLegend=catEntries.slice(0,10).map(([c,its],i)=>`<div style="display:flex;align-items:center;gap:5px;font-size:11px;margin-bottom:3px"><span style="width:8px;height:8px;border-radius:50%;background:${catColors[i%catColors.length]};flex-shrink:0;display:inline-block"></span><span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c)}</span><span style="color:var(--mu);font-weight:600">${its.length}</span></div>`).join('');
 
-URGENT — LOW STOCK (${low.length}):
-${low.length?low.map(i=>`- ${i.name} (${i.quantity} ${i.unit||''} remaining, alert at ≤${i.low_threshold})`).join('\n'):'None'}
+  const statusBar=catEntries.map(([c,its])=>{
+    const l=its.filter(i=>i.low_threshold>0&&i.quantity<=i.low_threshold).length;
+    const w=its.filter(i=>i.low_threshold>0&&i.quantity>i.low_threshold&&i.quantity<=i.low_threshold*2).length;
+    const o=its.length-l-w; const total=its.length||1;
+    return `<div style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px">${esc(c)}</span><span style="color:var(--mu);flex-shrink:0;margin-left:4px">${its.length}</span></div><div style="height:8px;background:var(--sf3);border-radius:4px;display:flex;overflow:hidden">${l?`<div style="width:${l/total*100}%;background:var(--rd)" title="${l} low"></div>`:''} ${w?`<div style="width:${w/total*100}%;background:var(--yw)" title="${w} watch"></div>`:''} ${o?`<div style="width:${o/total*100}%;background:var(--gn)" title="${o} ok"></div>`:''}</div></div>`;
+  }).join('');
 
-EXPIRING SOON — within 30 days (${expiring.length}):
-${expiring.length?expiring.map(i=>`- ${i.name} — expires ${i.expiry_date}`).join('\n'):'None'}
+  const catValues=catEntries.map(([c,its])=>({c,val:its.reduce((s,i)=>{if(i.price_per_unit&&i.quantity) return s+i.price_per_unit*i.quantity; if(i.price_total) return s+i.price_total; return s;},0)})).filter(x=>x.val>0).sort((a,b)=>b.val-a.val);
+  const maxVal=catValues[0]?.val||1;
+  const valueChart=catValues.length?catValues.slice(0,8).map(({c,val})=>`<div style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px">${esc(c)}</span><span style="color:var(--ac);font-weight:700;flex-shrink:0;margin-left:4px">₹${val.toFixed(0)}</span></div><div style="height:6px;background:var(--sf3);border-radius:3px"><div style="height:6px;border-radius:3px;background:var(--ac);width:${val/maxVal*100}%"></div></div></div>`).join(''):'<div style="color:var(--mu);font-size:12px">Add price data to unlock</div>';
 
-EXPIRED (${expired.length}):
-${expired.length?expired.map(i=>`- ${i.name} — expired ${i.expiry_date}`).join('\n'):'None'}
+  const tblRows=items.map(i=>{
+    const pct=i.low_threshold>0?Math.min(100,Math.round(i.quantity/(i.low_threshold*2)*100)):null;
+    const stCol=i.quantity<=i.low_threshold&&i.low_threshold>0?'var(--rd)':pct!==null&&pct<=60?'var(--yw)':'var(--gn)';
+    const stLabel=i.quantity<=i.low_threshold&&i.low_threshold>0?'Low':pct!==null&&pct<=60?'Watch':'OK';
+    const expCol=i.expiry_date?daysFrom(i.expiry_date)<0?'var(--rd)':daysFrom(i.expiry_date)<30?'var(--yw)':'var(--mu)':'var(--mu)';
+    return `<tr><td><strong>${esc(i.name)}</strong>${i.location?`<br><span style="font-size:10px;color:var(--mu)">📍${esc(i.location)}</span>`:''}</td><td style="color:var(--mu)">${esc(i.category||'—')}</td><td style="font-weight:700">${i.quantity} ${esc(i.unit||'')}</td><td><span style="color:${stCol};font-weight:700;font-size:11px">${stLabel}</span></td><td style="color:${expCol}">${i.expiry_date?fmtDateShort(i.expiry_date):'—'}</td><td style="color:var(--mu)">${i.price_per_unit?`₹${i.price_per_unit}/${esc(i.unit||'u')}`:(i.price_total?`₹${i.price_total} total`:'—')}</td><td style="color:var(--mu)">${esc(i.supplier||'—')}</td><td>${i.invoice_num||i.invoice_link||i.invoice_data?`<span style="color:var(--gn)">🧾</span>`:`<span style="color:var(--sf3)">—</span>`}</td></tr>`;
+  }).join('');
 
-PROCUREMENT GAPS:
-- Items without price data: ${noPrice.length}
-- Items without supplier: ${noSupplier.length}
+  const expiryRows=expiring90.map(i=>{
+    const d=daysFrom(i.expiry_date);
+    const col=d<7?'var(--rd)':d<30?'var(--yw)':'var(--mu)';
+    return `<tr><td><strong>${esc(i.name)}</strong></td><td style="color:var(--mu)">${esc(i.category||'—')}</td><td style="color:${col};font-weight:700">${d===0?'Today':d<0?`${Math.abs(d)}d ago`:`in ${d}d`}</td><td style="color:var(--mu)">${fmtDateShort(i.expiry_date)}</td><td>${esc(i.quantity+' '+(i.unit||''))}</td></tr>`;
+  }).join('');
 
-FULL ITEM LIST:
-${items.slice(0,30).map(i=>`[${i.category||'?'}] ${i.name} — ${i.quantity} ${i.unit||''}${i.supplier?` · ${i.supplier}`:''}${i.expiry_date?` · exp ${i.expiry_date}`:''}`).join('\n')}
-${items.length>30?`...and ${items.length-30} more items`:''}
+  const gapIds=[...new Set([...noPrice,...noSupplier,...noInvoice].map(i=>i.id))];
+  const gapRows=gapIds.map(id=>{
+    const i=items.find(x=>x.id===id); if(!i) return '';
+    const gaps=[];
+    if(!i.price_per_unit&&!i.price_total) gaps.push('no price');
+    if(!i.supplier) gaps.push('no supplier');
+    if(!i.invoice_num&&!i.invoice_link&&!i.invoice_data) gaps.push('no invoice');
+    return `<tr><td>${esc(i.name)}</td><td style="color:var(--mu)">${esc(i.category||'—')}</td><td style="color:var(--yw)">${gaps.join(' · ')}</td></tr>`;
+  }).join('');
 
-Analyse this stock for a TC lab. Provide:
-1. Stock health assessment (what's in good shape, what's critical)
-2. Immediate actions needed (reorder, discard expired, etc.)
-3. Notable gaps — what a TC lab typically needs that may be missing here
-4. Procurement recommendations if supplier/pricing data is sparse
-5. Any patterns worth noting
+  body.innerHTML=`<div id="stock-report-inner">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:20px">
+      ${sc(items.length,'Total items')}
+      ${sc(low.length,'Low stock',low.length?'var(--rd)':'var(--gn)')}
+      ${sc(expiring90.length,'Expiring 90d',expiring90.length?'var(--yw)':'var(--mu)')}
+      ${sc(expired.length,'Expired',expired.length?'var(--rd)':'var(--mu)')}
+      ${totalValue>0?sc('₹'+totalValue.toFixed(0),'Est. value','var(--ac)'):''}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:18px">
+      <div style="background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px">
+        <div style="font-size:10px;font-weight:800;letter-spacing:.08em;color:var(--mu);text-transform:uppercase;margin-bottom:10px">Category mix</div>
+        <div style="display:flex;gap:10px;align-items:flex-start">${donut}<div style="flex:1;overflow:hidden">${donutLegend}</div></div>
+      </div>
+      <div style="background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px">
+        <div style="font-size:10px;font-weight:800;letter-spacing:.08em;color:var(--mu);text-transform:uppercase;margin-bottom:10px">Stock levels by category <span style="font-weight:400"><span style="color:var(--gn)">■</span>OK <span style="color:var(--yw)">■</span>Watch <span style="color:var(--rd)">■</span>Low</span></div>
+        ${statusBar||'<div style="color:var(--mu);font-size:12px">Set thresholds to enable</div>'}
+      </div>
+      <div style="background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px">
+        <div style="font-size:10px;font-weight:800;letter-spacing:.08em;color:var(--mu);text-transform:uppercase;margin-bottom:10px">Value by category (₹)</div>
+        ${valueChart}
+      </div>
+    </div>
+    <div style="background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px;margin-bottom:14px;overflow-x:auto">
+      <div style="font-size:10px;font-weight:800;letter-spacing:.08em;color:var(--mu);text-transform:uppercase;margin-bottom:10px">Complete Stock (${items.length})</div>
+      ${items.length?`<table style="border-collapse:collapse;width:100%;font-size:12px"><thead><tr style="background:var(--sf2)"><th style="padding:7px 10px;border:1px solid var(--bd)">Name</th><th style="padding:7px 10px;border:1px solid var(--bd)">Category</th><th style="padding:7px 10px;border:1px solid var(--bd)">Qty</th><th style="padding:7px 10px;border:1px solid var(--bd)">Status</th><th style="padding:7px 10px;border:1px solid var(--bd)">Expiry</th><th style="padding:7px 10px;border:1px solid var(--bd)">Price</th><th style="padding:7px 10px;border:1px solid var(--bd)">Supplier</th><th style="padding:7px 10px;border:1px solid var(--bd)">Inv.</th></tr></thead><tbody>${tblRows}</tbody></table>`:'<div style="color:var(--mu);font-size:13px">No items yet</div>'}
+    </div>
+    ${expiring90.length||expired.length?`<div style="background:var(--sf);border:1px solid rgba(248,81,73,.3);border-radius:10px;padding:14px;margin-bottom:14px;overflow-x:auto"><div style="font-size:10px;font-weight:800;letter-spacing:.08em;color:var(--rd);text-transform:uppercase;margin-bottom:10px">⏳ Expiry Forecast — next 90 days${expired.length?' · '+expired.length+' already expired':''}</div><table style="border-collapse:collapse;width:100%;font-size:12px"><thead><tr style="background:var(--sf2)"><th style="padding:7px 10px;border:1px solid var(--bd)">Item</th><th style="padding:7px 10px;border:1px solid var(--bd)">Category</th><th style="padding:7px 10px;border:1px solid var(--bd)">When</th><th style="padding:7px 10px;border:1px solid var(--bd)">Date</th><th style="padding:7px 10px;border:1px solid var(--bd)">Qty</th></tr></thead><tbody>${expiryRows}</tbody></table></div>`:''}
+    ${gapRows?`<div style="background:var(--sf);border:1px solid rgba(210,153,34,.3);border-radius:10px;padding:14px;margin-bottom:14px;overflow-x:auto"><div style="font-size:10px;font-weight:800;letter-spacing:.08em;color:var(--yw);text-transform:uppercase;margin-bottom:10px">🧾 Procurement Gaps</div><table style="border-collapse:collapse;width:100%;font-size:12px"><thead><tr style="background:var(--sf2)"><th style="padding:7px 10px;border:1px solid var(--bd)">Item</th><th style="padding:7px 10px;border:1px solid var(--bd)">Category</th><th style="padding:7px 10px;border:1px solid var(--bd)">Missing</th></tr></thead><tbody>${gapRows}</tbody></table></div>`:''}
+    <div style="background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:16px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <span style="font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--ac);text-transform:uppercase">✦ Ravana's Analysis</span>
+        <span id="stock-ravana-loading" style="font-size:11px;color:var(--mu)">🔬 Reading…</span>
+      </div>
+      <div id="stock-ravana-narrative" style="font-size:13px;line-height:1.8;color:var(--mu)"><em>Generating insights…</em></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn sm ghost" onclick="_printStockReport()">🖨 Print / Save PDF</button>
+    </div>
+  </div>`;
 
-Be specific. Use actual item names from the data. End with ∿`;
+  const catSummary=catEntries.map(([c,its])=>`${c}:${its.length}`).join(', ');
+  const context=`Analyse Lab Stock for a TC lab. ${items.length} items, est value ${totalValue>0?'₹'+totalValue.toFixed(0):'unpriced'}.
+Categories: ${catSummary}
+LOW STOCK: ${low.map(i=>`${i.name}(${i.quantity}${i.unit||''})`).join(', ')||'none'}
+EXPIRING 90d: ${expiring90.slice(0,5).map(i=>`${i.name} in ${daysFrom(i.expiry_date)}d`).join(', ')||'none'}
+EXPIRED: ${expired.map(i=>i.name).join(', ')||'none'}
+GAPS: ${noPrice.length} unpriced, ${noSupplier.length} no supplier, ${noInvoice.length} no invoice
+ALL: ${items.map(i=>`${i.name}[${i.category||'?'}] ${i.quantity}${i.unit||''}${i.supplier?' ('+i.supplier+')':''}`).join(' | ')}
+
+Respond with these sections:
+## Immediate Actions
+## Stock Health Assessment
+## TC Lab Gaps (what a serious TC lab should have that is missing or critically low)
+## Procurement Observations
+## Reorder Priority — Top 5
+(format as a compact table: Item | Reason | Urgency)
+End with ∿`;
 
   try{
     const raw=await askAI(context);
-    if(!raw){ body.textContent='No response from Ravana.'; return; }
-    // Typewriter into the inline panel
-    body.innerHTML='';
+    const narrativeEl=document.getElementById('stock-ravana-narrative');
+    const loadingEl=document.getElementById('stock-ravana-loading');
+    if(loadingEl) loadingEl.style.display='none';
+    if(!narrativeEl) return;
+    if(!raw){narrativeEl.textContent='No response from Ravana.';return;}
     if(_stockRavanaTimer) clearInterval(_stockRavanaTimer);
     const words=raw.split(/(\s+)/);
-    let i=0; let built='';
+    let i=0;let built='';
     _stockRavanaTimer=setInterval(()=>{
-      if(i>=words.length){
-        clearInterval(_stockRavanaTimer); _stockRavanaTimer=null;
-        body.innerHTML=sanitizeMarkdown(raw);
-        return;
-      }
-      built+=words[i++];
-      body.textContent=built;
-      panel.scrollIntoView({behavior:'smooth',block:'nearest'});
-    },16);
+      if(i>=words.length){clearInterval(_stockRavanaTimer);_stockRavanaTimer=null;narrativeEl.innerHTML=sanitizeMarkdown(raw);return;}
+      built+=words[i++]; narrativeEl.textContent=built;
+    },14);
   }catch(e){
-    body.innerHTML=`<span style="color:var(--rd)">Analysis failed: ${esc(e.message)}</span>`;
+    const el=document.getElementById('stock-ravana-narrative');
+    if(el) el.innerHTML=`<span style="color:var(--rd)">Analysis failed: ${esc(e.message)}</span>`;
   }
   if(btn){btn.disabled=false;btn.textContent='↺ Re-analyse';}
+}
+
+function _printStockReport(){
+  const inner=document.getElementById('stock-report-inner');if(!inner) return;
+  const w=window.open('','_blank','width=1000,height=700');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Stock Report — TC Plants</title>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:12px;color:#0d1117;background:#fff;padding:20px}h1{font-size:18px;font-weight:800;margin-bottom:4px}h2{font-size:14px;font-weight:700;margin:14px 0 6px}table{border-collapse:collapse;width:100%;margin:6px 0;font-size:11px}th,td{border:1px solid #d0d7de;padding:6px 8px;text-align:left}th{background:#f6f8fa;font-weight:700}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px}.card{border:1px solid #d0d7de;border-radius:6px;padding:10px;text-align:center}.val{font-size:22px;font-weight:800}.lbl{font-size:9px;color:#656d76;text-transform:uppercase;margin-top:3px}svg text{fill:#0d1117}@media print{@page{margin:1.5cm}}</style>
+</head><body>
+<h1>📦 Lab Stock Report · TC Plants</h1>
+<div style="font-size:11px;color:#666;margin-bottom:14px">Generated ${new Date().toLocaleString('en-IN')}</div>
+${inner.innerHTML}
+</body></html>`);
+  w.document.close();
+  w.addEventListener('load',()=>setTimeout(()=>{w.focus();w.print();},500));
 }
 
 // ════════════════════════════════════════════════════════════
