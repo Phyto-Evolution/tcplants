@@ -7978,6 +7978,9 @@ async function startEditNote(){
 }
 
 async function saveNoteAction(){
+  // Task #21: Check online status before attempting write
+  if(!_checkOnline()) return;
+
   const title  =document.getElementById('ne-title').value.trim();
   const isGeneric=S_noteMode==='generic';
   const type   =isGeneric?'Generic Note':document.getElementById('ne-type').value;
@@ -8028,6 +8031,9 @@ async function saveNoteAction(){
 }
 
 async function deleteNote(){
+  // Task #21: Check online status before delete
+  if(!_checkOnline()) return;
+
   const id=S.cur; if(!id) return;
   const m=S.notes.find(n=>n.id===id);
   if(!confirm(`Permanently delete "${m?.title}"?\nThis removes the encrypted file from GitHub.`)) return;
@@ -10563,11 +10569,53 @@ window.addEventListener('offline',()=>document.getElementById('offline-pill').cl
 if(!navigator.onLine) document.getElementById('offline-pill').classList.add('on');
 
 // ════════════════════════════════════════════════════════════
-// PWA SERVICE WORKER
+// PWA SERVICE WORKER & OFFLINE SUPPORT (Task #21)
 // ════════════════════════════════════════════════════════════
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('/sw.js').catch(()=>{});
 }
+
+// Offline mode detection and handling
+function _updateOfflineState(){
+  const offline=!navigator.onLine;
+  const pill=document.getElementById('offline-pill');
+  const apiOffline=offline?'block':'none';
+  if(pill) pill.style.display=apiOffline;
+  if(offline){
+    toast('📡 Offline mode: View-only. Write operations will be blocked.','warn');
+  }
+}
+window.addEventListener('online', () => {
+  _updateOfflineState();
+  toast('✅ Back online!');
+});
+window.addEventListener('offline', () => {
+  _updateOfflineState();
+  toast('📡 Offline: Cannot sync changes', 'fail');
+});
+_updateOfflineState(); // Check on startup
+
+// Prevent writes when offline
+function _checkOnline(){
+  if(!navigator.onLine){
+    toast('📡 You are offline. Cannot make changes without internet.','fail');
+    return false;
+  }
+  return true;
+}
+
+// Wrap GitHub API calls with offline check
+const _originalLoadNotesIndex=loadNotesIndex;
+loadNotesIndex=async function(){
+  if(!_checkOnline()) throw new Error('offline');
+  return _originalLoadNotesIndex.call(this);
+};
+
+const _originalSaveNotesIndex=saveNotesIndex;
+saveNotesIndex=async function(notes,sha){
+  if(!_checkOnline()) throw new Error('offline');
+  return _originalSaveNotesIndex.call(this,notes,sha);
+};
 
 // Force HTTPS
 if(location.protocol==='http:'&&location.hostname!=='localhost'){
