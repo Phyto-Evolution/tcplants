@@ -4310,6 +4310,35 @@ function sanitizeMarkdown(md){
   });
 }
 
+// Input validation functions (Task #18)
+function validateNoteData(note) {
+  if (!note || typeof note !== 'object') throw 'Invalid note data';
+  if (!note.id || typeof note.id !== 'string' || note.id.length > 50) throw 'Invalid note ID';
+  if (note.title && note.title.length > 255) throw 'Note title too long (max 255 chars)';
+  if (note.body && note.body.length > 500000) throw 'Note body too large (max 500KB)';
+  if (note.date && !/^\d{4}-\d{2}-\d{2}/.test(note.date)) throw 'Invalid note date format';
+  if (note.cultures_out && (typeof note.cultures_out !== 'number' || note.cultures_out < 0 || note.cultures_out > 100000)) throw 'Invalid cultures_out value';
+  return true;
+}
+
+function validateBottleData(bottle) {
+  if (!bottle || typeof bottle !== 'object') throw 'Invalid bottle data';
+  if (!bottle.id || bottle.id.length > 50) throw 'Invalid bottle ID';
+  if (bottle.name && bottle.name.length > 200) throw 'Bottle name too long (max 200 chars)';
+  if (bottle.status && !['inoculated', 'growing', 'dormant', 'discarded', 'contaminated'].includes(bottle.status)) throw 'Invalid bottle status';
+  if (bottle.date && !/^\d{4}-\d{2}-\d{2}/.test(bottle.date)) throw 'Invalid bottle date';
+  return true;
+}
+
+function validateAccessionData(accession) {
+  if (!accession || typeof accession !== 'object') throw 'Invalid accession data';
+  if (!accession.id || accession.id.length > 50) throw 'Invalid accession ID';
+  if (accession.species && accession.species.length > 200) throw 'Species name too long';
+  if (accession.num && accession.num.length > 50) throw 'Accession number too long';
+  if (accession.status && !['active', 'dormant', 'lost', 'discarded'].includes(accession.status)) throw 'Invalid accession status';
+  return true;
+}
+
 function fmtDate(iso){
   if(!iso) return '';
   return new Date(iso).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric',weekday:'short'});
@@ -7961,6 +7990,13 @@ async function saveNoteAction(){
   const note_type=isGeneric?'generic':'tc';
   const pinned=isGeneric?!!(document.getElementById('ne-pin-cb')?.checked):false;
   if(!title){toast('Title is required','fail');return;}
+
+  // Validate input (Task #18)
+  try{
+    const noteToSave={id:'dummy',title,body,type,stage,species,cultures_out};
+    validateNoteData(noteToSave);
+  }catch(e){toast('⚠️ Invalid data: '+e,'fail');return;}
+
   document.getElementById('save-note-btn').disabled=true;
   load('Encrypting & saving…');
   try{
