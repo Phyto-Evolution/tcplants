@@ -771,7 +771,10 @@ main > .dview, main > .editor{ margin:0 auto; }
 #re-base-custom-wrap{display:none;margin-top:6px}
 
 /* ── HELP ── */
-.help-body{max-width:960px}
+.help-body{width:100%;box-sizing:border-box}
+#sec-help.fullpage{padding:0}
+#sec-help .help-body{padding:28px 32px}
+@media(max-width:600px){#sec-help .help-body{padding:16px 14px}}
 .help-body h2{font-size:22px;font-weight:700;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)}
 .help-body h2:first-child{margin-top:0}
 .help-body h3{font-size:15px;font-weight:700;margin:16px 0 6px;color:var(--ac)}
