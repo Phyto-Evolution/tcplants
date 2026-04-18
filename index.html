@@ -3943,6 +3943,29 @@ input, textarea, select {
         </div>
       </div>
     </div>
+    <!-- AI Proxy (Cloudflare Worker) -->
+    <div class="set-section collapsed">
+      <div class="set-section-title" onclick="_toggleSetSection(this)">AI Proxy (Cloudflare)</div>
+      <div class="set-section-body">
+        <div class="set-row set-row-full">
+          <div class="set-row-label">Worker URL</div>
+          <div class="set-row-sub">Your Cloudflare Worker URL — e.g. <code>https://plantking.xxx.workers.dev</code>. When set, all AI calls route through it and your API keys stay server-side.</div>
+          <input type="text" id="set-proxy-url" placeholder="https://plantking.xxx.workers.dev" style="width:100%;margin-top:6px;font-size:12px">
+        </div>
+        <div class="set-row set-row-full">
+          <div class="set-row-label">Proxy Secret</div>
+          <div class="set-row-sub">The <code>PROXY_SECRET</code> env var you set in Cloudflare. Sent with every request to authenticate it.</div>
+          <input type="password" id="set-proxy-secret" placeholder="your-secret-here" style="width:100%;margin-top:6px;font-size:12px">
+        </div>
+        <div style="display:flex;gap:6px;margin-top:10px">
+          <button class="btn xs green" onclick="_saveProxySettings()" style="flex:1">💾 Save</button>
+          <button class="btn xs ghost" onclick="_testProxy()">Test connection</button>
+          <button class="btn xs danger" onclick="_clearProxySettings()">Clear</button>
+        </div>
+        <div id="proxy-status" style="margin-top:8px;font-size:12px;color:var(--mu)"></div>
+      </div>
+    </div>
+
     <!-- FROZEN: Telegram Alerts — paused for redesign, preserved for future use
     <div class="set-section collapsed">
       <div class="set-section-title" onclick="_toggleSetSection(this)">Telegram Alerts</div>
@@ -7738,9 +7761,53 @@ async function _setAIKeyFromSettings(){
   try{ await saveEncryptedKeys(); toast('Claude key saved & encrypted ✓'); }
   catch(e){ toast('Saved locally — sync failed: '+e.message,'fail'); }
 }
+// ── Proxy settings ────────────────────────────────────────────
+function _saveProxySettings(){
+  const url=(document.getElementById('set-proxy-url')?.value||'').trim().replace(/\/$/,'');
+  const secret=(document.getElementById('set-proxy-secret')?.value||'').trim();
+  if(!url){ toast('Enter the Worker URL first','fail'); return; }
+  localStorage.setItem('tcplants_ai_proxy_url', url);
+  localStorage.setItem('tcplants_ai_proxy_secret', secret);
+  _aiProxyURL = url;
+  _aiProxySecret = secret;
+  document.getElementById('set-proxy-url').value='';
+  document.getElementById('set-proxy-secret').value='';
+  toast('Proxy saved — test the connection to verify');
+}
+async function _testProxy(){
+  const url=_aiProxyURL||(document.getElementById('set-proxy-url')?.value||'').trim().replace(/\//,'');
+  const st=document.getElementById('proxy-status');
+  if(!url){ if(st) st.textContent='No URL set.'; return; }
+  if(st) st.textContent='Checking…';
+  try{
+    const r=await fetch(url+'/health',{signal:AbortSignal.timeout(6000)});
+    const d=r.ok?await r.json():null;
+    if(st) st.innerHTML=d
+      ?`<span style="color:var(--gn)">✓ Connected</span> · Groq: ${d.groq?'✓':'✗'} · Claude: ${d.claude?'✓':'✗'}`
+      :`<span style="color:var(--rd)">✗ Worker responded with ${r.status}</span>`;
+  }catch(e){
+    if(st) st.innerHTML=`<span style="color:var(--rd)">✗ ${e.message}</span>`;
+  }
+}
+function _clearProxySettings(){
+  localStorage.removeItem('tcplants_ai_proxy_url');
+  localStorage.removeItem('tcplants_ai_proxy_secret');
+  _aiProxyURL=''; _aiProxySecret='';
+  const st=document.getElementById('proxy-status');
+  if(st) st.textContent='Proxy cleared — using direct API calls.';
+  toast('Proxy cleared');
+}
+function _initProxySettingsUI(){
+  const urlEl=document.getElementById('set-proxy-url');
+  const secEl=document.getElementById('set-proxy-secret');
+  if(urlEl&&_aiProxyURL) urlEl.placeholder=_aiProxyURL+' (saved)';
+  if(secEl&&_aiProxySecret) secEl.placeholder='••••••••• (saved)';
+  const st=document.getElementById('proxy-status');
+  if(st&&_aiProxyURL) st.innerHTML=`Active: <code style="font-size:11px">${_aiProxyURL}</code>`;
+}
 // Sync settings panel dropdown with active model on open
 function _syncAISettingsPanel(){
-  // Claude only — nothing dynamic to sync
+  _initProxySettingsUI();
 }
 
 // ── AI panel maximize ─────────────────────────────────────────
@@ -7872,7 +7939,8 @@ async function _buildAIContext(){
 }
 
 // Configure API proxy (set via settings or detect from environment)
-let _aiProxyURL = localStorage.getItem('tcplants_ai_proxy_url') || '';
+let _aiProxyURL    = localStorage.getItem('tcplants_ai_proxy_url') || '';
+let _aiProxySecret = localStorage.getItem('tcplants_ai_proxy_secret') || '';
 
 async function askAI(prompt){
   const panel=document.getElementById('ai-panel');
@@ -7943,29 +8011,44 @@ async function askAI(prompt){
 }
 
 // Backend proxy call (secure, server-side API keys)
-async function _callAIProxy(provider, model, prompt, clientKey){
-  const r=await fetch(_aiProxyURL+'/api/ai/chat',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      provider: provider,
-      model: model,
-      messages: [{role:'user',content:prompt}],
+async function _callAIProxy(provider, model, fullPrompt, clientKey){
+  // Split system prompt (AI_RULEBOOK section before '---') from user turn
+  const splitIdx = fullPrompt.indexOf('\n\n---\n## Lab Data Context');
+  const system = splitIdx > -1 ? fullPrompt.slice(0, splitIdx) : AI_RULEBOOK;
+  const userContent = splitIdx > -1 ? fullPrompt.slice(splitIdx) : fullPrompt;
+
+  const headers = {'Content-Type':'application/json'};
+  if(_aiProxySecret) headers['X-Lab-Secret'] = _aiProxySecret;
+
+  const r = await fetch(_aiProxyURL+'/api/ai/chat', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      provider,
+      model,
+      system,
+      messages: [{role:'user', content: userContent}],
       max_tokens: 1024,
-      client_key: clientKey  // optional, if server doesn't have its own keys
     }),
     signal: AbortSignal.timeout(30000)
   });
 
   if(!r.ok){
-    const err=new Error(`Proxy error ${r.status}`);
-    err.status=r.status;
-    throw err;
+    const e = new Error(`Proxy error ${r.status}`);
+    e.status = r.status;
+    throw e;
   }
-
-  const d=await r.json();
+  const d = await r.json();
   if(d.error) throw new Error(d.error);
-  return d.text||'';
+  return d.text || '';
+}
+
+async function _checkProxyHealth(){
+  if(!_aiProxyURL) return null;
+  try{
+    const r = await fetch(_aiProxyURL+'/health', {signal: AbortSignal.timeout(5000)});
+    return r.ok ? await r.json() : null;
+  }catch{ return null; }
 }
 
 // Direct API call (client key, no dangerous Anthropic header, proper error handling)
@@ -8395,19 +8478,23 @@ function _stopWhisperSTT(){
   if(_whisperRec&&_whisperRec.state==='recording') _whisperRec.stop();
 }
 async function _transcribeWhisper(blob){
-  const key=localStorage.getItem('tcplants_groq_key');
-  if(!key){ toast('Groq key needed for Whisper','fail'); return; }
   const fd=new FormData();
   fd.append('file',blob,'audio.webm');
   fd.append('model','whisper-large-v3');
   fd.append('language','en');
   try{
-    const r=await fetch('https://api.groq.com/openai/v1/audio/transcriptions',{
-      method:'POST',
-      headers:{Authorization:'Bearer '+key},
-      body:fd,
-      signal: AbortSignal.timeout(30000)
-    });
+    let r;
+    if(_aiProxyURL){
+      // Route through Cloudflare proxy — no client key exposed
+      const headers={'X-Lab-Secret':_aiProxySecret};
+      r=await fetch(_aiProxyURL+'/api/ai/whisper',{method:'POST',headers,body:fd,signal:AbortSignal.timeout(30000)});
+    } else {
+      const key=localStorage.getItem('tcplants_groq_key');
+      if(!key){ toast('Groq key needed for Whisper','fail'); return; }
+      r=await fetch('https://api.groq.com/openai/v1/audio/transcriptions',{
+        method:'POST',headers:{Authorization:'Bearer '+key},body:fd,signal:AbortSignal.timeout(30000)
+      });
+    }
     if(!r.ok) throw new Error(`Whisper error ${r.status}`);
     const d=await r.json();
     _aiRecordUsage('whisper-large-v3', null, null, 0);
