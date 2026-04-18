@@ -1520,6 +1520,37 @@ input, textarea, select {
     border-radius: 4px;
   }
 }
+
+/* ── 8 FEATURES CSS ── */
+#batch-action-bar {
+  box-shadow: 0 -2px 8px rgba(0,0,0,.2);
+}
+
+.blog-entry {
+  transition: background .2s, border-color .2s;
+}
+.blog-entry:hover {
+  background: var(--sf2);
+  border-color: var(--ac);
+}
+
+.search-result {
+  padding: 12px;
+  margin-bottom: 8px;
+  background: var(--sf2);
+  border-radius: 6px;
+  cursor: pointer;
+}
+.search-result:hover {
+  background: var(--sf3);
+}
+
+.analytics-card {
+  padding: 16px;
+  background: var(--sf);
+  border: 1px solid var(--bd);
+  border-radius: 8px;
+}
 </style>
 <script>(function(){var t=localStorage.getItem('tcplants_theme')||'dark';document.documentElement.dataset.theme=t;}());</script>
 </head>
@@ -3368,6 +3399,34 @@ input, textarea, select {
     </div>
   </div>
 
+  <!-- ── LAB JOURNAL / BLOG ── -->
+  <div class="section" id="sec-blog">
+    <main id="blog-main" style="flex:1;overflow-y:auto"></main>
+  </div>
+
+  <!-- ── SCHEDULE & TRANSFERS ── -->
+  <div class="section" id="sec-schedule">
+    <main id="calendar-main" style="flex:1;overflow-y:auto"></main>
+  </div>
+
+  <!-- ── RAVANA INSIGHTS ── -->
+  <div class="section" id="sec-insights">
+    <main id="insights-main" style="flex:1;overflow-y:auto"></main>
+  </div>
+
+  <!-- ── SUPPLY INVENTORY ── -->
+  <div class="section" id="sec-supply">
+    <main id="supply-main" style="flex:1;overflow-y:auto"></main>
+  </div>
+
+  <!-- ── ADVANCED SEARCH ── -->
+  <div class="section" id="sec-search">
+    <main id="search-main" style="flex:1;overflow-y:auto"></main>
+  </div>
+
+  <!-- ── BATCH ACTION BAR ── -->
+  <div id="batch-action-bar" style="display:none;position:fixed;bottom:0;left:0;right:0;background:var(--sf);padding:16px;border-top:1px solid var(--bd);display:flex;gap:12px;z-index:100"></div>
+
   <!-- ── NAV DRAWER ── -->
   <div id="nav-backdrop" onclick="closeNavDrawer()"></div>
   <div id="nav-drawer">
@@ -3389,9 +3448,14 @@ input, textarea, select {
       <button class="ndtab" data-sec="tools" onclick="navTo('tools')"><span class="nd-icon">⏱</span>Tools</button>
       <button class="ndtab" data-sec="sterilise" onclick="navTo('sterilise')"><span class="nd-icon">🧫</span>Sterilise</button>
       <button class="ndtab" data-sec="stock" onclick="navTo('stock')"><span class="nd-icon">📦</span>Stock</button>
-      <button class="ndtab" data-sec="calendar" onclick="navTo('calendar')"><span class="nd-icon">📅</span>Calendar</button>
       <button class="ndtab" data-sec="news" onclick="navTo('news')"><span class="nd-icon">📰</span>News</button>
       <button class="ndtab" data-sec="help" onclick="navTo('help')"><span class="nd-icon">❓</span>Help</button>
+      <div class="nd-divider"></div>
+      <button class="ndtab" data-sec="blog" onclick="navTo('blog')"><span class="nd-icon">📔</span>Lab Journal</button>
+      <button class="ndtab" data-sec="schedule" onclick="navTo('schedule')"><span class="nd-icon">📅</span>Schedule</button>
+      <button class="ndtab" data-sec="insights" onclick="navTo('insights')"><span class="nd-icon">✨</span>Insights</button>
+      <button class="ndtab" data-sec="supply" onclick="navTo('supply')"><span class="nd-icon">📦</span>Supplies</button>
+      <button class="ndtab" data-sec="search" onclick="navTo('search')"><span class="nd-icon">🔍</span>Search</button>
       <div class="nd-divider"></div>
       <button class="ndtab" onclick="closeNavDrawer();openActLog()"><span class="nd-icon">⚡</span>Activity</button>
       <button class="ndtab" onclick="closeNavDrawer();lock()" style="color:var(--rd)"><span class="nd-icon">🔒</span>Lock</button>
@@ -4075,6 +4139,11 @@ const S = {
   calMonth: new Date().getMonth(),
   calDate: null,
   calSelDate: null,
+  // 8 Features
+  analytics: null,
+  analyticsLastCalc: null,
+  blogPosts: [],
+  selected: { bottles: [] },
 };
 
 // ════════════════════════════════════════════════════════════
@@ -4355,6 +4424,34 @@ function validateAccessionData(accession) {
   if (accession.status && !['active', 'dormant', 'lost', 'discarded'].includes(accession.status)) throw 'Invalid accession status';
   return true;
 }
+
+// ════════════════════════════════════════════════════════════
+// 8 INTEGRATED LAB FEATURES (Task #27)
+// ════════════════════════════════════════════════════════════
+
+// 1. LAB ANALYTICS ENGINE
+const LabAnalytics={async calculate(){const a={contamination:{},success_rate:{},multiplication:{},culture_timeline:{},alerts:[]};const contam={};S.notes.forEach(n=>{if(!n.species)return;const sp=n.species.toLowerCase();if(!contam[sp])contam[sp]={total:0,contaminated:0};contam[sp].total++;if(n.type==='Contamination Log')contam[sp].contaminated++});a.contamination={by_species:Object.entries(contam).reduce((acc,[sp,d])=>{acc[sp]=d.total>0?Math.round(d.contaminated/d.total*1000)/10:0;return acc},{}),recent_30d:this._calcContam30(),trend:this._getTrend('contamination')};const success={};S.notes.forEach(n=>{if(!n.species)return;const sp=n.species.toLowerCase();if(!success[sp])success[sp]={total:0,success:0};success[sp].total++;if(!['Contamination Log','Failed Experiment'].includes(n.type))success[sp].success++});a.success_rate={by_species:Object.entries(success).reduce((acc,[sp,d])=>{acc[sp]=d.total>0?Math.round(d.success/d.total*1000)/10:0;return acc},{}),overall:S.notes.length>0?Math.round(S.notes.filter(n=>!['Contamination Log','Failed Experiment'].includes(n.type)).length/S.notes.length*1000)/10:0,trend:this._getTrend('success')};const multi={};S.notes.forEach(n=>{if(!n.species||n.cultures_out===null)return;const sp=n.species.toLowerCase();if(!multi[sp])multi[sp]=[];multi[sp].push(n.cultures_out)});a.multiplication={by_species:Object.entries(multi).reduce((acc,[sp,vals])=>{const avg=vals.length>0?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length*10)/10:0;acc[sp]=avg;return acc},{})};a.culture_timeline={by_species:this._buildTimeline()};a.alerts=this._genAlerts(a);S.analytics=a;S.analyticsLastCalc=new Date();return a},_calcContam30(){const d=new Date();d.setDate(d.getDate()-30);const rc=S.notes.filter(n=>n.type==='Contamination Log'&&new Date(n.date)>=d);const rt=S.notes.filter(n=>new Date(n.date)>=d).length;return rt>0?Math.round(rc.length/rt*1000)/10:0},_getTrend(m){const n=new Date();const tm=S.notes.filter(n=>{const d=new Date(n.date);return d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear()});const lm=S.notes.filter(n=>{const d=new Date(n.date);const l=new Date(n);l.setMonth(l.getMonth()-1);return d.getMonth()===l.getMonth()&&d.getFullYear()===l.getFullYear()});if(m==='contamination'){const tr=tm.filter(n=>n.type==='Contamination Log').length/(tm.length||1);const lr=lm.filter(n=>n.type==='Contamination Log').length/(lm.length||1);const d=Math.round((tr-lr)*1000)/10;return d<0?'↓ '+Math.abs(d)+'%':'↑ '+d+'%'}return '→ stable'},_buildTimeline(){const t={};S.notes.forEach(n=>{if(!n.species)return;const sp=n.species;if(!t[sp])t[sp]=[];t[sp].push({id:n.id,date:n.date,stage:n.stage,cultures:n.cultures_out,status:n.type==='Contamination Log'?'contaminated':'growing'})});return t},_genAlerts(a){const al=[];(S.bottles||[]).forEach(b=>{if(b.next_review&&new Date(b.next_review)<new Date())al.push({type:'overdue_review',bottle_id:b.id,species:b.species,days:Math.floor((Date.now()-new Date(b.next_review))/86400000)})});Object.entries(a.contamination.by_species||{}).forEach(([sp,r])=>{if(r>10)al.push({type:'high_contamination',species:sp,rate:r})});return al}};
+
+// 2. LAB BLOG
+const LabBlog={async fetchPosts(f={}){try{const r=await fetch('https://tcplants-blog.github.io/posts.json').catch(()=>null);if(!r||!r.ok)return S.blogPosts||[];const p=await r.json();S.blogPosts=p;return p}catch(e){return S.blogPosts||[]}},async createPost(t,m,sp,tgs,mf=[]){const ts=new Date().toISOString().split('T')[0].replace(/-/g,'')+'-'+Date.now().toString(36);const fn=`${ts}-${t.toLowerCase().replace(/\s+/g,'-').slice(0,30)}.md`;const fm=`---\ntitle: "${t}"\ndate: ${new Date().toISOString()}\ntimestamp: "${ts}"\nspecies: "${sp||'General'}"\ntags: [${tgs.map(x=>`"${x}"`).join(', ')}]\nmedia: [${mf.map(x=>`"${x}"`).join(', ')}]\ntc_plants_sync: true\n---\n\n${m}`;const p={id:ts,title:t,date:new Date().toISOString(),species:sp,tags:tgs,media:mf,filename:fn};if(!S.blogPosts)S.blogPosts=[];S.blogPosts.unshift(p);toast('📝 Lab entry: "'+t+'"');return p},renderBlogPage(){const c=document.getElementById('blog-main');if(!c)return;const p=S.blogPosts||[];c.innerHTML=p.length===0?'<div style="padding:40px;text-align:center;color:var(--mu)"><div style="font-size:28px;margin-bottom:12px">📔</div><p>No entries yet</p><button class="btn" onclick="LabBlog.createPost(prompt(\"Title:\"),prompt(\"Notes:\"),prompt(\"Species:\"),[])">Create Entry</button></div>':p.map(x=>'<div style="padding:16px;background:var(--sf);border:1px solid var(--bd);border-radius:8px;margin-bottom:12px;cursor:pointer" onclick="toast(\''+esc(x.title)+'\')"><div style="font-weight:600;margin-bottom:4px">'+esc(x.title)+'</div><div style="font-size:12px;color:var(--mu)">'+new Date(x.date).toLocaleDateString('en-IN')+' • '+x.species+'</div></div>').join('')}};
+
+// 3. LAB CALENDAR
+const LabCalendar={getDueTransfers(d=7){const c=new Date();c.setDate(c.getDate()+d);return(S.bottles||[]).filter(b=>b.next_review&&new Date(b.next_review)<=c&&['inoculated','growing'].includes(b.status))},getOverdueReviews(){return(S.bottles||[]).filter(b=>b.next_review&&new Date(b.next_review)<new Date()&&['inoculated','growing'].includes(b.status))},getTodaysAgenda(){const tr=this.getDueTransfers(0);const or=this.getOverdueReviews();return{transfers_count:tr.length,reviews_overdue:or.length,blog_today:(S.blogPosts||[]).filter(p=>{const d=new Date(p.date);const t=new Date();return d.toDateString()===t.toDateString()}).length,items:[...tr.map(b=>({type:'transfer',bottle:b})),...or.map(b=>({type:'review',bottle:b,days:Math.floor((Date.now()-new Date(b.next_review))/86400000)}))]}},renderCalendarView(){const c=document.getElementById('calendar-main');if(!c)return;const a=this.getTodaysAgenda();c.innerHTML='<div style="padding:20px"><h2 style="margin-bottom:20px">📅 Lab Schedule</h2><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px"><div style="background:var(--sf);padding:16px;border-radius:8px;border:1px solid var(--bd)"><div style="font-size:28px;font-weight:700;color:var(--ac)">'+a.transfers_count+'</div><div style="font-size:11px;color:var(--mu)">Transfers Due</div></div><div style="background:var(--sf);padding:16px;border-radius:8px;border:1px solid var(--bd)"><div style="font-size:28px;font-weight:700;color:var(--rd)">'+a.reviews_overdue+'</div><div style="font-size:11px;color:var(--mu)">Reviews Overdue</div></div></div><h3 style="margin-bottom:12px;font-size:13px;color:var(--mu)">UPCOMING ACTIONS</h3><div>'+a.items.map(i=>'<div style="padding:12px;background:var(--sf2);border-left:3px solid '+(i.type==='transfer'?'var(--ac)':'var(--rd)')+';margin-bottom:8px"><strong style="font-size:13px">'+esc(i.bottle.name||i.bottle.code)+'</strong><div style="font-size:11px;color:var(--mu);margin-top:4px">'+i.bottle.species+'</div></div>').join('')+'</div></div>'}};
+
+// 4. RAVANA INSIGHTS
+const RavanaInsights={async analyze(sp){if(!S.analytics)await LabAnalytics.calculate();const a=S.analytics;const am={};Object.keys(a.success_rate.by_species||{}).forEach(s=>{am[s]={success_rate:a.success_rate.by_species[s],contamination:a.contamination.by_species[s]||0,multiplication:a.multiplication.by_species[s]||0}});const s2=sp.toLowerCase();const m=am[s2]||{success_rate:0,contamination:0,multiplication:0};return{species:sp,metrics:m,compared:m.success_rate-a.success_rate.overall,rank:Object.values(am).filter(x=>x.success_rate>m.success_rate).length+1}},async renderInsightsPage(){const c=document.getElementById('insights-main');if(!c)return;if(!S.analytics)await LabAnalytics.calculate();const a=S.analytics;const sl=Object.keys(a.success_rate.by_species||{});c.innerHTML='<div style="padding:20px"><h2>✨ Ravana Insights</h2><select id="ins-sel" onchange="RavanaInsights.showDetail(this.value)" style="width:100%;padding:8px;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;color:var(--tx);margin:12px 0"><option>Select species...</option>'+sl.map(s=>'<option value="'+s+'">'+s+'</option>').join('')+'</select><div id="ins-det"></div></div>'}},showDetail(sp){if(!sp)return;RavanaInsights.analyze(sp).then(r=>{const d=document.getElementById('ins-det');d.innerHTML='<div style="padding:16px;background:var(--sf);border:1px solid var(--bd);border-radius:8px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px"><div style="text-align:center;padding:12px;background:var(--sf2);border-radius:6px"><div style="font-size:24px;font-weight:700;color:var(--ac)">'+r.metrics.success_rate+'%</div><div style="font-size:11px;color:var(--mu)">Success Rate</div></div><div style="text-align:center;padding:12px;background:var(--sf2);border-radius:6px"><div style="font-size:24px;font-weight:700;color:var(--gn)">'+r.metrics.multiplication+'x</div><div style="font-size:11px;color:var(--mu)">Multiplication</div></div></div><p style="color:var(--mu);font-size:12px">Rank: #'+r.rank+' in lab ('+Math.round(r.compared*10)/10+'% vs avg)</p></div>'})};
+
+// 5. BATCH OPS
+const BatchOps={selectedBottles:[],selectBottle(id,sel){if(sel){if(!this.selectedBottles.includes(id))this.selectedBottles.push(id)}else{this.selectedBottles=this.selectedBottles.filter(x=>x!==id)}this.updateBatchUI()},async bulkUpdateStatus(st,dt){this.selectedBottles.forEach(id=>{const b=S.bottles.find(x=>x.id===id);if(b){b.status=st;b.last_transfer=dt||new Date().toISOString().split('T')[0]}});await saveBottles(S.bottles,S.bottlesSha);toast('✅ Updated '+this.selectedBottles.length+' bottles');this.selectedBottles=[];this.updateBatchUI();renderBottleList()},updateBatchUI(){const b=document.getElementById('batch-action-bar');if(!b)return;if(this.selectedBottles.length===0){b.style.display='none';return}b.style.display='flex';b.innerHTML='<div style="flex:1"><strong>'+this.selectedBottles.length+'</strong> selected</div><button class="btn xs" onclick="BatchOps.bulkUpdateStatus(\'transferred\',new Date().toISOString().split(\'T\')[0])">↪️ Mark Transferred</button><button class="btn xs ghost" onclick="BatchOps.selectedBottles=[];BatchOps.updateBatchUI()">✕ Clear</button>'}};
+
+// 6. SUPPLY INVENTORY
+const SupplyInventory={items:[],addMediaBatch(n,q,c){const b={id:'media-'+Date.now().toString(36),name:n,quantity:q,used:0,remaining:q,date:new Date().toISOString().split('T')[0],cost:c,cost_per:Math.round(c/q*100)/100};this.items.push(b);localStorage.setItem('tcplants_supply',JSON.stringify(this.items));toast('📦 Added: '+n)},renderInventoryPage(){const c=document.getElementById('supply-main');if(!c)return;c.innerHTML='<div style="padding:20px"><h2>📦 Supplies</h2><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">'+this.items.map(i=>'<div style="padding:12px;background:var(--sf);border:1px solid var(--bd);border-radius:8px"><strong>'+esc(i.name)+'</strong><div style="font-size:11px;color:var(--mu);margin-top:8px">Used: '+i.used+'/'+i.quantity+'<br>Cost: ₹'+i.cost+'</div></div>').join('')+'</div><button class="btn" style="margin-top:20px" onclick="SupplyInventory.addMediaBatch(prompt(\'Name:\'),parseInt(prompt(\'Qty:\')||0),parseFloat(prompt(\'Cost:\')||0));SupplyInventory.renderInventoryPage()">+ Add Batch</button></div>'}};
+
+// 7. SEARCH SYSTEM
+const SearchSystem={async search(cr){const r={notes:[],bottles:[],blog:[]};r.notes=S.notes.filter(n=>{if(cr.species&&!n.species?.toLowerCase().includes(cr.species.toLowerCase()))return false;if(cr.q&&!n.title?.toLowerCase().includes(cr.q.toLowerCase()))return false;return true});r.bottles=(S.bottles||[]).filter(b=>{if(cr.species&&!b.species?.toLowerCase().includes(cr.species.toLowerCase()))return false;if(cr.q&&!b.name?.toLowerCase().includes(cr.q.toLowerCase()))return false;return true});r.blog=(S.blogPosts||[]).filter(p=>{if(cr.species&&!p.species?.toLowerCase().includes(cr.species.toLowerCase()))return false;if(cr.q&&!p.title?.toLowerCase().includes(cr.q.toLowerCase()))return false;return true});return r},renderSearchPage(){const c=document.getElementById('search-main');if(!c)return;c.innerHTML='<div style="padding:20px"><h2>🔍 Search</h2><input type="text" id="search-q" placeholder="Search..." style="width:100%;padding:8px;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;color:var(--tx);margin-bottom:12px"><button class="btn" onclick="SearchSystem.search({q:document.getElementById(\'search-q\').value}).then(r=>{const res=document.getElementById(\'search-res\');res.innerHTML=\'<h3>Notes (\'+(r.notes.length)+\')</h3>\'+r.notes.map(n=>\'<div style=\\\"padding:8px;cursor:pointer;background:var(--sf2);margin-bottom:4px;border-radius:4px\\\">\'+ esc(n.title)+\'</div>\').join(\'\')+\'<h3 style=\\\"margin-top:16px\\\">Bottles (\'+(r.bottles.length)+\')</h3>\'+r.bottles.map(b=>\'<div style=\\\"padding:8px;cursor:pointer;background:var(--sf2);margin-bottom:4px;border-radius:4px\\\">\'+ esc(b.name)+\'</div>\').join(\'\')})">Search</button><div id="search-res" style="margin-top:12px"></div></div>'}};
+
+// 8. DASHBOARD UPDATES
+const DashboardUpdates={async enhance(){if(!S.analytics)await LabAnalytics.calculate();const a=S.analytics.alerts||[];const statsEl=document.getElementById('dash-stats');if(statsEl&&a.length>0){const html='<div style="flex:1;padding:14px 16px;cursor:pointer;text-align:center;border-right:1px solid var(--bd);transition:background .12s" onmouseover="this.style.background=\'var(--sf2)\'" onmouseout="this.style.background=\'\'"><div style="font-size:22px;font-weight:800;color:var(--rd);line-height:1">'+a.length+'</div><div style="font-size:10px;color:var(--mu);margin-top:3px;text-transform:uppercase;letter-spacing:.06em">⚠️ At Risk</div></div>';statsEl.insertAdjacentHTML('afterbegin',html)}}};
 
 function fmtDate(iso){
   if(!iso) return '';
@@ -10092,6 +10189,12 @@ function navTo(sec){
     // For non-list sections: close the drawer
     document.querySelectorAll('.nd-list-area').forEach(el=>el.classList.remove('on'));
     closeNavDrawer();
+    // Render new feature sections
+    if(sec==='blog') LabBlog.renderBlogPage();
+    else if(sec==='schedule') LabCalendar.renderCalendarView();
+    else if(sec==='insights') RavanaInsights.renderInsightsPage();
+    else if(sec==='supply') SupplyInventory.renderInventoryPage();
+    else if(sec==='search') SearchSystem.renderSearchPage();
   }
 }
 
@@ -10189,6 +10292,11 @@ async function login(){
     // const _tgCo=document.getElementById('set-tg-contam'); if(_tgCo) _tgCo.checked=localStorage.getItem('tcplants_tg_contam')==='1';
     setTimeout(_doWriteSummary, 5000); // write summary on login
     if(window._pendingBottle){ const pid=window._pendingBottle; window._pendingBottle=null; navTo('bottles'); setTimeout(()=>openBottle(pid),50); }
+    // Initialize 8 features
+    LabAnalytics.calculate();
+    LabBlog.fetchPosts();
+    SupplyInventory.items = JSON.parse(localStorage.getItem('tcplants_supply') || '[]');
+    DashboardUpdates.enhance();
     fetchWeather();
     if(window._wxInterval) clearInterval(window._wxInterval);
     window._wxInterval = setInterval(fetchWeather, 60000);
