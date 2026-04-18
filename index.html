@@ -590,6 +590,11 @@ main > .dview, main > .editor{ margin:0 auto; }
 .dqa-btn:hover{border-color:var(--ac);background:rgba(88,166,255,.06)}
 .dqa-btn.primary{background:var(--ac);color:#0d1117;border-color:var(--ac)}
 .dqa-btn.primary:hover{opacity:.88}
+.dash-alert-strip{display:flex;flex-wrap:wrap;gap:6px}
+.dash-alert-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid;transition:opacity .15s}
+.dash-alert-pill:hover{opacity:.8}
+.dash-alert-pill.crit{background:rgba(248,81,73,.12);border-color:rgba(248,81,73,.4);color:var(--rd)}
+.dash-alert-pill.warn{background:rgba(210,153,34,.1);border-color:rgba(210,153,34,.35);color:var(--yw)}
 .dash-activity-bar{display:flex;align-items:flex-end;gap:3px;height:36px;margin:4px 0 8px}
 .dab-col{flex:1;background:var(--ac);border-radius:2px 2px 0 0;opacity:.7;min-height:3px;cursor:default;position:relative;transition:opacity .15s}
 .dab-col:hover{opacity:1}
@@ -1649,6 +1654,8 @@ input, textarea, select {
           <button class="dqa-btn" aria-label="Scan QR or barcode" onclick="openQRScan()">📷 QR Scan</button>
           <button class="dqa-btn" aria-label="View analytics and statistics" onclick="navTo('analytics')">📊 Analytics</button>
         </div>
+        <!-- Alert strip — rendered by _renderDashboard(), hidden when empty -->
+        <div id="dash-alerts" style="display:none;margin-bottom:12px"></div>
         <!-- Quick Stats -->
         <div id="dash-stats" style="display:flex;gap:0;margin-bottom:16px;background:var(--sf);border:1px solid var(--bd);border-radius:12px;overflow:hidden"></div>
         <!-- Dynamic panels rendered by _renderDashboard() -->
@@ -4450,8 +4457,7 @@ const SupplyInventory={items:[],addMediaBatch(n,q,c){const b={id:'media-'+Date.n
 // 7. SEARCH SYSTEM
 const SearchSystem={async search(cr){const r={notes:[],bottles:[],blog:[]};r.notes=S.notes.filter(n=>{if(cr.species&&!n.species?.toLowerCase().includes(cr.species.toLowerCase()))return false;if(cr.q&&!n.title?.toLowerCase().includes(cr.q.toLowerCase()))return false;return true});r.bottles=(S.bottles||[]).filter(b=>{if(cr.species&&!b.species?.toLowerCase().includes(cr.species.toLowerCase()))return false;if(cr.q&&!b.name?.toLowerCase().includes(cr.q.toLowerCase()))return false;return true});r.blog=(S.blogPosts||[]).filter(p=>{if(cr.species&&!p.species?.toLowerCase().includes(cr.species.toLowerCase()))return false;if(cr.q&&!p.title?.toLowerCase().includes(cr.q.toLowerCase()))return false;return true});return r},renderSearchPage(){const c=document.getElementById('search-main');if(!c)return;c.innerHTML='<div style="padding:20px"><h2>🔍 Search</h2><input type="text" id="search-q" placeholder="Search..." style="width:100%;padding:8px;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;color:var(--tx);margin-bottom:12px"><button class="btn" onclick="SearchSystem.search({q:document.getElementById(\'search-q\').value}).then(r=>{const res=document.getElementById(\'search-res\');res.innerHTML=\'<h3>Notes (\'+(r.notes.length)+\')</h3>\'+r.notes.map(n=>\'<div style=\\\"padding:8px;cursor:pointer;background:var(--sf2);margin-bottom:4px;border-radius:4px\\\">\'+ esc(n.title)+\'</div>\').join(\'\')+\'<h3 style=\\\"margin-top:16px\\\">Bottles (\'+(r.bottles.length)+\')</h3>\'+r.bottles.map(b=>\'<div style=\\\"padding:8px;cursor:pointer;background:var(--sf2);margin-bottom:4px;border-radius:4px\\\">\'+ esc(b.name)+\'</div>\').join(\'\')})">Search</button><div id="search-res" style="margin-top:12px"></div></div>'}};
 
-// 8. DASHBOARD UPDATES
-const DashboardUpdates={async enhance(){if(!S.analytics)await LabAnalytics.calculate();const a=S.analytics.alerts||[];const statsEl=document.getElementById('dash-stats');if(statsEl&&a.length>0){const html='<div style="flex:1;padding:14px 16px;cursor:pointer;text-align:center;border-right:1px solid var(--bd);transition:background .12s" onmouseover="this.style.background=\'var(--sf2)\'" onmouseout="this.style.background=\'\'"><div style="font-size:22px;font-weight:800;color:var(--rd);line-height:1">'+a.length+'</div><div style="font-size:10px;color:var(--mu);margin-top:3px;text-transform:uppercase;letter-spacing:.06em">⚠️ At Risk</div></div>';statsEl.insertAdjacentHTML('afterbegin',html)}}};
+// Dashboard alerts are now handled by _computeAlerts() + _renderDashboard()
 
 function fmtDate(iso){
   if(!iso) return '';
@@ -4594,11 +4600,76 @@ function _contamHeatmap(notes){
   </div>`;
 }
 
+function _computeAlerts(){
+  const alerts=[];
+  const now=new Date();
+  const allBots=S.bottles||[];
+  const notes=S.notes||[];
+  const gh=S.greenhouse||[];
+
+  // 1. Contamination spike — any species with ≥3 notes in last 30d and >10% contam rate
+  const spMap={};
+  notes.forEach(n=>{
+    if(!n.species||!n.date) return;
+    const age=(Date.now()-new Date(n.date))/86400000;
+    if(age>30) return;
+    const k=n.species.toLowerCase();
+    if(!spMap[k]) spMap[k]={name:n.species,total:0,contam:0};
+    spMap[k].total++;
+    if(n.type==='Contamination Log') spMap[k].contam++;
+  });
+  const spikes=Object.values(spMap).filter(sp=>sp.total>=3&&sp.contam/sp.total>0.1);
+  if(spikes.length){
+    const names=spikes.slice(0,2).map(s=>s.name).join(', ')+(spikes.length>2?` +${spikes.length-2}`:'');
+    alerts.push({level:'crit',icon:'☣️',msg:`Contamination spike: ${names}`,action:"navTo('contam')"});
+  }
+
+  // 2. Overdue reviews — bottles past next_review (active status only)
+  const overdueBot=allBots.filter(b=>b.next_review&&['inoculated','growing'].includes(b.status)&&daysFrom(b.next_review)<0);
+  const overdueNote=notes.filter(n=>n.next_review&&daysFrom(n.next_review)<0);
+  const totalOverdue=overdueBot.length+overdueNote.length;
+  if(totalOverdue>0){
+    alerts.push({level:'warn',icon:'⏰',msg:`${totalOverdue} overdue review${totalOverdue>1?'s':''}`,action:"navTo('reminders')"});
+  }
+
+  // 3. Transfer due — ≥5 bottles past 28 days since inoculation
+  const xferDue=allBots.filter(b=>{
+    if(!['inoculated','growing'].includes(b.status)||!b.date_inoculated) return false;
+    return Math.floor((now-new Date(b.date_inoculated))/86400000)>=28;
+  });
+  if(xferDue.length>=5){
+    alerts.push({level:'warn',icon:'✂️',msg:`${xferDue.length} bottles due for transfer`,action:"navTo('bottles')"});
+  }
+
+  // 4. GH plants needing attention
+  const ghSick=gh.filter(p=>p.health&&p.health!=='healthy');
+  if(ghSick.length){
+    alerts.push({level:'warn',icon:'🏡',msg:`${ghSick.length} GH plant${ghSick.length>1?'s':''} need attention`,action:"navTo('greenhouse')"});
+  }
+
+  return alerts;
+}
+
 function _renderDashboard(){
   const labName=localStorage.getItem('tcplants_lab_name')||'';
   const syncEl=document.getElementById('dash-last-sync');
   if(syncEl) syncEl.textContent=labName||'Encrypted · GitHub-backed';
   const el=document.getElementById('dash-stats'); if(!el) return;
+
+  // ── Alert strip ──────────────────────────────────────────────
+  const alertEl=document.getElementById('dash-alerts');
+  if(alertEl){
+    const alerts=_computeAlerts();
+    if(alerts.length){
+      alertEl.style.display='block';
+      alertEl.innerHTML=`<div class="dash-alert-strip">${
+        alerts.map(a=>`<div class="dash-alert-pill ${a.level}" onclick="${a.action}">${a.icon} ${esc(a.msg)}</div>`).join('')
+      }</div>`;
+    } else {
+      alertEl.style.display='none';
+      alertEl.innerHTML='';
+    }
+  }
 
   const now=new Date(); const todayStr=now.toISOString().slice(0,10);
   const allBots=S.bottles||[];
@@ -10317,7 +10388,7 @@ async function login(){
     LabAnalytics.calculate();
     LabBlog.fetchPosts();
     SupplyInventory.items = JSON.parse(localStorage.getItem('tcplants_supply') || '[]');
-    DashboardUpdates.enhance();
+    // alerts render automatically via _renderDashboard() on login
     fetchWeather();
     if(window._wxInterval) clearInterval(window._wxInterval);
     window._wxInterval = setInterval(fetchWeather, 60000);
