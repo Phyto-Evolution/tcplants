@@ -3630,9 +3630,20 @@ input, textarea, select {
           </div>
           <div id="jv-body" style="flex:1;overflow-y:auto;padding:20px 24px;line-height:1.8;font-size:14px"></div>
           <!-- Ravana Parse bar -->
-          <div style="border-top:1px solid var(--bd);padding:14px 24px;flex-shrink:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <div style="border-top:1px solid var(--bd);padding:12px 24px;flex-shrink:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
             <button class="btn sm" onclick="parseJournalWithRavana()" id="journal-parse-btn" style="background:linear-gradient(135deg,var(--ac),var(--pu));color:#fff;border:none">✨ Parse with Ravana</button>
-            <span style="font-size:12px;color:var(--mu)">Extract recipes, species, and notes from this entry</span>
+            <span style="font-size:12px;color:var(--mu)">Extract recipes, species, and notes</span>
+            <!-- Paused notice (shown when parseEnabled=false) -->
+            <div id="journal-parse-paused" style="display:none;align-items:center;gap:8px;background:rgba(210,153,34,.08);border:1px solid rgba(210,153,34,.3);border-radius:8px;padding:6px 12px">
+              <span style="font-size:12px;color:var(--yw)">⏸ Ravana parsing paused for this entry</span>
+              <button class="btn xs ghost" onclick="_setJournalParseEnabled(S.curJournal,true)" style="font-size:11px;border-color:var(--yw);color:var(--yw)">Resume</button>
+            </div>
+            <div style="flex:1"></div>
+            <!-- Toggle in view mode too -->
+            <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:11px;color:var(--mu)" id="journal-parse-toggle-wrap">
+              <input type="checkbox" id="journal-parse-toggle" onchange="_setJournalParseEnabled(S.curJournal,this.checked)" style="accent-color:var(--ac);cursor:pointer">
+              Parse with Ravana
+            </label>
           </div>
           <!-- Parse results -->
           <div id="journal-parse-results" style="display:none;border-top:1px solid var(--bd);padding:16px 24px;background:var(--sf2);flex-shrink:0"></div>
@@ -4772,15 +4783,26 @@ function renderJournalList(){
     el.innerHTML=`<div style="padding:20px 12px;font-size:12px;color:var(--mu);text-align:center">${q?'No matches':'No entries yet'}</div>`;
     return;
   }
-  el.innerHTML=list.map(e=>`
-    <div class="j-list-item${S.curJournal===e.id?' active':''}" onclick="openJournalEntry('${e.id}')">
+  el.innerHTML=list.map(e=>{
+    const enabled=e.parseEnabled!==false;
+    const parseSt=e.parsed?'✦ parsed':enabled?'● unparsed':'⏸ paused';
+    const parseTip=e.parsed?'Parsed by Ravana':enabled?'Unparsed — eligible for overnight parse':'Paused — Ravana will skip this entry';
+    const parseCol=e.parsed?'var(--gn)':enabled?'var(--sf3)':'var(--yw)';
+    return `<div class="j-list-item${S.curJournal===e.id?' active':''}" onclick="openJournalEntry('${e.id}')">
       <div style="display:flex;align-items:center;gap:6px">
-        <div class="j-list-title" style="flex:1">${esc(e.title||'Untitled')}</div>
-        <span title="${e.parsed?'Parsed by Ravana':'Not yet parsed'}" style="font-size:9px;flex-shrink:0;color:${e.parsed?'var(--gn)':'var(--sf3)'}">${e.parsed?'✦':'●'}</span>
+        <div class="j-list-title" style="flex:1;${!enabled?'opacity:.6;font-style:italic':''}">${esc(e.title||'Untitled')}</div>
+        <span title="${parseTip}" style="font-size:9px;flex-shrink:0;color:${parseCol};white-space:nowrap">${parseSt}</span>
       </div>
       <div class="j-list-date">${fmtJournalTs(e.date)}</div>
       ${e.tags?.length?`<div class="j-list-tags">${e.tags.slice(0,3).map(t=>`<span class="j-tag">${esc(t)}</span>`).join('')}</div>`:''}
-    </div>`).join('');
+      <div style="display:flex;align-items:center;gap:5px;margin-top:5px" onclick="event.stopPropagation()">
+        <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:10px;color:${enabled?'var(--ac)':'var(--mu)'}">
+          <input type="checkbox" ${enabled?'checked':''} onchange="_setJournalParseEnabled('${e.id}',this.checked)" style="accent-color:var(--ac);width:12px;height:12px;cursor:pointer">
+          Parse with Ravana
+        </label>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function showJournalEmpty(){
@@ -4805,13 +4827,23 @@ function openJournalEntry(id){
   // Show stored parse results if already parsed, clear otherwise
   const pr=document.getElementById('journal-parse-results');
   const parseBtn=document.getElementById('journal-parse-btn');
+  const enabled=e.parseEnabled!==false;
+  // Sync the inline toggle checkbox
+  const toggleCb=document.getElementById('journal-parse-toggle');
+  if(toggleCb) toggleCb.checked=enabled;
+  if(parseBtn){
+    parseBtn.style.display=enabled?'':'none';
+    parseBtn.textContent=e.parsed?'✨ Re-parse with Ravana':'✨ Parse with Ravana';
+  }
+  // Show paused notice if disabled
+  const pauseNotice=document.getElementById('journal-parse-paused');
+  if(pauseNotice) pauseNotice.style.display=enabled?'none':'flex';
+
   if(e.parsed && e.extracts && (e.extracts.recipes?.length||e.extracts.species?.length||e.extracts.notes?.length||e.extracts.summary)){
     window._journalParseData=e.extracts;
     _renderJournalExtracts(e.extracts);
-    if(parseBtn) parseBtn.textContent='✨ Re-parse with Ravana';
   } else {
     pr.style.display='none'; pr.innerHTML='';
-    if(parseBtn) parseBtn.textContent='✨ Parse with Ravana';
   }
 }
 
@@ -4920,7 +4952,7 @@ async function saveJournalEntry(){
       if(bodyChanged){ entry.parsed=false; entry.parsedAt=null; entry.summary=null; entry.extracts=[]; }
     }
   } else {
-    entry={id:'j-'+uid(), date:nowIso, title:title||fmtJournalTs(nowIso), body, tags, parsed:false, parsedAt:null, summary:null, extracts:[]};
+    entry={id:'j-'+uid(), date:nowIso, title:title||fmtJournalTs(nowIso), body, tags, parsed:false, parsedAt:null, summary:null, extracts:[], parseEnabled:true};
     S.journal.unshift(entry);
   }
   load('Saving journal…');
@@ -4949,6 +4981,7 @@ async function deleteJournalEntry(){
 // ── Ravana Parse ────────────────────────────────────────────
 async function parseJournalWithRavana(){
   const e=S.journal.find(x=>x.id===S.curJournal); if(!e) return;
+  if(e.parseEnabled===false){ toast('Parsing is paused for this entry — enable it first','fail'); return; }
   const btn=document.getElementById('journal-parse-btn');
   const pr=document.getElementById('journal-parse-results');
   btn.disabled=true; btn.textContent='✨ Parsing…';
@@ -5110,8 +5143,23 @@ function _journalAddSpecies(idx){
 
 const JOURNAL_PARSE_KEY='tcplants_journal_last_batch';
 
+async function _setJournalParseEnabled(id, enabled){
+  const e=(S.journal||[]).find(x=>x.id===id); if(!e) return;
+  e.parseEnabled=enabled;
+  // If re-enabling and was previously parsed, keep parsed state
+  // If disabling, just flag — don't touch parsed/extracts
+  try{
+    S.journalSha=await saveJournal(S.journal,S.journalSha);
+  }catch(_){}
+  renderJournalList();
+  // Refresh view if this entry is open
+  if(S.curJournal===id) openJournalEntry(id);
+  toast(enabled?'Ravana parsing enabled for this entry':'Entry paused — Ravana will skip it');
+}
+
 async function _batchParseUnparsedJournal(silent=false){
-  const unparsed=(S.journal||[]).filter(e=>!e.parsed && e.body && e.body.trim().length>30);
+  // Only parse entries where parseEnabled is not explicitly false
+  const unparsed=(S.journal||[]).filter(e=>!e.parsed && e.parseEnabled!==false && e.body && e.body.trim().length>30);
   if(!unparsed.length){ if(!silent) toast('All journal entries already parsed'); return; }
   if(!silent) toast(`📓 Parsing ${unparsed.length} journal entr${unparsed.length>1?'ies':'y'}…`);
 
