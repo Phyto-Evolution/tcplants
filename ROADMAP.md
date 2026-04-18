@@ -5,6 +5,23 @@ Pinned on 2026-04-18. Revisit here before starting any new session.
 
 ---
 
+## North Star — Agentic Ravana
+
+Every function in this site is a potential Ravana action. The site has hundreds of
+functions across Notes, Bottles, Accessions, Recipes, Greenhouse, Taxonomy, Analytics,
+Supplies, Reminders, Calendar, and more. Once the tool-use / function-calling
+architecture is in place, any of these can be wired as something Ravana can call
+on instruction — not just answer questions about, but actually do.
+
+The build path:
+1. Ship the priority features below (real site value, independent of AI)
+2. Build the tool-use framework into askAI() (one-time architectural change)
+3. Wire site functions as tools progressively — read-only first, writes with confirm
+
+There is no ceiling on what Ravana can do once that framework is in place.
+
+---
+
 ## Priority Queue
 
 ### 1. Batch Operations (Bottles)
