@@ -4576,13 +4576,6 @@ function _renderDashboard(){
     const H=(label,action='',actionLabel='')=>`<div class="dc-label">${label}${action?`<span onclick="${action}" style="color:var(--ac);cursor:pointer;font-size:10px">${actionLabel}</span>`:''}</div>`;
     const Row=(icon,title,sub,action,badge='',badgeCol='var(--mu)')=>`
       <div class="dc-row" onclick="${action}">
-        ${icon?`<span style="font-size:14px;flex-shrink:0">${icon}</span>`:''}
-        <div style="flex:1;min-width:0">
-          <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${title}</div>
-          ${sub?`<div style="font-size:11px;color:var(--mu);margin-top:1px">${sub}</div>`:''}
-        </div>
-        ${badge?`<span style="font-size:11px;font-weight:700;color:${badgeCol};flex-shrink:0">${badge}</span>`:''}
-      </div>`;
 
     // ── 1. CULTURES — donut + stage list ──────────────────────
     const donutHTML=C('donut',`
