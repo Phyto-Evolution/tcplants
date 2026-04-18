@@ -3434,6 +3434,34 @@ input, textarea, select {
         <p>Open the Ravana AI panel → tap <strong>📓 Journal Log</strong> tab. Shows all parsed entries with their summaries and extracted data. Each extract has a <strong>Use →</strong> button to pre-fill the relevant form, and a <strong>↺ Re-parse</strong> button to flag the entry for re-processing if Ravana made a mistake.</p>
       </div>
 
+      <h2 id="h-lifecycle">🔬 Culture Lifecycle Tracking</h2>
+      <div class="help-section-card">
+        <p>Every active bottle now shows how far it is through its expected stage duration, and the Analytics section shows a lab-wide lifecycle health summary.</p>
+        <h3>On each bottle detail</h3>
+        <p>Scroll down below the spec table to see the <strong>Culture Lifecycle</strong> strip:</p>
+        <ul style="font-size:13px;line-height:1.9;padding-left:18px">
+          <li>Stage path icons (🧪 → 💉 → 🌿 → ✂️ → 🌱 → ☀️ → 🪴) with current stage highlighted</li>
+          <li>Progress bar: days elapsed vs expected stage duration</li>
+          <li>Status badge showing whether the culture is on track, due soon, or overdue</li>
+          <li>Total days in lab since preparation</li>
+        </ul>
+        <h3>Expected duration — how it's calculated</h3>
+        <table><tr><th>Source</th><th>Priority</th></tr>
+          <tr><td>Historical bottles of same species (avg days inoculated → subcultured)</td><td>Highest — requires ≥2 completed bottles</td></tr>
+          <tr><td>Taxonomy species <code>subculture_interval_days</code> setting</td><td>Medium</td></tr>
+          <tr><td>Stage defaults (inoculated: 14d, growing/subcultured: 28d, rooting: 21d…)</td><td>Fallback</td></tr>
+        </table>
+        <h3>Status colours</h3>
+        <table><tr><th>Status</th><th>Condition</th></tr>
+          <tr><td style="color:var(--gn)">🟢 On track</td><td>Less than 70% of expected duration elapsed</td></tr>
+          <tr><td style="color:var(--yw)">🟡 Due soon</td><td>70–100% of expected duration</td></tr>
+          <tr><td style="color:var(--yw)">⏰ Transfer due</td><td>100–150% of expected</td></tr>
+          <tr><td style="color:var(--rd)">🔴 Delayed</td><td>More than 150% of expected — needs attention</td></tr>
+        </table>
+        <h3>Analytics — Culture Lifecycle Status</h3>
+        <p>Analytics section → <strong>Culture Lifecycle Status</strong> card. All active bottles grouped by status with counts and clickable rows that navigate directly to the bottle.</p>
+      </div>
+
       <h2 id="h-alerts">🚨 Dashboard Alerts</h2>
       <div class="help-section-card">
         <p>A strip of coloured pills appears above the stat band whenever the lab needs attention. It renders on every dashboard load and disappears automatically when the condition clears — no manual dismiss needed.</p>
@@ -7209,6 +7237,38 @@ function renderAnalytics(){
     }).join(''):`<p class="an-empty">Add 'Cultures Out' to notes to see multiplication rates.</p>`;
     const multiCard=`<div class="an-card"><div class="an-title">Multiplication Factor (avg cultures out)</div>${multiBars}</div>`;
 
+    // ── Culture lifecycle card
+    const activeBots=bots.filter(b=>['inoculated','growing','subcultured','rooting','hardening'].includes(b.status));
+    const lcGroups={on_track:[],due_soon:[],transfer_due:[],delayed:[]};
+    activeBots.forEach(b=>{
+      const lc=_calcBottleLifecycle(b);
+      if(lc&&!lc.terminal&&lcGroups[lc.status]) lcGroups[lc.status].push({b,lc});
+    });
+    const lcRow=(item)=>`<div onclick="navTo('bottles');openBottle('${item.b.id}')" style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--sf2);cursor:pointer">
+      <div style="flex:1;min-width:0">
+        <span style="font-size:12px;font-weight:600">${esc(item.b.code)}</span>
+        <span style="font-size:11px;color:var(--mu);margin-left:6px">${esc(item.b.species||'')}</span>
+      </div>
+      <span style="font-size:11px;font-weight:700;color:${item.lc.col};flex-shrink:0">${item.lc.label}</span>
+    </div>`;
+    const lcStat=(key,label,col)=>lcGroups[key].length?`
+      <div style="margin-bottom:12px">
+        <div style="font-size:10px;font-weight:800;letter-spacing:.08em;color:${col};text-transform:uppercase;margin-bottom:4px">${label} (${lcGroups[key].length})</div>
+        ${lcGroups[key].slice(0,5).map(lcRow).join('')}
+        ${lcGroups[key].length>5?`<div style="font-size:11px;color:var(--mu);margin-top:4px">+${lcGroups[key].length-5} more</div>`:''}
+      </div>`:'' ;
+    const lifecycleCard=activeBots.length?`<div class="an-card" style="grid-column:1/-1">
+      <div class="an-title">🔬 Culture Lifecycle Status</div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px">
+        ${[['on_track','🟢 On Track','var(--gn)'],['due_soon','🟡 Due Soon','var(--yw)'],['transfer_due','⏰ Transfer Due','var(--yw)'],['delayed','🔴 Delayed','var(--rd)']].map(([k,l,c])=>
+          `<div style="text-align:center"><div style="font-size:22px;font-weight:800;color:${c}">${lcGroups[k].length}</div><div style="font-size:10px;color:var(--mu)">${l}</div></div>`).join('')}
+      </div>
+      ${lcStat('delayed','🔴 Delayed','var(--rd)')}
+      ${lcStat('transfer_due','⏰ Transfer Due','var(--yw)')}
+      ${lcStat('due_soon','🟡 Due Soon','var(--yw)')}
+      ${lcStat('on_track','🟢 On Track','var(--gn)')}
+    </div>`:'' ;
+
     // Assemble with bottle chart
     const intervalSection=intervalCards?`<div class="an-grid">${intervalCards}</div>`:'';
     const usageCard=_buildUsageCard();
@@ -7217,6 +7277,7 @@ function renderAnalytics(){
       <div class="an-grid">${speciesCard}${multiCard}</div>
       ${intervalSection}
       <div class="an-grid">${funnelCard}</div>
+      ${lifecycleCard?`<div class="an-grid">${lifecycleCard}</div>`:''}
       <div class="an-grid">${botChart}${bottleCard}</div>
       <div class="an-grid">${effCard}${usageCard}</div>
     `;
@@ -9873,6 +9934,112 @@ function renderRecList(){
 const BOT_STATUSES=['prepared','inoculated','growing','subcultured','contaminated','discarded'];
 const BOT_STATUS_NEXT={prepared:'inoculated',inoculated:'growing',growing:'subcultured'};
 
+// Expected days per stage — defaults, overridden by taxonomy subculture_interval_days
+const STAGE_EXPECTED_DAYS={
+  prepared:3, inoculated:14, growing:28,
+  subcultured:28, rooting:21, hardening:14, weaned:7
+};
+
+// Full lifecycle stage order for the path visualisation
+const STAGE_PATH=[
+  {key:'prepared',  icon:'🧪', label:'Prepared'},
+  {key:'inoculated',icon:'💉', label:'Inoculated'},
+  {key:'growing',   icon:'🌿', label:'Growing'},
+  {key:'subcultured',icon:'✂️',label:'Subcultured'},
+  {key:'rooting',   icon:'🌱', label:'Rooting'},
+  {key:'hardening', icon:'☀️', label:'Hardening'},
+  {key:'weaned',    icon:'🪴', label:'Weaned'},
+];
+
+function _calcBottleLifecycle(b){
+  const terminal=['contaminated','discarded','weaned'].includes(b.status);
+  const stageStart=b.last_transfer||b.date_inoculated||b.date_prepared;
+  if(!stageStart&&!terminal) return null;
+
+  const now=new Date();
+  const daysInStage=stageStart?Math.floor((now-new Date(stageStart))/86400000):null;
+  const daysTotal=b.date_prepared?Math.floor((now-new Date(b.date_prepared))/86400000):null;
+
+  // Expected days for this stage — check taxonomy first
+  let expectedDays=STAGE_EXPECTED_DAYS[b.status]||28;
+  const spName=(b.species||'').toLowerCase();
+  const spData=(S.taxSpecies||[]).find(s=>(s.name||s.full_name||'').toLowerCase()===spName);
+  if(spData?.subculture_interval_days&&['inoculated','growing','subcultured'].includes(b.status)){
+    expectedDays=spData.subculture_interval_days;
+  }
+
+  // Calculate from historical bottles for this species (avg days inoculated→subcultured)
+  const historical=(S.bottles||[]).filter(x=>
+    x.id!==b.id &&
+    (x.species||'').toLowerCase()===spName &&
+    x.status==='subcultured' &&
+    x.date_inoculated && x.last_transfer
+  ).map(x=>Math.floor((new Date(x.last_transfer)-new Date(x.date_inoculated))/86400000)).filter(d=>d>3&&d<200);
+  if(historical.length>=2&&['inoculated','growing','subcultured'].includes(b.status)){
+    expectedDays=Math.round(historical.reduce((a,b)=>a+b,0)/historical.length);
+  }
+
+  if(terminal) return {terminal:true, daysTotal, status:b.status};
+
+  const pct=Math.min(100,Math.round(daysInStage/expectedDays*100));
+  const daysLeft=expectedDays-daysInStage;
+
+  let status, col, label;
+  if(daysInStage<expectedDays*0.7){
+    status='on_track';  col='var(--gn)'; label=`On track · ${daysLeft}d left`;
+  } else if(daysInStage<expectedDays){
+    status='due_soon';  col='var(--yw)'; label=`Due in ${daysLeft}d`;
+  } else if(daysInStage<expectedDays*1.5){
+    status='transfer_due'; col='var(--yw)'; label=`${Math.abs(daysLeft)}d past due`;
+  } else {
+    status='delayed'; col='var(--rd)'; label=`${Math.abs(daysLeft)}d overdue`;
+  }
+
+  return {terminal:false, daysInStage, daysTotal, expectedDays, daysLeft, pct, status, col, label, stageStart, histCount:historical.length};
+}
+
+function _botLifecycleHtml(b){
+  const lc=_calcBottleLifecycle(b);
+  if(!lc) return '';
+  if(lc.terminal){
+    const d=lc.daysTotal!=null?`<span style="color:var(--mu);font-size:12px">Total time in lab: ${lc.daysTotal} days</span>`:'';
+    return `<div style="padding:12px 16px;border-top:1px solid var(--bd)">${d}</div>`;
+  }
+
+  // Stage path
+  const pathIdx=STAGE_PATH.findIndex(s=>s.key===b.status);
+  const stagePath=STAGE_PATH.map((s,i)=>{
+    const done=i<pathIdx;
+    const current=i===pathIdx;
+    const col=done?'var(--gn)':current?'var(--ac)':'var(--sf3)';
+    const textCol=done?'var(--gn)':current?'var(--ac)':'var(--mu)';
+    return `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex:1;min-width:0">
+      <span style="font-size:${current?'16px':'12px'};opacity:${done||current?'1':'0.4'}">${s.icon}</span>
+      <span style="font-size:9px;color:${textCol};font-weight:${current?'700':'400'};white-space:nowrap;overflow:hidden;max-width:100%;text-overflow:ellipsis">${current?s.label:''}</span>
+      ${i<STAGE_PATH.length-1?`<span style="position:absolute;top:8px;left:calc(50% + 10px);right:calc(-50% + 10px);height:1px;background:${done?'var(--gn)':'var(--sf3)'};display:none"></span>`:''}
+    </div>`;
+  }).join('');
+
+  // Progress bar
+  const barCol=lc.status==='on_track'?'var(--gn)':lc.status==='delayed'?'var(--rd)':'var(--yw)';
+  const histNote=lc.histCount>=2?`Based on ${lc.histCount} previous ${b.species||'this'} bottles`:'Default estimate';
+
+  return `<div style="padding:12px 16px;border-top:1px solid var(--bd)">
+    <div style="font-size:10px;font-weight:800;letter-spacing:.08em;color:var(--mu);text-transform:uppercase;margin-bottom:10px">Culture Lifecycle</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      ${stagePath}
+    </div>
+    <div style="height:5px;background:var(--sf3);border-radius:3px;margin-bottom:6px">
+      <div style="height:5px;border-radius:3px;background:${barCol};width:${lc.pct}%;transition:width .4s"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:12px;color:var(--mu)">Day ${lc.daysInStage} of ~${lc.expectedDays} · ${histNote}</span>
+      <span style="font-size:12px;font-weight:700;color:${lc.col}">${lc.label}</span>
+    </div>
+    ${lc.daysTotal!=null?`<div style="font-size:11px;color:var(--sf3);margin-top:3px">Total: ${lc.daysTotal} days in lab</div>`:''}
+  </div>`;
+}
+
 function _botStatusLabel(s){return s?s.charAt(0).toUpperCase()+s.slice(1):'Prepared';}
 
 function _botNextSeq(){
@@ -10764,6 +10931,7 @@ function openBottle(id){
       </table>
     </div>
     ${b.flair_note?`<div style="padding:4px 16px 8px;font-size:12px;color:var(--mu);font-style:italic">${esc(b.flair_note)}</div>`:''}
+    ${_botLifecycleHtml(b)}
     ${stepperHtml?`<div class="bot-stepper-row">${stepperHtml}</div>`:''}
     ${b.notes?`<div class="bot-notes-body">${sanitizeMarkdown(b.notes)}</div>`:''}
     ${(b.batch_id&&batchMates.length)?`<div class="bot-batch-row">Batch: <a onclick="setBotFilter('all');S.bottleSearch='';renderBottleList()">View all ${batchMates.length+1} bottles in this batch</a></div>`:''}
