@@ -4732,7 +4732,7 @@ function renderJournalList(){
         <div class="j-list-title" style="flex:1">${esc(e.title||'Untitled')}</div>
         <span title="${e.parsed?'Parsed by Ravana':'Not yet parsed'}" style="font-size:9px;flex-shrink:0;color:${e.parsed?'var(--gn)':'var(--sf3)'}">${e.parsed?'✦':'●'}</span>
       </div>
-      <div class="j-list-date">${fmtDateShort(e.date)}</div>
+      <div class="j-list-date">${fmtJournalTs(e.date)}</div>
       ${e.tags?.length?`<div class="j-list-tags">${e.tags.slice(0,3).map(t=>`<span class="j-tag">${esc(t)}</span>`).join('')}</div>`:''}
     </div>`).join('');
 }
@@ -4754,7 +4754,7 @@ function openJournalEntry(id){
   view.style.display='flex';
   document.getElementById('jv-title').textContent=e.title||'Untitled';
   const tags=e.tags?.length?` · ${e.tags.map(t=>`#${t}`).join(' ')}`:'';
-  document.getElementById('jv-meta').textContent=fmtDateShort(e.date)+tags;
+  document.getElementById('jv-meta').textContent=fmtJournalTs(e.date)+(e.updatedAt&&e.updatedAt!==e.date?' · edited '+fmtJournalTs(e.updatedAt):'')+tags;
   document.getElementById('jv-body').innerHTML=sanitizeMarkdown(e.body||'');
   // Show stored parse results if already parsed, clear otherwise
   const pr=document.getElementById('journal-parse-results');
@@ -4854,17 +4854,20 @@ async function saveJournalEntry(){
   const body=document.getElementById('je-body').value.trim();
   const tags=document.getElementById('je-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
   if(!body){ toast('Write something first','fail'); return; }
-  const today=new Date().toISOString().slice(0,10);
+  const now=new Date();
+  const nowIso=now.toISOString();
+  const today=nowIso.slice(0,10);
   let entry;
   if(S.editingJournal){
     entry=S.journal.find(x=>x.id===S.editingJournal);
     if(entry){
       const bodyChanged=entry.body!==body;
-      entry.title=title||today; entry.body=body; entry.tags=tags;
+      entry.title=title||fmtJournalTs(nowIso); entry.body=body; entry.tags=tags;
+      entry.updatedAt=nowIso;
       if(bodyChanged){ entry.parsed=false; entry.parsedAt=null; entry.summary=null; entry.extracts=[]; }
     }
   } else {
-    entry={id:'j-'+uid(), date:today, title:title||today, body, tags, parsed:false, parsedAt:null, summary:null, extracts:[]};
+    entry={id:'j-'+uid(), date:nowIso, title:title||fmtJournalTs(nowIso), body, tags, parsed:false, parsedAt:null, summary:null, extracts:[]};
     S.journal.unshift(entry);
   }
   load('Saving journal…');
@@ -5425,6 +5428,12 @@ function fmtDate(iso){
 function fmtDateShort(iso){
   if(!iso) return '';
   return new Date(iso).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+}
+function fmtJournalTs(iso){
+  if(!iso) return '';
+  const d=new Date(iso);
+  const p=n=>String(n).padStart(2,'0');
+  return `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}:${p(d.getDate())}:${p(d.getMonth()+1)}:${d.getFullYear()}`;
 }
 function daysFrom(iso){
   if(!iso) return null;
@@ -8859,7 +8868,7 @@ function _renderJournalLog(){
   el.innerHTML=parsed.map(e=>{
     const ex=e.extracts||{};
     const hasExtracts=(ex.recipes?.length||0)+(ex.species?.length||0)+(ex.notes?.length||0)>0;
-    const parsedDate=e.parsedAt?new Date(e.parsedAt).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'';
+    const parsedDate=e.parsedAt?fmtJournalTs(e.parsedAt):'';
 
     const recipeCards=(ex.recipes||[]).map((r,i)=>`
       <div style="background:var(--sf3);border-radius:6px;padding:8px 10px;margin-bottom:4px;display:flex;align-items:center;gap:8px">
@@ -8892,7 +8901,7 @@ function _renderJournalLog(){
       <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px;gap:8px">
         <div>
           <div style="font-size:13px;font-weight:700">${esc(e.title||'Untitled')}</div>
-          <div style="font-size:11px;color:var(--mu)">${fmtDateShort(e.date)} · Parsed ${parsedDate}</div>
+          <div style="font-size:11px;color:var(--mu)">${fmtJournalTs(e.date)} · Parsed ${parsedDate}</div>
         </div>
         <button class="btn xs ghost" onclick="navTo('journal');openJournalEntry('${e.id}')" style="flex-shrink:0;font-size:11px">Open →</button>
       </div>
