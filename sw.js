@@ -1,4 +1,4 @@
-const V = 'tcplants-v10';
+const V = 'tcplants-v11';
 const SHELL = ['/', '/index.html', '/manifest.json', '/icon.svg', '/icon-192.png', '/icon-512.png'];
 
 self.addEventListener('install', e => {
