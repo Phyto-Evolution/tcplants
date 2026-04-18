@@ -1028,7 +1028,9 @@ main > .dview, main > .editor{ margin:0 auto; }
 .cal-dot.orange{background:var(--yw)}
 .cal-dot.red{background:var(--rd)}
 .cal-dot.teal{background:#1abc9c}
+.cal-dot.journal{background:var(--pu)}
 .cal-dot-more{font-size:9px;color:var(--mu);line-height:1}
+.cal-journal-badge{display:inline-flex;align-items:center;font-size:9px;font-weight:700;color:var(--pu);background:rgba(188,140,255,.12);border:1px solid rgba(188,140,255,.3);border-radius:8px;padding:1px 5px;margin-top:2px;line-height:1.4}
 #cal-day-panel{
   position:absolute;top:0;right:0;bottom:0;width:320px;
   background:var(--sf);border-left:1px solid var(--bd);
@@ -6708,6 +6710,14 @@ function _buildCalMap(){
       });
     }
   }
+  for(const j of (S.journal||[])){
+    if(j.date){
+      add(j.date,{
+        id:j.id, title:j.title||'Untitled', type:'Journal', stage:'', species:'',
+        dotType:'journal', isJournal:true, parsed:j.parsed||false
+      });
+    }
+  }
   return map;
 }
 
@@ -6767,14 +6777,22 @@ function _calCell(dateStr,dayNum,map,today,dim){
   if(isToday) cls+=' today';
   if(isSelected) cls+=' selected';
 
+  const nonJournal=entries.filter(e=>!e.isJournal);
+  const journalEntries=entries.filter(e=>e.isJournal);
+
   let dots='';
-  const show=entries.slice(0,3);
+  const show=nonJournal.slice(0,3);
   show.forEach(e=>{ dots+=`<span class="cal-dot ${e.dotType}"></span>`; });
-  if(entries.length>3) dots+=`<span class="cal-dot-more">+${entries.length-3}</span>`;
+  if(nonJournal.length>3) dots+=`<span class="cal-dot-more">+${nonJournal.length-3}</span>`;
+
+  const journalBadge=journalEntries.length
+    ?`<span class="cal-journal-badge" title="${journalEntries.length} journal entr${journalEntries.length>1?'ies':'y'}">📓${journalEntries.length}</span>`
+    :'';
 
   return `<div class="${cls}" onclick="openCalendarDay('${dateStr}')">
     <div class="cal-day-num">${dayNum}</div>
     <div class="cal-dots">${dots}</div>
+    ${journalBadge}
   </div>`;
 }
 
@@ -6818,11 +6836,28 @@ function openCalendarDay(dateStr){
   document.getElementById('cdp-new-btn').textContent=
     isPast ? '+ New note on this date' : '+ Schedule note for this date';
 
+  const journalOnDay=entries.filter(e=>e.isJournal);
+  const labOnDay=entries.filter(e=>!e.isJournal);
+
   let html='';
-  if(entries.length===0){
+  if(journalOnDay.length){
+    html+=`<div style="font-size:10px;font-weight:800;letter-spacing:.08em;color:var(--pu);text-transform:uppercase;margin-bottom:6px">📓 Journal (${journalOnDay.length})</div>`;
+    for(const e of journalOnDay){
+      html+=`<div class="cdp-card" style="border-color:rgba(188,140,255,.3);background:rgba(188,140,255,.06);cursor:pointer" onclick="navTo('journal');openJournalEntry('${e.id}');_closeCalPanel()">
+        <div class="cdp-card-title" style="display:flex;align-items:center;gap:8px">
+          <span style="flex:1">${esc(e.title)}</span>
+          <span style="font-size:10px;color:${e.parsed?'var(--gn)':'var(--mu)'}">${e.parsed?'✦ parsed':'● unparsed'}</span>
+        </div>
+        <div class="cdp-card-meta"><span class="cdp-badge" style="background:rgba(188,140,255,.15);color:var(--pu)">Journal</span></div>
+      </div>`;
+    }
+    if(labOnDay.length) html+=`<div style="font-size:10px;font-weight:800;letter-spacing:.08em;color:var(--mu);text-transform:uppercase;margin:10px 0 6px">Lab Entries</div>`;
+  }
+
+  if(labOnDay.length===0 && journalOnDay.length===0){
     html='<p style="font-size:13px;color:var(--mu);padding:8px 2px">No entries for this day.</p>';
   } else {
-    for(const e of entries){
+    for(const e of labOnDay){
       if(e.isBottle){
         const species=e.species?`<span class="cdp-badge">${esc(e.species)}</span>`:'';
         const type=e.type?`<span class="cdp-badge">${esc(e.type)}</span>`:'';
