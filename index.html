@@ -771,10 +771,7 @@ main > .dview, main > .editor{ margin:0 auto; }
 #re-base-custom-wrap{display:none;margin-top:6px}
 
 /* ── HELP ── */
-.help-body{width:100%;box-sizing:border-box}
-#sec-help.fullpage{padding:0}
-#sec-help .help-body{padding:28px 32px}
-@media(max-width:600px){#sec-help .help-body{padding:16px 14px}}
+.help-body{max-width:960px;margin:0 auto}
 .help-body h2{font-size:22px;font-weight:700;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)}
 .help-body h2:first-child{margin-top:0}
 .help-body h3{font-size:15px;font-weight:700;margin:16px 0 6px;color:var(--ac)}
@@ -14549,7 +14546,30 @@ async function saveInv(){
   S_invSha=res.content.sha;
 }
 
-const INV_CATS=['Media Salts','Growth Regulators','Gelling Agents','Sugars & Vitamins','Sterilisation','Glassware & Plastics','Equipment','Other'];
+const INV_CATS=[
+  // ── Media components ──────────────────────────
+  'Media Salts',            // MS, WPM, B5 base salts
+  'Growth Regulators',      // BAP, NAA, IBA, 2,4-D, kinetin, zeatin
+  'Gelling Agents',         // Gelrite, agar, phytagel
+  'Sugars & Carbon Sources',// sucrose, glucose, fructose
+  'Vitamins & Amino Acids', // myo-inositol, thiamine, glycine, pyridoxine
+  'pH Adjustment',          // HCl, KOH, NaOH, buffers
+  // ── Sterility & safety ───────────────────────
+  'Antibiotics & Antifungals', // PPM, carbendazim, cefotaxime, gentamicin
+  'Sterilisation Supplies', // autoclave tape, indicator strips, pouches
+  'Sealing & Closure',      // parafilm, caps, aluminum foil, micropore tape
+  'Laminar Flow & Safety',  // HEPA filters, UV lamps, gloves, masks, ethanol
+  // ── Labware & hardware ───────────────────────
+  'Culture Vessels',        // bottles, jars, Petri dishes, flasks, tubes
+  'Glassware',              // beakers, measuring cylinders, pipettes
+  'Instruments & Tools',    // pH meter, balances, forceps, scalpels, autoclave
+  'Labeling & Storage',     // labels, markers, zip bags, boxes
+  // ── Biological material ──────────────────────
+  'Plant Material',         // explant sources, seeds, rhizomes, mother stock
+  'Cold Storage Items',     // items stored in fridge / freezer / -20°C
+  // ── General ──────────────────────────────────
+  'Other',
+];
 
 function renderInv(){
   const summary=document.getElementById('inv-summary');
@@ -14558,12 +14578,21 @@ function renderInv(){
   if(!summary||!catList||!itemsEl) return;
   const items=S_inv.items||[];
   const low=items.filter(i=>i.quantity<=i.low_threshold&&i.low_threshold>0);
-  summary.innerHTML=`<div style="font-size:13px;font-weight:700;margin-bottom:6px">📊 Stock Summary</div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <div style="text-align:center"><div style="font-size:20px;font-weight:800">${items.length}</div><div style="font-size:10px;color:var(--mu)">items</div></div>
-      <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:${low.length?'var(--rd)':'var(--gn)'}">${low.length}</div><div style="font-size:10px;color:var(--mu)">low stock</div></div>
+  const expiring=items.filter(i=>i.expiry_date&&daysFrom(i.expiry_date)<30&&daysFrom(i.expiry_date)>=0);
+  const totalValue=items.reduce((s,i)=>{
+    if(i.price_per_unit&&i.quantity) return s+i.price_per_unit*i.quantity;
+    if(i.price_total) return s+i.price_total;
+    return s;
+  },0);
+  summary.innerHTML=`<div style="font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--mu);text-transform:uppercase;margin-bottom:8px">Stock Summary</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <div style="text-align:center"><div style="font-size:22px;font-weight:800">${items.length}</div><div style="font-size:10px;color:var(--mu)">items</div></div>
+      <div style="text-align:center"><div style="font-size:22px;font-weight:800;color:${low.length?'var(--rd)':'var(--gn)'}">${low.length}</div><div style="font-size:10px;color:var(--mu)">low stock</div></div>
+      ${expiring.length?`<div style="text-align:center"><div style="font-size:22px;font-weight:800;color:var(--yw)">${expiring.length}</div><div style="font-size:10px;color:var(--mu)">expiring</div></div>`:''}
+      ${totalValue>0?`<div style="text-align:center"><div style="font-size:18px;font-weight:800;color:var(--ac)">₹${totalValue.toFixed(0)}</div><div style="font-size:10px;color:var(--mu)">est. value</div></div>`:''}
     </div>
-    ${low.length?`<div style="margin-top:8px;font-size:11px;color:var(--rd);font-weight:600">⚠️ Low: ${low.slice(0,3).map(i=>esc(i.name)).join(', ')}${low.length>3?'…':''}</div>`:''}`;
+    ${low.length?`<div style="margin-top:8px;font-size:11px;color:var(--rd);font-weight:600">⚠️ ${low.slice(0,2).map(i=>esc(i.name)).join(', ')}${low.length>2?` +${low.length-2} more`:''}</div>`:''}
+    ${expiring.length?`<div style="margin-top:4px;font-size:11px;color:var(--yw)">⏳ ${expiring.slice(0,2).map(i=>esc(i.name)).join(', ')} expiring soon</div>`:''}`;
   let activeCat=localStorage.getItem('tcplants_inv_cat')||'';
   catList.innerHTML=['All',...INV_CATS].map(c=>`<div onclick="_setInvCat('${c==='All'?'':c}')" style="padding:5px 10px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:${activeCat===(c==='All'?'':c)?'700':'400'};background:${activeCat===(c==='All'?'':c)?'var(--ac)':'transparent'};color:${activeCat===(c==='All'?'':c)?'#0d1117':'var(--tx)'}">${c}</div>`).join('');
   const filtered=activeCat?items.filter(i=>i.category===activeCat):items;
@@ -14575,11 +14604,23 @@ function renderInv(){
     ${its.map(i=>{
       const pct=i.low_threshold>0?Math.min(100,Math.round(i.quantity/Math.max(i.low_threshold*2,1)*100)):null;
       const cls=pct!==null&&pct<=25?'inv-low':pct!==null&&pct<=60?'inv-warn':'inv-ok';
+      const warrantyWarn=i.warranty_exp&&daysFrom(i.warranty_exp)<30&&daysFrom(i.warranty_exp)>=0;
+      const hasInvoice=i.invoice_data||i.invoice_link||i.invoice_num;
       return `<div class="inv-row">
         <div style="flex:1;min-width:0">
-          <div class="inv-name">${esc(i.name)}${i.location?` <span style="font-size:11px;color:var(--mu)">📍${esc(i.location)}</span>`:''}</div>
-          ${i.expiry_date?`<div style="font-size:10px;color:${daysFrom(i.expiry_date)<30?'var(--rd)':'var(--mu)'}">Expires ${fmtDateShort(i.expiry_date)}</div>`:''}
-          ${pct!==null?`<div style="height:3px;background:var(--bd);border-radius:2px;margin-top:4px;width:100px"><div style="height:100%;background:${cls==='inv-low'?'var(--rd)':cls==='inv-warn'?'var(--yw)':'var(--gn)'};border-radius:2px;width:${pct}%"></div></div>`:''}
+          <div class="inv-name">
+            ${esc(i.name)}
+            ${i.location?` <span style="font-size:10px;color:var(--mu)">📍${esc(i.location)}</span>`:''}
+            ${hasInvoice?`<span style="font-size:10px;color:var(--mu);margin-left:4px" title="${esc(i.invoice_num||'Invoice attached')}">🧾</span>`:''}
+            ${i.product_url?`<a href="${esc(i.product_url)}" target="_blank" rel="noopener" style="font-size:10px;color:var(--ac);margin-left:4px" onclick="event.stopPropagation()">↗</a>`:''}
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:3px">
+            ${i.supplier?`<span style="font-size:10px;color:var(--mu)">${esc(i.supplier)}</span>`:''}
+            ${i.price_per_unit?`<span style="font-size:10px;color:var(--mu)">₹${i.price_per_unit}/${esc(i.unit||'unit')}</span>`:''}
+            ${i.expiry_date?`<span style="font-size:10px;color:${daysFrom(i.expiry_date)<30?'var(--rd)':'var(--mu)'}">Exp ${fmtDateShort(i.expiry_date)}</span>`:''}
+            ${warrantyWarn?`<span style="font-size:10px;color:var(--yw)">🛡 Warranty expiring</span>`:''}
+          </div>
+          ${pct!==null?`<div style="height:3px;background:var(--bd);border-radius:2px;margin-top:5px;width:120px"><div style="height:100%;background:${cls==='inv-low'?'var(--rd)':cls==='inv-warn'?'var(--yw)':'var(--gn)'};border-radius:2px;width:${pct}%"></div></div>`:''}
         </div>
         <div class="${cls} inv-qty">${i.quantity} ${esc(i.unit||'')}</div>
         <button class="btn xs ghost" onclick="_invOpenEditor('${i.id}')">✏️</button>
@@ -14592,38 +14633,124 @@ function _invOpenEditor(id){
   const item=id?(S_inv.items||[]).find(i=>i.id===id):null;
   const el=document.getElementById('inv-editor'); if(!el) return;
   el.style.display='';
-  el.innerHTML=`<div style="font-size:14px;font-weight:700;margin-bottom:12px">${item?'✏️ Edit Item':'＋ New Item'}</div>
-    <div class="row2" style="margin-bottom:10px">
-      <div class="field" style="margin:0"><label>Name *</label><input type="text" id="inv-name" value="${esc(item?.name||'')}" placeholder="e.g. Murashige & Skoog salts"></div>
-      <div class="field" style="margin:0"><label>Category</label><select id="inv-cat">${INV_CATS.map(c=>`<option${item?.category===c?' selected':''}>${c}</option>`).join('')}</select></div>
+  const sec=(label)=>`<div style="font-size:10px;font-weight:800;letter-spacing:.08em;color:var(--mu);text-transform:uppercase;margin:14px 0 8px;padding-top:12px;border-top:1px solid var(--sf2)">${label}</div>`;
+  const f=(lbl,id,type='text',val='',ph='',extra='')=>`<div class="field" style="margin:0"><label style="font-size:11px">${lbl}</label><input type="${type}" id="${id}" value="${val}" placeholder="${ph}" ${extra}></div>`;
+
+  el.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="font-size:14px;font-weight:700">${item?'✏️ Edit Item':'＋ New Item'}</div>
+      ${item?`<button class="btn sm ghost" style="color:var(--ac)" onclick="_invAdjust('${id}')">＋/− Adjust stock</button>`:''}
     </div>
+
+    <!-- Core identity -->
+    <div class="row2" style="margin-bottom:10px">
+      ${f('Name *','inv-name','text',esc(item?.name||''),'e.g. Murashige &amp; Skoog salts')}
+      <div class="field" style="margin:0"><label style="font-size:11px">Category</label>
+        <select id="inv-cat">${INV_CATS.map(c=>`<option${item?.category===c?' selected':''}>${c}</option>`).join('')}</select>
+      </div>
+    </div>
+
+    <!-- Stock levels -->
     <div class="row3" style="margin-bottom:10px">
-      <div class="field" style="margin:0"><label>Quantity</label><input type="number" id="inv-qty" value="${item?.quantity??''}" min="0" step="0.1" placeholder="0"></div>
-      <div class="field" style="margin:0"><label>Unit</label><input type="text" id="inv-unit" value="${esc(item?.unit||'')}" placeholder="g / mL / pcs"></div>
-      <div class="field" style="margin:0"><label>Low Stock Alert ≤</label><input type="number" id="inv-low" value="${item?.low_threshold??''}" min="0" step="0.1" placeholder="0 = off"></div>
+      ${f('Quantity on hand','inv-qty','number',item?.quantity??'','0','min="0" step="0.01"')}
+      ${f('Unit','inv-unit','text',esc(item?.unit||''),'g / mL / pcs / vials')}
+      ${f('Low stock alert ≤','inv-low','number',item?.low_threshold??'','0 = off','min="0" step="0.01"')}
+    </div>
+    <div class="row2" style="margin-bottom:0">
+      ${f('Storage location','inv-loc','text',esc(item?.location||''),'Fridge · Shelf B3 · -20°C')}
+      ${f('Expiry date','inv-exp','date',item?.expiry_date||'')}
+    </div>
+
+    ${sec('💰 Procurement & Pricing')}
+    <div class="row3" style="margin-bottom:10px">
+      ${f('Price per unit (₹)','inv-price-unit','number',item?.price_per_unit??'','0.00','min="0" step="0.01"')}
+      ${f('Total invoice amount (₹)','inv-price-total','number',item?.price_total??'','auto or enter','min="0" step="0.01"')}
+      ${f('Purchase date','inv-purchase-date','date',item?.purchase_date||'')}
     </div>
     <div class="row2" style="margin-bottom:10px">
-      <div class="field" style="margin:0"><label>Location</label><input type="text" id="inv-loc" value="${esc(item?.location||'')}" placeholder="e.g. Fridge, Shelf B3"></div>
-      <div class="field" style="margin:0"><label>Expiry Date</label><input type="date" id="inv-exp" value="${item?.expiry_date||''}"></div>
+      ${f('Supplier / Source name','inv-supplier','text',esc(item?.supplier||''),'e.g. HiMedia, Sigma-Aldrich')}
+      ${f('Supplier GST ID','inv-gst','text',esc(item?.gst_id||''),'29AABCU9603R1ZX')}
     </div>
-    <div class="field" style="margin-bottom:10px"><label>Notes</label><textarea id="inv-note" rows="2" style="height:auto">${esc(item?.notes||'')}</textarea></div>
+    <div class="row2" style="margin-bottom:10px">
+      ${f('Invoice number','inv-invoice-num','text',esc(item?.invoice_num||''),'e.g. INV-2026-0042')}
+      ${f('Product URL','inv-url','url',esc(item?.product_url||''),'https://…')}
+    </div>
+
+    <!-- Invoice document -->
+    <div class="field" style="margin-bottom:10px">
+      <label style="font-size:11px">Invoice document</label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="text" id="inv-invoice-link" value="${esc(item?.invoice_link||'')}" placeholder="Google Drive / Dropbox link" style="flex:1">
+        <span style="font-size:11px;color:var(--mu)">or</span>
+        <button type="button" class="btn xs ghost" onclick="document.getElementById('inv-invoice-file').click()" style="white-space:nowrap">📎 Upload PDF</button>
+        <input type="file" id="inv-invoice-file" accept=".pdf,image/*" style="display:none" onchange="_invHandleInvoiceFile(this)">
+      </div>
+      <div id="inv-invoice-preview" style="margin-top:6px;font-size:11px;color:var(--mu)">${item?.invoice_data?`📎 ${esc(item.invoice_filename||'Invoice attached')} <button onclick="_invClearInvoice()" class="btn xs ghost" style="font-size:10px">✕ Remove</button>`:item?.invoice_link?'':'No document attached'}</div>
+    </div>
+
+    ${sec('🛡 Warranty & Notes')}
+    <div class="row2" style="margin-bottom:10px">
+      ${f('Warranty','inv-warranty','text',esc(item?.warranty||''),'e.g. 1 year · till 2027-06 · none')}
+      ${f('Warranty expiry date','inv-warranty-exp','date',item?.warranty_exp||'')}
+    </div>
+    <div class="field" style="margin-bottom:14px"><label style="font-size:11px">Notes</label><textarea id="inv-note" rows="2" style="height:auto">${esc(item?.notes||'')}</textarea></div>
+
     <div style="display:flex;gap:8px">
       <button class="btn sm green" onclick="_invSave('${id||''}')">💾 Save</button>
       <button class="btn sm ghost" onclick="document.getElementById('inv-editor').style.display='none'">Cancel</button>
-      ${item?`<button class="btn sm ghost" style="margin-left:auto;color:var(--ac)" onclick="_invAdjust('${id}')">＋/− Adjust stock</button>`:''}
     </div>`;
 }
+// Invoice file handler — stores base64 in a temp variable picked up by _invSave
+let _invInvoiceData=null, _invInvoiceFilename=null;
+function _invHandleInvoiceFile(input){
+  const file=input.files[0]; if(!file) return;
+  if(file.size>2097152&&!confirm(`File is ${(file.size/1048576).toFixed(1)}MB — stored encrypted with item. Continue?`)) return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    _invInvoiceData=ev.target.result;
+    _invInvoiceFilename=file.name;
+    const prev=document.getElementById('inv-invoice-preview');
+    if(prev) prev.innerHTML=`📎 ${esc(file.name)} <button onclick="_invClearInvoice()" class="btn xs ghost" style="font-size:10px">✕ Remove</button>`;
+    toast('Invoice attached — will save with item');
+  };
+  reader.readAsDataURL(file);
+}
+function _invClearInvoice(){
+  _invInvoiceData=null; _invInvoiceFilename=null;
+  const prev=document.getElementById('inv-invoice-preview');
+  if(prev) prev.textContent='No document attached';
+  const input=document.getElementById('inv-invoice-file');
+  if(input) input.value='';
+}
+
 async function _invSave(id){
   const name=document.getElementById('inv-name').value.trim();
   if(!name){toast('Name required','fail');return;}
+  // Existing item's invoice data — preserve unless new file attached or cleared
+  const existing=id?(S_inv.items||[]).find(i=>i.id===id):null;
+  const invoiceData=_invInvoiceData!==null?_invInvoiceData:(existing?.invoice_data||null);
+  const invoiceFilename=_invInvoiceData!==null?_invInvoiceFilename:(existing?.invoice_filename||null);
+  _invInvoiceData=null; _invInvoiceFilename=null; // reset temp
+
+  const g=id=>document.getElementById(id);
+  const v=id=>g(id)?.value.trim()||'';
+  const n=id=>parseFloat(g(id)?.value)||0;
   const item={
-    id:id||uid(),name,category:document.getElementById('inv-cat').value,
-    quantity:parseFloat(document.getElementById('inv-qty').value)||0,
-    unit:document.getElementById('inv-unit').value.trim(),
-    low_threshold:parseFloat(document.getElementById('inv-low').value)||0,
-    location:document.getElementById('inv-loc').value.trim(),
-    expiry_date:document.getElementById('inv-exp').value||null,
-    notes:document.getElementById('inv-note').value.trim(),
+    id:id||uid(), name, category:v('inv-cat'),
+    quantity:n('inv-qty'), unit:v('inv-unit'), low_threshold:n('inv-low'),
+    location:v('inv-loc'), expiry_date:v('inv-exp')||null,
+    // Procurement
+    price_per_unit:parseFloat(g('inv-price-unit')?.value)||null,
+    price_total:parseFloat(g('inv-price-total')?.value)||null,
+    purchase_date:v('inv-purchase-date')||null,
+    supplier:v('inv-supplier'), gst_id:v('inv-gst'),
+    invoice_num:v('inv-invoice-num'),
+    invoice_link:v('inv-invoice-link'),
+    invoice_data:invoiceData, invoice_filename:invoiceFilename,
+    product_url:v('inv-url'),
+    // Warranty
+    warranty:v('inv-warranty'), warranty_exp:v('inv-warranty-exp')||null,
+    notes:v('inv-note'),
     updated_at:new Date().toISOString()
   };
   if(id){const idx=(S_inv.items||[]).findIndex(i=>i.id===id);if(idx!==-1)S_inv.items[idx]=item;else S_inv.items.push(item);}
