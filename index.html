@@ -10541,7 +10541,6 @@ async function saveNoteAction(){
   document.getElementById('save-note-btn').disabled=true;
   load('Encrypting & saving…');
   try{
-    let savedId;
     if(S.editing){
       const ef=await ghGet(`${DIR}/${S.editing}.enc`);
       await writeNote(S.editing,body,ef.sha,`lab: update "${title}"`);
@@ -10551,7 +10550,7 @@ async function saveNoteAction(){
         if(idx!==-1) ns[idx]={...ns[idx],title,type,stage,species,tags,next_review:review,recipe_id,cultures_out,note_type,pinned};
         return ns;
       });
-      S.notes=notes; S.notesSha=sha; savedId=editingId; S.cur=editingId;
+      S.notes=notes; S.notesSha=sha; S.cur=editingId;
     }else{
       const id=uid(), date=S.calDate ? new Date(S.calDate).toISOString() : new Date().toISOString();
       S.calDate=null;
@@ -10560,7 +10559,7 @@ async function saveNoteAction(){
         ns.push({id,title,date,type,stage,species,tags,next_review:review,recipe_id,cultures_out,note_type,pinned});
         return ns;
       });
-      S.notes=notes; S.notesSha=sha; savedId=id; S.cur=id;
+      S.notes=notes; S.notesSha=sha; S.cur=id;
     }
     _writeCache();
     populateTagsDatalist();
