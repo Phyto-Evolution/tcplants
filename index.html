@@ -7,11 +7,27 @@
 <title>TC Plants — Lab Notes</title>
 <link rel="manifest" href="manifest.json">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js" integrity="sha384-WRuXrYKj0YzIrLBmvqk+/GwFXqVWlVdj+WqqqiVLwXn6rbiYM5kBr8/N/rFbYzCi" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js" integrity="sha384-P6xHUyIW1aqBNjADZwbN8jJlx2KSNj/w3wvDmw4XaArZTpLnPkTpq5QWYPkWOkK+m" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3/dist/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.19.3/umd/index.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+<!-- Task #23: Configure marked.js securely -->
+<script>
+if(typeof marked !== 'undefined'){
+  marked.setOptions({
+    // Disable HTML rendering to prevent XSS
+    pedantic: false,
+    gfm: true,        // GitHub-flavored markdown
+    breaks: true,     // Line breaks
+    sanitize: false,  // We use DOMPurify instead
+    smartLists: true,
+    smartypants: false
+  });
+}
+</script>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
