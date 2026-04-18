@@ -5061,9 +5061,12 @@ function _renderJournalExtracts(data){
   if(!cards.length){
     pr.innerHTML=`<div style="font-size:13px;color:var(--mu)">No recipes, species, or note-worthy observations found. Try being more specific — mention media compositions, species names, or protocol steps.</div>`;
   } else {
-    pr.innerHTML=cards.join('');
-    // Stash parse results for action handlers
     window._journalParseData=data;
+    const total=(data.recipes?.length||0)+(data.species?.length||0)+(data.notes?.length||0);
+    const createAllBtn=total>1?`<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--sf2)">
+      <button class="btn sm green" onclick="_journalCreateAll()" style="width:100%">✨ Create all (${total} item${total>1?'s':''})</button>
+    </div>`:'';
+    pr.innerHTML=cards.join('')+createAllBtn;
   }
   pr.style.display='block';
 }
@@ -5138,6 +5141,69 @@ function _journalAddSpecies(idx){
       toast('Species pre-filled from journal ✓');
     },300);
   },200);
+}
+
+async function _journalCreateAll(){
+  const data=window._journalParseData; if(!data) return;
+  const recipes=data.recipes||[];
+  const species=data.species||[];
+  const notes=data.notes||[];
+  const total=recipes.length+species.length+notes.length;
+  if(!total) return;
+
+  // Show progress
+  const pr=document.getElementById('journal-parse-results');
+  if(pr) pr.innerHTML=`<div id="jca-progress" style="font-size:13px;color:var(--mu);padding:8px 0">Creating ${total} item${total>1?'s':''}…</div>`;
+
+  const created=[];
+  const log=(msg)=>{
+    created.push(msg);
+    const el=document.getElementById('jca-progress');
+    if(el) el.innerHTML=created.map(m=>`<div>✓ ${esc(m)}</div>`).join('')+`<div style="color:var(--mu)">…creating</div>`;
+  };
+
+  // Create recipes
+  for(let i=0;i<recipes.length;i++){
+    const r=recipes[i];
+    try{
+      // Build recipe object directly and save
+      const id=uid();
+      const rec={id,name:r.name||'New recipe',base:r.base||'',pgr:r.pgr||'',ph:r.ph||'',sucrose:r.sucrose||'',agar:r.gelrite||'',autoclave:r.autoclave||'',target:r.target||'',notes:r.notes||''};
+      S.recs.push(rec);
+      S.recSha=await saveRecipes(S.recs,S.recSha);
+      renderRecList();
+      log(`Recipe: ${r.name||'Untitled'}`);
+    }catch(e){ log(`Recipe failed: ${e.message}`); }
+  }
+
+  // Create notes
+  for(let i=0;i<notes.length;i++){
+    const n=notes[i];
+    try{
+      const id=uid();
+      const today=new Date().toISOString().slice(0,10);
+      const note={id,title:n.title||'Journal note',type:n.type||'TC Observation',stage:n.stage||'',species:n.species||'',date:today,tags:[],body_preview:(n.body||'').slice(0,100),next_review:null,cultures_out:null,pinned:false,recipe_id:null};
+      S.notes.push(note);
+      // Save body
+      const bodyEnc=await enc(n.body||'');
+      await ghPut(`notes/${id}.enc`,btoa(unescape(encodeURIComponent(bodyEnc))),null,`lab: journal extract — ${note.title}`);
+      S.notesSha=await saveNotesIndex(S.notes,S.notesSha);
+      renderNoteList();
+      log(`Note: ${n.title||'Observation'}`);
+    }catch(e){ log(`Note failed: ${e.message}`); }
+  }
+
+  // Taxonomy species — open form for each (can't fully automate without UX)
+  if(species.length){
+    toast(`${species.length} species to add — open Taxonomy to review`);
+    log(`Species: open Taxonomy to add ${species.map(s=>s.name).join(', ')}`);
+  }
+
+  // Final summary
+  const el=document.getElementById('jca-progress');
+  if(el) el.innerHTML=`<div style="color:var(--gn);font-weight:600">✓ Created ${recipes.length+notes.length} item${(recipes.length+notes.length)>1?'s':''}</div>`
+    +created.map(m=>`<div style="font-size:12px;color:var(--mu)">✓ ${esc(m)}</div>`).join('');
+  toast(`Created ${recipes.length+notes.length} items from journal`);
 }
 
 // ── Overnight journal batch parser ────────────────────────────
@@ -6002,11 +6068,24 @@ const SearchSystem={
   },
   renderSearchPage(){
     const c=document.getElementById('search-main'); if(!c) return;
-    c.innerHTML=`<div style="padding:20px;max-width:640px">
+    const filters=SearchSystem._loadFilters();
+    const filterChips=filters.length?`
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">
+        ${filters.map(f=>`
+          <span style="display:inline-flex;align-items:center;gap:4px;background:var(--sf2);border:1px solid var(--bd);border-radius:16px;padding:3px 10px 3px 12px;font-size:12px;cursor:pointer" onclick="SearchSystem._applyFilter('${esc(f.query)}')">
+            ${esc(f.name)}
+            <button onclick="event.stopPropagation();SearchSystem._deleteFilter('${esc(f.name)}');SearchSystem.renderSearchPage()" style="background:none;border:none;color:var(--mu);cursor:pointer;font-size:11px;padding:0 0 0 4px;line-height:1">✕</button>
+          </span>`).join('')}
+      </div>`:'';
+    c.innerHTML=`<div style="padding:20px;max-width:900px">
       <h2 style="margin-bottom:12px;font-size:18px">🔍 Search</h2>
-      <input type="text" id="search-q" placeholder="Search notes, bottles, accessions, recipes, greenhouse…"
-        style="width:100%;padding:10px 14px;background:var(--sf);border:1px solid var(--bd);border-radius:8px;color:var(--tx);font-size:14px;margin-bottom:16px"
-        oninput="SearchSystem._onInput(this.value)" autofocus>
+      ${filterChips}
+      <div style="display:flex;gap:8px;margin-bottom:16px">
+        <input type="text" id="search-q" placeholder="Search notes, bottles, accessions, recipes, greenhouse…"
+          style="flex:1;padding:10px 14px;background:var(--sf);border:1px solid var(--bd);border-radius:8px;color:var(--tx);font-size:14px"
+          oninput="SearchSystem._onInput(this.value)" autofocus>
+        <button class="btn sm ghost" onclick="SearchSystem._promptSaveFilter()" id="search-save-btn" style="white-space:nowrap;display:none">💾 Save filter</button>
+      </div>
       <div id="search-results"></div>
     </div>`;
     setTimeout(()=>{ const el=document.getElementById('search-q'); if(el) el.focus(); },50);
@@ -6015,6 +6094,36 @@ const SearchSystem={
     const res=this._run(q);
     const el=document.getElementById('search-results'); if(!el) return;
     el.innerHTML=this._renderResults(res,q);
+    const btn=document.getElementById('search-save-btn');
+    if(btn) btn.style.display=q.length>=2?'':'none';
+  },
+  _applyFilter(q){
+    SearchSystem.renderSearchPage();
+    setTimeout(()=>{
+      const el=document.getElementById('search-q'); if(!el) return;
+      el.value=q; el.focus(); SearchSystem._onInput(q);
+      const btn=document.getElementById('search-save-btn'); if(btn) btn.style.display='';
+    },50);
+  },
+  _promptSaveFilter(){
+    const q=document.getElementById('search-q')?.value.trim(); if(!q) return;
+    const name=prompt(`Save this search as:\n"${q}"\n\nFilter name:`,q);
+    if(!name) return;
+    SearchSystem._saveFilter(name.trim(),q);
+    SearchSystem.renderSearchPage();
+    setTimeout(()=>SearchSystem._applyFilter(q),50);
+    toast('Filter saved: '+name);
+  },
+  _loadFilters(){ try{ return JSON.parse(localStorage.getItem('tcplants_search_filters')||'[]'); }catch{ return []; } },
+  _saveFilter(name,query){
+    const filters=this._loadFilters().filter(f=>f.name!==name);
+    filters.unshift({name,query});
+    localStorage.setItem('tcplants_search_filters',JSON.stringify(filters.slice(0,20)));
+  },
+  _deleteFilter(name){
+    const filters=this._loadFilters().filter(f=>f.name!==name);
+    localStorage.setItem('tcplants_search_filters',JSON.stringify(filters));
+    toast('Filter removed');
   }
 };
 
@@ -9166,6 +9275,111 @@ async function _buildAIContext(){
 // Configure API proxy (set via settings or detect from environment)
 let _aiProxyURL = localStorage.getItem('tcplants_ai_proxy_url') || 'https://plantking.ape.workers.dev';
 
+// ════════════════════════════════════════════════════════════
+// RAVANA TOOL-USE FRAMEWORK
+// ════════════════════════════════════════════════════════════
+
+const AI_TOOLS=[
+  {type:'function',function:{name:'get_lab_summary',description:'Get current lab stats: bottle counts, active cultures, overdue reviews, recent contamination, species count.',parameters:{type:'object',properties:{}}}},
+  {type:'function',function:{name:'get_bottles',description:'Get bottles filtered by species and/or status.',parameters:{type:'object',properties:{species:{type:'string',description:'Species name (partial match)'},status:{type:'string',enum:['prepared','inoculated','growing','subcultured','rooting','hardening','weaned','contaminated','discarded']}}}}},
+  {type:'function',function:{name:'update_bottle_status',description:'Update the status of a bottle. Requires user confirmation before executing.',parameters:{type:'object',properties:{bottle_id:{type:'string'},status:{type:'string',enum:['inoculated','growing','subcultured','rooting','hardening','weaned','contaminated','discarded']}},required:['bottle_id','status']}}},
+  {type:'function',function:{name:'get_species_analysis',description:'Get performance metrics for a specific species: success rate, contamination rate, multiplication factor, active bottles.',parameters:{type:'object',properties:{species:{type:'string'}},required:['species']}}},
+  {type:'function',function:{name:'fetch_taxonomy_updates',description:'Fetch accepted species list for a genus from GBIF. Returns new species not yet in lab taxonomy.',parameters:{type:'object',properties:{genus:{type:'string',description:'Genus name, e.g. Nepenthes'}},required:['genus']}}},
+  {type:'function',function:{name:'search_lab',description:'Search across all lab sections: notes, bottles, accessions, recipes, greenhouse plants.',parameters:{type:'object',properties:{query:{type:'string'}},required:['query']}}},
+  {type:'function',function:{name:'get_schedule',description:'Get overdue reviews, transfers due, and upcoming actions in the lab.',parameters:{type:'object',properties:{}}}},
+];
+
+// Write-operations that require user confirmation before executing
+const AI_TOOLS_CONFIRM=new Set(['update_bottle_status']);
+
+async function _executeTool(name, params){
+  switch(name){
+    case 'get_lab_summary':{
+      const allBots=S.bottles||[];
+      const active=allBots.filter(b=>['inoculated','growing'].includes(b.status)).length;
+      const overdue=allBots.filter(b=>b.next_review&&['inoculated','growing'].includes(b.status)&&b.next_review<new Date().toISOString().slice(0,10)).length;
+      const contam=allBots.filter(b=>b.status==='contaminated').length;
+      const spSet=new Set([...(S.notes||[]).map(n=>n.species),(S.bottles||[]).map(b=>b.species)].flat().filter(Boolean));
+      return {total_bottles:allBots.length,active_cultures:active,overdue_reviews:overdue,contaminated:contam,total_notes:(S.notes||[]).length,species_count:spSet.size,accessions:(S.accs||[]).length};
+    }
+    case 'get_bottles':{
+      let list=S.bottles||[];
+      if(params.species) list=list.filter(b=>(b.species||'').toLowerCase().includes(params.species.toLowerCase()));
+      if(params.status) list=list.filter(b=>b.status===params.status);
+      return list.slice(0,20).map(b=>({id:b.id,code:b.code,species:b.species,status:b.status,stage:b.stage,next_review:b.next_review}));
+    }
+    case 'update_bottle_status':{
+      const b=(S.bottles||[]).find(x=>x.id===params.bottle_id);
+      if(!b) return {error:'Bottle not found: '+params.bottle_id};
+      const old=b.status;
+      b.status=params.status;
+      if(params.status==='subcultured') b.last_transfer=new Date().toISOString().slice(0,10);
+      try{
+        S.bottlesSha=await saveBottles(S.bottles,S.bottlesSha);
+        renderBottleList(); _renderDashboard();
+        return {success:true,bottle:b.code,old_status:old,new_status:params.status};
+      }catch(e){ b.status=old; return {error:e.message}; }
+    }
+    case 'get_species_analysis':{
+      if(typeof RavanaInsights!=='undefined') return RavanaInsights._computeMetrics(params.species);
+      return {error:'Analytics not available'};
+    }
+    case 'fetch_taxonomy_updates':{
+      try{
+        const url=_aiProxyURL?`${_aiProxyURL}/api/gbif?genus=${encodeURIComponent(params.genus)}`:`https://api.gbif.org/v1/species/search?q=${encodeURIComponent(params.genus)}&rank=SPECIES&status=ACCEPTED&limit=100`;
+        const r=await fetch(url);
+        const d=await r.json();
+        const gbifSpecies=(_aiProxyURL?d.species:d.results||[]).map(s=>s.canonicalName||s.scientificName||s.name);
+        const existing=new Set((S.taxCustom?.species||[]).map(s=>s.name?.toLowerCase()));
+        const newSp=gbifSpecies.filter(s=>s&&!existing.has(s.toLowerCase())).slice(0,20);
+        return {genus:params.genus,total_in_gbif:d.total||gbifSpecies.length,new_species:newSp,already_in_lab:(S.taxCustom?.species||[]).filter(s=>(s.name||'').toLowerCase().startsWith(params.genus.toLowerCase())).length};
+      }catch(e){ return {error:'GBIF fetch failed: '+e.message}; }
+    }
+    case 'search_lab':{
+      if(typeof SearchSystem!=='undefined'){
+        const r=SearchSystem._run(params.query);
+        return {notes:r?.notes?.slice(0,5).map(n=>({id:n.id,title:n.title,species:n.species}))||[],bottles:r?.bottles?.slice(0,5).map(b=>({id:b.id,code:b.code,species:b.species,status:b.status}))||[],accessions:r?.accs?.slice(0,5).map(a=>({id:a.id,species:a.species}))||[]};
+      }
+      return {error:'Search not available'};
+    }
+    case 'get_schedule':{
+      const today=new Date().toISOString().slice(0,10);
+      const overdue=(S.bottles||[]).filter(b=>b.next_review&&['inoculated','growing'].includes(b.status)&&b.next_review<today).map(b=>({code:b.code,species:b.species,days_overdue:Math.floor((Date.now()-new Date(b.next_review))/86400000)}));
+      const due7=(S.bottles||[]).filter(b=>b.next_review&&['inoculated','growing'].includes(b.status)&&b.next_review>=today&&b.next_review<=new Date(Date.now()+7*86400000).toISOString().slice(0,10));
+      return {overdue:overdue.slice(0,10),due_this_week:due7.length,overdue_count:overdue.length};
+    }
+    default: return {error:'Unknown tool: '+name};
+  }
+}
+
+// Pending tool confirmation (write ops)
+let _pendingToolCall=null;
+function _confirmToolCall(confirmed){
+  const banner=document.getElementById('ai-tool-confirm'); if(banner) banner.remove();
+  if(!confirmed||!_pendingToolCall){ _pendingToolCall=null; return; }
+  const {name,params,resolve}=_pendingToolCall; _pendingToolCall=null;
+  _executeTool(name,params).then(resolve);
+}
+
+async function _executeToolWithConfirm(name,params){
+  if(!AI_TOOLS_CONFIRM.has(name)) return _executeTool(name,params);
+  // Show confirmation banner in AI panel
+  return new Promise(resolve=>{
+    _pendingToolCall={name,params,resolve};
+    const msgs=document.getElementById('ai-msgs');
+    const banner=document.createElement('div');
+    banner.id='ai-tool-confirm';
+    banner.className='ai-msg ai';
+    banner.style.cssText='background:rgba(210,153,34,.08);border:1px solid rgba(210,153,34,.3)';
+    banner.innerHTML=`<div style="font-size:12px;color:var(--yw);margin-bottom:8px">Ravana wants to: <strong>${name}</strong><br><code style="font-size:11px">${JSON.stringify(params)}</code></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn xs green" onclick="_confirmToolCall(true)" style="flex:1">✓ Execute</button>
+        <button class="btn xs ghost" onclick="_confirmToolCall(false)" style="flex:1">✕ Cancel</button>
+      </div>`;
+    if(msgs){ msgs.appendChild(banner); msgs.scrollTop=msgs.scrollHeight; }
+  });
+}
+
 async function askAI(prompt){
   const panel=document.getElementById('ai-panel');
   panel.classList.add('on');
@@ -9209,16 +9423,29 @@ async function askAI(prompt){
     const provider=(_aiModel==='claude')?'claude':'groq';
     const model=(_aiModel==='claude')?'claude-opus-4-5':mi.groqModel;
 
-    // Try backend proxy first (if configured), fall back to direct API
-    if(_aiProxyURL){
-      text=await _callAIProxy(provider, model, fullPrompt, key);
-    } else {
-      // Direct API call (user-provided key only, no dangerous header)
-      const result=await _callAIDirect(provider, model, fullPrompt, key);
-      text=result.text;
-      tokUsed=result.tokUsed;
-      reqRem=result.reqRem;
-      tokRem=result.tokRem;
+    // Agent loop: supports tool calls (max 3 rounds)
+    const agentMessages=[{role:'user',content:fullPrompt}];
+    let rounds=0;
+    while(rounds<3){
+      rounds++;
+      let raw;
+      if(_aiProxyURL){
+        raw=await _callAIProxyFull(provider, model, agentMessages, key);
+      } else {
+        const result=await _callAIDirect(provider, model, fullPrompt, key);
+        raw={text:result.text,tool_call:null};
+        tokUsed=result.tokUsed; reqRem=result.reqRem; tokRem=result.tokRem;
+      }
+      if(raw.tool_call){
+        const {name,params}=raw.tool_call;
+        thinking.textContent=`🔧 ${name}…`;
+        const toolResult=await _executeToolWithConfirm(name,params);
+        agentMessages.push({role:'assistant',content:`[Called ${name}]`});
+        agentMessages.push({role:'user',content:`Tool result: ${JSON.stringify(toolResult)}`});
+      } else {
+        text=raw.text||'';
+        break;
+      }
     }
 
     if(!text) text='No response from Ravana.';
@@ -9235,6 +9462,27 @@ async function askAI(prompt){
     msgs.scrollTop=msgs.scrollHeight;
     return '';
   }
+}
+
+// Full proxy call — returns {text, tool_call}, sends tools for agent loop
+async function _callAIProxyFull(provider, model, messages, clientKey){
+  const splitIdx=messages[0]?.content?.indexOf('\n\n---\n## Lab Data Context')??-1;
+  const firstMsg=messages[0]?.content||'';
+  const system=splitIdx>-1?firstMsg.slice(0,splitIdx):AI_RULEBOOK;
+  // All messages after the first become the conversation
+  const convMessages=messages.length>1?messages:messages.map((m,i)=>
+    i===0?{role:'user',content:splitIdx>-1?firstMsg.slice(splitIdx):firstMsg}:m
+  );
+  const r=await fetch(_aiProxyURL+'/api/ai/chat',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({provider,model,system,messages:convMessages,max_tokens:1024,tools:AI_TOOLS}),
+    signal:AbortSignal.timeout(30000)
+  });
+  if(!r.ok){const e=new Error(`Proxy error ${r.status}`);e.status=r.status;throw e;}
+  const d=await r.json();
+  if(d.error) throw new Error(d.error);
+  return {text:d.text||'',tool_call:d.tool_call||null};
 }
 
 // Backend proxy call (secure, server-side API keys)
@@ -9928,6 +10176,86 @@ function _parseVoiceAction(text){
         unload();
       };
     }
+  }
+
+  // "new note for [species]" / "log observation for [species]"
+  const newNoteMatch=t.match(/(?:new\s+note|log\s+observation|add\s+note|new\s+entry)(?:\s+for)?\s+(.+)/);
+  if(newNoteMatch){
+    const sp=newNoteMatch[1].trim();
+    return ()=>{
+      navTo('notes'); startNewNote('tc');
+      setTimeout(()=>{
+        const el=document.getElementById('ne-species'); if(el){el.value=sp;el.dispatchEvent(new Event('input'));}
+        _ttsSpeak('New note for '+sp+'. Fill in the details.');
+      },300);
+    };
+  }
+
+  // "new bottle for [species]" / "start batch [species]"
+  const newBotMatch=t.match(/(?:new\s+bottle|start\s+(?:new\s+)?batch|add\s+bottle)(?:\s+for)?\s+(.+)/);
+  if(newBotMatch){
+    const sp=newBotMatch[1].trim();
+    return ()=>{
+      navTo('bottles'); startNewBottle('single');
+      setTimeout(()=>{
+        const el=document.getElementById('bot-species'); if(el){el.value=sp;el.dispatchEvent(new Event('input'));}
+        _ttsSpeak('New bottle for '+sp+'.');
+      },300);
+    };
+  }
+
+  // "how many [species] bottles" / "how is [species] doing"
+  const countMatch=t.match(/how\s+(?:many|is)\s+(.+?)\s+(?:bottles?|doing|performing)/);
+  if(countMatch){
+    const sp=countMatch[1].trim();
+    return ()=>{
+      const bots=(S.bottles||[]).filter(b=>(b.species||'').toLowerCase().includes(sp.toLowerCase()));
+      const active=bots.filter(b=>['inoculated','growing'].includes(b.status)).length;
+      const msg=bots.length?`${sp}: ${bots.length} bottle${bots.length>1?'s':''}, ${active} active.`:`No bottles found for ${sp}.`;
+      _ttsSpeak(msg); toast(msg);
+    };
+  }
+
+  // "schedule transfer for [species]" — set next_review on all active bottles
+  const scheduleMatch=t.match(/schedule\s+(?:transfer|review)(?:\s+for)?\s+(.+)/);
+  if(scheduleMatch){
+    const sp=scheduleMatch[1].trim();
+    return async ()=>{
+      const today=new Date(); today.setDate(today.getDate()+2);
+      const reviewDate=today.toISOString().slice(0,10);
+      const bots=(S.bottles||[]).filter(b=>(b.species||'').toLowerCase().includes(sp.toLowerCase())&&['inoculated','growing'].includes(b.status));
+      if(!bots.length){ _ttsSpeak('No active '+sp+' bottles found.'); return; }
+      bots.forEach(b=>b.next_review=reviewDate);
+      load('Saving…');
+      try{
+        S.bottlesSha=await saveBottles(S.bottles,S.bottlesSha);
+        _ttsSpeak(`Transfer scheduled for ${bots.length} ${sp} bottle${bots.length>1?'s':''} in 2 days.`);
+        renderBottleList();
+      }catch(e){ toast('Save failed','fail'); }
+      unload();
+    };
+  }
+
+  // "open search" / "search for [query]"
+  const searchMatch=t.match(/(?:open\s+)?search(?:\s+for\s+)?(.+)?/);
+  if(searchMatch&&(t.startsWith('open search')||t.startsWith('search for'))){
+    const q=(searchMatch[1]||'').trim();
+    return ()=>{
+      navTo('search');
+      if(q) setTimeout(()=>SearchSystem._applyFilter(q),100);
+      _ttsSpeak(q?`Searching for ${q}`:'Search opened.');
+    };
+  }
+
+  // "open insights" / "show insights for [species]"
+  const insightsMatch=t.match(/(?:open\s+|show\s+)?insights?(?:\s+for\s+(.+))?/);
+  if(insightsMatch&&t.includes('insight')){
+    const sp=(insightsMatch[1]||'').trim();
+    return ()=>{
+      navTo('insights');
+      if(sp) setTimeout(()=>RavanaInsights.showSpecies(sp),200);
+      _ttsSpeak(sp?`Opening insights for ${sp}`:'Insights opened.');
+    };
   }
 
   return null;

@@ -67,7 +67,7 @@ export default {
       try { body = await request.json(); }
       catch { return err('Invalid JSON', 400, origin); }
 
-      const { provider = 'groq', model, messages, max_tokens = 1024, system } = body;
+      const { provider = 'groq', model, messages, max_tokens = 1024, system, tools } = body;
 
       // Pick key: server-side first, client fallback if sent
       const groqKey = env.GROQ_KEY || body.client_key || '';
@@ -75,49 +75,61 @@ export default {
 
       try {
         let text = '';
+        let tool_call = null;   // {name, params, id}
 
         if (provider === 'groq') {
           if (!groqKey) return err('No Groq key configured', 503, origin);
           const msgs = system
             ? [{ role: 'system', content: system }, ...messages]
             : messages;
+          const reqBody = { model, messages: msgs, max_tokens, temperature: 0.7 };
+          // Attach tools if provided (OpenAI-compatible format)
+          if (tools?.length) reqBody.tools = tools;
           const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + groqKey,
-            },
-            body: JSON.stringify({ model, messages: msgs, max_tokens, temperature: 0.7 }),
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + groqKey },
+            body: JSON.stringify(reqBody),
           });
           const d = await r.json();
           if (!r.ok) return err(d.error?.message || 'Groq error ' + r.status, r.status, origin);
-          text = d.choices?.[0]?.message?.content || '';
+          const msg = d.choices?.[0]?.message;
+          if (msg?.tool_calls?.length) {
+            const tc = msg.tool_calls[0];
+            tool_call = { name: tc.function.name, params: JSON.parse(tc.function.arguments || '{}'), id: tc.id };
+          } else {
+            text = msg?.content || '';
+          }
 
         } else if (provider === 'claude') {
           if (!claudeKey) return err('No Claude key configured', 503, origin);
+          const reqBody = { model, max_tokens, ...(system ? { system } : {}), messages };
+          // Claude uses input_schema instead of parameters
+          if (tools?.length) {
+            reqBody.tools = tools.map(t => ({
+              name: t.function?.name || t.name,
+              description: t.function?.description || t.description,
+              input_schema: t.function?.parameters || t.parameters || { type: 'object', properties: {} }
+            }));
+          }
           const r = await fetch('https://api.anthropic.com/v1/messages', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'x-api-key': claudeKey,
-              'anthropic-version': '2023-06-01',
-            },
-            body: JSON.stringify({
-              model,
-              max_tokens,
-              ...(system ? { system } : {}),
-              messages,
-            }),
+            headers: { 'Content-Type': 'application/json', 'x-api-key': claudeKey, 'anthropic-version': '2023-06-01' },
+            body: JSON.stringify(reqBody),
           });
           const d = await r.json();
           if (!r.ok) return err(d.error?.message || 'Claude error ' + r.status, r.status, origin);
-          text = d.content?.[0]?.text || '';
+          const toolUse = d.content?.find(b => b.type === 'tool_use');
+          if (toolUse) {
+            tool_call = { name: toolUse.name, params: toolUse.input || {}, id: toolUse.id };
+          } else {
+            text = d.content?.find(b => b.type === 'text')?.text || '';
+          }
 
         } else {
           return err('Unknown provider: ' + provider, 400, origin);
         }
 
-        return json({ text }, 200, origin);
+        return json({ text, tool_call }, 200, origin);
 
       } catch (e) {
         return err('Upstream error: ' + e.message, 502, origin);
@@ -146,6 +158,26 @@ export default {
 
       } catch (e) {
         return err('Whisper error: ' + e.message, 502, origin);
+      }
+    }
+
+    // ── GET /api/gbif?genus=Nepenthes ────────────────────────
+    if (url.pathname === '/api/gbif' && request.method === 'GET') {
+      const genus = url.searchParams.get('genus');
+      if (!genus) return err('genus param required', 400, origin);
+      try {
+        const r = await fetch(`https://api.gbif.org/v1/species/search?q=${encodeURIComponent(genus)}&rank=SPECIES&status=ACCEPTED&limit=100`);
+        const d = await r.json();
+        const species = (d.results || []).map(s => ({
+          name: s.scientificName,
+          canonicalName: s.canonicalName,
+          family: s.family,
+          genus: s.genus,
+          key: s.key,
+        }));
+        return json({ species, total: d.count, genus }, 200, origin);
+      } catch (e) {
+        return err('GBIF error: ' + e.message, 502, origin);
       }
     }
 
