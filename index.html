@@ -3646,10 +3646,39 @@ input, textarea, select {
             <button class="btn sm green" onclick="saveJournalEntry()">Save</button>
             <button class="btn sm ghost" onclick="cancelJournalEdit()">Cancel</button>
           </div>
+          <!-- Toolbar -->
+          <div class="editor-toolbar" id="je-toolbar" style="padding:6px 14px;border-bottom:1px solid var(--bd);flex-shrink:0;background:var(--sf2)">
+            <button class="tb-btn" id="je-h1"     title="Heading 1">H1</button>
+            <button class="tb-btn" id="je-h2"     title="Heading 2">H2</button>
+            <button class="tb-btn" id="je-h3"     title="Heading 3">H3</button>
+            <div class="tb-div"></div>
+            <button class="tb-btn" id="je-bold"   title="Bold (Ctrl+B)"><b>B</b></button>
+            <button class="tb-btn" id="je-italic" title="Italic (Ctrl+I)"><i>I</i></button>
+            <button class="tb-btn" id="je-strike" title="Strikethrough"><s>S</s></button>
+            <div class="tb-div"></div>
+            <button class="tb-btn" id="je-code"   title="Inline code">`c`</button>
+            <button class="tb-btn" id="je-codebl" title="Code block">```</button>
+            <button class="tb-btn" id="je-quote"  title="Blockquote">"</button>
+            <button class="tb-btn" id="je-hr"     title="Horizontal rule">—</button>
+            <div class="tb-div"></div>
+            <button class="tb-btn" id="je-ul"     title="Bullet list">• List</button>
+            <button class="tb-btn" id="je-ol"     title="Numbered list">1. List</button>
+            <button class="tb-btn" id="je-task"   title="Task list">☑</button>
+            <div class="tb-div"></div>
+            <button class="tb-btn" id="je-link"   title="Link (Ctrl+K)">🔗</button>
+            <button class="tb-btn" id="je-img"    title="Image (URL or upload)">🖼</button>
+            <button class="tb-btn" id="je-iframe" title="Embed iframe (YouTube, Maps…)">⧉</button>
+            <button class="tb-btn" id="je-tbl"    title="Table">⊞</button>
+            <div class="tb-div"></div>
+            <button class="tb-btn" id="je-preview-toggle" title="Toggle preview" onclick="_toggleJournalPreview()" style="color:var(--ac)">👁</button>
+          </div>
+          <!-- Body: write pane -->
           <textarea id="je-body" placeholder="Write freely…
 
 Ideas, observations, protocol thoughts, species notes — anything.
-Use Ravana to extract structured data once you're done writing." style="flex:1;padding:20px 24px;background:transparent;border:none;outline:none;resize:none;font-size:14px;line-height:1.8;color:var(--tx);font-family:var(--font)"></textarea>
+Use Ravana to extract structured data once you're done writing." style="flex:1;padding:16px 20px;background:transparent;border:none;outline:none;resize:none;font-size:14px;line-height:1.8;color:var(--tx);font-family:var(--font)"></textarea>
+          <!-- Preview pane (hidden by default) -->
+          <div id="je-preview" class="md" style="display:none;flex:1;padding:16px 20px;overflow-y:auto;font-size:14px;line-height:1.8"></div>
         </div>
       </div>
     </div>
@@ -4683,12 +4712,14 @@ function sanitizeMarkdown(md){
   // Parse markdown
   const html=marked.parse(md);
   // Sanitize with DOMPurify — allow safe HTML tags only
-  const allowedTags=['p','br','h1','h2','h3','h4','h5','h6','strong','em','b','i','code','pre','ul','ol','li','blockquote','a','img','table','thead','tbody','tr','th','td','hr','div','span'];
-  const allowedAttrs=['href','title','src','alt','class'];
+  const allowedTags=['p','br','h1','h2','h3','h4','h5','h6','strong','em','b','i','code','pre','ul','ol','li','blockquote','a','img','table','thead','tbody','tr','th','td','hr','div','span','iframe','figure','figcaption'];
+  const allowedAttrs=['href','title','src','alt','class','width','height','allowfullscreen','frameborder','loading','style'];
   return DOMPurify.sanitize(html, {
     ALLOWED_TAGS: allowedTags,
     ALLOWED_ATTR: allowedAttrs,
-    KEEP_CONTENT: true  // Keep text content even if tag is removed
+    KEEP_CONTENT: true,
+    ADD_TAGS: ['iframe'],
+    ADD_ATTR: ['allowfullscreen','frameborder']
   });
 }
 
@@ -4794,6 +4825,10 @@ function startNewJournalEntry(){
   document.getElementById('je-title').value='';
   document.getElementById('je-tags').value='';
   document.getElementById('je-body').value='';
+  // Reset preview to write mode
+  const pv=document.getElementById('je-preview'); if(pv) pv.style.display='none';
+  const ta=document.getElementById('je-body'); if(ta) ta.style.display='';
+  const ptb=document.getElementById('je-preview-toggle'); if(ptb){ptb.style.background='';ptb.style.color='var(--ac)';}
   setTimeout(()=>document.getElementById('je-body').focus(),50);
 }
 
@@ -4806,6 +4841,9 @@ function editJournalEntry(){
   document.getElementById('je-title').value=e.title||'';
   document.getElementById('je-tags').value=(e.tags||[]).join(', ');
   document.getElementById('je-body').value=e.body||'';
+  // Reset preview to write mode
+  const pv2=document.getElementById('je-preview'); if(pv2) pv2.style.display='none';
+  const ta2=document.getElementById('je-body'); if(ta2) ta2.style.display='';
   setTimeout(()=>document.getElementById('je-body').focus(),50);
 }
 
@@ -9825,6 +9863,149 @@ function wireToolbar(prefix, taId, extraBtns={}){
 // Notes toolbar
 wireToolbar('tb-','ne-body',{'img-btn':insertImage});
 
+// Journal toolbar
+function insertJournalImage(){
+  // Show a small dialog: URL input + file upload
+  const ta=document.getElementById('je-body'); if(!ta) return;
+  const modal=document.createElement('div');
+  modal.style.cssText='position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center';
+  modal.innerHTML=`<div style="background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:20px;width:400px;max-width:96vw">
+    <div style="font-weight:700;margin-bottom:12px">🖼 Insert Image</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div>
+        <label style="font-size:11px;color:var(--mu)">Image URL</label>
+        <input id="_ji-url" type="url" placeholder="https://example.com/photo.jpg" style="width:100%;padding:7px 10px;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-size:13px">
+      </div>
+      <div style="text-align:center;font-size:12px;color:var(--mu)">— or —</div>
+      <button class="btn sm ghost" onclick="document.getElementById('_ji-file').click()" style="width:100%">📁 Upload from device</button>
+      <input id="_ji-file" type="file" accept="image/*" style="display:none">
+      <div>
+        <label style="font-size:11px;color:var(--mu)">Alt text (optional)</label>
+        <input id="_ji-alt" type="text" placeholder="Description of image" style="width:100%;padding:7px 10px;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-size:13px">
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn sm green" id="_ji-insert" style="flex:1">Insert</button>
+      <button class="btn sm ghost" id="_ji-cancel" style="flex:1">Cancel</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+
+  const fileEl=modal.querySelector('#_ji-file');
+  fileEl.onchange=e=>{
+    const file=e.target.files[0]; if(!file) return;
+    if(file.size>2097152&&!confirm(`Image is ${(file.size/1048576).toFixed(1)}MB — will embed as base64. Continue?`)) return;
+    const reader=new FileReader();
+    reader.onload=ev=>{ modal.querySelector('#_ji-url').value=ev.target.result; };
+    reader.readAsDataURL(file);
+  };
+
+  modal.querySelector('#_ji-insert').onclick=()=>{
+    const url=modal.querySelector('#_ji-url').value.trim();
+    const alt=modal.querySelector('#_ji-alt').value.trim()||'image';
+    if(!url){ toast('Enter a URL or upload a file','fail'); return; }
+    const pos=ta.selectionStart;
+    const ins=`\n![${alt}](${url})\n`;
+    ta.value=ta.value.slice(0,pos)+ins+ta.value.slice(pos);
+    ta.selectionStart=ta.selectionEnd=pos+ins.length;
+    ta.focus();
+    document.body.removeChild(modal);
+  };
+  modal.querySelector('#_ji-cancel').onclick=()=>document.body.removeChild(modal);
+  modal.addEventListener('click',e=>{ if(e.target===modal) document.body.removeChild(modal); });
+  setTimeout(()=>modal.querySelector('#_ji-url').focus(),50);
+}
+
+function insertJournalIframe(){
+  const ta=document.getElementById('je-body'); if(!ta) return;
+  const modal=document.createElement('div');
+  modal.style.cssText='position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center';
+  modal.innerHTML=`<div style="background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:20px;width:440px;max-width:96vw">
+    <div style="font-weight:700;margin-bottom:4px">⧉ Embed iframe</div>
+    <div style="font-size:12px;color:var(--mu);margin-bottom:12px">YouTube, Google Maps, Sheets, scientific papers…</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div>
+        <label style="font-size:11px;color:var(--mu)">Embed URL or paste full &lt;iframe&gt; code</label>
+        <textarea id="_jif-src" rows="3" placeholder="https://www.youtube.com/embed/... or paste full iframe HTML"
+          style="width:100%;padding:7px 10px;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-size:12px;resize:none"></textarea>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div>
+          <label style="font-size:11px;color:var(--mu)">Width</label>
+          <input id="_jif-w" type="text" value="100%" style="width:100%;padding:6px 8px;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-size:12px">
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--mu)">Height (px)</label>
+          <input id="_jif-h" type="number" value="315" style="width:100%;padding:6px 8px;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-size:12px">
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--mu);background:rgba(88,166,255,.06);padding:8px;border-radius:6px;line-height:1.6">
+        <strong>Tips:</strong><br>
+        YouTube: share → embed → copy URL from src="..."<br>
+        Google Maps: share → embed a map → copy iframe URL
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn sm green" id="_jif-insert" style="flex:1">Insert</button>
+      <button class="btn sm ghost" id="_jif-cancel" style="flex:1">Cancel</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+
+  modal.querySelector('#_jif-insert').onclick=()=>{
+    let src=modal.querySelector('#_jif-src').value.trim();
+    const w=modal.querySelector('#_jif-w').value.trim()||'100%';
+    const h=modal.querySelector('#_jif-h').value.trim()||'315';
+    if(!src){ toast('Enter a URL or iframe code','fail'); return; }
+    // If they pasted a full iframe tag, use as-is; otherwise build one
+    let iframe=src;
+    if(!src.toLowerCase().startsWith('<iframe')){
+      iframe=`<iframe src="${src}" width="${w}" height="${h}" frameborder="0" allowfullscreen loading="lazy"></iframe>`;
+    }
+    const pos=ta.selectionStart;
+    const ins=`\n\n${iframe}\n\n`;
+    ta.value=ta.value.slice(0,pos)+ins+ta.value.slice(pos);
+    ta.selectionStart=ta.selectionEnd=pos+ins.length;
+    ta.focus();
+    document.body.removeChild(modal);
+  };
+  modal.querySelector('#_jif-cancel').onclick=()=>document.body.removeChild(modal);
+  modal.addEventListener('click',e=>{ if(e.target===modal) document.body.removeChild(modal); });
+  setTimeout(()=>modal.querySelector('#_jif-src').focus(),50);
+}
+
+function _toggleJournalPreview(){
+  const ta=document.getElementById('je-body');
+  const pv=document.getElementById('je-preview');
+  if(!ta||!pv) return;
+  const showPreview=ta.style.display!=='none';
+  if(showPreview){
+    pv.innerHTML=sanitizeMarkdown(ta.value||'');
+    ta.style.display='none'; pv.style.display='block';
+    document.getElementById('je-preview-toggle').style.background='var(--ac)';
+    document.getElementById('je-preview-toggle').style.color='#0d1117';
+  } else {
+    ta.style.display=''; pv.style.display='none';
+    document.getElementById('je-preview-toggle').style.background='';
+    document.getElementById('je-preview-toggle').style.color='var(--ac)';
+    ta.focus();
+  }
+}
+
+// Wire journal toolbar — calls after DOM is ready (wireToolbar needs IDs to exist)
+function _wireJournalToolbar(){
+  const tb=makeTB('je-body');
+  const extra={
+    'je-h1': ()=>mdLinePrefix('je-body','# '),
+    'je-img': insertJournalImage,
+    'je-iframe': insertJournalIframe,
+  };
+  wireToolbar('je-','je-body', extra);
+}
+// Wire on first open (called from startNewJournalEntry and editJournalEntry)
+// Also wire now in case it's already in DOM
+_wireJournalToolbar();
+
 // Recipes toolbar
 wireToolbar('rb-','rr-notes');
 
@@ -9836,6 +10017,18 @@ document.getElementById('ne-body').addEventListener('keydown',e=>{
     else if(e.key==='i'){e.preventDefault();tb.italic();}
     else if(e.key==='k'){e.preventDefault();tb.link();}
     else if(e.key==='s'){e.preventDefault();saveNoteAction();}
+  }
+  if(e.key==='Tab'){e.preventDefault();const ta=e.target,s=ta.selectionStart;ta.value=ta.value.slice(0,s)+'  '+ta.value.slice(ta.selectionEnd);ta.selectionStart=ta.selectionEnd=s+2;}
+});
+
+// Keyboard shortcuts — journal textarea
+document.getElementById('je-body').addEventListener('keydown',e=>{
+  const tb=makeTB('je-body');
+  if(e.ctrlKey||e.metaKey){
+    if(e.key==='b'){e.preventDefault();tb.bold();}
+    else if(e.key==='i'){e.preventDefault();tb.italic();}
+    else if(e.key==='k'){e.preventDefault();tb.link();}
+    else if(e.key==='s'){e.preventDefault();saveJournalEntry();}
   }
   if(e.key==='Tab'){e.preventDefault();const ta=e.target,s=ta.selectionStart;ta.value=ta.value.slice(0,s)+'  '+ta.value.slice(ta.selectionEnd);ta.selectionStart=ta.selectionEnd=s+2;}
 });
