@@ -1247,6 +1247,7 @@ main > .dview, main > .editor{ margin:0 auto; }
 .bot-list-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;cursor:pointer;transition:background .12s}
 .bot-list-item:hover{background:var(--sf2)}
 .bot-list-item.active{background:var(--sf3)}
+.bot-list-item.batch-sel{background:rgba(88,166,255,.1);outline:1px solid rgba(88,166,255,.3)}
 .bot-status-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
 .bot-status-dot.prepared{background:var(--mu)}
 .bot-status-dot.inoculated{background:var(--ac)}
@@ -3432,7 +3433,7 @@ input, textarea, select {
   </div>
 
   <!-- ── BATCH ACTION BAR ── -->
-  <div id="batch-action-bar" style="display:none;position:fixed;bottom:0;left:0;right:0;background:var(--sf);padding:16px;border-top:1px solid var(--bd);display:flex;gap:12px;z-index:100"></div>
+  <div id="batch-action-bar" style="display:none;position:fixed;bottom:0;left:0;right:0;background:var(--sf);border-top:1px solid var(--bd);padding:12px 16px;gap:10px;align-items:center;z-index:200;flex-wrap:wrap"></div>
 
   <!-- ── NAV DRAWER ── -->
   <div id="nav-backdrop" onclick="closeNavDrawer()"></div>
@@ -3522,7 +3523,10 @@ input, textarea, select {
             <span class="search-icon">🔍</span>
             <input type="text" id="bot-search" placeholder="Search code, species…" oninput="S.bottleSearch=this.value;renderBottleList()">
           </div>
-          <div class="aside-stats" id="bot-stats"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div class="aside-stats" id="bot-stats"></div>
+            <button class="btn xs ghost" onclick="BatchOps.selectAll()" style="font-size:10px;padding:3px 8px" title="Select all visible bottles">☑ Select all</button>
+          </div>
         </div>
         <div class="bot-filter-row" id="bot-filter-row">
           <button class="bot-filter-pill active" data-bf="all" onclick="setBotFilter('all')">All</button>
@@ -4111,8 +4115,9 @@ const DIR    = 'notes';
 const IDX    = `${DIR}/index.enc`;
 const ACC_F  = 'accessions/data.enc';
 const REC_F  = 'recipes/data.enc';
-const BOT_F  = 'bottles/data.enc';
-const GH_F   = 'greenhouse/data.enc';
+const BOT_F    = 'bottles/data.enc';
+const GH_F     = 'greenhouse/data.enc';
+const SUPPLY_F = 'supplies/data.enc';
 const KEYS_F = 'settings/keys.enc';
 const API    = 'https://api.github.com';
 
@@ -4146,9 +4151,10 @@ const S = {
   calMonth: new Date().getMonth(),
   calDate: null,
   calSelDate: null,
-  // 8 Features
+  // supplies
+  supplies: [], suppliesSha: null,
+  // ui state
   analytics: null,
-  analyticsLastCalc: null,
   blogPosts: [],
   selected: { bottles: [] },
 };
@@ -4381,6 +4387,16 @@ async function saveGreenhouse(plants, sha, transfers){
   _writeSummary();
   return res.content.sha;
 }
+async function loadSupplies(){
+  const f=await ghGet(SUPPLY_F);
+  if(!f) return {items:[],sha:null};
+  const raw=JSON.parse(await dec(ghDec(f.content)));
+  return {items:raw.items||[], sha:f.sha};
+}
+async function saveSupplies(items, sha){
+  const res=await ghPut(SUPPLY_F, await enc(JSON.stringify({items})), sha, `lab: supplies — ${items.length} items`);
+  return res.content.sha;
+}
 
 // ════════════════════════════════════════════════════════════
 // UTILS
@@ -4442,20 +4458,302 @@ const LabAnalytics={async calculate(){const a={contamination:{},success_rate:{},
 // 2. LAB BLOG
 const LabBlog={async fetchPosts(f={}){try{const r=await fetch('https://tcplants-blog.github.io/posts.json').catch(()=>null);if(!r||!r.ok)return S.blogPosts||[];const p=await r.json();S.blogPosts=p;return p}catch(e){return S.blogPosts||[]}},async createPost(t,m,sp,tgs,mf=[]){const ts=new Date().toISOString().split('T')[0].replace(/-/g,'')+'-'+Date.now().toString(36);const fn=`${ts}-${t.toLowerCase().replace(/\s+/g,'-').slice(0,30)}.md`;const fm=`---\ntitle: "${t}"\ndate: ${new Date().toISOString()}\ntimestamp: "${ts}"\nspecies: "${sp||'General'}"\ntags: [${tgs.map(x=>`"${x}"`).join(', ')}]\nmedia: [${mf.map(x=>`"${x}"`).join(', ')}]\ntc_plants_sync: true\n---\n\n${m}`;const p={id:ts,title:t,date:new Date().toISOString(),species:sp,tags:tgs,media:mf,filename:fn};if(!S.blogPosts)S.blogPosts=[];S.blogPosts.unshift(p);toast('📝 Lab entry: "'+t+'"');return p},renderBlogPage(){const c=document.getElementById('blog-main');if(!c)return;const p=S.blogPosts||[];c.innerHTML=p.length===0?'<div style="padding:40px;text-align:center;color:var(--mu)"><div style="font-size:28px;margin-bottom:12px">📔</div><p>No entries yet</p><button class="btn" onclick="LabBlog.createPost(prompt(\"Title:\"),prompt(\"Notes:\"),prompt(\"Species:\"),[])">Create Entry</button></div>':p.map(x=>'<div style="padding:16px;background:var(--sf);border:1px solid var(--bd);border-radius:8px;margin-bottom:12px;cursor:pointer" onclick="toast(\''+esc(x.title)+'\')"><div style="font-weight:600;margin-bottom:4px">'+esc(x.title)+'</div><div style="font-size:12px;color:var(--mu)">'+new Date(x.date).toLocaleDateString('en-IN')+' • '+x.species+'</div></div>').join('')}};
 
-// 3. LAB CALENDAR
-const LabCalendar={getDueTransfers(d=7){const c=new Date();c.setDate(c.getDate()+d);return(S.bottles||[]).filter(b=>b.next_review&&new Date(b.next_review)<=c&&['inoculated','growing'].includes(b.status))},getOverdueReviews(){return(S.bottles||[]).filter(b=>b.next_review&&new Date(b.next_review)<new Date()&&['inoculated','growing'].includes(b.status))},getTodaysAgenda(){const tr=this.getDueTransfers(0);const or=this.getOverdueReviews();return{transfers_count:tr.length,reviews_overdue:or.length,blog_today:(S.blogPosts||[]).filter(p=>{const d=new Date(p.date);const t=new Date();return d.toDateString()===t.toDateString()}).length,items:[...tr.map(b=>({type:'transfer',bottle:b})),...or.map(b=>({type:'review',bottle:b,days:Math.floor((Date.now()-new Date(b.next_review))/86400000)}))]}},renderCalendarView(){const c=document.getElementById('calendar-main');if(!c)return;const a=this.getTodaysAgenda();c.innerHTML='<div style="padding:20px"><h2 style="margin-bottom:20px">📅 Lab Schedule</h2><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px"><div style="background:var(--sf);padding:16px;border-radius:8px;border:1px solid var(--bd)"><div style="font-size:28px;font-weight:700;color:var(--ac)">'+a.transfers_count+'</div><div style="font-size:11px;color:var(--mu)">Transfers Due</div></div><div style="background:var(--sf);padding:16px;border-radius:8px;border:1px solid var(--bd)"><div style="font-size:28px;font-weight:700;color:var(--rd)">'+a.reviews_overdue+'</div><div style="font-size:11px;color:var(--mu)">Reviews Overdue</div></div></div><h3 style="margin-bottom:12px;font-size:13px;color:var(--mu)">UPCOMING ACTIONS</h3><div>'+a.items.map(i=>'<div style="padding:12px;background:var(--sf2);border-left:3px solid '+(i.type==='transfer'?'var(--ac)':'var(--rd)')+';margin-bottom:8px"><strong style="font-size:13px">'+esc(i.bottle.name||i.bottle.code)+'</strong><div style="font-size:11px;color:var(--mu);margin-top:4px">'+i.bottle.species+'</div></div>').join('')+'</div></div>'}};
+// 3. LAB SCHEDULE
+const LabCalendar={
+  renderCalendarView(){
+    const c=document.getElementById('calendar-main'); if(!c) return;
+    const now=new Date(); const todayStr=now.toISOString().slice(0,10);
+    const allBots=S.bottles||[];
+    const notes=S.notes||[];
+    const gh=S.greenhouse||[];
+
+    // Overdue (past next_review) — bottles + notes
+    const overdueBot=allBots
+      .filter(b=>b.next_review&&['inoculated','growing'].includes(b.status)&&b.next_review<todayStr)
+      .map(b=>({icon:'🫙',label:esc(b.code),sub:esc(b.species||''),days:daysFrom(b.next_review),act:`navTo('bottles');openBottle('${b.id}')`,type:'overdue'}));
+    const overdueNote=notes
+      .filter(n=>n.next_review&&n.next_review<todayStr)
+      .map(n=>({icon:'📋',label:esc(n.title),sub:esc(n.species||''),days:daysFrom(n.next_review),act:`openNote('${n.id}')`,type:'overdue'}));
+    const overdue=[...overdueBot,...overdueNote].sort((a,b)=>a.days-b.days);
+
+    // Due soon — next 7 days
+    const dueBot=allBots
+      .filter(b=>b.next_review&&['inoculated','growing'].includes(b.status)&&b.next_review>=todayStr&&daysFrom(b.next_review)<=7)
+      .map(b=>({icon:'🫙',label:esc(b.code),sub:esc(b.species||''),days:daysFrom(b.next_review),act:`navTo('bottles');openBottle('${b.id}')`,type:'soon'}));
+    const dueNote=notes
+      .filter(n=>n.next_review&&n.next_review>=todayStr&&daysFrom(n.next_review)<=7)
+      .map(n=>({icon:'📋',label:esc(n.title),sub:esc(n.species||''),days:daysFrom(n.next_review),act:`openNote('${n.id}')`,type:'soon'}));
+    const dueSoon=[...dueBot,...dueNote].sort((a,b)=>a.days-b.days);
+
+    // Transfer due — inoculated ≥28 days ago
+    const xferDue=allBots
+      .filter(b=>['inoculated','growing'].includes(b.status)&&b.date_inoculated&&Math.floor((now-new Date(b.date_inoculated))/86400000)>=28)
+      .sort((a,b)=>new Date(a.date_inoculated)-new Date(b.date_inoculated))
+      .map(b=>{const d=Math.floor((now-new Date(b.date_inoculated))/86400000);
+        return{icon:'✂️',label:esc(b.code),sub:esc(b.species||''),days:-d,act:`navTo('bottles');openBottle('${b.id}')`,type:'xfer',age:d};});
+
+    // GH attention
+    const ghAttn=gh
+      .filter(p=>p.health&&p.health!=='healthy')
+      .map(p=>({icon:'🏡',label:esc(p.species||'Plant'),sub:`Health: ${esc(p.health)}`,days:0,act:`navTo('greenhouse');openGHPlant('${p.id}')`,type:'gh'}));
+
+    const statCard=(val,label,col)=>`<div style="background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:16px 20px;text-align:center">
+      <div style="font-size:32px;font-weight:800;color:${col};line-height:1">${val}</div>
+      <div style="font-size:11px;color:var(--mu);margin-top:4px">${label}</div></div>`;
+
+    const row=(item)=>`<div onclick="${item.act}" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--sf);border:1px solid var(--bd);border-radius:8px;cursor:pointer;margin-bottom:6px;transition:background .12s" onmouseover="this.style.background='var(--sf2)'" onmouseout="this.style.background='var(--sf)'">
+      <span style="font-size:18px;flex-shrink:0">${item.icon}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${item.label}</div>
+        ${item.sub?`<div style="font-size:11px;color:var(--mu)">${item.sub}</div>`:''}
+      </div>
+      <span style="font-size:12px;font-weight:700;flex-shrink:0;color:${item.type==='overdue'?'var(--rd)':item.type==='xfer'?'var(--yw)':'var(--ac)'}">
+        ${item.type==='overdue'?Math.abs(item.days)+'d overdue':item.type==='xfer'?item.age+'d old':item.days===0?'Today':'in '+item.days+'d'}
+      </span></div>`;
+
+    const section=(title,items,emptyMsg)=>items.length
+      ?`<div style="margin-bottom:20px"><div style="font-size:10px;font-weight:800;letter-spacing:.1em;color:var(--mu);text-transform:uppercase;margin-bottom:8px">${title}</div>${items.map(row).join('')}</div>`
+      :`<div style="margin-bottom:20px"><div style="font-size:10px;font-weight:800;letter-spacing:.1em;color:var(--mu);text-transform:uppercase;margin-bottom:8px">${title}</div><div style="padding:12px;color:var(--gn);font-size:13px">✓ ${emptyMsg}</div></div>`;
+
+    c.innerHTML=`<div style="padding:20px;max-width:680px">
+      <h2 style="margin-bottom:16px;font-size:18px">📅 Lab Schedule</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:24px">
+        ${statCard(overdue.length,'Overdue','var(--rd)')}
+        ${statCard(dueSoon.length,'Due this week','var(--yw)')}
+        ${statCard(xferDue.length,'Transfer due','var(--ac)')}
+        ${statCard(ghAttn.length,'GH attention','#52b788')}
+      </div>
+      ${section('⏰ OVERDUE',overdue,'Nothing overdue')}
+      ${section('📅 DUE THIS WEEK',dueSoon,'Nothing due in 7 days')}
+      ${section('✂️ TRANSFER DUE',xferDue,'No transfers pending')}
+      ${section('🏡 GREENHOUSE ATTENTION',ghAttn,'All plants healthy')}
+    </div>`;
+  }
+};
 
 // 4. RAVANA INSIGHTS
 const RavanaInsights={async analyze(sp){if(!S.analytics)await LabAnalytics.calculate();const a=S.analytics;const am={};Object.keys(a.success_rate.by_species||{}).forEach(s=>{am[s]={success_rate:a.success_rate.by_species[s],contamination:a.contamination.by_species[s]||0,multiplication:a.multiplication.by_species[s]||0}});const s2=sp.toLowerCase();const m=am[s2]||{success_rate:0,contamination:0,multiplication:0};return{species:sp,metrics:m,compared:m.success_rate-a.success_rate.overall,rank:Object.values(am).filter(x=>x.success_rate>m.success_rate).length+1}},async renderInsightsPage(){const c=document.getElementById('insights-main');if(!c)return;if(!S.analytics)await LabAnalytics.calculate();const a=S.analytics;const sl=Object.keys(a.success_rate.by_species||{});c.innerHTML='<div style="padding:20px"><h2>✨ Ravana Insights</h2><select id="ins-sel" onchange="RavanaInsights.showDetail(this.value)" style="width:100%;padding:8px;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;color:var(--tx);margin:12px 0"><option>Select species...</option>'+sl.map(s=>'<option value="'+s+'">'+s+'</option>').join('')+'</select><div id="ins-det"></div></div>'},showDetail(sp){if(!sp)return;RavanaInsights.analyze(sp).then(r=>{const d=document.getElementById('ins-det');d.innerHTML='<div style="padding:16px;background:var(--sf);border:1px solid var(--bd);border-radius:8px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px"><div style="text-align:center;padding:12px;background:var(--sf2);border-radius:6px"><div style="font-size:24px;font-weight:700;color:var(--ac)">'+r.metrics.success_rate+'%</div><div style="font-size:11px;color:var(--mu)">Success Rate</div></div><div style="text-align:center;padding:12px;background:var(--sf2);border-radius:6px"><div style="font-size:24px;font-weight:700;color:var(--gn)">'+r.metrics.multiplication+'x</div><div style="font-size:11px;color:var(--mu)">Multiplication</div></div></div><p style="color:var(--mu);font-size:12px">Rank: #'+r.rank+' in lab ('+Math.round(r.compared*10)/10+'% vs avg)</p></div>'})}};
 
 // 5. BATCH OPS
-const BatchOps={selectedBottles:[],selectBottle(id,sel){if(sel){if(!this.selectedBottles.includes(id))this.selectedBottles.push(id)}else{this.selectedBottles=this.selectedBottles.filter(x=>x!==id)}this.updateBatchUI()},async bulkUpdateStatus(st,dt){this.selectedBottles.forEach(id=>{const b=S.bottles.find(x=>x.id===id);if(b){b.status=st;b.last_transfer=dt||new Date().toISOString().split('T')[0]}});await saveBottles(S.bottles,S.bottlesSha);toast('✅ Updated '+this.selectedBottles.length+' bottles');this.selectedBottles=[];this.updateBatchUI();renderBottleList()},updateBatchUI(){const b=document.getElementById('batch-action-bar');if(!b)return;if(this.selectedBottles.length===0){b.style.display='none';return}b.style.display='flex';b.innerHTML='<div style="flex:1"><strong>'+this.selectedBottles.length+'</strong> selected</div><button class="btn xs" onclick="BatchOps.bulkUpdateStatus(\'transferred\',new Date().toISOString().split(\'T\')[0])">↪️ Mark Transferred</button><button class="btn xs ghost" onclick="BatchOps.selectedBottles=[];BatchOps.updateBatchUI()">✕ Clear</button>'}};
+const BatchOps={
+  get sel(){ return S.selected.bottles; },
+  toggle(id){
+    const i=S.selected.bottles.indexOf(id);
+    if(i===-1) S.selected.bottles.push(id);
+    else S.selected.bottles.splice(i,1);
+    this.updateUI(); renderBottleList();
+  },
+  selectAll(){
+    const el=document.getElementById('bot-list');
+    if(!el) return;
+    const ids=[...el.querySelectorAll('[data-id]')].map(x=>x.dataset.id);
+    const allSelected=ids.every(id=>S.selected.bottles.includes(id));
+    if(allSelected) S.selected.bottles=[];
+    else S.selected.bottles=[...new Set([...S.selected.bottles,...ids])];
+    this.updateUI(); renderBottleList();
+  },
+  clear(){ S.selected.bottles=[]; this.updateUI(); renderBottleList(); },
+  async bulkUpdate(status){
+    if(!S.selected.bottles.length) return;
+    const today=new Date().toISOString().slice(0,10);
+    const count=S.selected.bottles.length;
+    S.selected.bottles.forEach(id=>{
+      const b=S.bottles.find(x=>x.id===id); if(!b) return;
+      b.status=status;
+      if(status==='subcultured'||status==='transferred') b.last_transfer=today;
+    });
+    load('Saving…');
+    try{
+      S.bottlesSha=await saveBottles(S.bottles,S.bottlesSha);
+      toast(`Updated ${count} bottle${count>1?'s':''} → ${status}`);
+      logActivity(`Batch: ${count} bottles → ${status}`);
+    }catch(e){ toast('Save failed: '+e.message,'fail'); }
+    unload();
+    this.clear();
+  },
+  updateUI(){
+    const bar=document.getElementById('batch-action-bar'); if(!bar) return;
+    const n=S.selected.bottles.length;
+    if(!n){ bar.style.display='none'; return; }
+    bar.style.display='flex';
+    bar.innerHTML=`
+      <span style="font-weight:700;font-size:13px;flex-shrink:0">${n} selected</span>
+      <button class="btn xs green" onclick="BatchOps.bulkUpdate('subcultured')">✂️ Subcultured</button>
+      <button class="btn xs" onclick="BatchOps.bulkUpdate('growing')" style="border-color:var(--gn);color:var(--gn)">🌿 Growing</button>
+      <button class="btn xs" onclick="BatchOps.bulkUpdate('rooting')" style="border-color:var(--ac);color:var(--ac)">🌱 Rooting</button>
+      <button class="btn xs danger" onclick="BatchOps.bulkUpdate('contaminated')">☣️ Contaminated</button>
+      <button class="btn xs ghost" onclick="BatchOps.bulkUpdate('discarded')">🗑 Discard</button>
+      <div style="flex:1"></div>
+      <button class="btn xs ghost" onclick="BatchOps.clear()">✕ Clear</button>`;
+  }
+};
 
 // 6. SUPPLY INVENTORY
-const SupplyInventory={items:[],addMediaBatch(n,q,c){const b={id:'media-'+Date.now().toString(36),name:n,quantity:q,used:0,remaining:q,date:new Date().toISOString().split('T')[0],cost:c,cost_per:Math.round(c/q*100)/100};this.items.push(b);localStorage.setItem('tcplants_supply',JSON.stringify(this.items));toast('📦 Added: '+n)},renderInventoryPage(){const c=document.getElementById('supply-main');if(!c)return;c.innerHTML='<div style="padding:20px"><h2>📦 Supplies</h2><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">'+this.items.map(i=>'<div style="padding:12px;background:var(--sf);border:1px solid var(--bd);border-radius:8px"><strong>'+esc(i.name)+'</strong><div style="font-size:11px;color:var(--mu);margin-top:8px">Used: '+i.used+'/'+i.quantity+'<br>Cost: ₹'+i.cost+'</div></div>').join('')+'</div><button class="btn" style="margin-top:20px" onclick="SupplyInventory.addMediaBatch(prompt(\'Name:\'),parseInt(prompt(\'Qty:\')||0),parseFloat(prompt(\'Cost:\')||0));SupplyInventory.renderInventoryPage()">+ Add Batch</button></div>'}};
+const SupplyInventory={
+  renderInventoryPage(){
+    const c=document.getElementById('supply-main'); if(!c) return;
+    const items=S.supplies||[];
+    const today=new Date().toISOString().slice(0,10);
+
+    const statusOf=(item)=>{
+      if(item.expiry&&item.expiry<=today) return{label:'Expired',col:'var(--rd)'};
+      if(item.expiry){
+        const d=Math.ceil((new Date(item.expiry)-new Date())/86400000);
+        if(d<=14) return{label:`Expires in ${d}d`,col:'var(--yw)'};
+      }
+      const rem=item.quantity-(item.used||0);
+      if(rem<=0) return{label:'Depleted',col:'var(--mu)'};
+      return{label:`${rem} ${item.unit||'units'} left`,col:'var(--gn)'};
+    };
+
+    const card=(item)=>{
+      const st=statusOf(item);
+      const pct=item.quantity>0?Math.max(0,Math.min(100,Math.round(((item.quantity-(item.used||0))/item.quantity)*100))):0;
+      return `<div style="background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:16px">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
+          <div style="font-weight:700;font-size:14px">${esc(item.name)}</div>
+          <button class="btn xs ghost" onclick="SupplyInventory.deleteItem('${item.id}')" style="padding:2px 6px;font-size:11px">✕</button>
+        </div>
+        <div style="height:4px;background:var(--sf3);border-radius:2px;margin-bottom:10px">
+          <div style="height:4px;border-radius:2px;background:${pct>50?'var(--gn)':pct>20?'var(--yw)':'var(--rd)'};width:${pct}%;transition:width .4s"></div>
+        </div>
+        <div style="font-size:12px;color:${st.col};margin-bottom:6px;font-weight:600">${st.label}</div>
+        <div style="font-size:11px;color:var(--mu);display:flex;flex-direction:column;gap:2px">
+          <span>Qty: ${item.used||0} / ${item.quantity} ${item.unit||'units'} used</span>
+          ${item.cost_total?`<span>Cost: ₹${item.cost_total}${item.quantity?` (₹${(item.cost_total/item.quantity).toFixed(2)}/${item.unit||'unit'})`:''}</span>`:''}
+          ${item.date_prepared?`<span>Prepared: ${fmtDateShort(item.date_prepared)}</span>`:''}
+          ${item.expiry?`<span>Expires: ${fmtDateShort(item.expiry)}</span>`:''}
+        </div>
+        <div style="display:flex;gap:6px;margin-top:10px">
+          <button class="btn xs" onclick="SupplyInventory.markUsed('${item.id}')" style="flex:1;font-size:11px">+ Use 1</button>
+          <button class="btn xs ghost" onclick="SupplyInventory.editUse('${item.id}')" style="flex:1;font-size:11px">Edit use</button>
+        </div>
+      </div>`;
+    };
+
+    c.innerHTML=`<div style="padding:20px;max-width:900px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <h2 style="font-size:18px">📦 Supplies</h2>
+        <button class="btn sm green" onclick="SupplyInventory.openAddForm()">+ Add batch</button>
+      </div>
+      <div id="supply-form" style="display:none;background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:16px;margin-bottom:16px">
+        <div style="font-weight:700;margin-bottom:12px">New Supply Batch</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+          <div><label style="font-size:11px;color:var(--mu)">Name</label><input id="sup-name" type="text" placeholder="e.g. MS Medium" style="width:100%;padding:7px;background:var(--sf);border:1px solid var(--bd);border-radius:6px;color:var(--tx)"></div>
+          <div><label style="font-size:11px;color:var(--mu)">Unit</label><input id="sup-unit" type="text" placeholder="bottles / L / g" style="width:100%;padding:7px;background:var(--sf);border:1px solid var(--bd);border-radius:6px;color:var(--tx)"></div>
+          <div><label style="font-size:11px;color:var(--mu)">Quantity</label><input id="sup-qty" type="number" min="1" placeholder="50" style="width:100%;padding:7px;background:var(--sf);border:1px solid var(--bd);border-radius:6px;color:var(--tx)"></div>
+          <div><label style="font-size:11px;color:var(--mu)">Total cost (₹)</label><input id="sup-cost" type="number" min="0" placeholder="500" style="width:100%;padding:7px;background:var(--sf);border:1px solid var(--bd);border-radius:6px;color:var(--tx)"></div>
+          <div><label style="font-size:11px;color:var(--mu)">Prepared date</label><input id="sup-date" type="date" style="width:100%;padding:7px;background:var(--sf);border:1px solid var(--bd);border-radius:6px;color:var(--tx)" value="${today}"></div>
+          <div><label style="font-size:11px;color:var(--mu)">Expiry date</label><input id="sup-exp" type="date" style="width:100%;padding:7px;background:var(--sf);border:1px solid var(--bd);border-radius:6px;color:var(--tx)"></div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn sm green" onclick="SupplyInventory.saveNew()" style="flex:1">Save</button>
+          <button class="btn sm ghost" onclick="SupplyInventory.closeForm()" style="flex:1">Cancel</button>
+        </div>
+      </div>
+      ${items.length
+        ?`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px">${items.map(card).join('')}</div>`
+        :`<div style="padding:32px;text-align:center;color:var(--mu)"><div style="font-size:32px;margin-bottom:8px">📦</div><p>No supply batches yet. Add your first batch.</p></div>`}
+    </div>`;
+  },
+  openAddForm(){ const f=document.getElementById('supply-form'); if(f) f.style.display='block'; },
+  closeForm(){ const f=document.getElementById('supply-form'); if(f) f.style.display='none'; },
+  async saveNew(){
+    const name=document.getElementById('sup-name')?.value.trim();
+    const unit=document.getElementById('sup-unit')?.value.trim()||'units';
+    const qty=parseInt(document.getElementById('sup-qty')?.value)||0;
+    const cost=parseFloat(document.getElementById('sup-cost')?.value)||0;
+    const date=document.getElementById('sup-date')?.value||new Date().toISOString().slice(0,10);
+    const exp=document.getElementById('sup-exp')?.value||'';
+    if(!name||!qty){ toast('Name and quantity required','fail'); return; }
+    const item={id:uid(),name,unit,quantity:qty,used:0,cost_total:cost,date_prepared:date,expiry:exp||null};
+    S.supplies=[...S.supplies,item];
+    load('Saving…');
+    try{ S.suppliesSha=await saveSupplies(S.supplies,S.suppliesSha); toast('📦 Batch added: '+name); }
+    catch(e){ toast('Save failed: '+e.message,'fail'); }
+    unload(); this.renderInventoryPage();
+  },
+  async markUsed(id){
+    const item=S.supplies.find(x=>x.id===id); if(!item) return;
+    item.used=(item.used||0)+1;
+    load('Saving…');
+    try{ S.suppliesSha=await saveSupplies(S.supplies,S.suppliesSha); }
+    catch(e){ toast('Save failed: '+e.message,'fail'); }
+    unload(); this.renderInventoryPage();
+  },
+  async editUse(id){
+    const item=S.supplies.find(x=>x.id===id); if(!item) return;
+    const val=prompt(`Units used for "${item.name}" (current: ${item.used||0}):`,item.used||0);
+    if(val===null) return;
+    const n=parseInt(val);
+    if(isNaN(n)||n<0){ toast('Invalid number','fail'); return; }
+    item.used=n;
+    load('Saving…');
+    try{ S.suppliesSha=await saveSupplies(S.supplies,S.suppliesSha); toast('Updated'); }
+    catch(e){ toast('Save failed: '+e.message,'fail'); }
+    unload(); this.renderInventoryPage();
+  },
+  async deleteItem(id){
+    if(!confirm('Delete this supply batch?')) return;
+    S.supplies=S.supplies.filter(x=>x.id!==id);
+    load('Saving…');
+    try{ S.suppliesSha=await saveSupplies(S.supplies,S.suppliesSha); }
+    catch(e){ toast('Save failed: '+e.message,'fail'); }
+    unload(); this.renderInventoryPage();
+  }
+};
 
 // 7. SEARCH SYSTEM
-const SearchSystem={async search(cr){const r={notes:[],bottles:[],blog:[]};r.notes=S.notes.filter(n=>{if(cr.species&&!n.species?.toLowerCase().includes(cr.species.toLowerCase()))return false;if(cr.q&&!n.title?.toLowerCase().includes(cr.q.toLowerCase()))return false;return true});r.bottles=(S.bottles||[]).filter(b=>{if(cr.species&&!b.species?.toLowerCase().includes(cr.species.toLowerCase()))return false;if(cr.q&&!b.name?.toLowerCase().includes(cr.q.toLowerCase()))return false;return true});r.blog=(S.blogPosts||[]).filter(p=>{if(cr.species&&!p.species?.toLowerCase().includes(cr.species.toLowerCase()))return false;if(cr.q&&!p.title?.toLowerCase().includes(cr.q.toLowerCase()))return false;return true});return r},renderSearchPage(){const c=document.getElementById('search-main');if(!c)return;c.innerHTML='<div style="padding:20px"><h2>🔍 Search</h2><input type="text" id="search-q" placeholder="Search..." style="width:100%;padding:8px;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;color:var(--tx);margin-bottom:12px"><button class="btn" onclick="SearchSystem.search({q:document.getElementById(\'search-q\').value}).then(r=>{const res=document.getElementById(\'search-res\');res.innerHTML=\'<h3>Notes (\'+(r.notes.length)+\')</h3>\'+r.notes.map(n=>\'<div style=\\\"padding:8px;cursor:pointer;background:var(--sf2);margin-bottom:4px;border-radius:4px\\\">\'+ esc(n.title)+\'</div>\').join(\'\')+\'<h3 style=\\\"margin-top:16px\\\">Bottles (\'+(r.bottles.length)+\')</h3>\'+r.bottles.map(b=>\'<div style=\\\"padding:8px;cursor:pointer;background:var(--sf2);margin-bottom:4px;border-radius:4px\\\">\'+ esc(b.name)+\'</div>\').join(\'\')})">Search</button><div id="search-res" style="margin-top:12px"></div></div>'}};
+const SearchSystem={
+  _run(q){
+    if(!q||q.length<2) return null;
+    const lq=q.toLowerCase();
+    const match=(s)=>(s||'').toLowerCase().includes(lq);
+    const notes=(S.notes||[]).filter(n=>match(n.title)||match(n.species)||match(n.body_preview)||(n.tags||[]).some(t=>match(t)));
+    const bottles=(S.bottles||[]).filter(b=>match(b.code)||match(b.species)||match(b.notes));
+    const accs=(S.accs||[]).filter(a=>match(a.species)||match(a.num)||match(a.source));
+    const recs=(S.recs||[]).filter(r=>match(r.name)||match(r.base)||match(r.target));
+    const gh=(S.greenhouse||[]).filter(p=>match(p.species)||match(p.source));
+    return{notes,bottles,accs,recs,gh,total:notes.length+bottles.length+accs.length+recs.length+gh.length};
+  },
+  _renderResults(res,q){
+    if(!res) return '<div style="color:var(--mu);font-size:13px;padding:12px 0">Type at least 2 characters to search.</div>';
+    if(!res.total) return `<div style="color:var(--mu);font-size:13px;padding:12px 0">No results for "${esc(q)}"</div>`;
+    const sec=(icon,label,items,rows)=>items.length?`
+      <div style="margin-bottom:16px">
+        <div style="font-size:10px;font-weight:800;letter-spacing:.1em;color:var(--mu);text-transform:uppercase;margin-bottom:6px">${icon} ${label} <span style="font-weight:400">(${items.length})</span></div>
+        ${rows}
+      </div>`:'';
+    const pill=(txt,col='var(--mu)')=>`<span style="font-size:10px;background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:1px 7px;color:${col}">${txt}</span>`;
+    const row=(icon,title,sub,action)=>`<div onclick="${action}" style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--sf);border:1px solid var(--bd);border-radius:6px;cursor:pointer;margin-bottom:4px;transition:background .12s" onmouseover="this.style.background='var(--sf2)'" onmouseout="this.style.background='var(--sf)'">
+      <span style="font-size:15px;flex-shrink:0">${icon}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${title}</div>
+        ${sub?`<div style="font-size:11px;color:var(--mu)">${sub}</div>`:''}
+      </div></div>`;
+    return sec('📋','Notes',res.notes,res.notes.map(n=>row('📋',esc(n.title),[fmtDateShort(n.date),n.species?esc(n.species):'',n.stage||''].filter(Boolean).join(' · '),`openNote('${n.id}')`)).join(''))
+      +sec('🫙','Bottles',res.bottles,res.bottles.map(b=>row('🫙',esc(b.code),[esc(b.species||''),b.status||''].filter(Boolean).join(' · '),`navTo('bottles');openBottle('${b.id}')`)).join(''))
+      +sec('🌿','Accessions',res.accs,res.accs.map(a=>row('🌿',esc(a.species||a.num||''),esc(a.source||''),`navTo('registry');openAccession('${a.id}')`)).join(''))
+      +sec('🧪','Recipes',res.recs,res.recs.map(r=>row('🧪',esc(r.name),esc(r.base||''),`navTo('recipes');openRecipe('${r.id}')`)).join(''))
+      +sec('🏡','Greenhouse',res.gh,res.gh.map(p=>row('🏡',esc(p.species||'Plant'),`Health: ${esc(p.health||'?')}`,`navTo('greenhouse');openGHPlant('${p.id}')`)).join(''));
+  },
+  renderSearchPage(){
+    const c=document.getElementById('search-main'); if(!c) return;
+    c.innerHTML=`<div style="padding:20px;max-width:640px">
+      <h2 style="margin-bottom:12px;font-size:18px">🔍 Search</h2>
+      <input type="text" id="search-q" placeholder="Search notes, bottles, accessions, recipes, greenhouse…"
+        style="width:100%;padding:10px 14px;background:var(--sf);border:1px solid var(--bd);border-radius:8px;color:var(--tx);font-size:14px;margin-bottom:16px"
+        oninput="SearchSystem._onInput(this.value)" autofocus>
+      <div id="search-results"></div>
+    </div>`;
+    setTimeout(()=>{ const el=document.getElementById('search-q'); if(el) el.focus(); },50);
+  },
+  _onInput(q){
+    const res=this._run(q);
+    const el=document.getElementById('search-results'); if(!el) return;
+    el.innerHTML=this._renderResults(res,q);
+  }
+};
 
 // Dashboard alerts are now handled by _computeAlerts() + _renderDashboard()
 
@@ -4645,6 +4943,16 @@ function _computeAlerts(){
   const ghSick=gh.filter(p=>p.health&&p.health!=='healthy');
   if(ghSick.length){
     alerts.push({level:'warn',icon:'🏡',msg:`${ghSick.length} GH plant${ghSick.length>1?'s':''} need attention`,action:"navTo('greenhouse')"});
+  }
+
+  // 5. Supply expiry — anything expiring within 14 days or already expired
+  const todayStr=now.toISOString().slice(0,10);
+  const expiring=(S.supplies||[]).filter(s=>s.expiry&&s.expiry<=new Date(now.getTime()+14*86400000).toISOString().slice(0,10));
+  if(expiring.length){
+    const expired=expiring.filter(s=>s.expiry<=todayStr).length;
+    alerts.push({level:expired?'crit':'warn',icon:'📦',
+      msg:expired?`${expired} supply batch${expired>1?'es':''} expired`:`${expiring.length} supply item${expiring.length>1?'s':''} expiring soon`,
+      action:"navTo('supply')"});
   }
 
   return alerts;
@@ -6213,12 +6521,34 @@ function renderAnalytics(){
       ${summaryStats}${statusBars}
     </div>`;
 
+    // ── Multiplication factor per species
+    const multiMap={};
+    notes.forEach(n=>{
+      if(!n.species||n.cultures_out==null) return;
+      const k=n.species.toLowerCase();
+      if(!multiMap[k]) multiMap[k]={name:n.species,vals:[]};
+      multiMap[k].vals.push(n.cultures_out);
+    });
+    const multiList=Object.values(multiMap).filter(m=>m.vals.length>=2)
+      .map(m=>({name:m.name,avg:m.vals.reduce((a,b)=>a+b,0)/m.vals.length,n:m.vals.length}))
+      .sort((a,b)=>b.avg-a.avg).slice(0,8);
+    const maxMulti=Math.max(...multiList.map(m=>m.avg),1);
+    const multiBars=multiList.length?multiList.map(m=>{
+      const pct=Math.round(m.avg/maxMulti*100);
+      const col=m.avg>=4?'var(--gn)':m.avg>=2?'var(--ac)':'var(--mu)';
+      return `<div class="an-bar-row">
+        <div class="an-bar-label" title="${esc(m.name)}">${esc(m.name)}</div>
+        <div class="an-bar-track"><div class="an-bar-fill" style="width:${pct}%;background:${col}"></div></div>
+        <div class="an-bar-val">${m.avg.toFixed(1)}×</div></div>`;
+    }).join(''):`<p class="an-empty">Add 'Cultures Out' to notes to see multiplication rates.</p>`;
+    const multiCard=`<div class="an-card"><div class="an-title">Multiplication Factor (avg cultures out)</div>${multiBars}</div>`;
+
     // Assemble with bottle chart
     const intervalSection=intervalCards?`<div class="an-grid">${intervalCards}</div>`:'';
     const usageCard=_buildUsageCard();
     document.getElementById('analytics-content').innerHTML=`
       <div class="an-grid">${notesChart}${stageDist}${contamChart}${recipeCard}</div>
-      <div class="an-grid">${speciesCard}${tagCard}</div>
+      <div class="an-grid">${speciesCard}${multiCard}</div>
       ${intervalSection}
       <div class="an-grid">${funnelCard}</div>
       <div class="an-grid">${botChart}${bottleCard}</div>
@@ -9401,16 +9731,19 @@ function renderBottleList(){
   const active=S.bottles.filter(b=>['inoculated','growing'].includes(b.status)).length;
   document.getElementById('bot-stats').textContent=`${total} bottle${total!==1?'s':''} · ${active} active`;
   if(!list.length){el.innerHTML=`<div style="padding:18px;font-size:13px;color:var(--mu);text-align:center">${q||S.bottleFilter!=='all'?'No matches':'No bottles yet. Create one!'}</div>`;return;}
-  el.innerHTML=list.map(b=>`
-    <div class="bot-list-item${S.curBot===b.id?' active':''}" data-id="${b.id}" onclick="openBottle('${b.id}')">
-      <div class="bot-status-dot ${b.status||'prepared'}"></div>
-      <div class="bot-list-info">
+  el.innerHTML=list.map(b=>{
+    const sel=S.selected.bottles.includes(b.id);
+    return `<div class="bot-list-item${S.curBot===b.id?' active':''}${sel?' batch-sel':''}" data-id="${b.id}">
+      <input type="checkbox" class="bot-cb" ${sel?'checked':''} onclick="event.stopPropagation();BatchOps.toggle('${b.id}')" style="margin:0 6px 0 4px;cursor:pointer;flex-shrink:0;accent-color:var(--ac)">
+      <div class="bot-status-dot ${b.status||'prepared'}" onclick="openBottle('${b.id}')"></div>
+      <div class="bot-list-info" onclick="openBottle('${b.id}')">
         <div class="bot-list-code">${esc(b.code)}${b.session_id?'<span style="font-size:9px;background:var(--pu);color:#fff;padding:1px 5px;border-radius:3px;margin-left:5px;vertical-align:middle;opacity:.85">S</span>':''}</div>
         <div class="bot-list-sp">${esc(b.species||'—')}</div>
         ${b.stage?`<div class="bot-list-stage">${esc(b.stage)}</div>`:''}
       </div>
-      ${(b.flair_ids&&b.flair_ids.length)?`<div style="font-size:10px;color:var(--mu);flex-shrink:0">${b.flair_ids.length}🏷</div>`:''}
-    </div>`).join('');
+      ${(b.flair_ids&&b.flair_ids.length)?`<div style="font-size:10px;color:var(--mu);flex-shrink:0" onclick="openBottle('${b.id}')">${b.flair_ids.length}🏷</div>`:''}
+    </div>`;
+  }).join('');
 }
 
 function showBotEmpty(){
@@ -10350,12 +10683,13 @@ async function login(){
       toast('⚡ Loaded from cache');
     }else{
       load('Loading all data…');
-      const [{notes,sha:nSha},{accs,sha:aSha},{recs,sha:rSha},{bottles,sessions:bSess,sha:bSha},{plants:ghPlants,transfers:ghTransf,sha:ghSha}]=await Promise.all([loadNotesIndex(),loadAccessions(),loadRecipes(),loadBottles(),loadGreenhouse()]);
+      const [{notes,sha:nSha},{accs,sha:aSha},{recs,sha:rSha},{bottles,sessions:bSess,sha:bSha},{plants:ghPlants,transfers:ghTransf,sha:ghSha},{items:supItems,sha:supSha}]=await Promise.all([loadNotesIndex(),loadAccessions(),loadRecipes(),loadBottles(),loadGreenhouse(),loadSupplies()]);
       S.notes=notes; S.notesSha=nSha;
       S.accs=accs; S.accSha=aSha;
       S.recs=recs; S.recSha=rSha;
       S.bottles=bottles||[]; S.sessions=bSess||[]; S.bottlesSha=bSha;
       S.greenhouse=ghPlants||[]; S.ghTransfers=ghTransf||[]; S.greenhouseSha=ghSha;
+      S.supplies=supItems||[]; S.suppliesSha=supSha;
       _writeCache();
     }
     document.getElementById('login').style.display='none';
@@ -10664,15 +10998,11 @@ document.addEventListener('keydown',e=>{
     return;
   }
 
-  // Ctrl+K: Focus search (or open if not visible)
+  // Ctrl+K: Open global search
   if(e.ctrlKey&&e.key==='k'){
     e.preventDefault();
-    const search=document.getElementById('note-search');
-    if(search){
-      search.focus();
-      search.select();
-      toast('⌨️ Search (Ctrl+K)');
-    }
+    navTo('search');
+    setTimeout(()=>{ const el=document.getElementById('search-q'); if(el){ el.focus(); el.select(); }},80);
     return;
   }
 
