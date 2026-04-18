@@ -5254,6 +5254,42 @@ const BatchOps={
 
 // 6. SUPPLY INVENTORY
 const SupplyInventory={
+  calcPerformance(item){
+    if(!item.date_prepared) return null;
+    // Find next batch of same supply type (to close the active window)
+    const sameType=(S.supplies||[])
+      .filter(x=>x.id!==item.id&&x.name.toLowerCase()===item.name.toLowerCase()&&x.date_prepared)
+      .sort((a,b)=>a.date_prepared.localeCompare(b.date_prepared));
+    const nextBatch=sameType.find(x=>x.date_prepared>item.date_prepared);
+    const windowEnd=nextBatch?.date_prepared||item.expiry||null;
+
+    const bots=(S.bottles||[]).filter(b=>{
+      const d=(b.date_prepared||b.date_inoculated||'').slice(0,10);
+      if(!d||d<item.date_prepared) return false;
+      if(windowEnd&&d>windowEnd) return false;
+      return true;
+    });
+    if(!bots.length) return {windowStart:item.date_prepared,windowEnd,bottles:0};
+
+    const total=bots.length;
+    const contam=bots.filter(b=>b.status==='contaminated').length;
+    const success=bots.filter(b=>['subcultured','rooting','hardening','weaned'].includes(b.status)).length;
+    const contamRate=Math.round(contam/total*100);
+    const successRate=Math.round(success/total*100);
+
+    // Lab-wide contamination rate for comparison
+    const allBots=S.bottles||[];
+    const labContamRate=allBots.length?Math.round(allBots.filter(b=>b.status==='contaminated').length/allBots.length*100):0;
+    const flag=contamRate>labContamRate+10; // 10% worse than lab average
+
+    return{
+      windowStart:item.date_prepared, windowEnd,
+      bottles:total, contaminated:contam, successful:success,
+      contamRate, successRate, labContamRate, flag,
+      costPerBottle:item.cost_total&&total?(item.cost_total/total).toFixed(2):null
+    };
+  },
+
   renderInventoryPage(){
     const c=document.getElementById('supply-main'); if(!c) return;
     const items=S.supplies||[];
@@ -5273,7 +5309,30 @@ const SupplyInventory={
     const card=(item)=>{
       const st=statusOf(item);
       const pct=item.quantity>0?Math.max(0,Math.min(100,Math.round(((item.quantity-(item.used||0))/item.quantity)*100))):0;
-      return `<div style="background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:16px">
+      const perf=this.calcPerformance(item);
+      const perfHtml=perf&&perf.bottles>0?`
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--sf2)">
+          <div style="font-size:10px;font-weight:800;letter-spacing:.06em;color:var(--mu);text-transform:uppercase;margin-bottom:6px">Performance · ${perf.bottles} bottle${perf.bottles>1?'s':''} in window</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <div style="text-align:center">
+              <div style="font-size:18px;font-weight:800;color:${perf.contamRate>perf.labContamRate+5?'var(--rd)':perf.contamRate<perf.labContamRate-5?'var(--gn)':'var(--yw)'}">${perf.contamRate}%</div>
+              <div style="font-size:10px;color:var(--mu)">Contam</div>
+            </div>
+            <div style="text-align:center">
+              <div style="font-size:18px;font-weight:800;color:var(--gn)">${perf.successRate}%</div>
+              <div style="font-size:10px;color:var(--mu)">Success</div>
+            </div>
+            ${perf.costPerBottle?`<div style="text-align:center">
+              <div style="font-size:18px;font-weight:800">₹${perf.costPerBottle}</div>
+              <div style="font-size:10px;color:var(--mu)">/ bottle</div>
+            </div>`:''}
+          </div>
+          ${perf.flag?`<div style="margin-top:6px;font-size:11px;color:var(--rd);font-weight:600">⚠️ Contamination ${perf.contamRate - perf.labContamRate}% above lab average — check this batch</div>`:''}
+          <div style="font-size:10px;color:var(--mu);margin-top:4px">Lab avg: ${perf.labContamRate}% contam · Window: ${fmtDateShort(perf.windowStart)}${perf.windowEnd?' → '+fmtDateShort(perf.windowEnd):' → now'}</div>
+        </div>`:
+        perf?`<div style="margin-top:8px;font-size:11px;color:var(--mu)">No bottles prepared during this batch's window yet</div>`:'';
+
+      return `<div style="background:var(--sf);border:1px solid ${perf?.flag?'rgba(248,81,73,.4)':'var(--bd)'};border-radius:10px;padding:16px">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
           <div style="font-weight:700;font-size:14px">${esc(item.name)}</div>
           <button class="btn xs ghost" onclick="SupplyInventory.deleteItem('${item.id}')" style="padding:2px 6px;font-size:11px">✕</button>
@@ -5288,6 +5347,7 @@ const SupplyInventory={
           ${item.date_prepared?`<span>Prepared: ${fmtDateShort(item.date_prepared)}</span>`:''}
           ${item.expiry?`<span>Expires: ${fmtDateShort(item.expiry)}</span>`:''}
         </div>
+        ${perfHtml}
         <div style="display:flex;gap:6px;margin-top:10px">
           <button class="btn xs" onclick="SupplyInventory.markUsed('${item.id}')" style="flex:1;font-size:11px">+ Use 1</button>
           <button class="btn xs ghost" onclick="SupplyInventory.editUse('${item.id}')" style="flex:1;font-size:11px">Edit use</button>
@@ -5295,11 +5355,28 @@ const SupplyInventory={
       </div>`;
     };
 
+    // Best/worst batch summary across items that have performance data
+    const ranked=items.map(i=>({i,p:this.calcPerformance(i)})).filter(x=>x.p&&x.p.bottles>=3).sort((a,b)=>a.p.contamRate-b.p.contamRate);
+    const summaryHtml=ranked.length>=2?`
+      <div style="background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:14px;margin-bottom:16px;display:flex;gap:20px;flex-wrap:wrap">
+        <div>
+          <div style="font-size:10px;font-weight:800;letter-spacing:.06em;color:var(--gn);text-transform:uppercase;margin-bottom:4px">🏆 Best batch</div>
+          <div style="font-size:13px;font-weight:700">${esc(ranked[0].i.name)}</div>
+          <div style="font-size:12px;color:var(--mu)">${ranked[0].p.contamRate}% contam · ${ranked[0].p.successRate}% success${ranked[0].p.costPerBottle?' · ₹'+ranked[0].p.costPerBottle+'/bottle':''}</div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:800;letter-spacing:.06em;color:var(--rd);text-transform:uppercase;margin-bottom:4px">⚠️ Worst batch</div>
+          <div style="font-size:13px;font-weight:700">${esc(ranked[ranked.length-1].i.name)}</div>
+          <div style="font-size:12px;color:var(--mu)">${ranked[ranked.length-1].p.contamRate}% contam · ${ranked[ranked.length-1].p.successRate}% success${ranked[ranked.length-1].p.costPerBottle?' · ₹'+ranked[ranked.length-1].p.costPerBottle+'/bottle':''}</div>
+        </div>
+      </div>`:'';
+
     c.innerHTML=`<div style="padding:20px;max-width:900px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
         <h2 style="font-size:18px">📦 Supplies</h2>
         <button class="btn sm green" onclick="SupplyInventory.openAddForm()">+ Add batch</button>
       </div>
+      ${summaryHtml}
       <div id="supply-form" style="display:none;background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:16px;margin-bottom:16px">
         <div style="font-weight:700;margin-bottom:12px">New Supply Batch</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
