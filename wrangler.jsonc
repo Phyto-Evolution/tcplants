@@ -1,0 +1,32 @@
+{
+  // TC Plants Lab — AI Proxy Worker
+  // Deploy: wrangler deploy
+  // Secrets: wrangler secret put GROQ_KEY
+  //          wrangler secret put CLAUDE_KEY
+  //          wrangler secret put PROXY_SECRET
+
+  "name": "plantking",
+  "main": "cloudflare-worker.js",
+  "compatibility_date": "2025-04-01",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // Secrets — set via dashboard or `wrangler secret put`
+  // Never put actual values here — this file is in the repo
+  // GROQ_KEY, CLAUDE_KEY, PROXY_SECRET
+
+  "observability": {
+    "enabled": true,          // was false — turn on to see logs in dashboard
+    "head_sampling_rate": 1,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "persist": true,
+      "invocation_logs": true
+    },
+    "traces": {
+      "enabled": true,
+      "persist": true,
+      "head_sampling_rate": 1
+    }
+  }
+}
