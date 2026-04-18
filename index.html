@@ -2535,6 +2535,18 @@ input, textarea, select {
           <div id="inv-items"></div>
         </div>
       </div>
+
+      <!-- ── Ravana Stock Insights ── -->
+      <div style="margin-top:32px;border-top:1px solid var(--bd);padding-top:24px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <span style="font-size:15px;font-weight:800;color:var(--ac)">✦ Ravana</span>
+          <span style="font-size:13px;color:var(--mu)">Stock intelligence — on demand</span>
+          <button class="btn sm" id="stock-ravana-btn" onclick="_stockRavanaInsight()" style="margin-left:auto;background:linear-gradient(135deg,var(--ac),var(--pu));color:#fff;border:none">✦ Analyse stock</button>
+        </div>
+        <div id="stock-ravana-panel" style="display:none;background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:18px">
+          <div id="stock-ravana-body" style="font-size:13px;line-height:1.8;color:var(--tx)"></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -14770,6 +14782,92 @@ async function _invDelete(id){
   if(!confirm('Remove this item?')) return;
   S_inv.items=(S_inv.items||[]).filter(i=>i.id!==id);
   try{await saveInv();renderInv();toast('Item removed');}catch(e){toast('Delete failed','fail');}
+}
+
+// ── Ravana Stock Insights ─────────────────────────────────────
+let _stockRavanaTimer=null;
+async function _stockRavanaInsight(){
+  const btn=document.getElementById('stock-ravana-btn');
+  const panel=document.getElementById('stock-ravana-panel');
+  const body=document.getElementById('stock-ravana-body');
+  if(!panel||!body) return;
+
+  panel.style.display='block';
+  body.textContent='🔬 Ravana is reading your stock…';
+  if(btn){btn.disabled=true;btn.textContent='✦ Analysing…';}
+
+  const items=S_inv.items||[];
+  const today=new Date().toISOString().slice(0,10);
+  const low=items.filter(i=>i.quantity<=i.low_threshold&&i.low_threshold>0);
+  const expiring=items.filter(i=>i.expiry_date&&daysFrom(i.expiry_date)<30&&daysFrom(i.expiry_date)>=0);
+  const expired=items.filter(i=>i.expiry_date&&i.expiry_date<today);
+  const noPrice=items.filter(i=>!i.price_per_unit&&!i.price_total);
+  const noSupplier=items.filter(i=>!i.supplier);
+  const totalValue=items.reduce((s,i)=>{
+    if(i.price_per_unit&&i.quantity) return s+i.price_per_unit*i.quantity;
+    if(i.price_total) return s+i.price_total; return s;
+  },0);
+
+  // Build category breakdown
+  const byCat={};
+  items.forEach(i=>{const c=i.category||'Other';if(!byCat[c])byCat[c]=[];byCat[c].push(i);});
+  const catSummary=Object.entries(byCat).map(([c,its])=>`${c}: ${its.length} item${its.length>1?'s':''}`).join(' · ');
+
+  const context=`You are analysing the Lab Stock & Inventory for a plant tissue culture lab.
+
+STOCK OVERVIEW:
+- Total items: ${items.length}
+- Estimated total value: ${totalValue>0?'₹'+totalValue.toFixed(0):'not priced'}
+- Categories covered: ${catSummary||'none'}
+
+URGENT — LOW STOCK (${low.length}):
+${low.length?low.map(i=>`- ${i.name} (${i.quantity} ${i.unit||''} remaining, alert at ≤${i.low_threshold})`).join('\n'):'None'}
+
+EXPIRING SOON — within 30 days (${expiring.length}):
+${expiring.length?expiring.map(i=>`- ${i.name} — expires ${i.expiry_date}`).join('\n'):'None'}
+
+EXPIRED (${expired.length}):
+${expired.length?expired.map(i=>`- ${i.name} — expired ${i.expiry_date}`).join('\n'):'None'}
+
+PROCUREMENT GAPS:
+- Items without price data: ${noPrice.length}
+- Items without supplier: ${noSupplier.length}
+
+FULL ITEM LIST:
+${items.slice(0,30).map(i=>`[${i.category||'?'}] ${i.name} — ${i.quantity} ${i.unit||''}${i.supplier?` · ${i.supplier}`:''}${i.expiry_date?` · exp ${i.expiry_date}`:''}`).join('\n')}
+${items.length>30?`...and ${items.length-30} more items`:''}
+
+Analyse this stock for a TC lab. Provide:
+1. Stock health assessment (what's in good shape, what's critical)
+2. Immediate actions needed (reorder, discard expired, etc.)
+3. Notable gaps — what a TC lab typically needs that may be missing here
+4. Procurement recommendations if supplier/pricing data is sparse
+5. Any patterns worth noting
+
+Be specific. Use actual item names from the data. End with ∿`;
+
+  try{
+    const raw=await askAI(context);
+    if(!raw){ body.textContent='No response from Ravana.'; return; }
+    // Typewriter into the inline panel
+    body.innerHTML='';
+    if(_stockRavanaTimer) clearInterval(_stockRavanaTimer);
+    const words=raw.split(/(\s+)/);
+    let i=0; let built='';
+    _stockRavanaTimer=setInterval(()=>{
+      if(i>=words.length){
+        clearInterval(_stockRavanaTimer); _stockRavanaTimer=null;
+        body.innerHTML=sanitizeMarkdown(raw);
+        return;
+      }
+      built+=words[i++];
+      body.textContent=built;
+      panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+    },16);
+  }catch(e){
+    body.innerHTML=`<span style="color:var(--rd)">Analysis failed: ${esc(e.message)}</span>`;
+  }
+  if(btn){btn.disabled=false;btn.textContent='↺ Re-analyse';}
 }
 
 // ════════════════════════════════════════════════════════════
