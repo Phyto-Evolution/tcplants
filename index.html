@@ -590,6 +590,68 @@ main > .dview, main > .editor{ margin:0 auto; }
 .dqa-btn:hover{border-color:var(--ac);background:rgba(88,166,255,.06)}
 .dqa-btn.primary{background:var(--ac);color:#0d1117;border-color:var(--ac)}
 .dqa-btn.primary:hover{opacity:.88}
+/* ══════════════════════════════════════════════════════════
+   RAVANA SKIN — Claude Design visual layer
+   Scoped entirely under [data-skin="ravana"].
+   Toggle in Settings → Appearance → Ravana skin.
+   Add new Claude Design rules here — nothing bleeds outside.
+   ══════════════════════════════════════════════════════════ */
+
+/* AI panel title gradient text */
+[data-skin="ravana"] .ai-title{
+  background:linear-gradient(135deg,var(--ac),var(--pu));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+/* AI toggle button (✦) in footer bar — gradient with glow */
+[data-skin="ravana"] #lfb-ai{
+  background:linear-gradient(135deg,var(--ac),var(--pu));
+  color:#fff !important;
+  box-shadow:0 4px 18px rgba(88,166,255,.35);
+  border-color:transparent;
+}
+[data-skin="ravana"] #lfb-ai:hover{
+  box-shadow:0 6px 24px rgba(188,140,255,.4);
+  opacity:.92;
+}
+
+/* Floating AI button (when visible) */
+[data-skin="ravana"] #ai-btn{
+  background:linear-gradient(135deg,var(--ac),var(--pu));
+  box-shadow:0 4px 18px rgba(88,166,255,.35);
+  border-color:transparent;
+}
+
+/* AI panel top bar — subtle gradient border-bottom */
+[data-skin="ravana"] #ai-head{
+  background:linear-gradient(135deg,rgba(88,166,255,.06),rgba(188,140,255,.06));
+  border-bottom:1px solid rgba(188,140,255,.2);
+}
+
+/* AI messages — slightly richer assistant bubble */
+[data-skin="ravana"] .ai-msg.ai{
+  background:rgba(88,166,255,.06);
+  border:1px solid rgba(88,166,255,.12);
+  border-radius:12px;
+}
+
+/* Ravana Insights section header accent */
+[data-skin="ravana"] #sec-insights .ai-title,
+[data-skin="ravana"] #ri-page h2{
+  background:linear-gradient(135deg,var(--ac),var(--pu));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+/* Nav active tab — accent glow */
+[data-skin="ravana"] .ndtab.active{
+  background:rgba(88,166,255,.12);
+  border-left:2px solid var(--ac);
+}
+
+/* ── End Ravana Skin ─────────────────────────────────────── */
+
 /* ── Journal ── */
 #journal-layout{display:flex;height:100%;overflow:hidden}
 #journal-list-panel{width:220px;flex-shrink:0;border-right:1px solid var(--bd);overflow-y:auto;display:flex;flex-direction:column}
@@ -1594,7 +1656,11 @@ input, textarea, select {
   border-radius: 8px;
 }
 </style>
-<script>(function(){var t=localStorage.getItem('tcplants_theme')||'dark';document.documentElement.dataset.theme=t;}());</script>
+<script>(function(){
+  var t=localStorage.getItem('tcplants_theme')||'dark';
+  document.documentElement.dataset.theme=t;
+  if(localStorage.getItem('tcplants_skin')==='ravana') document.documentElement.dataset.skin='ravana';
+}());</script>
 </head>
 <body>
 
@@ -4117,6 +4183,13 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
             <div class="set-row-sub">Dark or light mode</div>
           </div>
           <button class="btn xs ghost" id="set-theme-btn" onclick="_setToggleTheme()">☀️ Light</button>
+        </div>
+        <div class="set-row">
+          <div class="set-row-info">
+            <div class="set-row-label">Ravana skin</div>
+            <div class="set-row-sub">Claude Design visual layer — gradient AI accents, enhanced button glow, richer depth. Experimental. Toggle off to revert instantly.</div>
+          </div>
+          <label class="toggle-switch"><input type="checkbox" id="set-skin-toggle" onchange="_setSkin(this.checked)"><div class="toggle-track"></div></label>
         </div>
       </div>
     </div>
@@ -9137,6 +9210,7 @@ function _initProxySettingsUI(){
 // Sync settings panel on open
 function _syncAISettingsPanel(){
   _initProxySettingsUI();
+  _initSkinToggle();
   const list=document.getElementById('set-model-list'); if(!list) return;
   list.innerHTML=AI_MODEL_ORDER.map(k=>{
     const m=AI_MODELS[k];
@@ -14167,6 +14241,19 @@ function _setToggleTheme(){
   document.getElementById('theme-btn').textContent=next==='dark'?'☀️':'🌙';
   document.querySelector('meta[name="theme-color"]').setAttribute('content',next==='dark'?'#161b22':'#f6f8fa');
   document.getElementById('set-theme-btn').textContent=next==='dark'?'☀️ Switch Light':'🌙 Switch Dark';
+}
+function _setSkin(on){
+  if(on){
+    document.documentElement.dataset.skin='ravana';
+    localStorage.setItem('tcplants_skin','ravana');
+  } else {
+    delete document.documentElement.dataset.skin;
+    localStorage.removeItem('tcplants_skin');
+  }
+}
+function _initSkinToggle(){
+  const cb=document.getElementById('set-skin-toggle');
+  if(cb) cb.checked=document.documentElement.dataset.skin==='ravana';
 }
 function _setWeatherCity(){
   // Weather city setting removed — function kept for backward compat
