@@ -4607,14 +4607,9 @@ async function ghPut(path,content,sha,msg){
     method:'PUT',headers:ghH(),
     body:JSON.stringify(body)
   });
-  // Auto-retry on SHA mismatch (422 or 409 — GitHub returns both)
+  // SHA conflict — do NOT retry with stale content; caller must read fresh first
   if(res.status===422||res.status===409){
-    const fresh=await ghGet(path);
-    if(fresh){ body.sha=fresh.sha; }
-    res=await fetch(`${API}/repos/${REPO}/contents/${path}`,{
-      method:'PUT',headers:ghH(),
-      body:JSON.stringify(body)
-    });
+    throw new Error('Save conflict: data was modified elsewhere. Please try again.');
   }
   if(!res.ok) throw new Error(`GitHub ${res.status}: ${await res.text()}`);
   return res.json();
@@ -4662,10 +4657,19 @@ async function loadNotesIndex(){
   const notes=JSON.parse(await dec(ghDec(f.content)));
   return {notes, sha:f.sha};
 }
-async function saveNotesIndex(notes,sha){
-  const res=await ghPut(IDX, await enc(JSON.stringify(notes)), sha, `lab: index — ${notes.length} entries`);
-  _writeSummary(); // fire-and-forget
-  return res.content.sha;
+// Write lock — serialises all index saves; prevents concurrent-write races
+let _notesSaveLock=Promise.resolve();
+async function saveNotesIndex(patchFn){
+  return (_notesSaveLock=_notesSaveLock.catch(()=>{}).then(async()=>{
+    // Always read fresh from GitHub — guarantees current SHA + current content
+    const fresh=await ghGet(IDX);
+    const freshNotes=fresh?JSON.parse(await dec(ghDec(fresh.content))):[];
+    const freshSha=fresh?fresh.sha:null;
+    const updated=patchFn(freshNotes);
+    const res=await ghPut(IDX,await enc(JSON.stringify(updated)),freshSha,`lab: index — ${updated.length} entries`);
+    _writeSummary();
+    return {sha:res.content.sha,notes:updated};
+  }));
 }
 
 // ── Lab Summary — plain JSON, readable by Telegram bot ──────
@@ -5272,11 +5276,11 @@ async function _journalCreateAll(){
       const id=uid();
       const today=new Date().toISOString().slice(0,10);
       const note={id,title:n.title||'Journal note',type:n.type||'TC Observation',stage:n.stage||'',species:n.species||'',date:today,tags:[],body_preview:(n.body||'').slice(0,100),next_review:null,cultures_out:null,pinned:false,recipe_id:null};
-      S.notes.push(note);
       // Save body
       const bodyEnc=await enc(n.body||'');
       await ghPut(`notes/${id}.enc`,btoa(unescape(encodeURIComponent(bodyEnc))),null,`lab: journal extract — ${note.title}`);
-      S.notesSha=await saveNotesIndex(S.notes,S.notesSha);
+      const {sha,notes}=await saveNotesIndex(ns=>{ns.push(note);return ns;});
+      S.notes=notes; S.notesSha=sha;
       renderNoteList();
       log(`Note: ${n.title||'Observation'}`);
     }catch(e){ log(`Note failed: ${e.message}`); }
@@ -6988,11 +6992,10 @@ async function saveQuickLog(){
   document.getElementById('ql-save-btn').disabled=true;
   load('Saving quick note…');
   try{
-    const {notes,sha:iSha}=await loadNotesIndex();
     const id=uid(), date=new Date().toISOString();
     await writeNote(id,body,null,`lab: quick log "${title}"`);
-    notes.push({id,title,date,type:'Self Notes / Brainstorming',stage:'',species:'',tags:[],next_review:null,recipe_id:null,cultures_out:null});
-    const newSha=await saveNotesIndex(notes,iSha);
+    const newNote={id,title,date,type:'Self Notes / Brainstorming',stage:'',species:'',tags:[],next_review:null,recipe_id:null,cultures_out:null};
+    const {sha:newSha,notes}=await saveNotesIndex(ns=>{ns.push(newNote);return ns;});
     S.notes=notes; S.notesSha=newSha;
     _writeCache(); populateTagsDatalist();
     renderNoteList(); updateReminderBadge();
@@ -10470,14 +10473,15 @@ function startNewNote(mode='tc'){
 
 function toggleNotePin(){
   const m=S.notes.find(n=>n.id===S.cur); if(!m) return;
-  m.pinned=!m.pinned;
-  saveNotesIndex(S.notes,S.notesSha).then(sha=>{
-    S.notesSha=sha; _writeCache(); renderNoteList();
-    const btn=document.getElementById('note-pin-btn');
-    if(btn){btn.classList.toggle('pinned',m.pinned);btn.title=m.pinned?'Pinned to dashboard':'Pin to dashboard';}
-    toast(m.pinned?'📌 Pinned to dashboard':'Unpinned');
-    _renderDashboard();
-  }).catch(e=>toast('Pin failed: '+e.message,'fail'));
+  const targetId=S.cur, newPinned=!m.pinned;
+  saveNotesIndex(ns=>{const n=ns.find(x=>x.id===targetId);if(n)n.pinned=newPinned;return ns;})
+    .then(({sha,notes})=>{
+      S.notes=notes; S.notesSha=sha; _writeCache(); renderNoteList();
+      const btn=document.getElementById('note-pin-btn');
+      if(btn){btn.classList.toggle('pinned',newPinned);btn.title=newPinned?'Pinned to dashboard':'Pin to dashboard';}
+      toast(newPinned?'📌 Pinned to dashboard':'Unpinned');
+      _renderDashboard();
+    }).catch(e=>toast('Pin failed: '+e.message,'fail'));
 }
 
 async function startEditNote(){
@@ -10537,21 +10541,27 @@ async function saveNoteAction(){
   document.getElementById('save-note-btn').disabled=true;
   load('Encrypting & saving…');
   try{
-    const {notes,sha:iSha}=await loadNotesIndex();
+    let savedId;
     if(S.editing){
       const ef=await ghGet(`${DIR}/${S.editing}.enc`);
       await writeNote(S.editing,body,ef.sha,`lab: update "${title}"`);
-      const idx=notes.findIndex(n=>n.id===S.editing);
-      if(idx!==-1) notes[idx]={...notes[idx],title,type,stage,species,tags,next_review:review,recipe_id,cultures_out,note_type,pinned};
-      S.notes=notes; S.cur=S.editing;
+      const editingId=S.editing;
+      const {sha,notes}=await saveNotesIndex(ns=>{
+        const idx=ns.findIndex(n=>n.id===editingId);
+        if(idx!==-1) ns[idx]={...ns[idx],title,type,stage,species,tags,next_review:review,recipe_id,cultures_out,note_type,pinned};
+        return ns;
+      });
+      S.notes=notes; S.notesSha=sha; savedId=editingId; S.cur=editingId;
     }else{
       const id=uid(), date=S.calDate ? new Date(S.calDate).toISOString() : new Date().toISOString();
       S.calDate=null;
       await writeNote(id,body,null,`lab: add "${title}"`);
-      notes.push({id,title,date,type,stage,species,tags,next_review:review,recipe_id,cultures_out,note_type,pinned});
-      S.notes=notes; S.cur=id;
+      const {sha,notes}=await saveNotesIndex(ns=>{
+        ns.push({id,title,date,type,stage,species,tags,next_review:review,recipe_id,cultures_out,note_type,pinned});
+        return ns;
+      });
+      S.notes=notes; S.notesSha=sha; savedId=id; S.cur=id;
     }
-    S.notesSha=await saveNotesIndex(S.notes,iSha);
     _writeCache();
     populateTagsDatalist();
     _clearDraft();
@@ -10574,9 +10584,8 @@ async function deleteNote(){
   try{
     const f=await ghGet(`${DIR}/${id}.enc`);
     if(f) await ghDel(`${DIR}/${id}.enc`,f.sha,`lab: delete "${m?.title}"`);
-    const {notes,sha}=await loadNotesIndex();
-    S.notes=notes.filter(n=>n.id!==id);
-    S.notesSha=await saveNotesIndex(S.notes,sha);
+    const {sha,notes}=await saveNotesIndex(ns=>ns.filter(n=>n.id!==id));
+    S.notes=notes; S.notesSha=sha;
     _writeCache();
     S.cur=null; updateReminderBadge(); renderNoteList(); showNote('empty');
     toast('Entry deleted');
@@ -13607,9 +13616,9 @@ loadNotesIndex=async function(){
 };
 
 const _originalSaveNotesIndex=saveNotesIndex;
-saveNotesIndex=async function(notes,sha){
+saveNotesIndex=async function(patchFn){
   if(!_checkOnline()) throw new Error('offline');
-  return _originalSaveNotesIndex.call(this,notes,sha);
+  return _originalSaveNotesIndex.call(this,patchFn);
 };
 
 // Force HTTPS
