@@ -3403,6 +3403,35 @@ input, textarea, select {
         </ol>
       </div>
 
+      <h2 id="h-journal">📓 Lab Journal</h2>
+      <div class="help-section-card">
+        <p>Nav drawer → <strong>Lab Journal</strong>. A freeform encrypted scratchpad — write in plain language, ideas, observations, protocol thoughts. No required fields. Ravana reads it and extracts structured data.</p>
+        <h3>Writing</h3>
+        <p>Tap <strong>✏️ New Entry</strong>. Write freely in the big text area — Markdown is supported. Give it a title and tags if you want, or just write. The 🎤 mic button dictates into the entry.</p>
+        <table><tr><th>Mic mode</th><th>How it works</th></tr>
+          <tr><td>Native</td><td>Words appear live as you speak — final transcript appended to entry</td></tr>
+          <tr><td>Whisper</td><td>Records audio → transcribes via Cloudflare proxy → appended to entry</td></tr>
+        </table>
+        <h3>Ravana Parse</h3>
+        <p>Tap <strong>✨ Parse with Ravana</strong> at the bottom of any entry. Ravana reads it and returns action cards:</p>
+        <table><tr><th>Found</th><th>Action card</th><th>What it does</th></tr>
+          <tr><td>A media recipe</td><td>🧪 Create Recipe →</td><td>Opens recipe form pre-filled with name, base, PGRs, pH, autoclave, target</td></tr>
+          <tr><td>A species name</td><td>🌿 Add to Taxonomy →</td><td>Opens custom species form pre-filled</td></tr>
+          <tr><td>An observation</td><td>📋 Create Lab Note →</td><td>Opens note editor pre-filled with title, type, species, stage, body</td></tr>
+        </table>
+        <p>Once parsed, the entry is marked <strong>✦</strong> (green) in the list. Editing the entry resets it to unparsed so it can be re-parsed after changes.</p>
+        <h3>Overnight Parser</h3>
+        <p>Unparsed entries (● grey) are automatically parsed in the background:</p>
+        <ul style="font-size:13px;line-height:1.9;padding-left:18px">
+          <li>At <strong>1am IST</strong> if the app tab is open</li>
+          <li>On <strong>first login each day</strong> — 8 seconds after unlock, any unparsed entries are batch-parsed silently</li>
+          <li>Runs once per day maximum — a toast confirms how many were parsed</li>
+          <li>After batch parse: <code>lab-summary.json</code> is updated</li>
+        </ul>
+        <h3>Journal Log in Ravana panel</h3>
+        <p>Open the Ravana AI panel → tap <strong>📓 Journal Log</strong> tab. Shows all parsed entries with their summaries and extracted data. Each extract has a <strong>Use →</strong> button to pre-fill the relevant form, and a <strong>↺ Re-parse</strong> button to flag the entry for re-processing if Ravana made a mistake.</p>
+      </div>
+
       <h2 id="h-alerts">🚨 Dashboard Alerts</h2>
       <div class="help-section-card">
         <p>A strip of coloured pills appears above the stat band whenever the lab needs attention. It renders on every dashboard load and disappears automatically when the condition clears — no manual dismiss needed.</p>
@@ -3876,7 +3905,12 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
     </div>
     <div style="font-size:10px;color:var(--mu)">Say "send" or "re-listen"</div>
   </div>
-  <!-- Quick chips -->
+  <!-- Panel tabs -->
+  <div id="ai-tabs" style="display:flex;border-bottom:1px solid var(--bd);flex-shrink:0">
+    <button id="ai-tab-chat" onclick="_switchAITab('chat')" style="flex:1;padding:8px 0;font-size:12px;font-weight:700;border:none;cursor:pointer;background:var(--sf);border-bottom:2px solid var(--ac);color:var(--tx)">💬 Chat</button>
+    <button id="ai-tab-journal" onclick="_switchAITab('journal')" style="flex:1;padding:8px 0;font-size:12px;font-weight:700;border:none;cursor:pointer;background:var(--sf2);border-bottom:2px solid transparent;color:var(--mu)">📓 Journal Log</button>
+  </div>
+  <!-- Quick chips (chat tab only) -->
   <div id="ai-chips" style="padding:8px 12px;display:flex;flex-wrap:wrap;gap:5px;border-bottom:1px solid var(--bd);flex-shrink:0" role="toolbar" aria-label="Quick Ravana prompts">
     <button class="ai-chip" aria-label="Summarize note" onclick="askAI('Summarise this note in 3-5 bullet points, highlighting key observations, results, and recommended next steps.')">Summarise note</button>
     <button class="ai-chip" aria-label="PGR advice" onclick="askAI('Based on the species, stage, and media shown in context, what PGR concentrations and media modifications would you recommend? Cite typical ranges from literature.')">PGR advice</button>
@@ -3885,8 +3919,10 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
     <button class="ai-chip" aria-label="Sterilization advice" onclick="askAI('What sterilisation protocol would you recommend for my current species and the contamination pattern I have shown?')">Sterilisation</button>
     <button class="ai-chip" aria-label="Multiplication rate" onclick="askAI('Based on my bottle records and subculture history, what is the estimated multiplication rate and what should I optimise next?')">Multiplication rate</button>
   </div>
-  <!-- Single unified chat -->
+  <!-- Chat panel -->
   <div id="ai-msgs"><div class="ai-msg ai">Greetings! I am Ravana, your TC lab assistant. I can help with protocols, species info, PGR doses, contamination analysis, and note summaries. What would you like to know?</div></div>
+  <!-- Journal log panel (hidden by default) -->
+  <div id="ai-journal-log" style="display:none;flex:1;overflow-y:auto;padding:12px 14px"></div>
   <!-- Input row: mic + textarea + send -->
   <div id="ai-input-row" style="padding:8px 10px;border-top:1px solid var(--bd);display:flex;gap:6px;flex-shrink:0;align-items:flex-end">
     <div style="display:flex;flex-direction:column;gap:3px;align-items:center;flex-shrink:0">
@@ -5017,8 +5053,8 @@ Omit arrays if nothing found. Title: ${e.title||'Untitled'}\nDate: ${e.date}\n\n
     renderJournalList();
     // Re-show current entry if it was just parsed
     if(S.curJournal){const e=S.journal.find(x=>x.id===S.curJournal);if(e?.parsed) openJournalEntry(S.curJournal);}
-    // Stamp last batch run time
-    localStorage.setItem(JOURNAL_PARSE_KEY, new Date().toISOString());
+    // Stamp last batch run date (store as date string for comparison)
+    localStorage.setItem(JOURNAL_PARSE_KEY, new Date().toDateString());
     // Trigger summary dump so lab-summary.json picks up parsed data
     _doWriteSummary && _doWriteSummary();
     toast(`✦ Ravana parsed ${parsedCount} journal entr${parsedCount>1?'ies':'y'}`);
@@ -5036,9 +5072,8 @@ function _scheduleOvernightJournalParse(){
     const istMs=now.getTime()+(5.5*3600000);
     const ist=new Date(istMs);
     if(ist.getHours()===1 && ist.getMinutes()<2){
-      const lastRun=localStorage.getItem(JOURNAL_PARSE_KEY);
-      const lastDate=lastRun?new Date(lastRun).toDateString():'';
-      if(lastDate!==ist.toDateString()){
+      const lastRun=localStorage.getItem(JOURNAL_PARSE_KEY)||'';
+      if(lastRun!==ist.toDateString()){
         _batchParseUnparsedJournal(true);
       }
     }
@@ -8698,7 +8733,81 @@ function _ttsSpeak(text, onEnd){
 function _ttsStop(){ speechSynthesis.cancel(); }
 
 // ── AI panel tab switch ───────────────────────────────────────
-function _switchAITab(){ /* tabs removed — single unified chat */ }
+function _switchAITab(tab='chat'){
+  const isChat=tab==='chat';
+  // Panels
+  document.getElementById('ai-msgs').style.display        = isChat?'flex':'none';
+  document.getElementById('ai-chips').style.display       = isChat?'flex':'none';
+  document.getElementById('ai-input-row').style.display   = isChat?'flex':'none';
+  document.getElementById('ai-journal-log').style.display = isChat?'none':'block';
+  // Tab buttons
+  const tc=document.getElementById('ai-tab-chat');
+  const tj=document.getElementById('ai-tab-journal');
+  if(tc){ tc.style.borderBottomColor=isChat?'var(--ac)':'transparent'; tc.style.color=isChat?'var(--tx)':'var(--mu)'; tc.style.background=isChat?'var(--sf)':'var(--sf2)'; }
+  if(tj){ tj.style.borderBottomColor=isChat?'transparent':'var(--ac)'; tj.style.color=isChat?'var(--mu)':'var(--tx)'; tj.style.background=isChat?'var(--sf2)':'var(--sf)'; }
+  if(!isChat) _renderJournalLog();
+}
+
+function _renderJournalLog(){
+  const el=document.getElementById('ai-journal-log'); if(!el) return;
+  const parsed=(S.journal||[]).filter(e=>e.parsed).sort((a,b)=>b.date.localeCompare(a.date));
+  if(!parsed.length){
+    el.innerHTML=`<div style="padding:24px 0;text-align:center;color:var(--mu)">
+      <div style="font-size:28px;margin-bottom:8px">📓</div>
+      <div style="font-size:13px">No parsed journal entries yet.</div>
+      <div style="font-size:12px;margin-top:6px">Open Lab Journal → write → tap ✨ Parse with Ravana</div>
+    </div>`;
+    return;
+  }
+
+  el.innerHTML=parsed.map(e=>{
+    const ex=e.extracts||{};
+    const hasExtracts=(ex.recipes?.length||0)+(ex.species?.length||0)+(ex.notes?.length||0)>0;
+    const parsedDate=e.parsedAt?new Date(e.parsedAt).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'';
+
+    const recipeCards=(ex.recipes||[]).map((r,i)=>`
+      <div style="background:var(--sf3);border-radius:6px;padding:8px 10px;margin-bottom:4px;display:flex;align-items:center;gap:8px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">🧪 ${esc(r.name||'Recipe')}</div>
+          <div style="font-size:11px;color:var(--mu)">${esc([r.base,r.pgr?`PGRs: ${r.pgr}`:'',r.ph?`pH ${r.ph}`:''].filter(Boolean).join(' · '))}</div>
+        </div>
+        <button class="btn xs ghost" onclick="window._journalParseData=${JSON.stringify(ex).replace(/'/g,'&#39;')};_journalCreateRecipe(${i});_switchAITab('chat')" style="flex-shrink:0;font-size:11px">Use →</button>
+      </div>`).join('');
+
+    const speciesCards=(ex.species||[]).map((sp,i)=>`
+      <div style="background:var(--sf3);border-radius:6px;padding:8px 10px;margin-bottom:4px;display:flex;align-items:center;gap:8px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">🌿 ${esc(sp.name)}</div>
+          <div style="font-size:11px;color:var(--mu)">${esc([sp.family,sp.category].filter(Boolean).join(' · '))}</div>
+        </div>
+        <button class="btn xs ghost" onclick="window._journalParseData=${JSON.stringify(ex).replace(/'/g,'&#39;')};_journalAddSpecies(${i});_switchAITab('chat')" style="flex-shrink:0;font-size:11px">Use →</button>
+      </div>`).join('');
+
+    const noteCards=(ex.notes||[]).map((n,i)=>`
+      <div style="background:var(--sf3);border-radius:6px;padding:8px 10px;margin-bottom:4px;display:flex;align-items:center;gap:8px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">📋 ${esc(n.title||'Observation')}</div>
+          <div style="font-size:11px;color:var(--mu)">${esc([n.type,n.species,n.stage].filter(Boolean).join(' · '))}</div>
+        </div>
+        <button class="btn xs ghost" onclick="window._journalParseData=${JSON.stringify(ex).replace(/'/g,'&#39;')};_journalCreateNote(${i});_switchAITab('chat')" style="flex-shrink:0;font-size:11px">Use →</button>
+      </div>`).join('');
+
+    return `<div style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px;gap:8px">
+        <div>
+          <div style="font-size:13px;font-weight:700">${esc(e.title||'Untitled')}</div>
+          <div style="font-size:11px;color:var(--mu)">${fmtDateShort(e.date)} · Parsed ${parsedDate}</div>
+        </div>
+        <button class="btn xs ghost" onclick="navTo('journal');openJournalEntry('${e.id}')" style="flex-shrink:0;font-size:11px">Open →</button>
+      </div>
+      ${ex.summary?`<div style="font-size:12px;color:var(--mu);line-height:1.6;margin-bottom:8px;padding:6px 8px;background:rgba(88,166,255,.05);border-left:2px solid var(--ac);border-radius:0 4px 4px 0">${esc(ex.summary)}</div>`:''}
+      ${hasExtracts?`<div style="font-size:10px;font-weight:800;letter-spacing:.08em;color:var(--mu);text-transform:uppercase;margin-bottom:6px">Extracted</div>${recipeCards}${speciesCards}${noteCards}`:'<div style="font-size:12px;color:var(--sf3)">No structured data extracted</div>'}
+      <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--sf2);display:flex;gap:6px">
+        <button class="btn xs ghost" onclick="(async()=>{S.journal.find(x=>x.id==='${e.id}').parsed=false;S.journalSha=await saveJournal(S.journal,S.journalSha);renderJournalList();_renderJournalLog();toast('Marked for re-parse')})()" style="font-size:11px">↺ Re-parse</button>
+      </div>
+    </div>`;
+  }).join('');
+}
 function _setMicBtnState(state){
   // sync both the footer bar mic and the in-panel mic button
   const btns=[document.getElementById('lfb-mic'),document.getElementById('ai-mic-btn')];
