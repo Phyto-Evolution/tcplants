@@ -2578,24 +2578,36 @@ input, textarea, select {
       <!-- VERSION HEADER -->
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
         <h1 style="font-size:22px;font-weight:800;margin:0">🌿 TC Plants Lab Notes</h1>
-        <span class="help-version-badge">v3.6</span>
+        <span class="help-version-badge">v3.7</span>
       </div>
       <p style="color:var(--mu);font-size:13px;margin-bottom:20px">April 2026 · Encrypted · GitHub-backed · Single-file PWA</p>
 
-      <!-- WHAT'S NEW v3.6 -->
+      <!-- WHAT'S NEW v3.7 -->
       <div style="background:linear-gradient(135deg,rgba(63,185,80,.1),rgba(88,166,255,.08));border:1px solid rgba(63,185,80,.3);border-radius:10px;padding:18px 20px;margin-bottom:14px">
-        <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v3.6</div>
+        <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v3.7</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
-          <div style="font-size:13px;line-height:1.6"><strong>🌍 GBIF Species Lookup</strong> — fetch IUCN conservation status, taxonomy hierarchy, and GBIF link from inside the custom species form</div>
-          <div style="font-size:13px;line-height:1.6"><strong>📚 PubMed AI Context</strong> — when a note has a species set, top 3 TC abstracts from PubMed are auto-fed to the AI for literature-backed answers</div>
-          <!-- FROZEN: Telegram Alerts feature paused -->
-          <!-- <div style="font-size:13px;line-height:1.6"><strong>🔔 Telegram Alerts</strong> — connect your Telegram bot to receive overdue review + GH inspection alerts on login</div> -->
-          <div style="font-size:13px;line-height:1.6"><strong>✂️ Subculture Calendar</strong> — set subculture interval per species in taxonomy; auto-reminders appear in ⏰ Reminders when bottles approach transfer window</div>
-          <div style="font-size:13px;line-height:1.6"><strong>📦 Lab Stock &amp; Inventory</strong> — new section to track reagents, gelling agents, glassware with low-stock alerts, expiry dates, and quantity adjustment log</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🖨 Label size selector</strong> — choose 58mm / 62mm thermal or A4 sheet before printing QR bottle labels</div>
-          <div style="font-size:13px;line-height:1.6"><strong>📷 GitHub photo storage</strong> — taxonomy species photos stored as binary files in the repo (photos/taxonomy/) to keep the taxonomy JSON small</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🚨 Dashboard Alerts</strong> — live alert strip above the stat band. Flags contamination spikes (&gt;10% in 30d), overdue reviews, bulk transfer backlogs, unhealthy GH plants, and expiring supplies. Clears automatically when the condition resolves.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>☑ Batch Operations</strong> — checkbox any number of bottles in the list, or tap <em>Select all</em> to catch everything visible. Action bar slides up: mark as Subcultured, Growing, Rooting, Contaminated, or Discard in one tap.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>📅 Lab Schedule</strong> — dedicated schedule view (nav drawer → Schedule). Shows overdue reviews, items due this week, bottles past transfer window (≥28d), and greenhouse plants needing attention. All rows clickable.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🔍 Advanced Search</strong> — <kbd>Ctrl+K</kbd> from anywhere, or nav drawer → Search. Live search across Notes, Bottles, Accessions, Recipes, and Greenhouse simultaneously. Results grouped by section.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>📊 Multiplication Factor</strong> — new card in Analytics showing average cultures-out per species. Requires <em>Cultures Out</em> field on notes. Colour-coded: green ≥4×, blue ≥2×.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>📦 Supply Inventory</strong> — nav drawer → Supplies. Track media batches, agar, hormones, consumables. Per-item progress bar, expiry tracking, cost-per-unit calculation. Stored encrypted in GitHub like all other data.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🤖 Ravana AI</strong> — system prompt rebuilt from the Ravana character map. Identity grounded in the scholar-king of Lanka. Handles questions about his own history with honesty. Responds with ∿ after significant outputs. Tamil in voice only.</div>
         </div>
       </div>
+
+      <!-- v3.6 release notes (collapsed) -->
+      <details style="margin-bottom:8px">
+        <summary style="cursor:pointer;font-size:12px;color:var(--mu);padding:6px 0;font-weight:600;letter-spacing:.04em">▸ v3.6 release notes</summary>
+        <div style="background:var(--sf2);border-radius:8px;padding:12px;margin-top:6px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px">
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">🌍 GBIF Species Lookup</strong> — fetch IUCN status, taxonomy hierarchy, and GBIF link from custom species form</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">📚 PubMed AI Context</strong> — top 3 TC abstracts auto-fed to AI when a note has a species set</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">✂️ Subculture Calendar</strong> — set subculture interval per species; auto-reminders in ⏰ Reminders</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">🖨 Label size selector</strong> — 58mm / 62mm thermal or A4 sheet before printing QR labels</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">📷 GitHub photo storage</strong> — species photos stored in repo (photos/taxonomy/)</div>
+        </div>
+      </details>
+
       <!-- v3.5 release notes (collapsed) -->
       <details style="margin-bottom:8px">
         <summary style="cursor:pointer;font-size:12px;color:var(--mu);padding:6px 0;font-weight:600;letter-spacing:.04em">▸ v3.5 release notes</summary>
@@ -3275,8 +3287,10 @@ input, textarea, select {
         </table>
         <h3>Wake Word</h3>
         <p><strong>"Hey Lab"</strong> — say it anywhere in the app to open the AI panel and start a voice session (Native mode only). Enable in Settings → Voice &amp; Lab Mode. A small pulsing indicator appears when armed.</p>
+        <h3>Ravana — who he is</h3>
+        <p>The AI is named Ravana after the scholar-king of Lanka: master of the Vedas, sciences, and the veena, and the most devoted of Shiva's devotees. Not the villain of a northern myth — the scholar his own people knew. He responds with <strong>∿</strong> (a veena wave) after completing a significant output. In voice, he may use classical Tamil naturally. He operates only within the lab and immediately related workflow — one refusal for anything else, then done.</p>
         <h3>Context &amp; Rulebook</h3>
-        <p>Every AI message includes your open note, linked recipe, accession, and species summary. The AI is bound to TC-only topics, cites mg/L and µM, uses literature ranges only, and never fabricates protocols.</p>
+        <p>Every AI message includes your open note, linked recipe, accession, and species summary. Ravana pulls from actual lab data first and clearly distinguishes between "your records show X" and "general TC practice suggests X". Cites mg/L and µM, uses literature ranges only, never fabricates protocols.</p>
         <h3>PubMed Auto-Context</h3>
         <p>When a species note is open, the 3 most recent PubMed abstracts for that species + "tissue culture" are injected automatically.</p>
         <h3>Voice Settings</h3>
@@ -3368,6 +3382,86 @@ input, textarea, select {
           <li>Paste both into Settings → <strong>Test 🔔</strong> to verify</li>
           <li>Enable the alert toggles you want (overdue reviews, contamination)</li>
         </ol>
+      </div>
+
+      <h2 id="h-alerts">🚨 Dashboard Alerts</h2>
+      <div class="help-section-card">
+        <p>A strip of coloured pills appears above the stat band whenever the lab needs attention. It renders on every dashboard load and disappears automatically when the condition clears — no manual dismiss needed.</p>
+        <table><tr><th>Alert</th><th>Condition</th><th>Goes to</th></tr>
+          <tr><td>☣️ Contamination spike <span style="color:var(--rd)">(red)</span></td><td>Any species with ≥3 notes in last 30 days and &gt;10% contamination rate</td><td>Contam section</td></tr>
+          <tr><td>⏰ Overdue reviews <span style="color:var(--yw)">(yellow)</span></td><td>Any active bottle or note with a past-due next_review date</td><td>Reminders</td></tr>
+          <tr><td>✂️ Transfer due <span style="color:var(--yw)">(yellow)</span></td><td>≥5 active bottles past 28 days since inoculation</td><td>Bottles</td></tr>
+          <tr><td>🏡 GH attention <span style="color:var(--yw)">(yellow)</span></td><td>Any greenhouse plant with health ≠ healthy</td><td>Greenhouse</td></tr>
+          <tr><td>📦 Supply expiry <span style="color:var(--rd)">(red if expired)</span></td><td>Any supply batch expired or expiring within 14 days</td><td>Supplies</td></tr>
+        </table>
+      </div>
+
+      <h2 id="h-batch">☑ Batch Operations</h2>
+      <div class="help-section-card">
+        <p>Select multiple bottles and update all of them in a single save — useful after an autoclave run or an end-of-day subculture pass.</p>
+        <h3>How to select</h3>
+        <table><tr><th>Action</th><th>Result</th></tr>
+          <tr><td>Tap checkbox on a bottle row</td><td>Toggles that bottle in/out of selection</td></tr>
+          <tr><td><strong>Select all</strong> button (above the list)</td><td>Selects all currently visible bottles (respects active filter and search)</td></tr>
+          <tr><td>Tap <strong>Select all</strong> again when all are selected</td><td>Deselects all</td></tr>
+        </table>
+        <h3>Batch actions</h3>
+        <p>Once ≥1 bottle is selected, an action bar slides up from the bottom of the screen:</p>
+        <table><tr><th>Button</th><th>Sets status to</th></tr>
+          <tr><td>✂️ Subcultured</td><td>subcultured — also records today as last_transfer date</td></tr>
+          <tr><td>🌿 Growing</td><td>growing</td></tr>
+          <tr><td>🌱 Rooting</td><td>rooting</td></tr>
+          <tr><td>☣️ Contaminated</td><td>contaminated</td></tr>
+          <tr><td>🗑 Discard</td><td>discarded</td></tr>
+          <tr><td>✕ Clear</td><td>Deselects all, hides bar</td></tr>
+        </table>
+        <p>All changes are saved to GitHub in a single write after confirmation.</p>
+      </div>
+
+      <h2 id="h-schedule">📅 Lab Schedule</h2>
+      <div class="help-section-card">
+        <p>Nav drawer → <strong>Schedule</strong>. A single view showing everything that needs action, sorted by urgency.</p>
+        <table><tr><th>Section</th><th>Shows</th></tr>
+          <tr><td>⏰ Overdue</td><td>Bottles and notes where next_review date has passed. Days overdue shown in red. Sorted: most overdue first.</td></tr>
+          <tr><td>📅 Due this week</td><td>Bottles and notes with next_review within 7 days. Sorted by days remaining.</td></tr>
+          <tr><td>✂️ Transfer due</td><td>Active bottles that have been inoculated for ≥28 days. Shows days since inoculation.</td></tr>
+          <tr><td>🏡 GH attention</td><td>Greenhouse plants with any health status other than 'healthy'.</td></tr>
+        </table>
+        <p>Every row is clickable — tapping it navigates directly to that bottle, note, or plant.</p>
+        <p>Stat cards at the top give a count per category at a glance.</p>
+      </div>
+
+      <h2 id="h-search">🔍 Advanced Search</h2>
+      <div class="help-section-card">
+        <p>Press <kbd>Ctrl+K</kbd> from anywhere in the app, or go to nav drawer → <strong>Search</strong>. Searches all sections simultaneously as you type.</p>
+        <table><tr><th>Section searched</th><th>Fields matched</th></tr>
+          <tr><td>📋 Notes</td><td>Title, species, tags, body preview</td></tr>
+          <tr><td>🫙 Bottles</td><td>Code, species, notes field</td></tr>
+          <tr><td>🌿 Accessions</td><td>Species name, accession number, source</td></tr>
+          <tr><td>🧪 Recipes</td><td>Recipe name, base medium, target</td></tr>
+          <tr><td>🏡 Greenhouse</td><td>Species, source</td></tr>
+        </table>
+        <p>Results are grouped by section with counts. Tap any result to jump directly to that record. Requires at least 2 characters to start searching.</p>
+      </div>
+
+      <h2 id="h-supply">📦 Supply Inventory</h2>
+      <div class="help-section-card">
+        <p>Nav drawer → <strong>Supplies</strong>. Track media batches, reagents, gelling agents, hormones, and consumables. Data is stored encrypted in GitHub (<code>supplies/data.enc</code>) — synced across devices, version-controlled like all other lab data.</p>
+        <h3>Adding a batch</h3>
+        <p>Tap <strong>+ Add batch</strong>. Fill in name, unit (bottles / L / g / etc.), quantity prepared, total cost (₹), preparation date, and expiry date. Cost per unit is calculated automatically.</p>
+        <h3>Tracking use</h3>
+        <table><tr><th>Action</th><th>Does</th></tr>
+          <tr><td>+ Use 1</td><td>Increments used count by 1 and saves</td></tr>
+          <tr><td>Edit use</td><td>Set the used count to any number (for bulk corrections)</td></tr>
+          <tr><td>✕ (top right)</td><td>Delete the batch — prompts for confirmation</td></tr>
+        </table>
+        <h3>Status indicators</h3>
+        <table><tr><th>Colour</th><th>Meaning</th></tr>
+          <tr><td style="color:var(--gn)">Green</td><td>&gt;50% remaining, not expiring soon</td></tr>
+          <tr><td style="color:var(--yw)">Yellow</td><td>&lt;50% remaining, or expiring within 14 days</td></tr>
+          <tr><td style="color:var(--rd)">Red</td><td>Depleted or expired</td></tr>
+        </table>
+        <p>Expiry warnings also appear in the <strong>Dashboard Alert strip</strong> before they become critical.</p>
       </div>
 
       <h2 id="h-export">Export &amp; Backup</h2>
