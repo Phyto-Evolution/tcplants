@@ -7,7 +7,8 @@
 <title>TC Plants — Lab Notes</title>
 <link rel="manifest" href="manifest.json">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3/dist/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.19.3/umd/index.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
@@ -4293,6 +4294,22 @@ async function saveGreenhouse(plants, sha, transfers){
 // ════════════════════════════════════════════════════════════
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// Sanitize markdown output to prevent XSS (Task #16)
+function sanitizeMarkdown(md){
+  if(!md) return '';
+  // Parse markdown
+  const html=marked.parse(md);
+  // Sanitize with DOMPurify — allow safe HTML tags only
+  const allowedTags=['p','br','h1','h2','h3','h4','h5','h6','strong','em','b','i','code','pre','ul','ol','li','blockquote','a','img','table','thead','tbody','tr','th','td','hr','div','span'];
+  const allowedAttrs=['href','title','src','alt','class'];
+  return DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: allowedTags,
+    ALLOWED_ATTR: allowedAttrs,
+    KEEP_CONTENT: true  // Keep text content even if tag is removed
+  });
+}
+
 function fmtDate(iso){
   if(!iso) return '';
   return new Date(iso).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric',weekday:'short'});
@@ -4839,7 +4856,7 @@ async function openNote(id){
       el.addEventListener('click',()=>{ switchSection('recipes'); openRecipe(el.dataset.recipeId); });
     });
     S.bodyCache[id]=body;
-    document.getElementById('nv-body').innerHTML=marked.parse(_wikiPreprocess(body));
+    document.getElementById('nv-body').innerHTML=sanitizeMarkdown(_wikiPreprocess(body));
     _renderBacklinks(id);
     // Bottle cross-link
     const noteBottles=S.bottles.filter(b=>b.note_id===id);
@@ -4949,7 +4966,7 @@ function _wikiPreprocess(md){
 }
 function _updatePreview(){
   const body=document.getElementById('ne-body').value;
-  document.getElementById('ne-preview').innerHTML=marked.parse(_wikiPreprocess(body));
+  document.getElementById('ne-preview').innerHTML=sanitizeMarkdown(_wikiPreprocess(body));
 }
 function _wirePaneToggle(){
   const wrap=document.getElementById('editor-body-wrap');
@@ -5750,7 +5767,7 @@ async function exportCalendar(scope){
           ${meta.tags?.length?`<span class="badge">🏷 ${esc(meta.tags.join(', '))}</span>`:''}
           ${recName?`<span class="badge">🧪 ${esc(recName)}</span>`:''}
         </div>
-        ${body?`<div class="body-content">${marked.parse(body)}</div>`:'<p class="no-body"><em>(no body)</em></p>'}
+        ${body?`<div class="body-content">${sanitizeMarkdown(body)}</div>`:'<p class="no-body"><em>(no body)</em></p>'}
       </div>`;
     }
   }
@@ -6940,6 +6957,31 @@ const AI_LIMITS={
   'whisper-large-v3':       {reqDay:2000,  tokDay:null},   // Groq Whisper — req only, no token limit
 };
 
+// Check if we're at quota (Task #8)
+function _checkAIQuota(){
+  const today=new Date().toISOString().slice(0,10);
+  const u=_aiUsage()[today]||{};
+  const mi=AI_MODELS[_aiModel];
+  const isGroq=_aiModel!=='claude';
+  const modelKey=isGroq?mi.groqModel:'claude';
+  const lim=AI_LIMITS[modelKey]||{reqDay:1000,tokDay:100000};
+  const d=u[modelKey]||{req:0,tok:0};
+
+  // Check request quota
+  if(d.req>=lim.reqDay){
+    return {exceeded:true,reason:'requests',used:d.req,limit:lim.reqDay};
+  }
+  // Check token quota (if applicable)
+  if(lim.tokDay&&d.tok>=lim.tokDay){
+    return {exceeded:true,reason:'tokens',used:d.tok,limit:lim.tokDay};
+  }
+  // Warn if >80% of either quota
+  if(d.req/lim.reqDay>0.8||lim.tokDay&&d.tok/lim.tokDay>0.8){
+    return {warning:true,reqPct:(d.req/lim.reqDay*100).toFixed(0),tokPct:lim.tokDay?(d.tok/lim.tokDay*100).toFixed(0):'—'};
+  }
+  return {ok:true};
+}
+
 function _renderAIUsageBar(){
   const bar=document.getElementById('ai-usage-bar'); if(!bar) return;
   const today=new Date().toISOString().slice(0,10);
@@ -6952,7 +6994,18 @@ function _renderAIUsageBar(){
   const reqPct=Math.min(d.req/lim.reqDay*100,100);
   const tokPct=Math.min(d.tok/lim.tokDay*100,100);
   const col=reqPct>80||tokPct>80?'var(--rd)':reqPct>50||tokPct>50?'var(--yw)':'var(--gn)';
-  bar.innerHTML=`
+
+  // Show quota warning/exceeded message
+  let quotaMsg='';
+  const quota=_checkAIQuota();
+  if(quota.exceeded){
+    const unit=quota.reason==='requests'?'requests':'tokens';
+    quotaMsg=`<div style="padding:6px 8px;background:var(--rd);color:#fff;border-radius:4px;font-size:10px;font-weight:600;margin-bottom:6px">⚠️ Quota exceeded (${unit}). Resets at midnight UTC.</div>`;
+  } else if(quota.warning){
+    quotaMsg=`<div style="padding:6px 8px;background:var(--yw);color:#000;border-radius:4px;font-size:10px;font-weight:600;margin-bottom:6px">⚡ Nearing quota: Req ${quota.reqPct}% · Tok ${quota.tokPct}%</div>`;
+  }
+
+  bar.innerHTML=quotaMsg+`
     <div style="display:flex;gap:8px;align-items:center;font-size:10px;color:var(--mu)">
       <span style="white-space:nowrap">${mi.icon} ${mi.label}</span>
       <div style="flex:1">
@@ -7185,6 +7238,16 @@ async function askAI(prompt){
     thinking.remove();
     msgs.innerHTML+=`<div class="ai-msg ai">⚙️ No ${mi.label} key configured. Tap ⚙️ to set one.</div>`;
     document.getElementById('ai-key-row').style.display='flex';
+    return;
+  }
+
+  // Check quota BEFORE making API call (Task #8)
+  const quota=_checkAIQuota();
+  if(quota.exceeded){
+    thinking.remove();
+    const unit=quota.reason==='requests'?'requests':'tokens';
+    msgs.innerHTML+=`<div class="ai-msg ai" style="color:var(--rd)">❌ <strong>Daily limit reached</strong><br>Used ${quota.used}/${quota.limit} ${unit}.<br>Resets at midnight UTC (${new Date().toISOString().split('T')[0]} end).</div>`;
+    toast('Ravana: Daily quota exceeded', 'fail');
     return;
   }
 
@@ -7494,26 +7557,43 @@ function _parseVoiceCommand(text){
 // interimResults:true = words appear live in textarea as you speak (visual feedback)
 // Only the isFinal result is actually processed
 let _nativeSR=null, _nativePending='', _nativeDoneCallback=null;
+// Get configured language (Task #4)
+function _getVoiceLanguage(){
+  const c=_voiceCfg();
+  // Default: en-IN (India), fallback to en-US
+  return c.lang||'en-IN';
+}
+
 function _startNativeSTT(isWake, onDone){
   if(!('SpeechRecognition' in window||'webkitSpeechRecognition' in window)){
-    toast('Speech recognition not supported — use Whisper mode','fail');
+    toast('💬 Speech recognition not supported in your browser. Try Whisper mode (Settings → Voice).','fail');
     if(onDone) onDone(); return;
   }
   if(_nativeSR){ try{_nativeSR.abort();}catch{} _nativeSR=null; }
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   _nativeSR=new SR();
-  _nativeSR.lang='en-US';
+  _nativeSR.lang=_getVoiceLanguage();  // Task #4: Use configured language
   _nativeSR.continuous=false;
   _nativeSR.interimResults=true; // live words in textarea while speaking
   _nativeSR.maxAlternatives=1;
   _nativeDoneCallback=onDone||null;
   _setMicBtnState('listening');
+
+  // Add timeout protection (max 30s of listening) — Task #4
+  let timeout=null;
+  const startTime=Date.now();
+  const timeoutMs=30000;  // 30 seconds max listening
+
   const inp=document.getElementById('ai-input');
   const prevVal=inp.value;
   inp.value='';
-  inp.placeholder='Listening…';
+  inp.placeholder='🎤 Listening… (max 30s)';
   inp.style.color='var(--mu)'; // dim while interim
+
   _nativeSR.onresult=e=>{
+    // Clear timeout on any result
+    if(timeout) clearTimeout(timeout);
+
     const results=Array.from(e.results);
     // Show interim live in textarea
     const interim=results.filter(r=>!r.isFinal).map(r=>r[0].transcript).join('');
@@ -7539,26 +7619,50 @@ function _startNativeSTT(isWake, onDone){
       const cb=_nativeDoneCallback; _nativeDoneCallback=null; if(cb) cb();
     }
   };
+
   _nativeSR.onerror=e=>{
+    if(timeout) clearTimeout(timeout);
     inp.value=prevVal; inp.placeholder='Ask or speak…'; inp.style.color='';
     _setMicBtnState('idle'); _nativeSR=null;
-    if(e.error==='no-speech') toast('Nothing heard — tap mic and speak clearly','fail');
-    else if(e.error==='not-allowed') toast('Mic permission denied','fail');
-    else if(e.error!=='aborted') toast('Mic error: '+e.error,'fail');
+
+    // Friendly error messages (Task #4)
+    if(e.error==='no-speech') toast('🔇 No speech detected. Tap mic and speak clearly.','fail');
+    else if(e.error==='not-allowed') toast('🔒 Microphone permission denied. Check browser settings.','fail');
+    else if(e.error==='network-error') toast('📡 Network error. Check connection.','fail');
+    else if(e.error==='bad-grammar') toast('⚠️ Language not supported. Try Whisper mode.','fail');
+    else if(e.error!=='aborted') toast('🎤 Voice error: '+e.error,'fail');
+
     const cb=_nativeDoneCallback; _nativeDoneCallback=null; if(cb) cb();
   };
+
   _nativeSR.onend=()=>{
+    if(timeout) clearTimeout(timeout);
     inp.placeholder='Ask or speak…'; inp.style.color='';
     if(!_nativePending) inp.value=prevVal; // restore if no result
     _setMicBtnState('idle'); _nativeSR=null;
   };
-  _nativeSR.start();
+
+  // Set timeout — auto-stop after 30s (Task #4)
+  timeout=setTimeout(()=>{
+    if(_nativeSR){
+      try{ _nativeSR.stop(); }catch{}
+      toast('⏱️ Listening timeout (30s). Try again or use Whisper mode.','fail');
+    }
+  }, timeoutMs);
+
+  try{ _nativeSR.start(); }catch(e){
+    if(timeout) clearTimeout(timeout);
+    toast('Failed to start mic: '+e.message,'fail');
+    _setMicBtnState('idle');
+  }
 }
 let _confirmSR=null;
 function _startConfirmListener(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR) return;
-  _confirmSR=new SR(); _confirmSR.lang='en-US'; _confirmSR.interimResults=false;
+  _confirmSR=new SR();
+  _confirmSR.lang=_getVoiceLanguage();  // Task #4: Use configured language
+  _confirmSR.interimResults=false;
   _confirmSR.onresult=e=>{
     const t=e.results[0][0].transcript.trim().toLowerCase();
     if(t.includes('send')||t.includes('yes')||t.includes('go')) _voiceConfirmSend();
@@ -7711,7 +7815,7 @@ function _startWakeListener(){
   _wakeSR.continuous=true;       // one instance, stays open — no new allocations
   _wakeSR.interimResults=false;
   _wakeSR.maxAlternatives=1;
-  _wakeSR.lang='en-IN';
+  _wakeSR.lang=_getVoiceLanguage();  // Task #4: Use configured language
   _wakeSR.onresult=e=>{
     if(_wakeHandingOff) return;   // already triggered, ignore until handoff done
     const t=Array.from(e.results).pop()[0].transcript.toLowerCase().trim();
@@ -8141,7 +8245,7 @@ function openAccession(id){
   const accBottles=S.bottles.filter(b=>b.accession_id===id||(b.species&&a.species&&b.species.toLowerCase()===a.species.toLowerCase()));
   if(accBottles.length) badges.push(`<span class="sbadge type" style="cursor:pointer;text-decoration:underline dotted" title="View bottles" onclick="navTo('bottles');S.bottleSearch='';setBotFilter('all');renderBottleList()">🫙 ${accBottles.length} bottle${accBottles.length!==1?'s':''}</span>`);
   document.getElementById('av-badges').innerHTML=badges.join('')+(flairPills?`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">${flairPills}</div>`:'')+flairNote;
-  document.getElementById('av-body').innerHTML=a.notes_md?marked.parse(a.notes_md):'';
+  document.getElementById('av-body').innerHTML=a.notes_md?sanitizeMarkdown(a.notes_md):'';
   // linked notes
   const linked=S.notes.filter(n=>(n.species||'').toLowerCase().includes((a.species||'').toLowerCase())||(n.species||'').toLowerCase().includes((a.number||'').toLowerCase()));
   const lEl=document.getElementById('av-linked');
@@ -8777,7 +8881,7 @@ function _ghOverviewHtml(p){
         <span style="color:var(--mu);font-size:11px">${esc((b.stage||'').replace('Stage ','S').replace(/ — .*/,''))}</span>
         <span class="bot-status-badge ${b.status||'prepared'}" style="font-size:10px;padding:1px 6px">${esc(b.status||'prepared')}</span>
       </div>`).join('')}`:''}
-    ${p.notes?`<div class="bot-notes-body" style="margin-top:12px">${marked.parse(p.notes)}</div>`:''}
+    ${p.notes?`<div class="bot-notes-body" style="margin-top:12px">${sanitizeMarkdown(p.notes)}</div>`:''}
   `;
 }
 
@@ -9169,7 +9273,7 @@ function openBottle(id){
     </div>
     ${b.flair_note?`<div style="padding:4px 16px 8px;font-size:12px;color:var(--mu);font-style:italic">${esc(b.flair_note)}</div>`:''}
     ${stepperHtml?`<div class="bot-stepper-row">${stepperHtml}</div>`:''}
-    ${b.notes?`<div class="bot-notes-body">${marked.parse(b.notes)}</div>`:''}
+    ${b.notes?`<div class="bot-notes-body">${sanitizeMarkdown(b.notes)}</div>`:''}
     ${(b.batch_id&&batchMates.length)?`<div class="bot-batch-row">Batch: <a onclick="setBotFilter('all');S.bottleSearch='';renderBottleList()">View all ${batchMates.length+1} bottles in this batch</a></div>`:''}
   `;
   showBotDetail();
@@ -9606,7 +9710,7 @@ function openRecipe(id){
   const recBottles=S.bottles.filter(b=>b.recipe_id===id);
   if(recBottles.length) rows.push([`🫙 Bottles`, `<a style="color:var(--ac);cursor:pointer" onclick="navTo('bottles');S.bottleSearch='';setBotFilter('all');renderBottleList()">${recBottles.length} bottle${recBottles.length!==1?'s':''} use this recipe</a>`]);
   document.getElementById('rv-spec').innerHTML=rows.map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('');
-  document.getElementById('rv-body').innerHTML=r.notes_md?marked.parse(r.notes_md):'';
+  document.getElementById('rv-body').innerHTML=r.notes_md?sanitizeMarkdown(r.notes_md):'';
   showRec('view');
 }
 
