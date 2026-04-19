@@ -858,6 +858,13 @@ main > .dview, main > .editor{ margin:0 auto; }
 .help-warn{background:rgba(248,81,73,.08);border-left:3px solid var(--rd);border-radius:0 6px 6px 0;padding:8px 12px;margin:8px 0;font-size:13px}
 .help-tip{background:rgba(63,185,80,.08);border-left:3px solid var(--gn);border-radius:0 6px 6px 0;padding:8px 12px;margin:8px 0;font-size:13px}
 .help-section-card{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:16px;margin-bottom:14px}
+.help-h2{font-size:15px;font-weight:800;margin-bottom:10px;color:var(--ac)}
+.help-h3{font-size:13px;font-weight:700;margin-bottom:8px;color:var(--tx)}
+.help-pre{background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:12px 14px;font-family:var(--mono);font-size:11.5px;line-height:1.7;white-space:pre-wrap;overflow-x:auto;margin-top:6px}
+.help-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
+.help-table th{text-align:left;padding:6px 10px;background:var(--sf2);border:1px solid var(--bd);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--mu)}
+.help-table td{padding:6px 10px;border:1px solid var(--bd);vertical-align:top;line-height:1.5}
+.help-table tr:nth-child(even) td{background:rgba(255,255,255,.02)}
 
 /* ── WEATHER ── */
 #weather-chip{
@@ -2713,7 +2720,8 @@ input, textarea, select {
       <!-- VERSION HEADER -->
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
         <h1 style="font-size:22px;font-weight:800;margin:0">🌿 TC Plants Lab Notes</h1>
-        <span class="help-version-badge">v3.7</span>
+        <span class="help-version-badge">v3.8</span>
+        <button class="btn xs ghost" onclick="navTo('logicflows')" style="margin-left:auto;border-color:var(--ac);color:var(--ac)">🔗 Logic Flows →</button>
       </div>
       <p style="color:var(--mu);font-size:13px;margin-bottom:20px">April 2026 · Encrypted · GitHub-backed · Single-file PWA</p>
 
@@ -3814,6 +3822,828 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
     <main id="search-main" style="flex:1;overflow-y:auto"></main>
   </div>
 
+  <!-- ── LOGIC FLOWS ── -->
+  <div class="section fullpage" id="sec-logicflows">
+    <main style="flex:1;overflow-y:auto;padding:28px 32px;max-width:980px">
+      <h1 style="font-size:20px;font-weight:800;margin-bottom:4px">🔗 Logic Flows</h1>
+      <p style="color:var(--mu);font-size:13px;margin-bottom:28px">Complete dependency map of every system in TC Plants Lab Notes — what each function does, what it calls, what calls it, what state it reads/writes, and what UI it changes. Use as blueprint for testing and for future development sessions.</p>
+
+      <!-- ═══ DATA ARCHITECTURE ═══ -->
+      <div class="help-section-card">
+        <h2 class="help-h2">Data Architecture</h2>
+        <h3 class="help-h3">State Object <code>S</code> — fields, owners, consumers</h3>
+        <table class="help-table">
+          <tr><th>Field</th><th>Populated by</th><th>Read by</th><th>Persisted to</th></tr>
+          <tr><td><code>S.notes[]</code></td><td>login → loadNotesIndex()</td><td>renderNoteList, openNote, LabAnalytics, _buildAIContext, Reminders, Dashboard, Search</td><td>notes/index.enc (index), notes/{id}.enc (body)</td></tr>
+          <tr><td><code>S.notesSha</code></td><td>loadNotesIndex, saveNotesIndex</td><td>saveNotesIndex (lock), writeNote</td><td>—</td></tr>
+          <tr><td><code>S.cur</code></td><td>openNote, saveNoteAction</td><td>openNote, saveNoteAction, renderNoteList (active highlight)</td><td>—</td></tr>
+          <tr><td><code>S.editing</code></td><td>editNote, startNewNote</td><td>saveNoteAction (branch: edit vs create)</td><td>—</td></tr>
+          <tr><td><code>S.accs[]</code></td><td>login → loadAccessions()</td><td>renderAccList, openAccession, openBottle (cross-link), Search</td><td>accessions/data.enc</td></tr>
+          <tr><td><code>S.recs[]</code></td><td>login → loadRecipes()</td><td>renderRecList, openRecipe, bottle form (recipe select), Search</td><td>recipes/data.enc</td></tr>
+          <tr><td><code>S.bottles[]</code></td><td>login → loadBottles()</td><td>renderBottleList, openBottle, Dashboard, Reminders, Analytics, Greenhouse (cross-ref), Species detail, Search</td><td>bottles/data.enc</td></tr>
+          <tr><td><code>S.sessions[]</code></td><td>login → loadBottles() (packed together)</td><td>openBottle (session info row), saveSessionAction</td><td>bottles/data.enc (same file)</td></tr>
+          <tr><td><code>S.bottlesSha</code></td><td>loadBottles, saveBottles</td><td>saveBottles, saveBottleAction, saveSessionAction, updateBottleStatus</td><td>—</td></tr>
+          <tr><td><code>S.bottleFilter</code></td><td>setBotFilter()</td><td>renderBottleList</td><td>—</td></tr>
+          <tr><td><code>S.bottleSearch</code></td><td>search input, navTo links, viewBatch</td><td>renderBottleList</td><td>—</td></tr>
+          <tr><td><code>S.botBatchFilter</code></td><td>viewBatch(batchId)</td><td>renderBottleList (overrides status filter)</td><td>—</td></tr>
+          <tr><td><code>S.curBot</code></td><td>openBottle, saveBottleAction</td><td>openBottle, renderBottleList (active highlight)</td><td>—</td></tr>
+          <tr><td><code>S.greenhouse[]</code></td><td>login → loadGreenhouse()</td><td>renderGHList, openGHPlant, Dashboard, Reminders, Search</td><td>greenhouse/data.enc</td></tr>
+          <tr><td><code>S.ghTransfers[]</code></td><td>login → loadGreenhouse() (packed together)</td><td>openGHPlant (transfer tab), saveGHExplant</td><td>greenhouse/data.enc (same file)</td></tr>
+          <tr><td><code>S.supplies[]</code></td><td>login → loadSupplies()</td><td>SupplyInventory.renderInventoryPage, calcPerformance, Dashboard (low-stock)</td><td>supplies/data.enc</td></tr>
+          <tr><td><code>S.journal[]</code></td><td>login → loadJournal()</td><td>renderJournalList, openJournalEntry, _scheduleOvernightJournalParse, _buildAIContext</td><td>journal/entries.enc</td></tr>
+          <tr><td><code>S_inv</code> (separate)</td><td>loadInv() — on Stock section visit</td><td>renderInv, saveInv</td><td>inventory/data.enc</td></tr>
+          <tr><td><code>S.taxSpecies[]</code></td><td>loadTaxonomy() post-login</td><td>_taxSuggest, species picker, _buildAIContext, Species section</td><td>taxonomy/*.json (read-only packs)</td></tr>
+          <tr><td><code>S.taxCustom</code></td><td>loadTaxonomy → ghGet(taxonomy/custom.enc)</td><td>Species section (custom tab), _taxSuggest, flairs</td><td>taxonomy/custom.enc</td></tr>
+          <tr><td><code>S.analytics</code></td><td>LabAnalytics.calculate() post-login</td><td>_buildAIContext (AI context only) — renderAnalytics() does NOT use it (recalculates inline)</td><td>—</td></tr>
+          <tr><td><code>S.weather</code></td><td>fetchWeather() post-login, every 60s</td><td>weather-chip display, _buildAIContext</td><td>—</td></tr>
+          <tr><td><code>S.section</code></td><td>switchSection()</td><td>navTo, switchSection, closeSidebarMobile checks</td><td>—</td></tr>
+        </table>
+
+        <h3 class="help-h3" style="margin-top:20px">Encryption cycle (enc → GitHub → dec)</h3>
+        <pre class="help-pre">Write path:
+  data (JS object)
+  → JSON.stringify(data)
+  → enc(text): AES-256-GCM
+      deriveKey(S.pw, randomSalt, 600000 PBKDF2 iterations)
+      crypto.subtle.encrypt → ciphertext
+      return JSON.stringify({v:1, s:b64(salt), i:b64(iv), d:b64(ct)})
+  → ghPut(path, encryptedStr, sha, msg)
+      btoa(unescape(encodeURIComponent(encryptedStr)))   ← GitHub base64
+      PUT /repos/Phyto-Evolution/tcplants/contents/{path}
+      returns new sha → stored in S.*Sha
+
+Read path:
+  ghGet(path)
+  → fetch GitHub API → r.json()
+  → f.content = GitHub base64 string
+  → ghDec(f.content): atob → decodeURIComponent/escape → encrypted JSON string
+  → dec(encryptedStr): JSON.parse → {s,i,d}
+      deriveKey(S.pw, b64d(s))
+      crypto.subtle.decrypt({name:'AES-GCM', iv:b64d(i)}, key, b64d(d))
+      → new TextDecoder().decode(plaintext)
+  → JSON.parse(plaintext) → JS object → assigned to S.*
+
+⚠️  loadInv() (Stock section) is missing the ghDec() step — latent bug if inventory/data.enc ever exists.</pre>
+
+        <h3 class="help-h3" style="margin-top:20px">Session cache (10-minute TTL)</h3>
+        <pre class="help-pre">_writeCache():
+  sessionStorage.setItem('_lc', JSON.stringify({
+    notes, notesSha, accs, accSha, recs, recSha,
+    bottles, bottlesSha, sessions,
+    greenhouse, ghTransfers, greenhouseSha,
+    taxCustom, taxCustomSha,
+    ts: Date.now()
+  }))
+
+_readCache():
+  sessionStorage.getItem('_lc') → parse
+  if(Date.now() - ts > 10*60*1000) return null  ← TTL expired
+  return cached object
+
+Login branch:
+  if(_readCache()) → restore from cache, skip 7 API calls
+  else → Promise.all 7 loads → _writeCache()
+
+⚠️  supplies and journal are NOT cached — re-fetched every login after cache miss.</pre>
+      </div>
+
+      <!-- ═══ LOGIN FLOW ═══ -->
+      <div class="help-section-card">
+        <h2 class="help-h2">Login / Unlock Flow</h2>
+        <pre class="help-pre">User action: fills Username (passphrase) + Password (GitHub token) → clicks Sign In
+
+login():
+  1. Read lpw (passphrase → S.pw) + ltok (GitHub token → S.tok)
+  2. If no token but DEVICE_KEY exists → _tryRestoreDeviceToken(pw) → decrypt saved token
+  3. Validate HTTPS (crypto.subtle requires it)
+  4. GET /repos/Phyto-Evolution/tcplants → verify token has repo access
+  5. S.pw = pw; S.tok = tok
+  6. sessionStorage.setItem('_lt', tok)  ← session backup
+  7a. Cache hit (_readCache()): restore 5 data stores, toast "⚡ Loaded from cache"
+  7b. Cache miss: Promise.all([
+        loadNotesIndex(),     → notes/index.enc    → S.notes, S.notesSha
+        loadAccessions(),     → accessions/data.enc → S.accs, S.accSha
+        loadRecipes(),        → recipes/data.enc    → S.recs, S.recSha
+        loadBottles(),        → bottles/data.enc    → S.bottles, S.sessions, S.bottlesSha
+        loadGreenhouse(),     → greenhouse/data.enc → S.greenhouse, S.ghTransfers, S.greenhouseSha
+        loadSupplies(),       → supplies/data.enc   → S.supplies, S.suppliesSha (or empty if file missing)
+        loadJournal()         → journal/entries.enc → S.journal, S.journalSha (or empty)
+      ]) → _writeCache()
+  8. Hide #login, show #app
+  9. renderNoteList(); renderAccList(); renderRecList(); renderBottleList(); renderGHList()
+  10. populateTagsDatalist(); updateReminderBadge(); switchSection('notes'); showNote('empty')
+  11. Show UI chrome: #ql-fab, #ai-btn, #lab-footer-bar, #actlog-tab
+  12. fetchActivityLog() — commits feed
+  13. If no DEVICE_KEY → show #trust-banner (save device offer)
+  14. loadTaxonomy() — taxonomy packs + custom species
+  15. loadEncryptedKeys() → _initAIKeyHint() + _initVoiceSettings()
+  16. setTimeout(_doWriteSummary, 5000) — commit lab-summary.json
+  17. LabAnalytics.calculate() → S.analytics
+  18. _scheduleOvernightJournalParse() — 8s delayed, then batch-parse unparsed journal entries
+  19. fetchWeather() + setInterval(fetchWeather, 60000)
+
+Device trust:
+  DEVICE_KEY = 'tcplants_device_v1'
+  Trust yes → enc(S.tok) → localStorage.setItem(DEVICE_KEY, ...)
+  Trust no → banner dismissed
+  Next login → ltok field hidden (#saved-device-banner shown) → _tryRestoreDeviceToken(pw) → dec(localStorage)
+  Forget device → localStorage.removeItem(DEVICE_KEY) → ltok field shown again
+
+Offline wrappers (Haiku addition):
+  loadNotesIndex and saveNotesIndex are wrapped to throw Error('offline') if !navigator.onLine
+  Other 5 load functions are NOT wrapped — inconsistent
+  _updateOfflineState() fires at startup → may briefly show offline toast</pre>
+      </div>
+
+      <!-- ═══ NAVIGATION ═══ -->
+      <div class="help-section-card">
+        <h2 class="help-h2">Navigation System</h2>
+        <pre class="help-pre">navTo(sec):
+  → switchSection(sec)
+  → if listSecs.includes(sec):
+      openNavDrawer()                          ← drawer IS the sidebar for list sections
+      toggle nd-{sec} panel inside drawer
+      if sec!=='bottles': S.botBatchFilter=null ← clear batch context
+  → else (full-page sections):
+      hide all nd-list-area panels
+      closeNavDrawer()
+      render section: journal/schedule/insights/supply/search/logicflows
+
+switchSection(name):
+  → S.section = name
+  → remove .on from all .section divs, add .on to #sec-{name}
+  → sync ndtab .active state
+  → trigger section render:
+      reminders  → renderReminders()
+      contam     → renderContamDashboard()
+      analytics  → renderAnalytics()
+      sterilise  → loadCustomSterilProtocol() or renderSterilPage()
+      stock      → loadInv().then(renderInv)
+      species    → renderSpecies()
+      news       → _renderPersistedPins() + handleNewsToggle
+      calendar   → renderCalendar()
+      bottles    → renderBottleList() + showBotEmpty()
+      greenhouse → renderGHList() + showGHEmpty()
+
+List section panels (inside #nav-drawer → #nd-panel):
+  nd-notes     → note-list, note-search, type/stage filters
+  nd-registry  → acc-list, acc-search
+  nd-recipes   → rec-list, rec-search
+  nd-bottles   → bot-list, bot-search, status pills, new button
+  nd-greenhouse → gh-list, gh-search, filter pills
+
+Cross-section link pattern (canonical):
+  navTo('section'); openDetail('id')   ← navTo opens drawer, openDetail populates main area
+
+  ✓ Correct:  navTo('bottles');openBottle(id)
+  ✗ Broken:   openBottle(id)           ← section may not be active, drawer closed
+  ✗ Broken:   switchSection('notes');openNote(id) ← drawer never opened
+
+viewBatch(batchId) — special bottle navigation:
+  S.botBatchFilter = batchId
+  S.bottleFilter = 'all'; S.bottleSearch = ''
+  openNavDrawer(); renderBottleList()   ← list shows only batch members</pre>
+      </div>
+
+      <!-- ═══ NOTES FLOW ═══ -->
+      <div class="help-section-card">
+        <h2 class="help-h2">Notes — Full CRUD Flow</h2>
+        <pre class="help-pre">CREATE:
+  startNewNote('generic'|'tc')
+  → clear form fields, set S.editing=null
+  → show #note-editor, hide #note-view
+  → _wireDraftListeners() already active: oninput → sessionStorage draft save
+
+  saveNoteAction():
+  → read all form fields: title, body, type, stage, species, tags, review, recipe_id, cultures_out
+  → if isGeneric: cultures_out=null, pinned from checkbox
+  → validateNoteData({id:'dummy',title,body,...}) ← Haiku addition, throws on invalid
+  → disable save button
+  → if S.editing:
+      ghGet(DIR/{S.editing}.enc)               ← read current body + sha
+      writeNote(S.editing, body, sha, msg)      ← ghPut body file
+      saveNotesIndex(patchFn)                   ← update index (read-fresh, patch, write)
+  → else (new note):
+      id = uid(), date = now (or S.calDate if set from calendar)
+      S.calDate = null
+      writeNote(id, body, null, msg)            ← ghPut body file (sha=null → create)
+      saveNotesIndex(ns => ns.push({id,title,date,...}))
+  → _writeCache(); populateTagsDatalist(); _clearDraft()
+  → renderNoteList(); openNote(S.cur); closeNavDrawer()
+  → toast 'Saved ✓'
+
+  saveNotesIndex(patchFn) — LOCK mechanism:
+  → returns _notesSaveLock = _notesSaveLock.then(async()=>{...})
+  → ALWAYS reads fresh SHA first (ghGet(IDX)) to avoid conflicts
+  → applies patchFn to fresh notes array
+  → ghPut(IDX, enc(JSON.stringify(updated)), freshSha)
+  → returns {sha, notes}
+
+READ:
+  openNote(id):
+  → S.cur = id; S.editing = null
+  → find note in S.notes (index metadata)
+  → ghGet(DIR/{id}.enc) → body loaded (cached in S.bodyCache)
+  → sanitizeMarkdown(_wikiPreprocess(body)) → #nv-body.innerHTML
+  → render badges: species link, stage, type, tags, linked bottles count, linked recipe
+  → renderBacklinks(id) — notes containing [[id]]
+
+  renderNoteList():
+  → reads S.notes with filters: typeFilter, stageFilter, searchQ
+  → overdue filter: next_review < today
+  → sorted by pinned first, then date desc
+  → emits .n-item divs with data-id attrs → tap handler → openNote
+
+UPDATE:
+  editNote() → S.editing = S.cur → populate form fields → show editor
+  saveNoteAction() same as create but patches existing index entry + overwrites body file
+
+DELETE:
+  deleteNote() → confirm → ghDel(DIR/{id}.enc) → saveNotesIndex(remove by id) → renderNoteList → showNote('empty')
+
+DRAFT SYSTEM:
+  _wireDraftListeners() → oninput on note fields → debounced sessionStorage save
+  On startNewNote: check sessionStorage for draft → if found: show restore banner
+  _clearDraft() → sessionStorage.removeItem
+
+WIKI-LINKS:
+  _wikiPreprocess(body): finds [[title]] patterns → replaces with <span class="wikilink" data-note-id=...>
+  Click wikilink → openNote(data-note-id)
+  openWikiModal() → search S.notes by title → select → insert [[title]] into editor
+  renderBacklinks(id) → S.notes.filter(n=>n.body contains [[id]]) → backlinks panel
+
+NOTE HISTORY:
+  fetchNoteHistory(id) → GitHub commits API /repos/.../commits?path=notes/{id}.enc
+  → list with sha, date, author → click → ghGet(sha ref) → dec → show in modal → restore option
+
+CAMERA/BARCODE in notes:
+  openCamera() → getUserMedia → _startCam() → ZXing BrowserQRCodeReader
+  → decode QR → insertBarcodeResult(text) → appended to ne-body textarea</pre>
+      </div>
+
+      <!-- ═══ BOTTLES FLOW ═══ -->
+      <div class="help-section-card">
+        <h2 class="help-h2">Bottles — Full CRUD & Lifecycle</h2>
+        <pre class="help-pre">THREE CREATION MODES — toggled by setBotMode():
+
+SINGLE (qty=1):
+  startNewBottle('single') → setBotMode('single') → show form, hide session builder
+  saveBottleAction():
+  → read form: species, stage, status, recipe_id, accession_id, note_id, media_volume,
+               explants, next_review, flair_note, notes, flair_ids, date_prepared,
+               date_inoculated, greenhouse_plant_id
+  → build base = {recipe_id, species, accession_id, stage, status, ...}
+  → code = FSL-{year}-{_botNextSeq()} (max existing seq + 1, zero-padded to 4 digits)
+  → id = uid(); push to S.bottles
+  → S.bottlesSha = await saveBottles(S.bottles, S.bottlesSha)  ← ghPut bottles/data.enc
+  → renderBottleList(); closeNavDrawer()
+  → openBottle(S.curBot)   ← populates bot-detail + generates QR canvas
+
+BATCH (qty > 1):
+  setBotMode('batch') → shows qty field
+  saveBottleAction():
+  → loop qty times: each gets id=uid(), code=FSL-{year}-{seq+i}, shared batch_id=uid()
+  → push all to S.bottles, save in one ghPut
+  → renderBottleList(); closeNavDrawer()
+  → _showSavedQRGrid(newBottles, label)  ← renders all labels using LABEL_CONFIGS[0]
+  → clicking a QR card → openBottle(id)
+
+SESSION (autoclave run with multiple batches):
+  setBotMode('session') → hides form fields, shows session builder div
+  addSessionBatch() → push {species,stage,recipe,qty} to UI batch rows
+  Capacity bar: total qty vs autoclave capacity → yellow >90%, red >100%
+  saveSessionAction():
+  → collect all batch rows from DOM
+  → for each batch: loop qty, generate bottles with shared batch_id + session_id
+  → create session record: {id, date, batches[], autoclave params}
+  → S.sessions.push(session); all bottles pushed to S.bottles
+  → saveBottles(S.bottles, S.bottlesSha, S.sessions)  ← single ghPut
+  → renderBottleList(); closeNavDrawer()
+  → _showSavedQRGrid(allNewBottles, label) grouped by batch
+
+EDIT:
+  startEditBottle(id) → populate form from S.bottles[id] → S.editingBot = id
+  saveBottleAction() edit branch:
+  → S.bottles[idx] = {...existing, ...base}
+  → saveBottles → renderBottleList; openBottle(S.curBot); closeNavDrawer()
+
+DELETE:
+  deleteBottle(id) → confirm → S.bottles.filter(remove) → saveBottles → renderBottleList → showBotEmpty
+
+STATUS UPDATE (lifecycle stepper):
+  updateBottleStatus(id, newStatus):
+  → S.bottles[idx].status = newStatus
+  → if newStatus==='inoculated': set date_inoculated
+  → if newStatus==='subcultured': set last_transfer
+  → saveBottles → renderBottleList; openBottle(S.curBot); closeNavDrawer()
+
+  Stepper buttons in bot-detail (generated by openBottle):
+  → BOT_STATUS_NEXT: prepared→inoculated, inoculated→growing, growing→subcultured
+  → terminal buttons: subcultured, contaminated, discarded
+  → ghBtn: 🏡 Send to GH → sendToGreenhouse(id)
+
+FILTER SYSTEM:
+  setBotFilter(f):
+    S.bottleFilter = f
+    S.botBatchFilter = null   ← clears batch context
+    renderBottleList()
+
+  viewBatch(batchId):             ← NEW: fixes broken "View all in batch" link
+    S.botBatchFilter = batchId
+    S.bottleFilter = 'all'; S.bottleSearch = ''
+    openNavDrawer(); renderBottleList()
+
+  renderBottleList() filter priority:
+    1. S.botBatchFilter → filter by batch_id (overrides everything)
+    2. S.bottleFilter → filter by status (if not 'all')
+    3. S.bottleSearch → text search (code, species, notes)
+    4. Sort by date_prepared desc
+
+QR & LABEL SYSTEM:
+  6 LABEL_CONFIGS: 58mm-full, 58mm-compact, 62mm-full, A4-4up, A4-2up, A4-QR-only
+  Each config: {id, name, w, h, qr (px), fields[], css}
+
+  openBottle() inline QR:
+  → canvas id=bot-qr-{id} inside bot-detail HTML
+  → QRCode.toCanvas(canvas, 'https://notes.tcplants.in?bottle={id}', {width:130})
+  → Size selector buttons: 58mm/62mm/a4 → _setLabelSize()
+
+  _toggleLabelPanel(id):
+  → _renderLabelPanel(id) → scope selector (this bottle / all in batch)
+  → scope==='batch' → S.bottles.filter(x=>x.batch_id===b.batch_id)
+  → _botLabelHtmlConfig(b, cfg) → HTML label with QR canvas + fields
+  → printBottleLabel(id) / printBatchLabels(batchId) → print window
+
+  _showSavedQRGrid(bottles, label):
+  → bot-detail.innerHTML = grid of _botLabelHtmlConfig(b, LABEL_CONFIGS[0])
+  → requestAnimationFrame → QRCode.toCanvas for each bot-label-qr-{id}
+  → Print all button → _printSavedQRs(ids)
+
+CROSS-SECTION LINKS from bot-detail:
+  Accession  → navTo('registry');openAccession(acc.id)
+  Recipe     → navTo('recipes');openRecipe(rec.id)
+  Linked note → navTo('notes');openNote(note.id)
+  Source GH plant → navTo('greenhouse');openGHPlant(srcPlant.id)
+  Batch link → viewBatch(b.batch_id)   ← opens drawer + filters to batch members
+
+_botNextSeq():
+  → max of all FSL-YYYY-NNNN codes parsed as integers → +1
+  → if no existing bottles → returns 1</pre>
+      </div>
+
+      <!-- ═══ RAVANA AI FLOW ═══ -->
+      <div class="help-section-card">
+        <h2 class="help-h2">Ravana AI — Context, Routing, Tool-Use</h2>
+        <pre class="help-pre">CONTEXT BUILDING — _buildAIContext():
+  assembles a structured prompt snapshot:
+  → lab identity (name from settings)
+  → notes (10 most recent): title, type, stage, species, date, preview
+  → bottles (10 most recent active): code, species, stage, status, recipe, next_review
+  → species summary: S.taxSpecies + S.taxCustom.species → grouped by category
+  → analytics snapshot: S.analytics (contamination rates, success rates)
+  → schedule: overdue bottles + notes + due-this-week
+  → journal (3 recent): title, date, parsed flag
+  → recipes (5): name, base media
+  → greenhouse (5 plants): species, quantity, health, location
+  → weather: S.weather lab + greenhouse readings
+  → supplies: low-stock items
+
+  Context is sanitized via _sanitizeContextData() to strip special chars (Haiku addition, prevents prompt injection)
+
+PROVIDER SELECTION — _selectAIProvider():
+  reads S.aiModel ('groq'|'claude'|'gemini') from settings
+  → groq: llama-3.3-70b-versatile (default)
+  → claude: claude-opus-4-5
+  → gemini: via Gemini API (legacy, less used now)
+
+ROUTING — askAI(prompt):
+  if _aiProxyURL set:
+    → _callAIProxyFull(provider, model, messages, clientKey)
+    → POST {_aiProxyURL}/api/ai/chat  ← Cloudflare Worker at plantking.ape.workers.dev
+    → body: {provider, model, messages, max_tokens, system, tools}
+    → if tool_call in response → _handleToolCall(tool_call) → _executeTool
+  else:
+    → _callAIDirect(provider, model, prompt, key)
+    → direct browser API call (fallback, key exposed)
+
+  Default proxy: localStorage('tcplants_ai_proxy_url') || 'https://plantking.ape.workers.dev'
+
+TOOL DISPATCH — _executeTool(name, params):
+  get_lab_summary   → returns formatted S.notes + S.bottles + analytics snapshot
+  get_bottles       → S.bottles filtered by species/status params
+  get_species_analysis → LabAnalytics + bottle history for species
+  fetch_taxonomy_updates → ghGet taxonomy pack file → species list
+  search_lab        → cross-section text search
+  get_schedule      → overdue + due-this-week from all sections
+
+  WRITE OPS (require confirmation gate):
+  update_bottle_status(bottle_id, status):
+    → _pendingToolConfirm = {name, params}
+    → show confirmation banner in AI panel
+    → user clicks Confirm → _executeWriteOp
+    → find bottle → update status → saveBottles → renderBottleList; openBottle
+
+  create_note, create_bottle, log_contam → similar confirmation gate (pending implementation)
+
+VOICE INTEGRATION:
+  _voiceCfg():
+    returns {mode:'nat'|'wsp', confirm:bool, tts:bool, wakeWord:bool, labMode:bool}
+    Lab mode forces: mode='wsp', confirm=false, tts=true, wakeWord=true
+
+  Native STT path:
+    _startNativeSR() → SpeechRecognition({continuous, interimResults, lang:en-IN})
+    → onresult: interim words shown in AI textarea live
+    → onfinal: transcript → if !confirm: askAI(); if confirm: _showVoiceConfirm
+
+  Whisper path:
+    _startRecording() → MediaRecorder(getUserMedia) → collect blobs
+    3.5s silence grace → _stopRecording() → Blob → _transcribeWhisper()
+    → POST {proxy}/api/ai/whisper with FormData(audio_file, model='whisper-large-v3')
+    → transcript → if confirm: show #ai-voice-confirm; if !confirm: askAI()
+
+  Wake word:
+    if wakeWord enabled → SpeechRecognition always-on → listen for 'hey lab'/'hey ravana'
+    → arm → full voice input cycle → 'bye lab'/'bye ravana' → disarm
+    #wake-armed-dot indicator shows when armed
+
+QUOTA CHECK — _isAtQuota() (Task #8):
+  checks localStorage token usage counters
+  compares against AI_LIMITS for selected provider
+  if at quota → toast warning, skip API call</pre>
+      </div>
+
+      <!-- ═══ GREENHOUSE FLOW ═══ -->
+      <div class="help-section-card">
+        <h2 class="help-h2">Greenhouse — Plant Tracking & Transfer Flows</h2>
+        <pre class="help-pre">GREENHOUSE PLANT CRUD:
+  startNewGHPlant() → form: species, quantity, location, source, health, notes, next_inspection
+  saveGHPlant() → push to S.greenhouse → saveGreenhouse(S.greenhouse, S.greenhouseSha, S.ghTransfers)
+  openGHPlant(id) → detail tabs: overview, transfers, condition log, output plan, inspections
+  editGHPlant(id) → populate form → save → renderGHList; openGHPlant
+
+BOTTLE → GH TRANSFER (explant-out from bottle to greenhouse):
+  sendToGreenhouse(bottleId):
+  → find bottle → show transfer form (species, qty, destination)
+  → saveGHExplant(bottleId, formData):
+      transfer = {id, type:'explant_out', plant_id, bottle_id, date, quantity, notes}
+      S.ghTransfers.push(transfer)
+      saveGreenhouse(S.greenhouse, S.greenhouseSha, S.ghTransfers)
+      → openGHPlant shows the transfer in transfer tab
+
+GH → BOTTLE (bottle created FROM greenhouse plant):
+  In bottle form: greenhouse_plant_id field → dropdown of GH plants by species
+  On save: bottle.greenhouse_plant_id = plantId
+  In openBottle(): 'Source plant' row links back to the GH plant
+
+QUANTITY LEDGER:
+  adjustQuantity(plantId, delta, reason):
+  → p.quantity += delta
+  → transfer = {type:'quantity_adjust', delta, reason, date}
+  → S.ghTransfers.push(transfer)
+  → saveGreenhouse → openGHPlant (ledger tab shows history)
+
+CONDITION LOG:
+  logCondition(plantId, health, notes):
+  → p.health = health; p.last_inspection = today
+  → transfer = {type:'health_log', health, notes, date}
+  → saveGreenhouse → openGHPlant
+
+saveGreenhouse(plants, sha, transfers):
+  → data = {plants, transfers}
+  → ghPut(GH_F, enc(JSON.stringify(data)), sha)
+  → loadGreenhouse reads back: raw.plants, raw.transfers</pre>
+      </div>
+
+      <!-- ═══ DASHBOARD FLOW ═══ -->
+      <div class="help-section-card">
+        <h2 class="help-h2">Dashboard — Render Pipeline</h2>
+        <pre class="help-pre">_renderDashboard() is called:
+  → at login (after all data loaded), via setTimeout
+  → NOT re-called on section switch to dashboard (uses cached render)
+
+Stat band (5 cards with onclick → navTo):
+  Notes count    → navTo('notes')
+  Bottles count  → navTo('bottles')
+  Accessions     → navTo('registry')
+  Greenhouse     → navTo('greenhouse')
+  Reminders      → navTo('reminders')
+  Each card: fn string injected as onclick="${s.fn}" via innerHTML
+
+Alert strip — _computeAlerts():
+  contamination > 10% in 30d   → level:'crit' → navTo('contam')
+  overdue reviews               → level:'warn' → navTo('reminders')
+  transfers due (>28d growing)  → level:'warn' → navTo('bottles')  ← fixed: drawer now opens
+  GH plants sick                → level:'warn' → navTo('greenhouse') ← fixed
+  supply expiring (<14d)        → level:'info' → navTo('supply')
+  empty strip when no alerts
+
+Active bottles strip:
+  S.bottles.filter(status∈['inoculated','growing'])
+  → 5 most recent → card with code + species → onclick: navTo('bottles');openBottle(id)
+
+Recent notes:
+  S.notes sorted by date desc, top 5
+  → click → navTo('notes');openNote(id)
+
+Bottle status donut:
+  count by status → SVG arc segments → click segment → navTo('bottles');setBotFilter(status)
+  ← fixed: setBotFilter now opens drawer via navTo fix
+
+Analytics panels:
+  contamination heatmap (per species, last 30d)
+  activity heatmap (notes per day, last 60d)
+  active species list
+
+Pinned news card (if any pinned)
+Research summary (PubMed headlines)
+AI usage bar (token counts by provider)
+Voice transcript log</pre>
+      </div>
+
+      <!-- ═══ ANALYTICS FLOW ═══ -->
+      <div class="help-section-card">
+        <h2 class="help-h2">Analytics Engine</h2>
+        <pre class="help-pre">TWO SEPARATE SYSTEMS (disconnected — known issue):
+
+1. LabAnalytics.calculate() — runs at login:
+   → contamination.by_species: {species: contamRate%}
+   → success_rate.by_species + overall
+   → multiplication.by_species (avg cultures_out)
+   → culture_timeline.by_species (all notes chronologically)
+   → alerts: overdue reviews, high-contam species
+   → stored to S.analytics + S.analyticsLastCalc
+   → consumed by: _buildAIContext() AI context only
+
+2. renderAnalytics() — full-page analytics:
+   → RECALCULATES everything inline from S.notes + S.bottles
+   → does NOT use S.analytics (duplicate effort — known gap)
+   → outputs: 9 chart sections with SVG bars/donut
+
+Analytics recalculation triggers:
+  → login (LabAnalytics.calculate)
+  → analytics section visit (renderAnalytics — separate inline calc)
+  → saveNoteAction / deleteNote / updateBottleStatus (no auto-recalc — stale S.analytics)
+
+⚠️  S.analytics goes stale after data changes. Ravana AI may use stale context.
+    Fix: call LabAnalytics.calculate() after any save operation.</pre>
+      </div>
+
+      <!-- ═══ JOURNAL FLOW ═══ -->
+      <div class="help-section-card">
+        <h2 class="help-h2">Lab Journal — Entry, Parse, Extract</h2>
+        <pre class="help-pre">CREATE:
+  startNewJournalEntry() → clear form → show editor
+  saveJournalEntry():
+  → if editing: update entry.body, mark bodyChanged=true → reset parsed=false
+  → else: new {id, title, body, date, tags, parseEnabled:true, parsed:false}
+  → S.journal.unshift(entry) → saveJournal(S.journal, S.journalSha) → renderJournalList
+
+VOICE DICTATION in journal:
+  _journalMicTap():
+  → if voiceCfg.mode === 'wsp': record → Whisper → transcript → append to je-body
+  → else: SpeechRecognition → interim results live in je-body → final text appended
+
+RAVANA PARSE:
+  parseJournalWithRavana():
+  → prompt: "Parse this lab journal entry and extract structured data as JSON"
+  → JSON schema: {recipes:[{name,base,pgr,ph,notes}], species:[{name,category}], notes:[{title,type,stage,species,body}]}
+  → askAI(prompt) → _renderJournalExtracts(data)
+  → extract cards shown: "Create recipe", "Add species", "Create note"
+  → _journalCreateRecipe(idx) → navTo('recipes'); populate recipe form
+  → _journalCreateNote(idx)   → navTo('notes'); populate note form
+  → _journalAddSpecies(idx)   → navTo('species'); trigger add form
+  → _journalCreateAll()       → batch create all extracted items
+
+OVERNIGHT BATCH PARSE:
+  _scheduleOvernightJournalParse():
+  → fires 8s after login
+  → checks: unparsed entries with body.length > 30 AND parseEnabled !== false
+  → if hasUnparsed AND (firstVisitToday OR forceFlag):
+      show progress in journal parse banner
+      for each unparsed: askAI(parse prompt) → mark parsed=true → saveJournal
+  → re-renders journal list (parsed entries get ✦ badge)
+
+PARSE TOGGLE:
+  _setJournalParseEnabled(id, bool):
+  → entry.parseEnabled = bool → saveJournal → renderJournalList
+  → paused entries show ⏸ badge, skipped by overnight parser</pre>
+      </div>
+
+      <!-- ═══ TAXONOMY FLOW ═══ -->
+      <div class="help-section-card">
+        <h2 class="help-h2">Taxonomy — Packs, Custom Species, Flairs</h2>
+        <pre class="help-pre">PACK LOADING — loadTaxonomy():
+  TAX_PACKS map: {nepenthaceae:'carnivorous', orchidaceae:'orchids', musaceae:'banana', ...}
+  enabled packs: from localStorage('tcplants_tax_enabled') or all enabled
+  → for each enabled pack: fetch taxonomy/{category}/{pack}.json
+  → merge into S.taxSpecies[] (canonical names)
+  → S.taxFlairs[] from JSON flair definitions
+  → also: ghGet(TAX_CUSTOM_FILE) → S.taxCustom.species + S.taxCustom.flairs
+
+AUTOCOMPLETE — _taxSuggest(inputEl):
+  triggered by: oninput on bot-species, ne-species, re-target fields
+  → query = inputEl.value
+  → filter S.taxSpecies + S.taxCustom.species by includes(query)
+  → show #tax-dropdown div positioned under input
+  → keyboard nav: _taxDropdownKeyNav → up/down arrow, Enter to select
+  → _taxDropdownSelect(name) → fill input, hide dropdown, trigger related fields
+    (e.g., species → populate accession dropdown, GH plant dropdown)
+
+SPECIES PICKER MODAL:
+  openSpeciesPicker(targetFieldId):
+  → shows #species-picker-modal
+  → browse by category or search
+  → select → fill targetFieldId input
+
+CSV IMPORT:
+  _importCsvTaxonomy(csvText):
+  → parse CSV: columns Name,Category,CommonName,Source
+  → validate each row → push to S.taxCustom.species
+  → saveCustomTaxonomy() → ghPut(TAX_CUSTOM_FILE, enc(JSON.stringify(S.taxCustom)), sha)
+  → _writeCache(); renderSpecies()
+
+FLAIRS:
+  S.taxFlairs + S.taxCustom.flairs → combined in _botFlairHtml(flair_ids)
+  → colored pills in bottle detail + list
+  → flair picker in bottle editor: click to toggle flair_ids[]</pre>
+      </div>
+
+      <!-- ═══ REMINDERS FLOW ═══ -->
+      <div class="help-section-card">
+        <h2 class="help-h2">Reminders — Badge, List, Navigation</h2>
+        <pre class="help-pre">DATA SOURCES (all in-memory, no dedicated file):
+  Bottles with next_review: S.bottles.filter(next_review exists + status active)
+  Notes with next_review:   S.notes.filter(next_review exists)
+  GH plants with next_inspection: S.greenhouse.filter(next_inspection exists)
+
+renderReminders():
+  → overdueBot: next_review < today + status∈['inoculated','growing']
+     act: navTo('bottles');openBottle(id)
+  → overdueNote: next_review < today
+     act: navTo('notes');openNote(id)          ← fixed (was missing navTo)
+  → overdueGH: next_inspection < today
+     act: navTo('greenhouse');openGHPlant(id)
+  → dueBot/dueNote: within next 7 days (same pattern)
+  → ghXferDue: inoculated bottles > 28 days ago (based on date_inoculated)
+  → sort all by days remaining
+  → render .rem-card divs with data-id, data-isBottle, data-isGh attrs
+
+Tap handler (_setupTap):
+  .rem-card → isGh=1: navTo('greenhouse');openGHPlant
+           → isBottle=1: navTo('bottles');openBottle   ← fixed
+           → else: navTo('notes');openNote              ← fixed
+
+updateReminderBadge():
+  → count total overdue items → #nd-rbadge.textContent + show/hide
+  → called after: login, saveNoteAction, saveBottleAction, saveGHPlant, deleteNote
+
+Badge triggers (cyclic dependency awareness):
+  saving a note → saveNoteAction → updateReminderBadge (in line with render)
+  saving a bottle → no auto-badge update (gap — badge may be stale after bottle edits)</pre>
+      </div>
+
+      <!-- ═══ SEARCH FLOW ═══ -->
+      <div class="help-section-card">
+        <h2 class="help-h2">Search System — Cross-Section</h2>
+        <pre class="help-pre">SearchSystem.renderSearchPage():
+  → #search-main page with input + saved filter chips
+  → oninput → _doSearch(query)
+
+_doSearch(query):
+  → notes: title/body_preview/species/tags includes query
+  → bottles: code/species/notes includes query
+  → accs: species/accession_id/source includes query
+  → recs: name/base/notes includes query
+  → gh: species/location/notes includes query
+  → render grouped results with sec() + row() helpers
+
+Result navigation:
+  Notes   → navTo('notes');openNote(id)            ← fixed (was openNote only)
+  Bottles → navTo('bottles');openBottle(id)
+  Accs    → navTo('registry');openAccession(id)
+  Recipes → navTo('recipes');openRecipe(id)
+  GH      → navTo('greenhouse');openGHPlant(id)
+
+Saved filters:
+  localStorage('tcplants_search_filters') → up to 20 saved filter strings
+  chip click → fill input → trigger search</pre>
+      </div>
+
+      <!-- ═══ SUPPLY/STOCK INVENTORY ═══ -->
+      <div class="help-section-card">
+        <h2 class="help-h2">Inventory — TWO Separate Systems</h2>
+        <pre class="help-pre">⚠️  TWO COMPLETELY SEPARATE INVENTORY SYSTEMS — different files, different state, different UX
+
+SYSTEM 1: Stock (nav → 📦 Stock)
+  State: S_inv = {items:[]} — NOT part of S
+  File: inventory/data.enc
+  Load: loadInv() — called on section visit (NOT at login)
+        ⚠️  Missing ghDec() step — latent decode bug if file exists
+  Render: renderInv() → category tabs → items list → edit/delete
+  Low-stock: S_inv.items.filter(qty <= low_threshold) → dashboard alert (via S_inv?.items)
+  Categories: Media Salts, Growth Regulators, Gelling Agents, Sugars, Vitamins, etc.
+  Use case: tracking reagent stocks with low-stock thresholds
+
+SYSTEM 2: Supply Inventory (nav → 📦 Supplies)
+  State: S.supplies[] — part of main S
+  File: supplies/data.enc
+  Load: loadSupplies() at login — part of Promise.all 7 loads
+  Render: SupplyInventory.renderInventoryPage() → batch cards with performance
+  Performance: calcPerformance(item) — correlates supply batch window with bottle outcomes
+    → finds bottles prepared within date_prepared → next_batch window
+    → contamRate, successRate vs lab average → flag if >10% worse
+  Use case: tracking media prep batches + correlating with TC success rates
+
+Relationship to bottles:
+  Supply batch.date_prepared → bottle.date_prepared window → performance correlation
+  NOT automatically decremented when bottles are created (manual tracking)
+
+Login line 13277:
+  SupplyInventory.items = JSON.parse(localStorage('tcplants_supply') || '[]')
+  ⚠️  This is DEAD CODE — renderInventoryPage() uses S.supplies not SupplyInventory.items</pre>
+      </div>
+
+      <!-- ═══ CALENDAR FLOW ═══ -->
+      <div class="help-section-card">
+        <h2 class="help-h2">Calendar — Month Grid & Day Panel</h2>
+        <pre class="help-pre">renderCalendar():
+  → S.calYear, S.calMonth → build month grid
+  → each day cell: count notes + bottles with dates in that day
+  → click day → _openCalPanel(date) → #cdp-list
+
+_openCalPanel(date):
+  S.calSelDate = date
+  → filter S.notes: date slice = date
+  → filter S.bottles: date_prepared/date_inoculated slice = date
+  → filter S.journal: date slice = date
+  → filter S.greenhouse: next_inspection = date
+  → render .cdp-card divs with data-id, data-isBottle attrs
+
+Tap handler (cdp-list):
+  isBottle=1 → navTo('bottles');openBottle(id)   ← fixed
+  else       → navTo('notes');openNote(id)         ← fixed
+
+New note from calendar:
+  click day → 'New entry for this date' button
+  S.calDate = date → navTo('notes') → startNewNote()
+  in saveNoteAction: date = new Date(S.calDate).toISOString(); S.calDate=null
+
+Month navigation: S.calMonth/calYear ±1 → re-renderCalendar
+
+Export: _exportCalRange(start, end) → format events as .ics / markdown</pre>
+      </div>
+
+      <!-- ═══ WEATHER FLOW ═══ -->
+      <div class="help-section-card">
+        <h2 class="help-h2">Weather, Activity Log, Service Worker</h2>
+        <pre class="help-pre">WEATHER:
+  fetchWeather():
+  → navigator.geolocation.getCurrentPosition → lat/lon
+    OR stored coords from settings
+  → fetch OpenMeteo API: current temp, real-feel, humidity, UV, rain
+  → S.weather = {lab:{...}, gh:{...}, updatedAt: now}
+  → update #weather-chip button text
+  → called at login + every 60s via window._wxInterval
+
+  Dual location: lab coords + greenhouse coords (separate settings)
+  If geolocation denied: uses stored coords or shows error
+
+ACTIVITY LOG:
+  fetchActivityLog():
+  → GET /repos/Phyto-Evolution/tcplants/commits?per_page=30
+  → render .al-clickable items (commits that contain note titles)
+  → click → find note by title → closeActLog(); navTo('notes'); openNote(id)   ← fixed
+  → auto-refresh every session on login
+
+SERVICE WORKER (sw.js):
+  Cache strategy: network-first for index.html, cache-first for CDN assets
+  Cache name bumped manually (SW_CACHE version) to force refresh
+  Registration: navigator.serviceWorker.register('/sw.js')
+  Offline: navigator.onLine → #offline-pill shown
+  Write ops blocked when offline via _checkOnline()
+  ⚠️  Only loadNotesIndex + saveNotesIndex wrapped with offline check (Haiku, inconsistent)</pre>
+      </div>
+
+      <!-- ═══ KNOWN ISSUES ═══ -->
+      <div class="help-section-card" style="border-color:rgba(248,81,73,.3)">
+        <h2 class="help-h2" style="color:var(--rd)">Known Gaps &amp; Latent Bugs</h2>
+        <table class="help-table">
+          <tr><th>Issue</th><th>Location</th><th>Impact</th><th>Status</th></tr>
+          <tr><td>loadInv() missing ghDec()</td><td>Line 14751</td><td>Stock data unreadable if inventory/data.enc exists</td><td>Latent (file doesn't exist yet)</td></tr>
+          <tr><td>S.analytics goes stale after saves</td><td>LabAnalytics.calculate only at login</td><td>Ravana AI gets outdated context after data changes</td><td>Gap</td></tr>
+          <tr><td>renderAnalytics() vs S.analytics disconnect</td><td>renderAnalytics()</td><td>Duplicate computation, S.analytics never shown on Analytics page</td><td>Gap</td></tr>
+          <tr><td>SupplyInventory.items dead assignment</td><td>Login line 13277</td><td>Dead code, localStorage-based value never read</td><td>Dead code</td></tr>
+          <tr><td>validateBottleData wrong status list</td><td>Line 4862</td><td>Would reject subcultured/rooting/hardening/weaned/prepared statuses</td><td>Inert (not called)</td></tr>
+          <tr><td>Offline check only on 2 of 7 load functions</td><td>Lines 13701-13711</td><td>Partial offline blocking — inconsistent behaviour</td><td>Haiku artifact</td></tr>
+          <tr><td>updateReminderBadge not called after bottle saves</td><td>saveBottleAction</td><td>Badge count may be stale after bottle edits</td><td>Gap</td></tr>
+          <tr><td>Telegram integration frozen</td><td>Lines 13267-13271</td><td>Commented out — settings UI exists but no function</td><td>Frozen</td></tr>
+          <tr><td>Two inventory systems (Stock ≠ Supply)</td><td>Separate files + state</td><td>User confusion, low-stock alerts only from Stock</td><td>Design debt</td></tr>
+        </table>
+      </div>
+
+    </main>
+  </div>
+
   <!-- ── BATCH ACTION BAR ── -->
   <div id="batch-action-bar" style="display:none;position:fixed;bottom:0;left:0;right:0;background:var(--sf);border-top:1px solid var(--bd);padding:12px 16px;gap:10px;align-items:center;z-index:200;flex-wrap:wrap"></div>
 
@@ -3840,6 +4670,7 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
       <button class="ndtab" data-sec="stock" onclick="navTo('stock')"><span class="nd-icon">📦</span>Stock</button>
       <button class="ndtab" data-sec="news" onclick="navTo('news')"><span class="nd-icon">📰</span>News</button>
       <button class="ndtab" data-sec="help" onclick="navTo('help')"><span class="nd-icon">❓</span>Help</button>
+      <button class="ndtab" data-sec="logicflows" onclick="navTo('logicflows')"><span class="nd-icon">🔗</span>Logic Flows</button>
       <div class="nd-divider"></div>
       <button class="ndtab" data-sec="journal" onclick="navTo('journal')"><span class="nd-icon">📔</span>Lab Journal</button>
       <button class="ndtab" data-sec="schedule" onclick="navTo('schedule')"><span class="nd-icon">📅</span>Schedule</button>
@@ -4543,7 +5374,7 @@ const S = {
   weather:{lab:null,gh:null,updatedAt:null},
   bodyCache:{},
   bottles: [], sessions: [], bottlesSha: null,
-  bottleFilter: 'all', bottleSearch: '',
+  bottleFilter: 'all', bottleSearch: '', botBatchFilter: null,
   curBot: null, editingBot: null,
   greenhouse: [], ghTransfers: [], greenhouseSha: null,
   ghFilter: 'all', ghSearch: '', ghView: 'list',
@@ -5414,7 +6245,7 @@ const LabCalendar={
       .map(b=>({icon:'🫙',label:esc(b.code),sub:esc(b.species||''),days:daysFrom(b.next_review),act:`navTo('bottles');openBottle('${b.id}')`,type:'overdue'}));
     const overdueNote=notes
       .filter(n=>n.next_review&&n.next_review<todayStr)
-      .map(n=>({icon:'📋',label:esc(n.title),sub:esc(n.species||''),days:daysFrom(n.next_review),act:`openNote('${n.id}')`,type:'overdue'}));
+      .map(n=>({icon:'📋',label:esc(n.title),sub:esc(n.species||''),days:daysFrom(n.next_review),act:`navTo('notes');openNote('${n.id}')`,type:'overdue'}));
     const overdue=[...overdueBot,...overdueNote].sort((a,b)=>a.days-b.days);
 
     // Due soon — next 7 days
@@ -5423,7 +6254,7 @@ const LabCalendar={
       .map(b=>({icon:'🫙',label:esc(b.code),sub:esc(b.species||''),days:daysFrom(b.next_review),act:`navTo('bottles');openBottle('${b.id}')`,type:'soon'}));
     const dueNote=notes
       .filter(n=>n.next_review&&n.next_review>=todayStr&&daysFrom(n.next_review)<=7)
-      .map(n=>({icon:'📋',label:esc(n.title),sub:esc(n.species||''),days:daysFrom(n.next_review),act:`openNote('${n.id}')`,type:'soon'}));
+      .map(n=>({icon:'📋',label:esc(n.title),sub:esc(n.species||''),days:daysFrom(n.next_review),act:`navTo('notes');openNote('${n.id}')`,type:'soon'}));
     const dueSoon=[...dueBot,...dueNote].sort((a,b)=>a.days-b.days);
 
     // Transfer due — inoculated ≥28 days ago
@@ -6167,7 +6998,7 @@ const SearchSystem={
         <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${title}</div>
         ${sub?`<div style="font-size:11px;color:var(--mu)">${sub}</div>`:''}
       </div></div>`;
-    return sec('📋','Notes',res.notes,res.notes.map(n=>row('📋',esc(n.title),[fmtDateShort(n.date),n.species?esc(n.species):'',n.stage||''].filter(Boolean).join(' · '),`openNote('${n.id}')`)).join(''))
+    return sec('📋','Notes',res.notes,res.notes.map(n=>row('📋',esc(n.title),[fmtDateShort(n.date),n.species?esc(n.species):'',n.stage||''].filter(Boolean).join(' · '),`navTo('notes');openNote('${n.id}')`)).join(''))
       +sec('🫙','Bottles',res.bottles,res.bottles.map(b=>row('🫙',esc(b.code),[esc(b.species||''),b.status||''].filter(Boolean).join(' · '),`navTo('bottles');openBottle('${b.id}')`)).join(''))
       +sec('🌿','Accessions',res.accs,res.accs.map(a=>row('🌿',esc(a.species||a.num||''),esc(a.source||''),`navTo('registry');openAccession('${a.id}')`)).join(''))
       +sec('🧪','Recipes',res.recs,res.recs.map(r=>row('🧪',esc(r.name),esc(r.base||''),`navTo('recipes');openRecipe('${r.id}')`)).join(''))
@@ -8193,7 +9024,7 @@ async function fetchActivityLog(){
       el.addEventListener('click',()=>{
         const title=el.dataset.noteTitle;
         const note=S.notes.find(n=>n.title===title);
-        if(note){ closeActLog(); switchSection('notes'); openNote(note.id); }
+        if(note){ closeActLog(); navTo('notes'); openNote(note.id); }
         else toast('Note not found — may have been renamed','fail');
       });
     });
@@ -12004,7 +12835,16 @@ function _populateGHDropdown(species, selectedId=''){
 
 function setBotFilter(f){
   S.bottleFilter=f;
+  S.botBatchFilter=null; // clear batch-specific filter when using status pills
   document.querySelectorAll('.bot-filter-pill').forEach(p=>p.classList.toggle('active',p.dataset.bf===f));
+  renderBottleList();
+}
+function viewBatch(batchId){
+  S.botBatchFilter=batchId;
+  S.bottleFilter='all';
+  S.bottleSearch='';
+  document.querySelectorAll('.bot-filter-pill').forEach(p=>p.classList.toggle('active',p.dataset.bf==='all'));
+  openNavDrawer();
   renderBottleList();
 }
 
@@ -12012,13 +12852,15 @@ function renderBottleList(){
   const el=document.getElementById('bot-list'); if(!el) return;
   const q=(S.bottleSearch||'').toLowerCase();
   let list=S.bottles;
-  if(S.bottleFilter && S.bottleFilter!=='all') list=list.filter(b=>b.status===S.bottleFilter);
+  if(S.botBatchFilter) list=list.filter(b=>b.batch_id===S.botBatchFilter);
+  else if(S.bottleFilter && S.bottleFilter!=='all') list=list.filter(b=>b.status===S.bottleFilter);
   if(q) list=list.filter(b=>(b.code||'').toLowerCase().includes(q)||(b.species||'').toLowerCase().includes(q)||(b.notes||'').toLowerCase().includes(q));
   list=[...list].sort((a,b)=>new Date(b.date_prepared||0)-new Date(a.date_prepared||0));
   const total=S.bottles.length;
   const active=S.bottles.filter(b=>['inoculated','growing'].includes(b.status)).length;
-  document.getElementById('bot-stats').textContent=`${total} bottle${total!==1?'s':''} · ${active} active`;
-  if(!list.length){el.innerHTML=`<div style="padding:18px;font-size:13px;color:var(--mu);text-align:center">${q||S.bottleFilter!=='all'?'No matches':'No bottles yet. Create one!'}</div>`;return;}
+  const batchLabel=S.botBatchFilter?` · batch (${list.length})`:''
+  document.getElementById('bot-stats').textContent=`${total} bottle${total!==1?'s':''} · ${active} active${batchLabel}`;
+  if(!list.length){el.innerHTML=`<div style="padding:18px;font-size:13px;color:var(--mu);text-align:center">${q||S.bottleFilter!=='all'||S.botBatchFilter?'No matches':'No bottles yet. Create one!'}</div>`;return;}
   el.innerHTML=list.map(b=>{
     const sel=S.selected.bottles.includes(b.id);
     return `<div class="bot-list-item${S.curBot===b.id?' active':''}${sel?' batch-sel':''}" data-id="${b.id}">
@@ -12139,7 +12981,7 @@ function openBottle(id){
     ${_botLifecycleHtml(b)}
     ${stepperHtml?`<div class="bot-stepper-row">${stepperHtml}</div>`:''}
     ${b.notes?`<div class="bot-notes-body">${sanitizeMarkdown(b.notes)}</div>`:''}
-    ${(b.batch_id&&batchMates.length)?`<div class="bot-batch-row">Batch: <a onclick="setBotFilter('all');S.bottleSearch='';renderBottleList()">View all ${batchMates.length+1} bottles in this batch</a></div>`:''}
+    ${(b.batch_id&&batchMates.length)?`<div class="bot-batch-row">Batch: <a onclick="viewBatch('${b.batch_id}')">View all ${batchMates.length+1} bottles in this batch</a></div>`:''}
   `;
   showBotDetail();
   // Generate QR code
@@ -13156,12 +13998,14 @@ function navTo(sec){
   // For list sections: show the panel but keep drawer open
   const listSecs=['notes','registry','recipes','bottles','greenhouse'];
   if(listSecs.includes(sec)){
+    openNavDrawer(); // ensure drawer is open — list IS the sidebar
     document.getElementById('nd-notes').classList.toggle('on',sec==='notes');
     document.getElementById('nd-registry').classList.toggle('on',sec==='registry');
     document.getElementById('nd-recipes').classList.toggle('on',sec==='recipes');
     document.getElementById('nd-bottles').classList.toggle('on',sec==='bottles');
     document.getElementById('nd-greenhouse').classList.toggle('on',sec==='greenhouse');
-    // Don't close drawer for list sections — it becomes the sidebar
+    // also clear batch filter when navigating away from a specific bottle context
+    if(sec!=='bottles') S.botBatchFilter=null;
   } else {
     // For non-list sections: close the drawer
     document.querySelectorAll('.nd-list-area').forEach(el=>el.classList.remove('on'));
@@ -13172,6 +14016,7 @@ function navTo(sec){
     else if(sec==='insights') RavanaInsights.renderInsightsPage();
     else if(sec==='supply') SupplyInventory.renderInventoryPage();
     else if(sec==='search') SearchSystem.renderSearchPage();
+    else if(sec==='logicflows'){} // static page — no render needed
   }
 }
 
@@ -13325,11 +14170,11 @@ function _initTapHandlers(){
   // Bottle list
   _setupTap('bot-list',    '.bot-list-item', el=>openBottle(el.dataset.id));
   // Reminders
-  _setupTap('reminders-body', '.rem-card',   el=>{ if(el.dataset.isGh==='1'){ navTo('greenhouse');openGHPlant(el.dataset.id); } else if(el.dataset.isBottle==='1') openBottle(el.dataset.id); else openNote(el.dataset.id); });
+  _setupTap('reminders-body', '.rem-card',   el=>{ if(el.dataset.isGh==='1'){ navTo('greenhouse');openGHPlant(el.dataset.id); } else if(el.dataset.isBottle==='1'){ navTo('bottles');openBottle(el.dataset.id); } else { navTo('notes');openNote(el.dataset.id); } });
   // Contamination list
-  _setupTap('contam-list', '.sr-item',       el=>openNote(el.dataset.id));
+  _setupTap('contam-list', '.sr-item',       el=>{ navTo('notes');openNote(el.dataset.id); });
   // Calendar day panel
-  _setupTap('cdp-list',    '.cdp-card',      el=>{ if(el.dataset.isBottle==='1') openBottle(el.dataset.id); else openNote(el.dataset.id); });
+  _setupTap('cdp-list',    '.cdp-card',      el=>{ if(el.dataset.isBottle==='1'){ navTo('bottles');openBottle(el.dataset.id); } else { navTo('notes');openNote(el.dataset.id); } });
   // Autocomplete dropdown (tax-dropdown)
   _setupTap('tax-dropdown','.tax-row',       el=>_taxDropdownSelect(el.dataset.name));
   // Species picker modal body
