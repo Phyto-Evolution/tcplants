@@ -1362,6 +1362,18 @@ main > .dview, main > .editor{ margin:0 auto; }
 /* Label matrix panel */
 #bot-label-panel{display:none;padding:16px;border-bottom:1px solid var(--bd);background:var(--sf2)}
 #bot-label-panel.on{display:block}
+/* Post-save QR grid */
+.bot-saved-qrs{padding:16px}
+.bot-saved-qrs-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.bot-saved-qrs-title{font-size:14px;font-weight:700;flex:1}
+.bot-saved-batch-label{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--mu);margin:14px 0 6px}
+.bot-saved-batch-label:first-child{margin-top:0}
+.bot-saved-qr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px}
+.bot-saved-qr-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px;border-radius:6px;transition:background .12s}
+.bot-saved-qr-item:hover{background:var(--sf2)}
+.bot-saved-qr-item canvas{border-radius:4px;background:#fff;padding:3px}
+.bot-saved-qr-code{font-family:var(--mono);font-size:10px;color:var(--tx);text-align:center;word-break:break-all}
+.bot-saved-qr-sp{font-size:10px;color:var(--mu);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;max-width:84px}
 .lbl-cfg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
 .lbl-cfg-card{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:10px;cursor:pointer;transition:border-color .15s;position:relative}
 .lbl-cfg-card:hover{border-color:var(--ac)}
@@ -12318,12 +12330,85 @@ async function saveSessionAction(){
   try{
     S.bottlesSha=await saveBottles(allBottles, S.bottlesSha, allSessions);
     S.bottles=allBottles; S.sessions=allSessions;
-    renderBottleList();
     S.curBot=newBottles[0]?.id;
-    if(S.curBot) openBottle(S.curBot);
+    renderBottleList();
+    _showSavedQRGrid(newBottles, `${newBottles.length} bottle${newBottles.length!==1?'s':''} across ${batches.length} batch${batches.length!==1?'es':''}`);
     toast(`🔥 Session saved — ${newBottles.length} bottles across ${batches.length} batch${batches.length!==1?'es':''}`, 'ok');
   }catch(e){ toast('Save failed: '+e.message,'fail'); }
   btn.disabled=false; btn.textContent='Save';
+}
+
+function _showSavedQRGrid(bottles, label){
+  const detail=document.getElementById('bot-detail'); if(!detail) return;
+  // Group by batch_id; each batch becomes one visual group
+  const groupMap=new Map();
+  for(const b of bottles){
+    const key=b.batch_id||b.id;
+    if(!groupMap.has(key)) groupMap.set(key,[]);
+    groupMap.get(key).push(b);
+  }
+  const groups=[...groupMap.values()];
+  const multiGroup=groups.length>1;
+  const groupsHtml=groups.map((g,gi)=>`
+    ${multiGroup?`<div class="bot-saved-batch-label">Batch ${gi+1} · ${g.length} bottle${g.length!==1?'s':''}</div>`:''}
+    <div class="bot-saved-qr-grid">${g.map(b=>`
+      <div class="bot-saved-qr-item" onclick="openBottle('${b.id}')">
+        <canvas id="svqr-${b.id}" width="72" height="72"></canvas>
+        <div class="bot-saved-qr-code">${esc(b.code)}</div>
+        ${b.species?`<div class="bot-saved-qr-sp">${esc(b.species)}</div>`:''}
+      </div>`).join('')}
+    </div>`).join('');
+  const allIds=bottles.map(b=>`'${b.id}'`).join(',');
+  detail.innerHTML=`
+    <div class="bot-saved-qrs">
+      <div class="bot-saved-qrs-header">
+        <div class="bot-saved-qrs-title">✅ ${label}</div>
+        <button class="btn sm ghost" onclick="openBottle('${bottles[0].id}')">View first</button>
+        <button class="btn sm ghost" onclick="_printSavedQRs([${allIds}])">🖨 Print all</button>
+      </div>
+      <div style="font-size:12px;color:var(--mu);margin-bottom:14px">Tap any QR to open that bottle</div>
+      ${groupsHtml}
+    </div>`;
+  showBotDetail();
+  requestAnimationFrame(()=>{
+    bottles.forEach(b=>{
+      const canvas=document.getElementById(`svqr-${b.id}`);
+      if(canvas&&typeof QRCode!=='undefined'){
+        QRCode.toCanvas(canvas,`https://notes.tcplants.in?bottle=${b.id}`,{width:72,margin:0,color:{dark:'#000000',light:'#ffffff'}},err=>{if(err)console.warn('QR err',err);});
+      }
+    });
+  });
+}
+
+function _printSavedQRs(ids){
+  const bottles=ids.map(id=>S.bottles.find(b=>b.id===id)).filter(Boolean);
+  if(!bottles.length) return;
+  const cfg=LABEL_CONFIGS[0];
+  const labelsHtml=bottles.map(b=>_botLabelHtmlConfig(b,cfg)).join('');
+  const w=window.open('','_blank','width=900,height=700');
+  if(!w){ toast('Allow popups to print labels','fail'); return; }
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>TC Plants Labels</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#fff;font-family:Arial,sans-serif;font-size:9pt;width:58mm}
+.bot-label{display:flex;align-items:flex-start;gap:2mm;padding:2mm;border:0.5px dashed #ccc;page-break-inside:avoid}
+.bot-label canvas{flex-shrink:0;background:#fff}
+.bot-label-right{flex:1;min-width:0;display:flex;flex-direction:column;gap:0.5mm}
+.bot-lbl-code{font-size:11pt;font-weight:700;line-height:1.2}
+.bot-lbl-sp{font-size:8pt;line-height:1.3;font-style:italic}
+.bot-lbl-flair,.bot-lbl-stage,.bot-lbl-ts,.bot-lbl-review{font-size:7.5pt;color:#333;line-height:1.3}
+@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+<\/style>
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"><\/script>
+<\/head><body>${labelsHtml}<\/body><\/html>`);
+  w.document.close();
+  w.onload=()=>{
+    bottles.forEach(b=>{
+      const c=w.document.getElementById(`print-qr-${b.id}`);
+      if(c&&w.QRCode) w.QRCode.toCanvas(c,`https://notes.tcplants.in?bottle=${b.id}`,{width:88,margin:0,color:{dark:'#000000',light:'#ffffff'}},()=>{});
+    });
+    setTimeout(()=>w.print(),600);
+  };
 }
 
 function setBotMode(mode){
@@ -12394,7 +12479,7 @@ async function saveBottleAction(){
   const btn=document.getElementById('bot-save-btn');
   btn.disabled=true; btn.textContent='Saving…';
   try{
-    let newBots;
+    let newBots; let toastMsg='Saved';
     if(S.editingBot){
       // Update existing
       const idx=S.bottles.findIndex(x=>x.id===S.editingBot);
@@ -12417,9 +12502,16 @@ async function saveBottleAction(){
       S.bottles=newBots;
       S.bottlesSha=await saveBottles(newBots, S.bottlesSha);
       S.curBot=newBottles[0].id;
-      renderBottleList(); openBottle(S.curBot); closeNavDrawer();
+      renderBottleList(); closeNavDrawer();
+      if(qty>1){
+        _showSavedQRGrid(newBottles, `${qty} bottles saved${base.species?' · '+base.species:''}`);
+        toastMsg=`🫙 ${qty} bottles saved`;
+      } else {
+        openBottle(S.curBot);
+        toastMsg=`🫙 Bottle${base.species?' for '+base.species:''} saved`;
+      }
     }
-    toast(S.editingBot===null?`🫙 Bottle${base.species?' for '+base.species:''} saved`:'Saved','ok');
+    toast(toastMsg,'ok');
   } catch(e){ toast('Save failed: '+e.message,'fail'); }
   btn.disabled=false; btn.textContent='Save';
 }
