@@ -1362,18 +1362,20 @@ main > .dview, main > .editor{ margin:0 auto; }
 /* Label matrix panel */
 #bot-label-panel{display:none;padding:16px;border-bottom:1px solid var(--bd);background:var(--sf2)}
 #bot-label-panel.on{display:block}
-/* Post-save QR grid */
+/* Post-save QR label grid — uses existing bot-label format inline */
 .bot-saved-qrs{padding:16px}
 .bot-saved-qrs-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
 .bot-saved-qrs-title{font-size:14px;font-weight:700;flex:1}
 .bot-saved-batch-label{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--mu);margin:14px 0 6px}
 .bot-saved-batch-label:first-child{margin-top:0}
-.bot-saved-qr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px}
-.bot-saved-qr-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px;border-radius:6px;transition:background .12s}
-.bot-saved-qr-item:hover{background:var(--sf2)}
-.bot-saved-qr-item canvas{border-radius:4px;background:#fff;padding:3px}
-.bot-saved-qr-code{font-family:var(--mono);font-size:10px;color:var(--tx);text-align:center;word-break:break-all}
-.bot-saved-qr-sp{font-size:10px;color:var(--mu);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;max-width:84px}
+.bot-saved-qr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.bot-saved-qrs .bot-label{display:flex;align-items:flex-start;gap:8px;padding:8px;border:1px solid var(--bd);border-radius:6px;background:var(--sf);cursor:pointer;transition:background .12s}
+.bot-saved-qrs .bot-label:hover{background:var(--sf2)}
+.bot-saved-qrs .bot-label canvas{border-radius:4px;background:#fff;padding:3px;flex-shrink:0}
+.bot-saved-qrs .bot-label-right{display:flex;flex-direction:column;gap:3px;min-width:0;overflow:hidden}
+.bot-saved-qrs .bot-lbl-code{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--tx);display:block}
+.bot-saved-qrs .bot-lbl-sp{font-size:11px;font-style:italic;color:var(--mu);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bot-saved-qrs .bot-lbl-flair,.bot-saved-qrs .bot-lbl-stage,.bot-saved-qrs .bot-lbl-ts{font-size:10px;color:var(--mu);display:block}
 .lbl-cfg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
 .lbl-cfg-card{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:10px;cursor:pointer;transition:border-color .15s;position:relative}
 .lbl-cfg-card:hover{border-color:var(--ac)}
@@ -12340,7 +12342,8 @@ async function saveSessionAction(){
 
 function _showSavedQRGrid(bottles, label){
   const detail=document.getElementById('bot-detail'); if(!detail) return;
-  // Group by batch_id; each batch becomes one visual group
+  const cfg=LABEL_CONFIGS[0]; // 58mm full: code · species · flair · stage · date, qr:88
+  // Group by batch_id
   const groupMap=new Map();
   for(const b of bottles){
     const key=b.batch_id||b.id;
@@ -12351,13 +12354,8 @@ function _showSavedQRGrid(bottles, label){
   const multiGroup=groups.length>1;
   const groupsHtml=groups.map((g,gi)=>`
     ${multiGroup?`<div class="bot-saved-batch-label">Batch ${gi+1} · ${g.length} bottle${g.length!==1?'s':''}</div>`:''}
-    <div class="bot-saved-qr-grid">${g.map(b=>`
-      <div class="bot-saved-qr-item" onclick="openBottle('${b.id}')">
-        <canvas id="svqr-${b.id}" width="72" height="72"></canvas>
-        <div class="bot-saved-qr-code">${esc(b.code)}</div>
-        ${b.species?`<div class="bot-saved-qr-sp">${esc(b.species)}</div>`:''}
-      </div>`).join('')}
-    </div>`).join('');
+    <div class="bot-saved-qr-grid">${g.map(b=>`<div onclick="openBottle('${b.id}')">${_botLabelHtmlConfig(b,cfg)}</div>`).join('')}</div>
+  `).join('');
   const allIds=bottles.map(b=>`'${b.id}'`).join(',');
   detail.innerHTML=`
     <div class="bot-saved-qrs">
@@ -12366,15 +12364,15 @@ function _showSavedQRGrid(bottles, label){
         <button class="btn sm ghost" onclick="openBottle('${bottles[0].id}')">View first</button>
         <button class="btn sm ghost" onclick="_printSavedQRs([${allIds}])">🖨 Print all</button>
       </div>
-      <div style="font-size:12px;color:var(--mu);margin-bottom:14px">Tap any QR to open that bottle</div>
+      <div style="font-size:12px;color:var(--mu);margin-bottom:14px">Tap any label to open that bottle</div>
       ${groupsHtml}
     </div>`;
   showBotDetail();
   requestAnimationFrame(()=>{
     bottles.forEach(b=>{
-      const canvas=document.getElementById(`svqr-${b.id}`);
+      const canvas=document.getElementById(`print-qr-${cfg.id}-${b.id}`);
       if(canvas&&typeof QRCode!=='undefined'){
-        QRCode.toCanvas(canvas,`https://notes.tcplants.in?bottle=${b.id}`,{width:72,margin:0,color:{dark:'#000000',light:'#ffffff'}},err=>{if(err)console.warn('QR err',err);});
+        QRCode.toCanvas(canvas,`https://notes.tcplants.in?bottle=${b.id}`,{width:cfg.qr,margin:0,color:{dark:'#000000',light:'#ffffff'}},err=>{if(err)console.warn('QR err',err);});
       }
     });
   });
