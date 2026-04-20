@@ -1731,6 +1731,12 @@ input, textarea, select {
       <button class="btn xs ghost" onclick="forgetDevice()" style="margin-top:8px">Forget this device</button>
     </div>
     <div id="lerr"></div>
+    <div id="lmigrate" style="display:none;margin-top:8px;padding:12px;background:rgba(210,153,34,.1);border:1px solid rgba(210,153,34,.3);border-radius:8px">
+      <div style="font-size:12px;color:var(--yw);margin-bottom:8px;font-weight:600">⚠ One-time migration needed</div>
+      <div style="font-size:11px;color:var(--mu);margin-bottom:8px">Your data is encrypted with your old passphrase. Enter it once to re-encrypt everything with your token.</div>
+      <input type="password" id="lmigrate-pw" placeholder="Old passphrase" style="width:100%;padding:8px 12px;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-size:13px;box-sizing:border-box;margin-bottom:8px" autocomplete="off">
+      <button class="btn sm green" style="width:100%" onclick="_runMigration()">Migrate & Sign In</button>
+    </div>
     <button class="btn" id="lbtn" style="width:100%;padding:11px;font-size:15px;margin-top:4px;border-radius:8px">Sign In →</button>
     <div id="trust-banner">
       <span>Trust this device? Your password will be saved encrypted.</span>
@@ -14104,6 +14110,7 @@ async function login(){
   if(!tok && localStorage.getItem(DEVICE_KEY)) tok=localStorage.getItem(DEVICE_KEY)||'';
   const err=document.getElementById('lerr');
   err.style.display='none';
+  document.getElementById('lmigrate').style.display='none';
   if(!crypto?.subtle){
     err.innerHTML='Encryption requires HTTPS. <a href="'+location.href.replace('http:','https:')+'" style="color:var(--ac)">Click here to switch →</a>';
     err.style.display='block'; return;
@@ -14174,12 +14181,62 @@ async function login(){
     if(window._wxInterval) clearInterval(window._wxInterval);
     window._wxInterval = setInterval(fetchWeather, 60000);
   }catch(e){
-    err.textContent=e.message; err.style.display='block';
-    S.pw=null; S.tok=null;
+    if(e.name==='OperationError'||e instanceof DOMException){
+      // Wrong passphrase — data encrypted with old passphrase, offer migration
+      document.getElementById('lmigrate').style.display='';
+      err.textContent='Data encrypted with a different passphrase — migrate below.';
+      err.style.display='block';
+      // Keep S.tok set so migration can use ghGet/ghPut
+    } else {
+      err.textContent=e.message; err.style.display='block';
+      S.pw=null; S.tok=null;
+    }
   }
   document.getElementById('lbtn').disabled=false;
-  document.getElementById('lbtn').textContent='Unlock Lab →';
+  document.getElementById('lbtn').textContent='Sign In →';
   unload();
+}
+
+async function _migrateEncryption(oldPw){
+  const files=[IDX,ACC_F,REC_F,BOT_F,GH_F,SUPPLY_F,JOURNAL_F,KEYS_F,TAX_CUSTOM_FILE];
+  let done=0;
+  for(const path of files){
+    const f=await ghGet(path);
+    if(!f) continue;
+    try{
+      S.pw=oldPw;
+      const plain=await dec(ghDec(f.content));
+      S.pw=S.tok;
+      await ghPut(path,await enc(plain),f.sha,'migrate: re-encrypt with token');
+      done++;
+    }catch(e){
+      // File may not exist or already migrated — skip
+      S.pw=S.tok;
+    }
+  }
+  return done;
+}
+
+async function _runMigration(){
+  const oldPw=document.getElementById('lmigrate-pw').value;
+  if(!oldPw){toast('Enter your old passphrase','fail');return;}
+  if(!S.tok){toast('Token missing — please reload and try again','fail');return;}
+  const err=document.getElementById('lerr');
+  load('Migrating encryption…');
+  try{
+    const count=await _migrateEncryption(oldPw);
+    unload();
+    document.getElementById('lmigrate').style.display='none';
+    err.style.display='none';
+    toast(`✓ Migrated ${count} files — signing in…`,'ok');
+    // Small pause so toast is visible, then sign in (data now encrypted with token)
+    setTimeout(login, 800);
+  }catch(e){
+    unload();
+    err.textContent='Migration failed: '+e.message;
+    err.style.display='block';
+    S.pw=S.tok; // restore
+  }
 }
 
 // ════════════════════════════════════════════════════════════
