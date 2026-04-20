@@ -14563,13 +14563,33 @@ function exportCSV(){
 // ════════════════════════════════════════════════════════════
 // NAVIGATION
 // ════════════════════════════════════════════════════════════
-// Navigate from dashboard / external link — switch section + show overview, NO drawer pop
+// Navigate from dashboard stat cards
 function _dashNav(sec){
-  closeNavDrawer();
   switchSection(sec);
-  if(sec==='notes') showNote('empty');
-  else if(sec==='registry') showReg('empty');
-  else if(sec==='recipes') showRec('empty');
+  if(sec==='notes'){
+    // Notes: open the list drawer so the user can browse
+    document.querySelectorAll('.nd-list-area').forEach(el=>el.classList.remove('on'));
+    document.getElementById('nd-notes').classList.add('on');
+    openNavDrawer();
+  } else if(sec==='bottles'){
+    // Bottles: show overview in main, open drawer for list
+    showBotEmpty();
+    document.querySelectorAll('.nd-list-area').forEach(el=>el.classList.remove('on'));
+    document.getElementById('nd-bottles').classList.add('on');
+    openNavDrawer();
+  } else if(sec==='registry'){
+    showReg('empty');
+    document.querySelectorAll('.nd-list-area').forEach(el=>el.classList.remove('on'));
+    document.getElementById('nd-registry').classList.add('on');
+    openNavDrawer();
+  } else if(sec==='greenhouse'){
+    showGHEmpty();
+    document.querySelectorAll('.nd-list-area').forEach(el=>el.classList.remove('on'));
+    document.getElementById('nd-greenhouse').classList.add('on');
+    openNavDrawer();
+  } else {
+    closeNavDrawer();
+  }
 }
 
 function switchSection(name){
