@@ -1790,7 +1790,7 @@ input, textarea, select {
         <!-- Alert strip — rendered by _renderDashboard(), hidden when empty -->
         <div id="dash-alerts" style="display:none;margin-bottom:12px"></div>
         <!-- Quick Stats -->
-        <div id="dash-stats" style="display:flex;gap:0;margin-bottom:16px;background:var(--sf);border:1px solid var(--bd);border-radius:12px;overflow:hidden"></div>
+        <div id="dash-stats" style="display:flex;flex-wrap:wrap;gap:0;margin-bottom:16px;background:var(--sf);border:1px solid var(--bd);border-radius:12px;overflow:hidden"></div>
         <!-- Dynamic panels rendered by _renderDashboard() -->
         <div class="dash-grid" id="dash-panels">
           <div>
@@ -7433,6 +7433,25 @@ function _renderDashboard(){
   const overdueCount=[...S.notes.filter(n=>n.next_review&&daysFrom(n.next_review)<=0),
     ...allBots.filter(b=>b.next_review&&['inoculated','growing'].includes(b.status)&&daysFrom(b.next_review)<=0)].length;
   const ghTotal=(S.greenhouse||[]).reduce((s,p)=>s+(p.quantity||1),0);
+  // Recipes
+  const recCount=(S.recs||[]).length;
+  // Supplies low stock (remaining ≤ 20% of original or ≤ 2 units left)
+  const supLow=(S.supplies||[]).filter(s=>{const rem=(s.quantity||0)-(s.used||0);return rem<=(s.quantity?Math.max(2,Math.ceil(s.quantity*0.2)):2);}).length;
+  // Contamination — notes of type Contamination Log in last 30 days
+  const contam30=(S.notes||[]).filter(n=>n.type==='Contamination Log'&&n.date&&(Date.now()-new Date(n.date))<30*86400000).length;
+  // Vault value (compact)
+  const _vaultINR=(()=>{
+    const prices=(S.value||{}).prices||{};
+    let v=0;
+    for(const b of allBots){if(['discarded','contaminated'].includes(b.status))continue;v+=(parseInt(b.quantity)||1)*(parseFloat(prices['stage_'+b.status])||0);}
+    for(const p of (S.greenhouse||[])){v+=(parseInt(p.quantity)||1)*(parseFloat(prices['gh_'+(p.size_grade||'small')])||0);}
+    if(v>=100000) return '₹'+Math.round(v/100000*10)/10+'L';
+    if(v>=1000) return '₹'+Math.round(v/1000*10)/10+'k';
+    return v?'₹'+v:'—';
+  })();
+  // Journal entries this week
+  const weekAgo=new Date(now); weekAgo.setDate(weekAgo.getDate()-7);
+  const journalWeek=(S.journal||[]).filter(e=>e.date&&new Date(e.date)>=weekAgo).length;
 
   // ── Stat band ────────────────────────────────────────────────
   const stats=[
@@ -7441,9 +7460,14 @@ function _renderDashboard(){
     {icon:'🌿',val:S.accs.length,label:'Accessions',c:'var(--gn)',fn:"_dashNav('registry')"},
     {icon:'🏡',val:(S.greenhouse||[]).length,label:`${ghTotal} plants`,c:'#52b788',fn:"_dashNav('greenhouse')"},
     {icon:'⏰',val:overdueCount,label:'overdue',c:overdueCount?'var(--rd)':'var(--mu)',fn:"_dashNav('reminders')"},
+    {icon:'🧪',val:recCount,label:'Recipes',c:'var(--pu)',fn:"_dashNav('recipes')"},
+    {icon:'📦',val:supLow,label:'low stock',c:supLow?'var(--yw)':'var(--mu)',fn:"navTo('supply')"},
+    {icon:'☣️',val:contam30,label:'contam 30d',c:contam30?'var(--rd)':'var(--mu)',fn:"navTo('contam')"},
+    {icon:'💰',val:_vaultINR,label:'vault value',c:'var(--yw)',fn:"navTo('value')"},
+    {icon:'📔',val:journalWeek,label:'journal 7d',c:'var(--ac)',fn:"navTo('journal')"},
   ];
-  el.innerHTML=stats.map((s,i)=>`<div onclick="${s.fn}" style="flex:1;padding:14px 16px;cursor:pointer;text-align:center;border-right:${i<stats.length-1?'1px solid var(--bd)':'none'};transition:background .12s" onmouseover="this.style.background='var(--sf2)'" onmouseout="this.style.background=''">
-    <div style="font-size:22px;font-weight:800;color:${s.c};line-height:1">${s.val}</div>
+  el.innerHTML=stats.map((s,i)=>`<div onclick="${s.fn}" style="flex:1 1 18%;min-width:80px;padding:12px 8px;cursor:pointer;text-align:center;border-right:${i%5!==4&&i<stats.length-1?'1px solid var(--bd)':'none'};border-bottom:${i<5?'1px solid var(--bd)':'none'};transition:background .12s" onmouseover="this.style.background='var(--sf2)'" onmouseout="this.style.background=''">
+    <div style="font-size:20px;font-weight:800;color:${s.c};line-height:1">${s.val}</div>
     <div style="font-size:10px;color:var(--mu);margin-top:3px;text-transform:uppercase;letter-spacing:.06em">${s.icon} ${s.label}</div>
   </div>`).join('');
 
@@ -14581,6 +14605,11 @@ function _dashNav(sec){
     showReg('empty');
     document.querySelectorAll('.nd-list-area').forEach(el=>el.classList.remove('on'));
     document.getElementById('nd-registry').classList.add('on');
+    openNavDrawer();
+  } else if(sec==='recipes'){
+    showRec('empty');
+    document.querySelectorAll('.nd-list-area').forEach(el=>el.classList.remove('on'));
+    document.getElementById('nd-recipes').classList.add('on');
     openNavDrawer();
   } else if(sec==='greenhouse'){
     showGHEmpty();
