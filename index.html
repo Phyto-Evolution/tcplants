@@ -747,13 +747,13 @@ main > .dview, main > .editor{ margin:0 auto; }
 .scaler-result{background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:10px;font-family:var(--mono);font-size:13px;margin-top:8px;white-space:pre-wrap;min-height:40px;line-height:1.8}
 /* dashboard */
 /* ── DASHBOARD REDESIGN ── */
-#dash-panels{display:grid;gap:12px;grid-template-columns:1fr 1fr 1fr;grid-template-areas:
-  "donut  alerts  activity"
-  "contam contam  contam"
-  "species gh     gh"
-  "recent pinned  research"
-  "aibar  aibar   aibar"
-  "voice  voice   voice";
+#dash-panels{display:grid;gap:12px;grid-template-columns:repeat(6,1fr);grid-template-areas:
+  "donut  donut  alerts  alerts  activity activity"
+  "contam contam contam  contam  contam   contam"
+  "species species species gh     gh       gh"
+  "recent recent pinned  pinned  research research"
+  "aibar  aibar  aibar   aibar   aibar    aibar"
+  "voice  voice  voice   voice   voice    voice";
 }
 @media(max-width:900px){#dash-panels{grid-template-columns:1fr 1fr;grid-template-areas:"donut alerts""activity contam""species species""gh gh""recent pinned""research research""aibar aibar""voice voice";}}
 @media(max-width:580px){#dash-panels{grid-template-columns:1fr;grid-template-areas:"donut""alerts""activity""contam""species""gh""recent""pinned""research""aibar""voice";}}
