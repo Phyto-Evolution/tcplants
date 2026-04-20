@@ -2551,6 +2551,7 @@ input, textarea, select {
         <button class="sp-tab active" data-sptab="culture" onclick="_spTab('culture')">In Culture</button>
         <button class="sp-tab" data-sptab="taxonomy" onclick="_spTab('taxonomy')">Taxonomy Packs</button>
         <button class="sp-tab" data-sptab="flairs" onclick="_spTab('flairs')">Flairs</button>
+        <button class="sp-tab" data-sptab="gbif" onclick="_spTab('gbif')">🌍 GBIF Search</button>
       </div>
       <div id="sp-culture" class="sp-panel">
         <p style="font-size:13px;color:var(--mu);margin-bottom:20px">Derived from your notes and accession registry.</p>
@@ -2558,6 +2559,16 @@ input, textarea, select {
       </div>
       <div id="sp-taxonomy" class="sp-panel" style="display:none"></div>
       <div id="sp-flairs" class="sp-panel" style="display:none"></div>
+      <div id="sp-gbif" class="sp-panel" style="display:none">
+        <p style="font-size:13px;color:var(--mu);margin-bottom:14px">Live search the GBIF database — results come directly from GBIF, nothing is stored locally. Click any result to import it as a Custom Species.</p>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <input type="text" id="gbif-search-input" placeholder="Type genus, species, or common name…" autocomplete="off"
+            oninput="_gbifSearchDebounce()" onkeydown="if(event.key==='Enter')_gbifSearch()"
+            style="flex:1">
+          <button class="btn sm" onclick="_gbifSearch()">Search</button>
+        </div>
+        <div id="gbif-search-results" style="font-size:13px"></div>
+      </div>
     </div>
   </div>
 
@@ -9147,8 +9158,10 @@ function _spTab(name){
   document.getElementById('sp-culture').style.display=name==='culture'?'':'none';
   document.getElementById('sp-taxonomy').style.display=name==='taxonomy'?'':'none';
   document.getElementById('sp-flairs').style.display=name==='flairs'?'':'none';
+  document.getElementById('sp-gbif').style.display=name==='gbif'?'':'none';
   if(name==='taxonomy') _renderTaxonomyPanel();
   if(name==='flairs') _renderFlairsPanel();
+  if(name==='gbif') setTimeout(()=>document.getElementById('gbif-search-input').focus(),50);
 }
 
 function _renderTaxonomyPanel(){
@@ -9223,7 +9236,7 @@ function _renderTaxonomyPanel(){
         <div class="row2" style="margin-bottom:8px">
           <div class="field" style="margin:0">
             <label>Scientific Name *</label>
-            <input type="text" id="tc-fullname" placeholder="Genus species  or  Genus × species (hybrid)">
+            <input type="text" id="tc-fullname" placeholder="Genus species  or  Genus × species (hybrid)" oninput="_taxSuggest(this)" onkeydown="_taxDropdownKeyNav(event)" autocomplete="off">
           </div>
           <div class="field" style="margin:0">
             <label>Common Name</label>
@@ -15706,6 +15719,72 @@ async function _taxGBIFLookup(){
     toast('GBIF data loaded');
   }catch(e){if(res){res.textContent='GBIF fetch failed: '+e.message;} toast('GBIF error','fail');}
 }
+
+// ════════════════════════════════════════════════════════════
+// 1b. GBIF SPECIES SEARCH PORTAL (taxonomy tab)
+// ════════════════════════════════════════════════════════════
+let _gbifSearchTimer=null;
+function _gbifSearchDebounce(){
+  clearTimeout(_gbifSearchTimer);
+  _gbifSearchTimer=setTimeout(_gbifSearch,500);
+}
+async function _gbifSearch(){
+  const q=(document.getElementById('gbif-search-input').value||'').trim();
+  const res=document.getElementById('gbif-search-results');
+  if(!q){res.innerHTML='';return;}
+  res.innerHTML='<span style="color:var(--mu)">Searching GBIF…</span>';
+  try{
+    const r=await fetch(`https://api.gbif.org/v1/species/search?q=${encodeURIComponent(q)}&rank=SPECIES&status=ACCEPTED&limit=20`);
+    const d=await r.json();
+    const items=(d.results||[]);
+    if(!items.length){res.innerHTML='<span style="color:var(--mu)">No results from GBIF.</span>';return;}
+    const iucnMap={'LC':'least_concern','NT':'near_threatened','VU':'vulnerable','EN':'endangered','CR':'critically_endangered','DD':'data_deficient'};
+    res.innerHTML=items.map(sp=>{
+      const name=sp.canonicalName||sp.scientificName||'';
+      const family=sp.family||'';
+      const kingdom=sp.kingdom||'';
+      const alreadyHave=(S.taxSpecies||[]).some(s=>s.full_name.toLowerCase()===name.toLowerCase())
+                      ||(S.taxCustom?.species||[]).some(s=>(s.name||'').toLowerCase()===name.toLowerCase());
+      return `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--sf);border:1px solid var(--bd);border-radius:8px;margin-bottom:5px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;font-style:italic">${esc(name)}</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:1px">${esc(kingdom)}${family?' › '+esc(family):''}</div>
+        </div>
+        ${alreadyHave?'<span style="font-size:11px;color:var(--gn);flex-shrink:0">✓ In taxonomy</span>'
+          :`<button class="btn xs" onclick="_gbifImportSpecies(${JSON.stringify(name)},${JSON.stringify(family)},${JSON.stringify(sp.usageKey||'')})" style="flex-shrink:0">Import →</button>`}
+      </div>`;
+    }).join('');
+  }catch(e){res.innerHTML=`<span style="color:var(--rd)">GBIF error: ${esc(e.message)}</span>`;}
+}
+async function _gbifImportSpecies(name,family,usageKey){
+  // Switch to "In Culture" tab (where the custom species form lives)
+  _spTab('culture');
+  // Open and reset the add form properly
+  _taxOpenAddForm();
+  // Pre-fill name
+  const fn=document.getElementById('tc-fullname');
+  if(fn) fn.value=name;
+  // Fetch IUCN via GBIF if we have a usageKey
+  if(usageKey){
+    const res=document.getElementById('tc-gbif-result');
+    if(res){res.style.display='';res.textContent='Fetching conservation data…';}
+    try{
+      const r2=await fetch(`https://api.gbif.org/v1/species/${usageKey}/iucnRedListCategory`);
+      let iucn='';
+      if(r2.ok){const d2=await r2.json();iucn=d2.category||'';}
+      const iucnStatus=iucn&&iucnMap[iucn]?iucnMap[iucn]:'';
+      const sel=document.getElementById('tc-status');
+      if(iucnStatus&&sel) sel.value=iucnStatus;
+      const cls=iucn?iucn.toLowerCase():'';
+      if(res) res.innerHTML=`<strong>${esc(name)}</strong>${family?' · '+esc(family):''}${iucn?` · <span class="gbif-badge ${cls}">🌍 IUCN ${iucn}</span>`:''}
+        <br><a href="https://www.gbif.org/species/${usageKey}" target="_blank" rel="noopener" style="color:var(--ac);font-size:11px">View on GBIF ↗</a>`;
+    }catch(e){}
+  }
+  // Scroll form into view
+  document.getElementById('tax-custom-form').scrollIntoView({behavior:'smooth',block:'start'});
+  toast('Pre-filled from GBIF — add flairs and save');
+}
+const iucnMap={'LC':'least_concern','NT':'near_threatened','VU':'vulnerable','EN':'endangered','CR':'critically_endangered','DD':'data_deficient'};
 
 // ════════════════════════════════════════════════════════════
 // 2. PUBMED SPECIES CONTEXT FOR AI
