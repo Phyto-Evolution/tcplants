@@ -2720,24 +2720,49 @@ input, textarea, select {
       <!-- VERSION HEADER -->
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
         <h1 style="font-size:22px;font-weight:800;margin:0">🌿 TC Plants Lab Notes</h1>
-        <span class="help-version-badge">v3.8</span>
+        <span class="help-version-badge">v3.9</span>
         <button class="btn xs ghost" onclick="navTo('logicflows')" style="margin-left:auto;border-color:var(--ac);color:var(--ac)">🔗 Logic Flows →</button>
       </div>
       <p style="color:var(--mu);font-size:13px;margin-bottom:20px">April 2026 · Encrypted · GitHub-backed · Single-file PWA</p>
 
-      <!-- WHAT'S NEW v3.7 -->
+      <!-- WHAT'S NEW v3.9 -->
       <div style="background:linear-gradient(135deg,rgba(63,185,80,.1),rgba(88,166,255,.08));border:1px solid rgba(63,185,80,.3);border-radius:10px;padding:18px 20px;margin-bottom:14px">
-        <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v3.7</div>
+        <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v3.9</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
-          <div style="font-size:13px;line-height:1.6"><strong>🚨 Dashboard Alerts</strong> — live alert strip above the stat band. Flags contamination spikes (&gt;10% in 30d), overdue reviews, bulk transfer backlogs, unhealthy GH plants, and expiring supplies. Clears automatically when the condition resolves.</div>
-          <div style="font-size:13px;line-height:1.6"><strong>☑ Batch Operations</strong> — checkbox any number of bottles in the list, or tap <em>Select all</em> to catch everything visible. Action bar slides up: mark as Subcultured, Growing, Rooting, Contaminated, or Discard in one tap.</div>
-          <div style="font-size:13px;line-height:1.6"><strong>📅 Lab Schedule</strong> — dedicated schedule view (nav drawer → Schedule). Shows overdue reviews, items due this week, bottles past transfer window (≥28d), and greenhouse plants needing attention. All rows clickable.</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🔍 Advanced Search</strong> — <kbd>Ctrl+K</kbd> from anywhere, or nav drawer → Search. Live search across Notes, Bottles, Accessions, Recipes, and Greenhouse simultaneously. Results grouped by section.</div>
-          <div style="font-size:13px;line-height:1.6"><strong>📊 Multiplication Factor</strong> — new card in Analytics showing average cultures-out per species. Requires <em>Cultures Out</em> field on notes. Colour-coded: green ≥4×, blue ≥2×.</div>
-          <div style="font-size:13px;line-height:1.6"><strong>📦 Supply Inventory</strong> — nav drawer → Supplies. Track media batches, agar, hormones, consumables. Per-item progress bar, expiry tracking, cost-per-unit calculation. Stored encrypted in GitHub like all other data.</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🤖 Ravana AI</strong> — system prompt rebuilt from the Ravana character map. Identity grounded in the scholar-king of Lanka. Handles questions about his own history with honesty. Responds with ∿ after significant outputs. Tamil in voice only.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>☑ Batch checkboxes fixed</strong> — global CSS <code>width:100%</code> was applied to all inputs including checkboxes, stretching them invisible. Scoped to text inputs only. Checkboxes now render correctly in the bottle list.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>📦 Stock section decode fixed</strong> — loadInv() was missing the ghDec() step, which would have silently corrupted data on first save. Stock data now decrypts correctly.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🔐 Single-token login</strong> — removed username/passphrase field. Your GitHub token is now the only credential — it authenticates AND encrypts. One-time migration tool re-encrypts all files with new key.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🎤 Journal mic persistent</strong> — mic stays open continuously until manually stopped. Live transcription printed as you speak. Auto-flair from #hashtags if checkbox checked.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🖨 View batch → barcode page</strong> — "View all X bottles in this batch" now opens a dedicated full-page QR barcode sheet with Print + Download PDF buttons, not the nav drawer.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🔧 validateBottleData fixed</strong> — status whitelist now includes all 10 statuses (prepared, inoculated, growing, subcultured, rooting, hardening, weaned, dormant, discarded, contaminated).</div>
         </div>
       </div>
+
+      <!-- v3.8 release notes (collapsed) -->
+      <details style="margin-bottom:8px">
+        <summary style="cursor:pointer;font-size:12px;color:var(--mu);padding:6px 0;font-weight:600;letter-spacing:.04em">▸ v3.8 release notes</summary>
+        <div style="background:var(--sf2);border-radius:8px;padding:12px;margin-top:6px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px">
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">🔗 Logic Flows page</strong> — complete dependency map of every system: data arch, nav, CRUD paths, AI, known gaps</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">🧭 navTo() fixed</strong> — all external cross-section links now open the drawer correctly</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">🫙 viewBatch()</strong> — "View all X bottles in batch" filters to actual batch members, not all bottles</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">⏰ Reminder badge</strong> — badge now updates after bottle saves, not just at login</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">13 wiring fixes</strong> — reminders, search results, activity log, contamination list, calendar all navigate correctly</div>
+        </div>
+      </details>
+
+      <!-- v3.7 release notes (collapsed) -->
+      <details style="margin-bottom:8px">
+        <summary style="cursor:pointer;font-size:12px;color:var(--mu);padding:6px 0;font-weight:600;letter-spacing:.04em">▸ v3.7 release notes</summary>
+        <div style="background:var(--sf2);border-radius:8px;padding:12px;margin-top:6px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">🚨 Dashboard Alerts</strong> — live alert strip. Flags contamination spikes, overdue reviews, transfer backlogs, unhealthy GH plants, expiring supplies.</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">☑ Batch Operations</strong> — checkbox bottles, action bar slides up: Subcultured, Growing, Rooting, Contaminated, Discard in one tap.</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">📅 Lab Schedule</strong> — overdue reviews, items due this week, bottles past transfer window, GH plants needing attention.</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">🔍 Advanced Search</strong> — Ctrl+K from anywhere. Live across Notes, Bottles, Accessions, Recipes, Greenhouse.</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">📊 Multiplication Factor</strong> — new Analytics card, cultures-out per species. Green ≥4×, blue ≥2×.</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">📦 Supply Inventory</strong> — track media batches, agar, hormones. Expiry tracking, cost per unit, encrypted in GitHub.</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">🤖 Ravana AI</strong> — system prompt rebuilt from Ravana character map. Scholar-king identity, ∿ glyph after significant outputs.</div>
+        </div>
+      </details>
 
       <!-- v3.6 release notes (collapsed) -->
       <details style="margin-bottom:8px">
@@ -3913,15 +3938,17 @@ Login branch:
       <!-- ═══ LOGIN FLOW ═══ -->
       <div class="help-section-card">
         <h2 class="help-h2">Login / Unlock Flow</h2>
-        <pre class="help-pre">User action: fills Username (passphrase) + Password (GitHub token) → clicks Sign In
+        <pre class="help-pre">User action: fills GitHub access token → clicks Sign In (single field since token IS the passphrase)
 
 login():
-  1. Read lpw (passphrase → S.pw) + ltok (GitHub token → S.tok)
-  2. If no token but DEVICE_KEY exists → _tryRestoreDeviceToken(pw) → decrypt saved token
+  1. Read ltok (GitHub token → S.tok). S.pw = S.tok (token is the encryption key)
+  2. If no token but DEVICE_KEY exists → restore from localStorage
   3. Validate HTTPS (crypto.subtle requires it)
   4. GET /repos/Phyto-Evolution/tcplants → verify token has repo access
-  5. S.pw = pw; S.tok = tok
+  5. S.pw = tok; S.tok = tok
   6. sessionStorage.setItem('_lt', tok)  ← session backup
+  Migration: if dec() throws OperationError, show #lmigrate panel → _migrateEncryption(oldPw)
+    re-encrypts all .enc files from old passphrase → token passphrase
   7a. Cache hit (_readCache()): restore 5 data stores, toast "⚡ Loaded from cache"
   7b. Cache miss: Promise.all([
         loadNotesIndex(),     → notes/index.enc    → S.notes, S.notesSha
@@ -3949,7 +3976,7 @@ Device trust:
   DEVICE_KEY = 'tcplants_device_v1'
   Trust yes → enc(S.tok) → localStorage.setItem(DEVICE_KEY, ...)
   Trust no → banner dismissed
-  Next login → ltok field hidden (#saved-device-banner shown) → _tryRestoreDeviceToken(pw) → dec(localStorage)
+  Next login → token restored from localStorage directly (stored plaintext since token = key)
   Forget device → localStorage.removeItem(DEVICE_KEY) → ltok field shown again
 
 Offline wrappers (Haiku addition):
@@ -4632,13 +4659,14 @@ SERVICE WORKER (sw.js):
         <h2 class="help-h2" style="color:var(--rd)">Known Gaps &amp; Latent Bugs</h2>
         <table class="help-table">
           <tr><th>Issue</th><th>Location</th><th>Impact</th><th>Status</th></tr>
-          <tr><td>loadInv() missing ghDec()</td><td>Line 14751</td><td>Stock data unreadable if inventory/data.enc exists</td><td>Latent (file doesn't exist yet)</td></tr>
+          <tr><td><s>loadInv() missing ghDec()</s></td><td>Fixed v3.9</td><td>Stock data unreadable if inventory/data.enc exists</td><td>✅ Fixed</td></tr>
           <tr><td>S.analytics goes stale after saves</td><td>LabAnalytics.calculate only at login</td><td>Ravana AI gets outdated context after data changes</td><td>Gap</td></tr>
           <tr><td>renderAnalytics() vs S.analytics disconnect</td><td>renderAnalytics()</td><td>Duplicate computation, S.analytics never shown on Analytics page</td><td>Gap</td></tr>
-          <tr><td>SupplyInventory.items dead assignment</td><td>Login line 13277</td><td>Dead code, localStorage-based value never read</td><td>Dead code</td></tr>
-          <tr><td>validateBottleData wrong status list</td><td>Line 4862</td><td>Would reject subcultured/rooting/hardening/weaned/prepared statuses</td><td>Inert (not called)</td></tr>
+          <tr><td><s>SupplyInventory.items dead assignment</s></td><td>Fixed v3.9</td><td>Dead code, localStorage-based value never read</td><td>✅ Fixed</td></tr>
+          <tr><td><s>validateBottleData wrong status list</s></td><td>Fixed v3.9</td><td>Would reject subcultured/rooting/hardening/weaned/prepared statuses</td><td>✅ Fixed</td></tr>
+          <tr><td><s>Batch checkbox invisible (CSS width:100% on all inputs)</s></td><td>Fixed v3.9</td><td>Checkboxes stretched full-width, invisible in bottle list</td><td>✅ Fixed</td></tr>
           <tr><td>Offline check only on 2 of 7 load functions</td><td>Lines 13701-13711</td><td>Partial offline blocking — inconsistent behaviour</td><td>Haiku artifact</td></tr>
-          <tr><td>updateReminderBadge not called after bottle saves</td><td>saveBottleAction</td><td>Badge count may be stale after bottle edits</td><td>Gap</td></tr>
+          <tr><td><s>updateReminderBadge not called after bottle saves</s></td><td>Fixed v3.8</td><td>Badge count may be stale after bottle edits</td><td>✅ Fixed</td></tr>
           <tr><td>Telegram integration frozen</td><td>Lines 13267-13271</td><td>Commented out — settings UI exists but no function</td><td>Frozen</td></tr>
           <tr><td>Two inventory systems (Stock ≠ Supply)</td><td>Separate files + state</td><td>User confusion, low-stock alerts only from Stock</td><td>Design debt</td></tr>
         </table>
@@ -5692,7 +5720,7 @@ function validateBottleData(bottle) {
   if (!bottle || typeof bottle !== 'object') throw 'Invalid bottle data';
   if (!bottle.id || bottle.id.length > 50) throw 'Invalid bottle ID';
   if (bottle.name && bottle.name.length > 200) throw 'Bottle name too long (max 200 chars)';
-  if (bottle.status && !['inoculated', 'growing', 'dormant', 'discarded', 'contaminated'].includes(bottle.status)) throw 'Invalid bottle status';
+  if (bottle.status && !['prepared','inoculated','growing','subcultured','rooting','hardening','weaned','dormant','discarded','contaminated'].includes(bottle.status)) throw 'Invalid bottle status';
   if (bottle.date && !/^\d{4}-\d{2}-\d{2}/.test(bottle.date)) throw 'Invalid bottle date';
   return true;
 }
@@ -14232,7 +14260,6 @@ async function login(){
     // Initialize 8 features
     LabAnalytics.calculate();
     // journal loaded at login via loadJournal() in the data Promise.all above
-    SupplyInventory.items = JSON.parse(localStorage.getItem('tcplants_supply') || '[]');
     // alerts render automatically via _renderDashboard() on login
     _scheduleOvernightJournalParse();
     fetchWeather();
@@ -15744,7 +15771,7 @@ let S_inv={items:[]}, S_invSha=null;
 async function loadInv(){
   try{
     const f=await ghGet(INV_FILE);
-    if(f){const raw=await dec(f.content);S_inv=JSON.parse(raw);S_invSha=f.sha;}
+    if(f){const raw=await dec(ghDec(f.content));S_inv=JSON.parse(raw);S_invSha=f.sha;}
     else{S_inv={items:[]};S_invSha=null;}
   }catch(e){S_inv={items:[]};S_invSha=null;}
 }
