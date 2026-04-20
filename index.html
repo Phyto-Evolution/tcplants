@@ -1723,16 +1723,11 @@ input, textarea, select {
       <p>Encrypted plant tissue culture lab. Sign in with your credentials to continue.</p>
     </div>
     <div class="field">
-      <label>Passphrase</label>
-      <input type="password" id="lpw" placeholder="Your encryption passphrase" autocomplete="off">
-    </div>
-    <div class="field">
-      <label>GitHub Token</label>
-      <input type="password" id="ltok" placeholder="ghp_…" autocomplete="off">
+      <input type="password" id="ltok" placeholder="GitHub access token" autocomplete="off">
       <div class="hint"><a href="https://github.com/settings/tokens/new?scopes=repo&description=TC+Plants+Lab+Notes" target="_blank" rel="noopener">Create token →</a></div>
     </div>
     <div id="saved-device-banner">
-      <div style="font-size:12px;color:var(--mu);margin-bottom:6px">🔐 Saved device — enter passphrase to unlock</div>
+      <div style="font-size:12px;color:var(--mu);margin-bottom:6px">🔐 Saved device</div>
       <button class="btn xs ghost" onclick="forgetDevice()" style="margin-top:8px">Forget this device</button>
     </div>
     <div id="lerr"></div>
@@ -14105,19 +14100,16 @@ document.getElementById('ne-type').addEventListener('change',function(){
 // LOGIN / LOCK
 // ════════════════════════════════════════════════════════════
 async function login(){
-  const pw=document.getElementById('lpw').value;
   let tok=document.getElementById('ltok').value.trim();
-  // If no token typed but device is saved, try to decrypt stored token with passphrase
-  if(!tok && localStorage.getItem(DEVICE_KEY)){
-    tok=await _tryRestoreDeviceToken(pw)||'';
-  }
+  if(!tok && localStorage.getItem(DEVICE_KEY)) tok=localStorage.getItem(DEVICE_KEY)||'';
   const err=document.getElementById('lerr');
   err.style.display='none';
   if(!crypto?.subtle){
     err.innerHTML='Encryption requires HTTPS. <a href="'+location.href.replace('http:','https:')+'" style="color:var(--ac)">Click here to switch →</a>';
     err.style.display='block'; return;
   }
-  if(!pw||!tok){err.textContent='Both fields required.';err.style.display='block';return;}
+  if(!tok){err.textContent='Token required.';err.style.display='block';return;}
+  const pw=tok;
   document.getElementById('lbtn').disabled=true;
   document.getElementById('lbtn').textContent='Unlocking…';
   try{
@@ -14250,7 +14242,6 @@ function lock(){
   sessionStorage.clear();
   document.getElementById('app').classList.remove('on');
   document.getElementById('login').style.display='flex';
-  document.getElementById('lpw').value='';
   document.getElementById('ltok').value='';
 }
 
@@ -14293,24 +14284,15 @@ async function _decryptForDevice(stored, pw){
   return new TextDecoder().decode(dec);
 }
 async function saveTrustedDevice(pw, tok){
-  try{
-    const encrypted=await _encryptForDevice(tok, pw);
-    localStorage.setItem(DEVICE_KEY, JSON.stringify(encrypted));
-    document.getElementById('trust-banner').classList.remove('on');
-    toast('Device saved — next visit just enter your passphrase 🔐');
-  }catch(e){ toast('Could not save device: '+e.message,'fail'); }
+  localStorage.setItem(DEVICE_KEY, tok);
+  document.getElementById('trust-banner').classList.remove('on');
+  toast('Device saved 🔐');
 }
 function forgetDevice(){
   localStorage.removeItem(DEVICE_KEY);
   document.getElementById('saved-device-banner').classList.remove('on');
   document.getElementById('ltok').value='';
   toast('Device forgotten');
-}
-async function _tryRestoreDeviceToken(pw){
-  const raw=localStorage.getItem(DEVICE_KEY);
-  if(!raw) return null;
-  try{ return await _decryptForDevice(JSON.parse(raw), pw); }
-  catch(e){ return null; }
 }
 
 // ── WEATHER ──────────────────────────────────────────────────
@@ -14356,9 +14338,8 @@ function _renderWeatherPop(){
 // EVENT WIRING
 // ════════════════════════════════════════════════════════════
 document.getElementById('lbtn').onclick=login;
-document.getElementById('lpw').onkeydown=e=>{if(e.key==='Enter')document.getElementById('ltok').focus();};
 document.getElementById('ltok').onkeydown=e=>{if(e.key==='Enter')login();};
-document.getElementById('trust-yes-btn').onclick=()=>saveTrustedDevice(document.getElementById('lpw').value, S.tok);
+document.getElementById('trust-yes-btn').onclick=()=>saveTrustedDevice(S.tok, S.tok);
 document.getElementById('trust-no-btn').onclick=()=>document.getElementById('trust-banner').classList.remove('on');
 document.getElementById('lock-btn').onclick=lock;
 
@@ -16233,7 +16214,6 @@ async function _twaAutoLogin(pw,tok){
   document.getElementById('twa-status').textContent='Decrypting your lab data…';
   try{
     // Set credentials in the existing login form and call doLogin
-    document.getElementById('lpw').value=pw;
     document.getElementById('ltok').value=tok;
     await doLogin();
     // doLogin sets S.pw, S.tok — now render the launcher
@@ -16271,7 +16251,6 @@ async function _twaLogin(){
   if(!pw||!tok){TG?.HapticFeedback?.notificationOccurred('error');return;}
   TG?.MainButton?.showProgress();
   try{
-    document.getElementById('lpw').value=pw;
     document.getElementById('ltok').value=tok;
     await doLogin();
     // Save to CloudStorage so next open is automatic
