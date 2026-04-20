@@ -10864,16 +10864,19 @@ async function askAI(prompt){
     return text;
   }catch(e){
     thinking.remove();
-    const errMsg=e.status===429?'Rate limited. Try again in a minute.':e.message||'Unknown error';
+    let errMsg=e.message||'Unknown error';
+    if(e.status===429) errMsg='Rate limited — Groq free tier reached. Wait a minute or switch to 8B Quick.';
+    else if(e.status===503||e.status===502) errMsg='Groq service unavailable. Retried once — try again in a moment.';
+    else if(e.status===400) errMsg='Bad request: '+(e.message||'model error')+'. Try switching to 8B Quick.';
     msgs.innerHTML+=`<div class="ai-msg ai" style="color:var(--rd)">⚠️ ${esc(errMsg)}</div>`;
-    toast('Ravana error: '+errMsg, 'fail');
+    toast('Ravana: '+errMsg.substring(0,60), 'fail');
     msgs.scrollTop=msgs.scrollHeight;
     return '';
   }
 }
 
 // Full proxy call — returns {text, tool_call}, sends tools for agent loop
-async function _callAIProxyFull(provider, model, messages, clientKey){
+async function _callAIProxyFull(provider, model, messages, clientKey, _retry=0){
   const splitIdx=messages[0]?.content?.indexOf('\n\n---\n## Lab Data Context')??-1;
   const firstMsg=messages[0]?.content||'';
   const system=splitIdx>-1?firstMsg.slice(0,splitIdx):AI_RULEBOOK;
@@ -10887,7 +10890,22 @@ async function _callAIProxyFull(provider, model, messages, clientKey){
     body:JSON.stringify({provider,model,system,messages:convMessages,max_tokens:1024,tools:AI_TOOLS}),
     signal:AbortSignal.timeout(30000)
   });
-  if(!r.ok){const e=new Error(`Proxy error ${r.status}`);e.status=r.status;throw e;}
+  if(!r.ok){
+    let errMsg=`Proxy error ${r.status}`;
+    try{ const d=await r.json(); if(d.error) errMsg=d.error; }catch{}
+    // Auto-retry once for 400/503/502 after short delay (transient upstream errors)
+    if(_retry===0&&[400,502,503].includes(r.status)){
+      await new Promise(res=>setTimeout(res,4000));
+      return _callAIProxyFull(provider, model, messages, clientKey, 1);
+    }
+    // If 70B fails, fall back to 8B on second attempt
+    if(_retry===1&&model==='llama-3.3-70b-versatile'){
+      toast('70B unavailable — retrying with 8B…','warn');
+      await new Promise(res=>setTimeout(res,2000));
+      return _callAIProxyFull(provider, 'llama-3.1-8b-instant', messages, clientKey, 2);
+    }
+    const e=new Error(errMsg); e.status=r.status; throw e;
+  }
   const d=await r.json();
   if(d.error) throw new Error(d.error);
   return {text:d.text||'',tool_call:d.tool_call||null};

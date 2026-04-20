@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd /tmp/tcplants && git diff --quiet HEAD -- conversations/ || (git add conversations/ && git commit -m 'chat: auto-dump on session stop' && git pull --rebase origin main && git push origin main) 2>/dev/null; exit 0"
+          }
+        ]
+      }
+    ]
+  }
+}
