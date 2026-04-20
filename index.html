@@ -6753,18 +6753,29 @@ const RavanaInsights={
           </div>`:''}
         </div>
 
-        <!-- RIGHT: Ravana analysis -->
-        <div style="background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:16px;display:flex;flex-direction:column">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-shrink:0">
-            <div style="font-size:12px;font-weight:800;letter-spacing:.06em;color:var(--ac);text-transform:uppercase">✦ Ravana's Analysis</div>
-            <button class="btn xs ghost" id="ri-ask-btn" onclick="RavanaInsights._runAnalysis('${esc(spName)}')" style="font-size:11px">▶ Analyse</button>
+      </div>
+
+      <!-- FULL WIDTH: Ravana Deep Analysis -->
+      <div style="background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:18px;margin-bottom:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div>
+            <div style="font-size:13px;font-weight:800;letter-spacing:.06em;color:var(--ac);text-transform:uppercase">✦ Ravana's Deep Analysis</div>
+            <div style="font-size:11px;color:var(--mu);margin-top:2px">Reads published TC literature + your lab data before responding</div>
           </div>
-          <div id="ri-analysis" style="flex:1;font-size:13px;line-height:1.8;color:var(--mu);overflow-y:auto">
-            <em>Tap ▶ Analyse to have Ravana read your data and provide insights on this species.</em>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div id="ri-papers-badge" style="display:none;font-size:10px;color:var(--gn);background:rgba(63,185,80,.12);border:1px solid rgba(63,185,80,.3);border-radius:10px;padding:2px 8px"></div>
+            <button class="btn sm" id="ri-ask-btn" onclick="RavanaInsights._runAnalysis('${esc(spName)}')" style="font-size:12px">▶ Run Analysis</button>
           </div>
-          <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--sf2);flex-shrink:0">
-            <button class="btn xs green" onclick="askAI('Give me a detailed analysis of ${esc(spName)} in my TC lab. Focus on what is working, what risks exist, and what I should do next.')" style="width:100%;font-size:12px">💬 Ask Ravana directly</button>
-          </div>
+        </div>
+        <div id="ri-analysis" style="font-size:13px;line-height:1.85;color:var(--tx);min-height:60px">
+          <em style="color:var(--mu)">Tap ▶ Run Analysis — Ravana will fetch published protocols for this species from PubMed, read your lab records, then generate a full technical briefing.</em>
+        </div>
+        <div id="ri-papers-list" style="display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--sf2)">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--mu);text-transform:uppercase;margin-bottom:8px;cursor:pointer" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">📚 Literature reviewed ▾</div>
+          <div id="ri-papers-inner" style="display:none"></div>
+        </div>
+        <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--sf2)">
+          <button class="btn xs green" onclick="askAI('Deep technical analysis of ${esc(spName)} in my TC lab — protocols, PGR optimisation, contamination patterns, what to do next.')" style="font-size:12px">💬 Continue with Ravana</button>
         </div>
       </div>`;
 
@@ -6791,44 +6802,190 @@ const RavanaInsights={
     return bars;
   },
 
-  // ── AI analysis with typewriter effect ───────────────────
+  // ── Deep AI analysis — reads PubMed + GBIF before responding ─
   async _runAnalysis(spName){
     const el=document.getElementById('ri-analysis'); if(!el) return;
-    const btn=document.getElementById('ri-ask-btn'); if(btn){btn.disabled=true;btn.textContent='…';}
-    el.innerHTML=`<div style="color:var(--mu);font-style:italic">🔬 Ravana is reading your data…</div>`;
+    const btn=document.getElementById('ri-ask-btn'); if(btn){btn.disabled=true;btn.classList.add('btn-loading');}
+    const badge=document.getElementById('ri-papers-badge');
+    const papersList=document.getElementById('ri-papers-list');
+    const papersInner=document.getElementById('ri-papers-inner');
+
+    // ── Phase 1: fetch papers + GBIF in parallel, show live progress ──
+    el.innerHTML=`<div style="font-size:13px;color:var(--mu)">
+      <div style="margin-bottom:6px">🔬 Searching PubMed for published protocols on <em>${esc(spName)}</em>…</div>
+      <div id="ri-paper-log" style="font-size:11px;line-height:1.9;color:var(--mu)"></div>
+    </div>`;
+    const log=document.getElementById('ri-paper-log');
+    const addLog=msg=>{if(log)log.innerHTML+=`<div>${msg}</div>`;};
+
+    let papers=[], habitatCtx='';
+    try{
+      const [pRes, gRes]=await Promise.allSettled([
+        this._fetchInsightsPapers(spName, (title,yr)=>addLog(`📄 Found: <em>${esc(title.slice(0,80))}…</em> (${yr})`)),
+        this._fetchGBIFHabitat(spName)
+      ]);
+      if(pRes.status==='fulfilled') papers=pRes.value||[];
+      if(gRes.status==='fulfilled') habitatCtx=gRes.value||'';
+    }catch(_){}
+
+    if(badge){
+      if(papers.length){badge.textContent=`${papers.length} papers read`;badge.style.display='';}
+      else badge.style.display='none';
+    }
+    if(papersList&&papersInner&&papers.length){
+      papersList.style.display='';
+      papersInner.innerHTML=papers.map(p=>`
+        <div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--sf2)">
+          <div style="font-size:12px;font-weight:600;color:var(--ac)">${esc(p.title)} (${esc(p.year)})</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:2px">${esc(p.authors)} · ${esc(p.journal)}</div>
+          ${p.pmid?`<a href="https://pubmed.ncbi.nlm.nih.gov/${p.pmid}/" target="_blank" rel="noopener" style="font-size:10px;color:var(--ac)">PubMed ↗</a>`:''}
+        </div>`).join('');
+    }
+
+    // ── Phase 2: build deep context ──────────────────────────────────
+    el.innerHTML=`<div style="color:var(--mu);font-style:italic">✦ Ravana is synthesising literature + lab data…</div>`;
 
     const m=this._computeMetrics(spName);
     const topSupply=this._findBestSupplyForSpecies(spName);
-    const context=`Species under analysis: ${spName}
+    const allRecipes=(S.recs||[]);
+    const spRecipes=[...new Set(m.spNotes.filter(n=>n.recipe_id).map(n=>n.recipe_id))].map(id=>allRecipes.find(r=>r.id===id)).filter(Boolean);
+    const contamDetail=m.contamNotes.slice(-5).map(n=>`  • ${fmtDateShort(n.date)}: "${n.title}"${n.stage?` [${n.stage}]`:''}`).join('\n')||'  None recorded';
+    const stageBreakdown=m.activeBots.reduce((acc,b)=>{acc[b.status]=(acc[b.status]||0)+1;return acc;},{});
+    const stageStr=Object.entries(stageBreakdown).map(([s,c])=>`${s}: ${c}`).join(', ')||'none';
+    const taxSp=(S.taxCustom?.species||[]).find(s=>s.full_name?.toLowerCase()===spName.toLowerCase());
 
-YOUR LAB DATA FOR THIS SPECIES:
-- Notes: ${m.spNotes.length} total · ${m.contamNotes.length} contamination events
-- Success rate: ${m.successRate??'N/A'}% (lab average: ${m.allSR}%)
-- Contamination rate: ${m.contamRate??'N/A'}% (lab average: ${m.allCR}%)
-- 30-day contamination: ${m.contamRate30??'N/A'}% · Trend: ${m.contamTrend!=null?(m.contamTrend<=0?`↓ improving ${Math.abs(m.contamTrend)}%`:`↑ worsening ${m.contamTrend}%`):'unknown'}
-- Multiplication factor: ${m.multiAvg!=null?m.multiAvg+'× avg':'no data'} (${m.multiCount} passages)
-- Avg cycle days: ${m.avgCycleDays??'unknown'} (${m.cycleDaysCount} completed cycles)
-- Active bottles: ${m.activeBots.length} · Overdue: ${m.overdue}
-- Health score: ${m.score}/100 · Rank: #${this._allSpecies().map(s=>this._computeMetrics(s.name)).filter(x=>x.score>m.score).length+1} in lab
-${m.topRec?`- Best recipe: ${m.topRec.name}${m.topRec.pgr?` (${m.topRec.pgr})`:''}`:''}
-${topSupply?`- Best supply batch: ${topSupply.name} (${topSupply.p.contamRate}% contam)`:'' }
+    const labCtx=`
+SPECIES: ${spName}${taxSp?.common_name?` (${taxSp.common_name})`:''}${taxSp?.conservation_status?` · IUCN: ${taxSp.conservation_status}`:''}
 
-RECENT CONTAMINATION EVENTS:
-${m.contamNotes.slice(-3).map(n=>`- ${fmtDateShort(n.date)}: "${n.title}"`).join('\n')||'None recent'}
+LAB PERFORMANCE DATA:
+- Total notes: ${m.spNotes.length} | Contamination events: ${m.contamNotes.length}
+- Success rate: ${m.successRate??'no data'}% (lab average: ${m.allSR}%)
+- Contamination rate: ${m.contamRate??'no data'}% (lab average: ${m.allCR}%)
+- 30-day contamination: ${m.contamRate30??'no data'}% | Trend vs prev month: ${m.contamTrend!=null?(m.contamTrend<=0?`↓ improving by ${Math.abs(m.contamTrend)}%`:`↑ worsening by ${m.contamTrend}%`):'insufficient data'}
+- Multiplication factor: ${m.multiAvg!=null?m.multiAvg+'× avg ('+m.multiCount+' passages recorded)':'no data'}
+- Average cycle duration: ${m.avgCycleDays??'unknown'}d (${m.cycleDaysCount} completed cycles)
+- Active bottles: ${m.activeBots.length} | Overdue: ${m.overdue} | Stage breakdown: ${stageStr}
+- Health score: ${m.score}/100 | Lab rank: #${this._allSpecies().map(s=>this._computeMetrics(s.name)).filter(x=>x.score>m.score).length+1}
 
-[VOICE RESPONSE OFF — full analysis mode. Use headers, be specific, cite actual numbers from the data. Format: Assessment → Observations → Recommendations → Watch For. End with ∿]`;
+PROTOCOLS IN USE:
+${spRecipes.length?spRecipes.map(r=>`- ${r.name}${r.base_medium?` | Base: ${r.base_medium}`:''}${r.pgr?` | PGR: ${r.pgr}`:''}${r.ph?` | pH: ${r.ph}`:''}${r.sterilisation?` | Sterilisation: ${r.sterilisation}`:''}`).join('\n'):'  No specific recipes recorded for this species'}
+${m.topRec?`Most used recipe: ${m.topRec.name}`:''}
+${topSupply?`Best-performing supply batch: ${topSupply.name} (${topSupply.p.contamRate}% contamination rate)`:''}
+
+CONTAMINATION HISTORY (last 5 events):
+${contamDetail}
+${habitatCtx}`;
+
+    const literatureCtx=papers.length?`
+PUBLISHED LITERATURE (${papers.length} papers retrieved — read these carefully before responding):
+${papers.map((p,i)=>`
+[${i+1}] ${p.title} (${p.year}) — ${p.journal}
+Authors: ${p.authors}
+Abstract: ${p.abstract}`).join('\n')}
+`:'[No published literature retrieved — base recommendations on general TC principles for this genus/family and flag this clearly]';
+
+    const prompt=`${labCtx}
+${literatureCtx}
+
+---
+INSTRUCTIONS — DEEP TECHNICAL BRIEFING:
+
+You have read the lab data and the published literature above. Now produce a structured technical analysis. Be specific, be direct, cite paper numbers [1], [2] etc. where relevant. Use actual numbers from the data.
+
+## 1. Literature Summary
+What do the published protocols say about this species? Key parameters: explant type, sterilisation method (agent, concentration, duration), basal medium, PGR combination (cite mg/L AND µM for every hormone), pH, photoperiod, temperature. If no species-specific papers exist, state what is known for the genus/family.
+
+## 2. Your Lab vs Published Protocols
+Where does Shiva's current approach match or deviate from published protocols? Identify specific gaps. Use numbers.
+
+## 3. Stage-by-Stage Diagnosis
+For each active stage in the lab, assess performance. What is working? What is the bottleneck? Where are bottles stalling?
+
+## 4. Contamination Pattern Analysis
+Based on the contamination history and frequency: what is the most likely source (endophytic, surface contamination, laminar flow issue, media prep, explant handling)? What is the signature of this contamination pattern?
+
+## 5. Protocol Recommendations
+Specific, actionable changes. For every PGR mentioned give concentration in both mg/L and µM. Include medium modifications, sterilisation protocol adjustments, explant handling. Base on literature where possible.
+
+## 6. Environmental Parameters
+Based on native habitat (${habitatCtx?'see GBIF data above':'general knowledge of genus'}), what temperature range, humidity, photoperiod, and light intensity should be targeted for this species in Kelambakkam's tropical climate?
+
+## 7. Immediate Action Plan — Next 30 Days
+Numbered list. Specific. Prioritised by impact.
+
+[VOICE RESPONSE OFF. No filler. No "Great question." This is a technical briefing for a working lab. End with ∿]`;
 
     try{
-      const raw=await askAI(context);
-      if(!raw){ el.innerHTML='<em style="color:var(--mu)">No response from Ravana.</em>'; return; }
-      // Typewriter effect
+      const raw=await askAI(prompt);
+      if(!raw){ el.innerHTML='<em style="color:var(--mu)">No response.</em>'; return; }
       el.innerHTML='';
       el.dataset.loaded='1';
       this._typeOut(el, raw);
     }catch(e){
       el.innerHTML=`<span style="color:var(--rd)">Analysis failed: ${esc(e.message)}</span>`;
     }
-    if(btn){btn.disabled=false;btn.textContent='↺ Re-analyse';}
+    if(btn){btn.disabled=false;btn.classList.remove('btn-loading');btn.textContent='↺ Re-analyse';}
+  },
+
+  // ── Fetch papers from multiple PubMed queries ─────────────────
+  async _fetchInsightsPapers(spName, onFound){
+    const queries=[
+      `"${spName}" tissue culture micropropagation`,
+      `"${spName}" contamination sterilization explant`,
+      `"${spName}" plant growth regulator cytokinin auxin`,
+      `"${spName}" organogenesis somatic embryogenesis`
+    ];
+    const genus=spName.split(' ')[0];
+    if(genus&&genus!==spName) queries.push(`"${genus}" tissue culture protocol`);
+
+    const seen=new Set(); const papers=[];
+    const parseXML=(xml,query)=>{
+      const doc=new DOMParser().parseFromString(xml,'application/xml');
+      doc.querySelectorAll('PubmedArticle').forEach(art=>{
+        const pmid=art.querySelector('PMID')?.textContent||'';
+        if(seen.has(pmid)||!pmid) return;
+        seen.add(pmid);
+        const title=art.querySelector('ArticleTitle')?.textContent?.replace(/\.$/, '')||'';
+        const ab=[...art.querySelectorAll('AbstractText')].map(el=>el.textContent).join(' ').slice(0,1200);
+        if(!ab) return;
+        const year=art.querySelector('PubDate Year')?.textContent||art.querySelector('PubDate MedlineDate')?.textContent?.slice(0,4)||'';
+        const journal=art.querySelector('Journal Title')?.textContent||art.querySelector('ISOAbbreviation')?.textContent||'';
+        const authorEls=[...art.querySelectorAll('Author')].slice(0,3);
+        const authors=authorEls.map(a=>`${a.querySelector('LastName')?.textContent||''} ${(a.querySelector('Initials')?.textContent||'').slice(0,1)}`).filter(x=>x.trim()).join(', ')+(authorEls.length<art.querySelectorAll('Author').length?' et al.':'');
+        papers.push({pmid,title,year,journal,authors,abstract:ab,query});
+        if(onFound&&title) onFound(title,year);
+      });
+    };
+
+    await Promise.allSettled(queries.map(async q=>{
+      try{
+        const sr=await fetch(`https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=${encodeURIComponent(q)}&retmax=3&sort=relevance&retmode=json`);
+        if(!sr.ok) return;
+        const sd=await sr.json();
+        const ids=(sd.esearchresult?.idlist||[]).filter(id=>!seen.has(id));
+        if(!ids.length) return;
+        const fr=await fetch(`https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=${ids.join(',')}&rettype=abstract&retmode=xml`);
+        if(!fr.ok) return;
+        parseXML(await fr.text(), q);
+      }catch(_){}
+    }));
+    return papers.slice(0,10);
+  },
+
+  // ── GBIF native habitat/distribution for climate context ──────
+  async _fetchGBIFHabitat(spName){
+    try{
+      const r=await fetch(`https://api.gbif.org/v1/species/match?name=${encodeURIComponent(spName)}&verbose=true`);
+      if(!r.ok) return '';
+      const d=await r.json();
+      if(!d.usageKey) return '';
+      const rd=await fetch(`https://api.gbif.org/v1/species/${d.usageKey}/distributions?limit=30`);
+      if(!rd.ok) return '';
+      const dd=await rd.json();
+      const countries=[...new Set((dd.results||[]).filter(x=>x.status==='NATIVE'||x.status==='ENDEMIC').map(x=>x.locality||x.country||'').filter(Boolean))].slice(0,10);
+      if(!countries.length) return '';
+      return `\nNATIVE DISTRIBUTION (GBIF): ${countries.join(', ')}`;
+    }catch(_){return '';}
   },
 
   _typeOut(el, text){
