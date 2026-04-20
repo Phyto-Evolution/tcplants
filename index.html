@@ -10913,16 +10913,8 @@ function _startNativeSTT(isWake, onDone){
     _nativePending=transcript;
     _setMicBtnState('idle');
     _dumpVoiceTranscript(transcript);
-    const c=_voiceCfg();
-    if(c.confirm!==false){
-      document.getElementById('vc-heard-text').textContent=transcript;
-      document.getElementById('ai-voice-confirm').classList.add('on');
-      document.getElementById('ai-panel').classList.add('on');
-      if(c.cmdConfirm!==false) _startConfirmListener();
-    } else {
-      _voiceExecute(transcript);
-      const cb=_nativeDoneCallback; _nativeDoneCallback=null; if(cb) cb();
-    }
+    _voiceExecute(transcript);
+    const cb=_nativeDoneCallback; _nativeDoneCallback=null; if(cb) cb();
   };
 
   _nativeSR.onerror=e=>{
@@ -11077,14 +11069,10 @@ async function _transcribeWhisper(blob){
       const btn=document.getElementById('je-mic-btn'); if(btn){ btn.textContent='🎤'; btn.style.color=''; }
       return;
     }
-    // ALWAYS show confirmation before sending (Task #5)
+    // Auto-execute — no confirmation gate
     _nativePending=t;
-    document.getElementById('vc-heard-text').textContent=t;
-    document.getElementById('ai-voice-confirm').classList.add('on');
     document.getElementById('ai-panel').classList.add('on');
-    // Optional TTS readback
-    const c=_voiceCfg();
-    if(c.tts) _ttsSpeak('I heard: '+t);
+    _voiceExecute(t);
   }catch(e){
     const msg=e.name==='AbortError'?'Transcription timeout':e.message;
     toast('Transcription failed: '+msg,'fail');
