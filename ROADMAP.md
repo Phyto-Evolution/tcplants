@@ -1,6 +1,6 @@
 # TC Plants Lab — Feature Roadmap
 
-Updated: 2026-04-20. Read this before starting any session.
+Updated: 2026-04-21. Read this before starting any session.
 
 ---
 
@@ -46,78 +46,29 @@ There is no ceiling on what Ravana can do once that framework is in place.
 | GBIF D: Reference photo in species detail panel | v3.10 |
 | S.analytics freshness (recalc after note/bottle save) | v3.10 |
 | Offline check consistency (removed Haiku monkey-patches) | v3.10 |
+| GBIF C: Native distribution tag row in species detail | v3.11 |
+| GBIF E: order/class/kingdom saved to taxCustom on import | v3.11 |
+| GBIF F: Bulk CP genera import (Nepenthaceae + 4 families) | v3.11 |
+| Stock → Supply deprecation (Stock redirects to Supply) | v3.11 |
+| Species Performance Ranking table in Analytics | v3.11 |
+| Lab Cost Tracking card in Analytics (6-month spend, cost/bottle) | v3.11 |
+| Export Report (3-CSV export + Print report) | v3.11 |
+| QR on GH plants (📷 QR tab, ?gh= URL, scanner routing) | v3.11 |
+| Passage tracking (parent_id field, lineage in bottle detail) | v3.11 |
+| Ravana voice: "add N bottles of [species]" batch creation | v3.11 |
+| Ravana voice: "open bottle [code]", "show species [name]", "export report" | v3.11 |
+| Ravana Insights: PubMed paper fetch + GBIF habitat + deep technical analysis | v3.11 |
+| Dashboard 10-card stat band (Recipes, Supplies, Contam 30d, Vault, Journal 7d) | v3.11 |
 
 ---
 
-## Priority Queue
+## Priority Queue (next session)
 
-### 1. GBIF — deeper integration (taxonomy section)
-GBIF (gbif.org) is a free, no-key API with a lot we can use. Already using:
-species/match and iucnRedListCategory. What else is worth adding:
-
-**A. Synonyms resolver** — when user types a name that is a synonym, GBIF match
-returns `synonym: true` and `acceptedUsageKey`. Show a banner: "This is a synonym
-of *Accepted name* — use accepted name?" One API call, zero storage.
-`GET /v1/species/match?name=Heliamphora nutans&verbose=true`
-
-**B. Common names auto-fill** — on GBIF import, fetch vernacular names and
-pre-fill the Common Name field with the English one (or first available).
-`GET /v1/species/{key}/vernacularNames`
-
-**C. Native distribution** — show which countries the species is native to,
-displayed as a compact tag row in the species detail panel. Useful for
-climate context when setting up TC conditions.
-`GET /v1/species/{key}/distributions`
-
-**D. Reference photo** — pull one photo from GBIF media (often iNaturalist
-observations) and show it as a reference image in species detail. Read-only,
-displayed via img src — nothing stored locally.
-`GET /v1/species/{key}/media?type=StillImage&limit=1`
-
-**E. Full taxonomy hierarchy** — family, order, class stored alongside custom
-species so Ravana and analytics can group by family (e.g. all Nepenthaceae).
-Already returned by species/match — just needs to be saved to taxCustom.
-
-**F. Carnivorous plant checklist bulk import** — GBIF hosts the ICPS checklist
-and Catalogue of Life. Could offer a one-click "Import all carnivorous plant
-genera" to populate the taxonomy pack without manual entry.
-Relevant dataset: `GET /v1/species/search?highertaxonKey=6&rank=SPECIES&limit=300`
-(key 6 = Nepenthaceae, etc. — would need one call per family)
-
-Shipped: B (common names), A (synonym resolver), D (reference photo)
-Remaining priority order: C → E → F
-
----
-
-### 2. Ravana Insights (AI per-species briefing)
-Ask Ravana about a specific species and get a data-backed answer.
-- "How is my Nepenthes rajah doing?" → pulls all bottles, notes, analytics for that species
-- Identifies patterns: what stage keeps failing, what contamination type recurs
-- Suggests protocol adjustments based on your own data, not generic advice
-- Triggered from species detail panel or direct chat
-- Context: S.analytics + relevant bottles + notes + GBIF distribution for habitat context
-
----
-
-### 3. Lab Analytics — per-species detail panel
-The Analytics section currently shows lab-wide numbers. Per-species breakdown:
-- Contamination rate (30-day + all-time) per species
-- Survival rate per species
-- Multiplication factor (cultures out / in per passage)
-- Average time per stage
-- Bar/donut chart per species
-Data all exists in S.bottles + S.notes — pure rendering work.
-
----
-
-### 5. Two inventory systems (design decision needed)
-Stock (S_inv / inventory/data.enc) and Supply (S.supplies / supplies/data.enc)
-are completely separate. Dashboard low-stock alerts only read S_inv (Stock).
-Options:
-- Option A: merge them — one system, one file, one UI
-- Option B: keep separate but wire Supply into dashboard alerts too
-- Option C: deprecate Stock, redirect to Supply
-Leaning toward C — Supply is more complete and newer.
+### 1. Agentic Ravana — tool-use framework
+Wire `askAI()` to call site functions as tools. First pass: read-only tools
+(getBottles, getNotes, getSpecies, getAnalytics). Then write tools with confirm
+gate (saveBottle, saveNote, updateStatus). This is the architectural unlock that
+makes Ravana fully agentic.
 
 ---
 
@@ -133,8 +84,7 @@ Leaning toward C — Supply is more complete and newer.
 ---
 
 ## Notes
-- All data stays encrypted in GitHub — no new backend needed for any of the above
-- GBIF items B/A/D are all read-only, no new .enc files needed
-- GBIF item E would extend taxCustom schema (add `family`, `order` fields)
-- GBIF item F would write to taxCustom — treat like any custom species save
-- Build one feature at a time, test before moving on
+- All data stays encrypted in GitHub — no new backend needed
+- GBIF bulk import writes to taxCustom — same save path as manual custom species
+- Passage tracking: parent_id on bottles — lineage shown in bottle detail
+- Lab cost: based on supply date_prepared + cost_total fields (no per-bottle granularity yet)

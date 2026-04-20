@@ -2310,6 +2310,12 @@ input, textarea, select {
           <input type="number" id="bot-qty" value="1" min="1" max="200" oninput="_updateBatchPreview()">
         </div>
       </div>
+      <div class="field">
+        <label>Source bottle (passage, optional)</label>
+        <input type="text" id="bot-parent-code" placeholder="e.g. NR-001 — leave blank for new initiation" autocomplete="off"
+          oninput="_botLookupParent(this.value)" style="flex:1">
+        <div id="bot-parent-hint" style="font-size:11px;color:var(--mu);margin-top:3px"></div>
+      </div>
       <div id="bot-batch-preview" class="bot-batch-preview" style="display:none"></div>
 
       <!-- ── SESSION BUILDER ── -->
@@ -2489,7 +2495,11 @@ input, textarea, select {
   <!-- ── ANALYTICS ── -->
   <div class="section fullpage" id="sec-analytics">
     <div style="max-width:960px;margin:0 auto;width:100%;padding-bottom:40px">
-      <h2 style="font-size:20px;font-weight:700;margin-bottom:24px">📊 Lab Analytics</h2>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap">
+        <h2 style="font-size:20px;font-weight:700;flex:1">📊 Lab Analytics</h2>
+        <button class="btn sm ghost" onclick="exportLabReport('csv')">📥 Export CSV</button>
+        <button class="btn sm ghost" onclick="exportLabReport('print')">🖨 Print Report</button>
+      </div>
       <div id="analytics-content"></div>
     </div>
   </div>
@@ -2575,6 +2585,12 @@ input, textarea, select {
           <button class="btn sm" onclick="_gbifSearch()">Search</button>
         </div>
         <div id="gbif-search-results" style="font-size:13px"></div>
+        <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--bd)">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin-bottom:8px">Bulk Import</div>
+          <p style="font-size:12px;color:var(--mu);margin-bottom:10px">Fetch all accepted species from the major carnivorous plant families (Nepenthaceae, Droseraceae, Sarraceniaceae, Lentibulariaceae, Cephalotaceae) directly from GBIF and import any that aren't already in your taxonomy.</p>
+          <button class="btn sm" id="gbif-bulk-btn" onclick="_gbifBulkImportCP(this)">🌿 Import CP Checklist</button>
+          <div id="gbif-bulk-status" style="font-size:12px;color:var(--mu);margin-top:8px"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -9238,6 +9254,9 @@ function renderAnalytics(){
       ${lcStat('on_track','🟢 On Track','var(--gn)')}
     </div>`:'' ;
 
+    // ── Species performance ranking (uses RavanaInsights._computeMetrics if available)
+    const rankingCard=_buildSpeciesRankingCard(speciesMap);
+
     // Assemble with bottle chart
     const intervalSection=intervalCards?`<div class="an-grid">${intervalCards}</div>`:'';
     const usageCard=_buildUsageCard();
@@ -9248,13 +9267,15 @@ function renderAnalytics(){
       <div class="an-grid">${funnelCard}</div>
       ${lifecycleCard?`<div class="an-grid">${lifecycleCard}</div>`:''}
       <div class="an-grid">${botChart}${bottleCard}</div>
-      <div class="an-grid">${effCard}${usageCard}</div>
+      <div class="an-grid">${rankingCard}</div>
+      <div class="an-grid">${effCard}${_buildLabCostCard()}${usageCard}</div>
     `;
     return;
   }
 
   // ── Usage metrics card
   const usageCard=_buildUsageCard();
+  const rankingCard=_buildSpeciesRankingCard(speciesMap);
 
   // ── Assemble (no bottles)
   const intervalSection=intervalCards?`<div class="an-grid">${intervalCards}</div>`:'';
@@ -9263,8 +9284,91 @@ function renderAnalytics(){
     <div class="an-grid">${speciesCard}${tagCard}</div>
     ${intervalSection}
     <div class="an-grid">${funnelCard}</div>
-    <div class="an-grid">${effCard}${usageCard}</div>
+    <div class="an-grid">${rankingCard}</div>
+    <div class="an-grid">${effCard}${_buildLabCostCard()}${usageCard}</div>
   `;
+}
+
+function _buildSpeciesRankingCard(speciesMap){
+  // Species performance ranking — sortable table using _computeMetrics when available
+  const spNames=Object.values(speciesMap).filter(s=>s.total>=2).map(s=>s.name);
+  if(!spNames.length) return `<div class="an-card" style="grid-column:1/-1"><div class="an-title">🏆 Species Performance Ranking</div><p class="an-empty">Need ≥2 notes per species to rank.</p></div>`;
+  const rows=spNames.map(name=>{
+    let m=null;
+    try{ if(typeof RavanaInsights!=='undefined') m=RavanaInsights._computeMetrics(name); }catch(_){}
+    if(!m){
+      // Fallback: basic calc from speciesMap
+      const s=speciesMap[name.toLowerCase()]||speciesMap[name];
+      const sr=s?Math.round((s.total-s.contam)/s.total*100):null;
+      m={spName:name,score:sr!=null?sr:50,contamRate:s?Math.round(s.contam/s.total*100):null,
+        multiAvg:null,avgCycleDays:null,activeBots:[]};
+    }
+    const scoreCol=m.score>=70?'var(--gn)':m.score>=45?'var(--yw)':'var(--rd)';
+    return {name,score:m.score,contamRate:m.contamRate,multiAvg:m.multiAvg,
+      avgCycleDays:m.avgCycleDays,activeCnt:(m.activeBots||[]).length,scoreCol};
+  }).sort((a,b)=>b.score-a.score);
+
+  const tableRows=rows.map((r,i)=>`<tr>
+    <td style="font-weight:600;color:var(--mu)">#${i+1}</td>
+    <td style="font-style:italic">${esc(r.name)}</td>
+    <td><span style="font-size:13px;font-weight:700;color:${r.scoreCol}">${r.score}</span></td>
+    <td>${r.contamRate!=null?r.contamRate+'%':'—'}</td>
+    <td>${r.multiAvg!=null?r.multiAvg+'×':'—'}</td>
+    <td>${r.avgCycleDays!=null?r.avgCycleDays+'d':'—'}</td>
+    <td>${r.activeCnt||0}</td>
+  </tr>`).join('');
+
+  return `<div class="an-card" style="grid-column:1/-1">
+    <div class="an-title">🏆 Species Performance Ranking</div>
+    <div style="overflow-x:auto"><table class="an-table">
+      <thead><tr><th>#</th><th>Species</th><th>Score /100</th><th>Contam %</th><th>Mult ×</th><th>Cycle days</th><th>Active bottles</th></tr></thead>
+      <tbody>${tableRows}</tbody>
+    </table></div>
+    <div style="font-size:11px;color:var(--mu);margin-top:8px">Score = 50 + (success rate vs lab avg) − (contam penalty) + (multiplication bonus) ± overdue penalty.</div>
+  </div>`;
+}
+
+function _buildLabCostCard(){
+  // Lab cost tracking: monthly supply spend + estimated cost per bottle
+  try{
+    const supplies=S.supplies||[];
+    if(!supplies.length) return `<div class="an-card"><div class="an-title">💸 Lab Costs</div><p class="an-empty">Add supplies with costs to track lab spending.</p></div>`;
+
+    // Monthly spend from supply date_prepared
+    const now=new Date();
+    const months=[];
+    for(let i=5;i>=0;i--){
+      const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+      months.push({key:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`,
+        label:d.toLocaleDateString('en-IN',{month:'short',year:'2-digit'}),spend:0});
+    }
+    supplies.forEach(item=>{
+      if(!item.cost_total||!item.date_prepared) return;
+      const k=item.date_prepared.slice(0,7);
+      const m=months.find(x=>x.key===k);
+      if(m) m.spend+=Number(item.cost_total)||0;
+    });
+    const totalSpend=months.reduce((s,m)=>s+m.spend,0);
+    const totalBottles=(S.bottles||[]).length;
+    const costPerBottle=totalBottles>0?Math.round(totalSpend/totalBottles):null;
+
+    const maxSpend=Math.max(...months.map(m=>m.spend),1);
+    const bars=months.map(m=>`<div class="an-bar-row">
+      <div class="an-bar-label">${m.label}</div>
+      <div class="an-bar-track"><div class="an-bar-fill" style="width:${Math.round(m.spend/maxSpend*100)}%;background:var(--yw)"></div></div>
+      <div class="an-bar-val">${m.spend?fmtINR(m.spend):'—'}</div>
+    </div>`).join('');
+
+    return `<div class="an-card">
+      <div class="an-title">💸 Lab Costs (6 months)</div>
+      ${bars}
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px">
+        <div class="an-stat" style="flex:1;min-width:80px"><div class="big" style="color:var(--yw)">${fmtINR(totalSpend)}</div><div class="lbl">6-month spend</div></div>
+        ${costPerBottle!=null?`<div class="an-stat" style="flex:1;min-width:80px"><div class="big">${fmtINR(costPerBottle)}</div><div class="lbl">Cost / bottle (est.)</div></div>`:''}
+      </div>
+      <div style="font-size:11px;color:var(--mu);margin-top:6px">Based on supply purchase dates. Cost/bottle = total supply spend ÷ total bottles.</div>
+    </div>`;
+  }catch(e){ return ''; }
 }
 
 function _buildUsageCard(){
@@ -9284,6 +9388,99 @@ function _buildUsageCard(){
 }
 
 // ── ACTIVITY LOG ─────────────────────────────────────────────
+function exportLabReport(mode){
+  const now=new Date();
+  const dateStr=now.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+
+  if(mode==='csv'){
+    // CSV export: bottles + notes + GH plants as separate sheets (3 files)
+    const botHeaders='Code,Species,Stage,Status,Date Prepared,Date Inoculated,Next Review,Recipe,Batch ID,Parent ID,Media Volume,Notes';
+    const botRows=(S.bottles||[]).map(b=>{
+      const rec=(S.recs||[]).find(r=>r.id===b.recipe_id);
+      return [b.code,b.species||'',b.stage||'',b.status||'',
+        b.date_prepared?b.date_prepared.slice(0,10):'',
+        b.date_inoculated?b.date_inoculated.slice(0,10):'',
+        b.next_review||'',rec?rec.name:'',b.batch_id||'',b.parent_id||'',b.media_volume||'',
+        (b.notes||'').replace(/[\r\n,]/g,' ')
+      ].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',');
+    });
+    const botCsv=botHeaders+'\n'+botRows.join('\n');
+    _downloadText(botCsv,`tcplants_bottles_${now.toISOString().slice(0,10)}.csv`,'text/csv');
+
+    const noteHeaders='Date,Title,Type,Stage,Species,Cultures Out,Recipe,Tags';
+    const noteRows=(S.notes||[]).map(n=>{
+      const rec=(S.recs||[]).find(r=>r.id===n.recipe_id);
+      return [n.date||'',n.title||'',n.type||'',n.stage||'',n.species||'',
+        n.cultures_out!=null?n.cultures_out:'',rec?rec.name:'',
+        (n.tags||[]).join('|')
+      ].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',');
+    });
+    _downloadText(noteHeaders+'\n'+noteRows.join('\n'),`tcplants_notes_${now.toISOString().slice(0,10)}.csv`,'text/csv');
+
+    const ghHeaders='Species,Location,Quantity,Health,Source,Size Grade,Next Inspection';
+    const ghRows=(S.greenhouse||[]).map(p=>[
+      p.species||'',p.location||'',p.quantity||1,p.health||'',p.source||'',p.size_grade||'',p.next_inspection||''
+    ].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','));
+    _downloadText(ghHeaders+'\n'+ghRows.join('\n'),`tcplants_greenhouse_${now.toISOString().slice(0,10)}.csv`,'text/csv');
+
+    toast('3 CSV files exported (Bottles, Notes, Greenhouse)');
+    return;
+  }
+
+  // Print mode — open a styled printable window
+  const bots=S.bottles||[];
+  const notes=S.notes||[];
+  const gh=S.greenhouse||[];
+  const active=bots.filter(b=>['inoculated','growing'].includes(b.status)).length;
+  const contamRate=bots.length?Math.round(bots.filter(b=>b.status==='contaminated').length/bots.length*100):0;
+  const spSet=new Set([...bots.map(b=>b.species),...notes.map(n=>n.species)].filter(Boolean));
+
+  const html=`<!DOCTYPE html><html><head><meta charset="utf-8">
+  <title>TC Plants Lab Report — ${dateStr}</title>
+  <style>
+    body{font-family:system-ui,sans-serif;max-width:900px;margin:0 auto;padding:32px;color:#1a1a2e}
+    h1{font-size:22px;margin-bottom:4px}h2{font-size:16px;margin:20px 0 8px;border-bottom:1px solid #ddd;padding-bottom:4px}
+    .meta{font-size:12px;color:#666;margin-bottom:24px}
+    .stats{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+    .stat{background:#f5f5f5;border-radius:8px;padding:12px 16px;min-width:90px;text-align:center}
+    .stat .big{font-size:24px;font-weight:700}.stat .lbl{font-size:11px;color:#666;margin-top:2px}
+    table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+    th{background:#f0f0f0;padding:6px 8px;text-align:left;font-weight:600}
+    td{padding:5px 8px;border-bottom:1px solid #eee}
+    @media print{body{padding:16px}}
+  </style></head><body>
+  <h1>Forest Studio Labs — Inventory Report</h1>
+  <div class="meta">Generated: ${dateStr} · TC Plants Lab Management System</div>
+  <div class="stats">
+    <div class="stat"><div class="big">${bots.length}</div><div class="lbl">Total bottles</div></div>
+    <div class="stat"><div class="big" style="color:#1abc9c">${active}</div><div class="lbl">Active</div></div>
+    <div class="stat"><div class="big" style="color:${contamRate>20?'#e74c3c':'#666'}">${contamRate}%</div><div class="lbl">Contam rate</div></div>
+    <div class="stat"><div class="big">${gh.length}</div><div class="lbl">GH plants</div></div>
+    <div class="stat"><div class="big">${notes.length}</div><div class="lbl">Lab notes</div></div>
+    <div class="stat"><div class="big">${spSet.size}</div><div class="lbl">Species</div></div>
+  </div>
+  <h2>Active Bottles</h2>
+  <table><thead><tr><th>Code</th><th>Species</th><th>Stage</th><th>Status</th><th>Date Prepared</th><th>Next Review</th></tr></thead>
+  <tbody>${bots.filter(b=>['inoculated','growing','prepared','rooting','hardening'].includes(b.status)).map(b=>`<tr>
+    <td>${b.code}</td><td style="font-style:italic">${b.species||'—'}</td><td>${b.stage||'—'}</td>
+    <td>${b.status}</td><td>${b.date_prepared?b.date_prepared.slice(0,10):'—'}</td><td>${b.next_review||'—'}</td>
+  </tr>`).join('')}</tbody></table>
+  <h2>Greenhouse Plants</h2>
+  <table><thead><tr><th>Species</th><th>Location</th><th>Qty</th><th>Health</th><th>Size Grade</th></tr></thead>
+  <tbody>${gh.map(p=>`<tr>
+    <td style="font-style:italic">${p.species||'—'}</td><td>${p.location||'—'}</td>
+    <td>${p.quantity||1}</td><td>${p.health||'—'}</td><td>${p.size_grade||'—'}</td>
+  </tr>`).join('')}</tbody></table>
+  <script>window.onload=()=>window.print();</script>
+  </body></html>`;
+  const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); }
+}
+function _downloadText(content, filename, type){
+  const blob=new Blob([content],{type});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=filename; document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1000);
+}
 function _alTimeAgo(iso){
   const s=Math.round((Date.now()-new Date(iso))/1000);
   if(s<60) return `${s}s ago`;
@@ -11442,6 +11639,23 @@ function _parseVoiceAction(text){
     };
   }
 
+  // "add [N] bottles of [species]" — batch with count
+  const addBatchMatch=t.match(/add\s+(\d+)\s+bottles?\s+(?:of\s+)?(.+)/);
+  if(addBatchMatch){
+    const qty=Math.min(200,parseInt(addBatchMatch[1])||1);
+    const sp=addBatchMatch[2].trim();
+    return ()=>{
+      navTo('bottles'); startNewBottle('batch');
+      setTimeout(()=>{
+        const spEl=document.getElementById('bot-species'); if(spEl){spEl.value=sp;spEl.dispatchEvent(new Event('input'));}
+        const qtyEl=document.getElementById('bot-qty'); if(qtyEl){qtyEl.value=qty;qtyEl.dispatchEvent(new Event('input'));}
+        _updateBatchPreview();
+        _ttsSpeak(`Batch of ${qty} bottles for ${sp}. Review and save when ready.`);
+        toast(`🫙 ${qty} bottles of ${sp} — review and save`);
+      },300);
+    };
+  }
+
   // "new bottle for [species]" / "start batch [species]"
   const newBotMatch=t.match(/(?:new\s+bottle|start\s+(?:new\s+)?batch|add\s+bottle)(?:\s+for)?\s+(.+)/);
   if(newBotMatch){
@@ -11507,6 +11721,36 @@ function _parseVoiceAction(text){
       if(sp) setTimeout(()=>RavanaInsights.showSpecies(sp),200);
       _ttsSpeak(sp?`Opening insights for ${sp}`:'Insights opened.');
     };
+  }
+
+  // "open bottle [code]" / "show bottle [code]"
+  const openBotCodeMatch=t.match(/(?:open|show|find)\s+bottle\s+(fsl[-\s]?\d+[-\s]?\d+)/i);
+  if(openBotCodeMatch){
+    const raw=openBotCodeMatch[1].toUpperCase().replace(/\s+/g,'-');
+    return ()=>{
+      const b=(S.bottles||[]).find(x=>x.code===raw||x.code.replace(/-/g,'')===raw.replace(/-/g,''));
+      if(b){ navTo('bottles'); openBottle(b.id); _ttsSpeak(`Opening ${b.code}, ${b.species||''}.`); }
+      else { _ttsSpeak(`No bottle found with code ${raw}.`); toast('Bottle not found: '+raw,'fail'); }
+    };
+  }
+
+  // "show species [name]" / "open [species] in taxonomy"
+  const showSpMatch=t.match(/(?:show|open)\s+(?:species\s+)?(.+?)(?:\s+in\s+taxonomy)?$/);
+  if(showSpMatch&&(t.startsWith('show species')||t.startsWith('open species'))){
+    const sp=showSpMatch[1].trim();
+    return ()=>{
+      navTo('species');
+      setTimeout(()=>{
+        const match=(S.taxSpecies||[]).find(s=>s.full_name.toLowerCase().includes(sp.toLowerCase()));
+        if(match) openSpDetail(match.full_name);
+        _ttsSpeak(match?`Showing ${match.full_name}`:`Showing taxonomy. No exact match for ${sp}.`);
+      },200);
+    };
+  }
+
+  // "export report" / "download report"
+  if(/(?:export|download)\s+(?:lab\s+)?report/.test(t)){
+    return ()=>{ exportLabReport('csv'); _ttsSpeak('Exporting lab report as CSV.'); };
   }
 
   return null;
@@ -12840,21 +13084,46 @@ function openGHPlant(id){
       <button class="gh-tab" data-tab="ledger" onclick="ghTab('ledger')">📦 Ledger</button>
       <button class="gh-tab" data-tab="health" onclick="ghTab('health')">🩺 Health</button>
       <button class="gh-tab" data-tab="plan" onclick="ghTab('plan')">⚗️ Plan</button>
+      <button class="gh-tab" data-tab="qr" onclick="ghTab('qr')">📷 QR</button>
     </div>
     <div id="ght-overview" class="gh-tab-panel">${_ghOverviewHtml(p)}</div>
     <div id="ght-ledger"   class="gh-tab-panel" style="display:none">${_ghLedgerHtml(p)}</div>
     <div id="ght-health"   class="gh-tab-panel" style="display:none">${_ghHealthHtml(p)}</div>
     <div id="ght-plan"     class="gh-tab-panel" style="display:none">${_ghPlanHtml(p)}</div>
+    <div id="ght-qr"      class="gh-tab-panel" style="display:none">${_ghQRHtml(p)}</div>
   `;
   showGHDetail();
 }
 
 function ghTab(name){
   document.querySelectorAll('.gh-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===name));
-  ['overview','ledger','health','plan'].forEach(n=>{
+  ['overview','ledger','health','plan','qr'].forEach(n=>{
     const el=document.getElementById('ght-'+n);
     if(el) el.style.display=n===name?'':'none';
   });
+  if(name==='qr') _renderGHQRCanvas(S.curGH);
+}
+function _ghQRHtml(p){
+  const url=`${location.origin}${location.pathname}?gh=${encodeURIComponent(p.id)}`;
+  return `<div style="padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px">
+    <div style="font-size:13px;color:var(--mu);text-align:center;margin-bottom:4px">Scan to open this plant record</div>
+    <canvas id="gh-qr-canvas-${esc(p.id)}" style="border-radius:8px;border:1px solid var(--bd)"></canvas>
+    <div style="font-size:11px;color:var(--mu);word-break:break-all;max-width:240px;text-align:center">${esc(url)}</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn sm" onclick="window.print()">🖨 Print</button>
+      <button class="btn sm ghost" onclick="_copyToClipboard(${JSON.stringify(url)})">📋 Copy link</button>
+    </div>
+    <div style="margin-top:4px;font-size:12px;text-align:center;font-weight:600">${esc(p.species||'Unknown')}</div>
+    <div style="font-size:11px;color:var(--mu)">${esc(p.location||'')}${p.quantity?` · ${p.quantity} plants`:''}</div>
+  </div>`;
+}
+function _renderGHQRCanvas(id){
+  if(!id) return;
+  const p=(S.greenhouse||[]).find(x=>x.id===id); if(!p) return;
+  const canvas=document.getElementById(`gh-qr-canvas-${id}`);
+  if(!canvas||typeof QRCode==='undefined') return;
+  const url=`${location.origin}${location.pathname}?gh=${encodeURIComponent(id)}`;
+  QRCode.toCanvas(canvas, url, {width:160,margin:2,color:{dark:'#000000',light:'#ffffff'}}, ()=>{});
 }
 
 function _ghOverviewHtml(p){
@@ -13322,7 +13591,11 @@ function openBottle(id){
     ['Batch', b.batch_id?`<span id="bot-batch-count-${id}">${batchMates.length+1} bottles in batch</span>`:(b.session_id?'Part of session':'Single')],
     ['Session', sessRec?`🔥 ${sessRec.date} — ${sessRec.batches.length} media batch${sessRec.batches.length!==1?'es':''}, ${S.bottles.filter(x=>x.session_id===sessRec.id).length} bottles${sessRec.autoclave?' · '+sessRec.autoclave:''}`:null],
     ['Source plant', srcPlant?`<a style="color:var(--ac);cursor:pointer" onclick="navTo('greenhouse');openGHPlant('${srcPlant.id}')">🌿 ${esc(srcPlant.species||'?')} — ${srcPlant.quantity||1} plant${(srcPlant.quantity||1)!==1?'s':''}${srcPlant.location?' @ '+esc(srcPlant.location):''}</a>`:null],
+    ['Passaged from', b.parent_id?(()=>{const par=(S.bottles||[]).find(x=>x.id===b.parent_id);return par?`<a style="color:var(--ac);cursor:pointer" onclick="openBottle('${par.id}')">⬆ ${esc(par.code)} · ${esc(par.species||'?')}</a>`:`<span style="color:var(--mu)">(parent deleted)</span>`;})():null],
   ].filter(([,v])=>v&&v!=='—'&&v!==null);
+  // Children (bottles that list this as parent)
+  const children=(S.bottles||[]).filter(x=>x.parent_id===id);
+  const childrenHtml=children.length?`<div style="padding:4px 16px 10px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin-bottom:6px">Subcultured to (${children.length} bottle${children.length!==1?'s':''})</div><div style="display:flex;flex-wrap:wrap;gap:5px">${children.map(c=>`<a style="font-size:12px;padding:3px 8px;border-radius:8px;background:var(--sf2);border:1px solid var(--bd);cursor:pointer;color:var(--ac)" onclick="openBottle('${c.id}')">⬇ ${esc(c.code)}</a>`).join('')}</div></div>`:'';
 
   document.getElementById('bot-detail').innerHTML=`
     <div class="bot-detail-header">
@@ -13359,6 +13632,7 @@ function openBottle(id){
       </table>
     </div>
     ${b.flair_note?`<div style="padding:4px 16px 8px;font-size:12px;color:var(--mu);font-style:italic">${esc(b.flair_note)}</div>`:''}
+    ${childrenHtml}
     ${_botLifecycleHtml(b)}
     ${stepperHtml?`<div class="bot-stepper-row">${stepperHtml}</div>`:''}
     ${b.notes?`<div class="bot-notes-body">${sanitizeMarkdown(b.notes)}</div>`:''}
@@ -13406,8 +13680,28 @@ function _populateBotEditor(b){
   document.getElementById('bot-flair-pills').innerHTML=allFlairs.map(f=>
     `<span class="flair-pill${selIds.has(f.id)?' selected':''}" data-fid="${f.id}" style="cursor:pointer${selIds.has(f.id)?';background:var(--ac);color:#0d1117':''}" onclick="_toggleBotFlair('${f.id}',this)">${esc(f.emoji||'')} ${esc(f.name)}</span>`
   ).join('');
+  // Parent passage
+  const parentEl=document.getElementById('bot-parent-code');
+  if(parentEl){
+    if(b?.parent_id){
+      const parent=(S.bottles||[]).find(x=>x.id===b.parent_id);
+      parentEl.value=parent?parent.code:'';
+      const hintEl=document.getElementById('bot-parent-hint');
+      if(hintEl&&parent) hintEl.textContent=`↑ ${parent.code} · ${parent.species||'?'} · ${parent.stage||'?'}`;
+    } else { parentEl.value=''; const hintEl=document.getElementById('bot-parent-hint'); if(hintEl) hintEl.textContent=''; }
+  }
 }
 
+function _botLookupParent(code){
+  const hintEl=document.getElementById('bot-parent-hint');
+  if(!hintEl) return;
+  const v=(code||'').trim();
+  if(!v){hintEl.textContent='';return;}
+  const b=(S.bottles||[]).find(x=>x.code===v||x.code.toLowerCase()===v.toLowerCase());
+  hintEl.textContent=b?`↑ ${b.code} · ${b.species||'?'} · ${b.stage||'?'} · ${_botStatusLabel(b.status)}`:'No bottle with this code found';
+  hintEl.style.color=b?'var(--gn)':'var(--rd)';
+}
+function _botStatusLabel(s){const m={prepared:'Prepared',inoculated:'Inoculated',growing:'Growing',subcultured:'Subcultured',contaminated:'Contaminated',discarded:'Discarded',rooting:'Rooting',hardening:'Hardening',weaned:'Weaned'};return m[s]||s;}
 function _botPopulateAccessions(sp){
   const sel=document.getElementById('bot-accession'); if(!sel) return;
   const cur=sel.value;
@@ -13695,8 +13989,10 @@ async function saveBottleAction(){
   const date_prepared=document.getElementById('bot-date-prepared').value?new Date(document.getElementById('bot-date-prepared').value).toISOString():new Date().toISOString();
   const date_inoculated=document.getElementById('bot-date-inoculated').value?new Date(document.getElementById('bot-date-inoculated').value).toISOString():null;
   const greenhouse_plant_id=document.getElementById('bot-gh-plant')?.value||null;
+  const parentCode=(document.getElementById('bot-parent-code')?.value||'').trim();
+  const parent_id=parentCode?((S.bottles||[]).find(b=>b.code===parentCode)?.id||null):null;
 
-  const base={recipe_id,species:sp,accession_id,stage,status,date_prepared,date_inoculated,next_review,media_volume,explants,note_id,flair_ids,flair_note,notes,greenhouse_plant_id};
+  const base={recipe_id,species:sp,accession_id,stage,status,date_prepared,date_inoculated,next_review,media_volume,explants,note_id,flair_ids,flair_note,notes,greenhouse_plant_id,parent_id:parent_id||undefined};
 
   const btn=document.getElementById('bot-save-btn');
   btn.disabled=true; btn.textContent='Saving…';
@@ -14779,6 +15075,8 @@ function _dashNav(sec){
 }
 
 function switchSection(name){
+  // Stock deprecated — redirect to Supply
+  if(name==='stock'){ switchSection('supply'); return; }
   S.section=name;
   document.querySelectorAll('.section').forEach(el=>el.classList.remove('on'));
   const sec=document.getElementById(`sec-${name}`);
@@ -14789,7 +15087,7 @@ function switchSection(name){
   if(name==='contam') renderContamDashboard();
   if(name==='analytics') renderAnalytics();
   if(name==='sterilise'){ if(_sterilActiveId===undefined) loadCustomSterilProtocol(); else renderSterilPage(); }
-  if(name==='stock'){ loadInv().then(renderInv); }
+  if(name==='stock'){ loadInv().then(renderInv); } // kept for safety, unreachable due to redirect above
   if(name==='species') renderSpecies();
   if(name==='news'){ _renderPersistedPins(); if(document.getElementById('news-toggle').checked && !_newsData) handleNewsToggle(true); }
   if(name==='calendar') renderCalendar();
@@ -16216,23 +16514,50 @@ async function _loadSpDetailGBIF(spName){
       }catch(_){}
     }
 
+    // GBIF C + D: Reference photo + native distribution — fetch in parallel
+    const [rmRes,rdRes]=await Promise.allSettled([
+      fetch(`https://api.gbif.org/v1/species/${d.usageKey}/media?type=StillImage&limit=1`),
+      fetch(`https://api.gbif.org/v1/species/${d.usageKey}/distributions?limit=50`)
+    ]);
+
     // GBIF D: Reference photo
-    const rm=await fetch(`https://api.gbif.org/v1/species/${d.usageKey}/media?type=StillImage&limit=1`);
-    if(!rm.ok) return;
-    const dm=await rm.json();
-    const media=(dm.results||[])[0];
-    if(!media?.identifier||!body.isConnected) return;
-    const photoDiv=document.createElement('div');
-    photoDiv.className='spd-section';
-    photoDiv.innerHTML=`<div class="spd-section-title">Reference Photo <span style="font-size:10px;color:var(--mu);font-weight:400">(via GBIF / iNaturalist)</span></div>
-      <img src="${esc(media.identifier)}" alt="${esc(spName)}" loading="lazy"
-        style="width:100%;max-height:220px;object-fit:cover;border-radius:8px;border:1px solid var(--bd);margin-top:4px"
-        onerror="this.parentElement.style.display='none'">
-      ${media.rightsHolder?`<div style="font-size:10px;color:var(--mu);margin-top:4px">© ${esc(media.rightsHolder)}</div>`:''}`;
-    // Insert after summary block (first .spd-section)
-    const firstSection=body.querySelector('.spd-section');
-    if(firstSection&&firstSection.nextSibling) body.insertBefore(photoDiv,firstSection.nextSibling);
-    else body.appendChild(photoDiv);
+    if(rmRes.status==='fulfilled'&&rmRes.value.ok){
+      try{
+        const dm=await rmRes.value.json();
+        const media=(dm.results||[])[0];
+        if(media?.identifier&&body.isConnected){
+          const photoDiv=document.createElement('div');
+          photoDiv.className='spd-section';
+          photoDiv.innerHTML=`<div class="spd-section-title">Reference Photo <span style="font-size:10px;color:var(--mu);font-weight:400">(via GBIF / iNaturalist)</span></div>
+            <img src="${esc(media.identifier)}" alt="${esc(spName)}" loading="lazy"
+              style="width:100%;max-height:220px;object-fit:cover;border-radius:8px;border:1px solid var(--bd);margin-top:4px"
+              onerror="this.parentElement.style.display='none'">
+            ${media.rightsHolder?`<div style="font-size:10px;color:var(--mu);margin-top:4px">© ${esc(media.rightsHolder)}</div>`:''}`;
+          const firstSection=body.querySelector('.spd-section');
+          if(firstSection&&firstSection.nextSibling) body.insertBefore(photoDiv,firstSection.nextSibling);
+          else body.appendChild(photoDiv);
+        }
+      }catch(_){}
+    }
+
+    // GBIF C: Native distribution tags
+    if(rdRes.status==='fulfilled'&&rdRes.value.ok&&body.isConnected){
+      try{
+        const dd=await rdRes.value.json();
+        const natives=(dd.results||[]).filter(r=>r.status==='NATIVE'||r.status==='ENDEMIC');
+        if(natives.length){
+          const countries=[...new Set(natives.map(r=>r.country||r.area).filter(Boolean))].slice(0,12);
+          const tagRow=document.createElement('div');
+          tagRow.className='spd-section';
+          tagRow.innerHTML=`<div class="spd-section-title">Native Distribution <span style="font-size:10px;color:var(--mu);font-weight:400">(GBIF)</span></div>
+            <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px">
+              ${countries.map(c=>`<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:var(--sf2);border:1px solid var(--bd);color:var(--tx)">🌍 ${esc(c)}</span>`).join('')}
+              ${natives.length>12?`<span style="font-size:11px;color:var(--mu)">+${natives.length-12} more</span>`:''}
+            </div>`;
+          body.appendChild(tagRow);
+        }
+      }catch(_){}
+    }
   }catch(_){}
 }
 
@@ -16259,6 +16584,16 @@ function _handleNavQRResult(text){
     navTo('bottles');
     openBottle(bottleMatch[1]);
     toast('Opening bottle: '+bottleMatch[1]);
+    return;
+  }
+  // GH plant URL pattern
+  const ghMatch=text.match(/[?&]gh=([a-zA-Z0-9_%-]+)/);
+  if(ghMatch){
+    const ghId=decodeURIComponent(ghMatch[1]);
+    closeCamera();
+    navTo('greenhouse');
+    openGHPlant(ghId);
+    toast('Opening plant: '+ghId);
     return;
   }
   // Try note ID pattern (UUID-like)
@@ -16484,16 +16819,75 @@ function _gbifAlreadyInTaxonomy(name){
   return (S.taxSpecies||[]).some(s=>s.full_name.toLowerCase()===low)
       ||(S.taxCustom?.species||[]).some(s=>(s.full_name||s.name||'').toLowerCase()===low);
 }
+
+// GBIF F: Bulk import all CP genera from GBIF checklist
+const _CP_FAMILY_KEYS={
+  'Nepenthaceae':7682,'Droseraceae':6557,'Sarraceniaceae':6559,
+  'Lentibulariaceae':6558,'Cephalotaceae':2463
+};
+async function _gbifBulkImportCP(btn){
+  const statusEl=document.getElementById('gbif-bulk-status');
+  if(btn){btn.disabled=true;btn.classList.add('btn-loading');}
+  if(statusEl) statusEl.textContent='Fetching species from GBIF…';
+  try{
+    // Fetch all accepted species for each family in parallel
+    const families=Object.entries(_CP_FAMILY_KEYS);
+    const results=await Promise.allSettled(families.map(([fam,key])=>
+      fetch(`https://api.gbif.org/v1/species/search?highertaxonKey=${key}&rank=SPECIES&status=ACCEPTED&limit=300`)
+        .then(r=>r.ok?r.json():Promise.reject(fam))
+        .then(d=>(d.results||[]).map(sp=>({
+          name:sp.canonicalName||sp.scientificName||'',
+          family:sp.family||fam,
+          key:sp.usageKey||'',
+          order:sp.order||'',
+          klass:sp.class||'',
+          kingdom:sp.kingdom||''
+        })).filter(x=>x.name))
+    ));
+    // Flatten + deduplicate
+    const allSp=[];
+    results.forEach(r=>{ if(r.status==='fulfilled') allSp.push(...r.value); });
+    const seen=new Set();
+    const deduped=allSp.filter(s=>{ const k=s.name.toLowerCase(); if(seen.has(k)) return false; seen.add(k); return true; });
+    // Filter out already imported
+    const toImport=deduped.filter(s=>!_gbifAlreadyInTaxonomy(s.name));
+    if(!toImport.length){
+      if(statusEl) statusEl.textContent=`✓ All ${deduped.length} species already in your taxonomy.`;
+      if(btn){btn.disabled=false;btn.classList.remove('btn-loading');}
+      return;
+    }
+    if(statusEl) statusEl.textContent=`Found ${toImport.length} new species. Importing…`;
+    // Batch import without IUCN/vernacular (too many API calls) — can enrich individually later
+    if(!S.taxCustom) S.taxCustom={species:[],flairs:[]};
+    if(!S.taxCustom.species) S.taxCustom.species=[];
+    toImport.forEach(s=>{
+      const sp={id:uid(),full_name:s.name,common_name:'',conservation_status:'',source:'gbif',flair_ids:[],
+        gbif_key:s.key||undefined,gbif_family:s.family||undefined,
+        gbif_order:s.order||undefined,gbif_class:s.klass||undefined,gbif_kingdom:s.kingdom||undefined};
+      S.taxCustom.species.push(sp);
+      S.taxSpecies.push({...sp,is_custom:true});
+    });
+    await saveCustomTaxonomy(); _writeCache();
+    if(statusEl) statusEl.innerHTML=`✓ Imported <strong>${toImport.length}</strong> new species (${deduped.length - toImport.length} already existed). Taxonomy updated.`;
+    toast(`Imported ${toImport.length} CP species`);
+  }catch(e){
+    if(statusEl) statusEl.textContent='Import failed: '+e.message;
+    toast('Bulk import failed: '+e.message,'fail');
+  }finally{
+    if(btn){btn.disabled=false;btn.classList.remove('btn-loading');}
+  }
+}
 async function _gbifImportSpecies(name,family,usageKey,btn){
   // Disable button and show loading state immediately
   if(btn){btn.disabled=true;btn.textContent='Saving…';}
   try{
-    // Fetch IUCN status + common name in parallel if we have a usageKey
-    let conservationStatus='', commonName='';
+    // Fetch IUCN status + common name + full taxonomy in parallel if we have a usageKey
+    let conservationStatus='', commonName='', gbifOrder='', gbifClass='', gbifKingdom='';
     if(usageKey){
-      const [r2,r3]=await Promise.allSettled([
+      const [r2,r3,r4]=await Promise.allSettled([
         fetch(`https://api.gbif.org/v1/species/${usageKey}/iucnRedListCategory`),
-        fetch(`https://api.gbif.org/v1/species/${usageKey}/vernacularNames?limit=20`)
+        fetch(`https://api.gbif.org/v1/species/${usageKey}/vernacularNames?limit=20`),
+        fetch(`https://api.gbif.org/v1/species/${usageKey}`)
       ]);
       if(r2.status==='fulfilled'&&r2.value.ok){const d2=await r2.value.json();const cat=d2.category||'';conservationStatus=iucnMap[cat]||'';}
       if(r3.status==='fulfilled'&&r3.value.ok){
@@ -16501,6 +16895,11 @@ async function _gbifImportSpecies(name,family,usageKey,btn){
         const results=d3.results||[];
         const eng=results.find(v=>v.language==='eng')||results[0];
         if(eng) commonName=eng.vernacularName||'';
+      }
+      if(r4.status==='fulfilled'&&r4.value.ok){
+        const d4=await r4.value.json();
+        gbifOrder=d4.order||''; gbifClass=d4.class||''; gbifKingdom=d4.kingdom||'';
+        if(!family) family=d4.family||'';
       }
     }
     // Save directly to taxonomy — no form required
@@ -16513,6 +16912,9 @@ async function _gbifImportSpecies(name,family,usageKey,btn){
       flair_ids:[],
       gbif_key:usageKey||undefined,
       gbif_family:family||undefined,
+      gbif_order:gbifOrder||undefined,
+      gbif_class:gbifClass||undefined,
+      gbif_kingdom:gbifKingdom||undefined,
     };
     if(!S.taxCustom) S.taxCustom={species:[],flairs:[]};
     if(!S.taxCustom.species) S.taxCustom.species=[];
