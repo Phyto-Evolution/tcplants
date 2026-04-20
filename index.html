@@ -1723,17 +1723,12 @@ input, textarea, select {
       <p>Encrypted plant tissue culture lab. Sign in with your credentials to continue.</p>
     </div>
     <div class="field">
-      <label>Username</label>
-      <input type="password" id="lpw" placeholder="Enter your passphrase" autocomplete="off">
-    </div>
-    <div class="field">
-      <label>Password</label>
-      <input type="password" id="ltok" placeholder="Your access token" autocomplete="off">
+      <label>Access Key</label>
+      <input type="password" id="ltok" placeholder="Your GitHub access token" autocomplete="off">
       <div class="hint"><a href="https://github.com/settings/tokens/new?scopes=repo&description=TC+Plants+Lab+Notes" target="_blank" rel="noopener">Create access token →</a></div>
     </div>
     <div id="saved-device-banner">
-      <div style="font-size:12px;color:var(--mu);margin-bottom:6px">🔐 Saved device — password auto-filled</div>
-      <div style="font-size:11px;color:var(--mu)">Enter your username to unlock.</div>
+      <div style="font-size:12px;color:var(--mu);margin-bottom:6px">🔐 Saved device</div>
       <button class="btn xs ghost" onclick="forgetDevice()" style="margin-top:8px">Forget this device</button>
     </div>
     <div id="lerr"></div>
@@ -4915,7 +4910,6 @@ SERVICE WORKER (sw.js):
   <div id="ai-usage-bar" style="padding:6px 12px;border-bottom:1px solid var(--bd);background:var(--sf2);flex-shrink:0"></div>
   <!-- Voice confirm overlay -->
   <div id="ai-voice-confirm" role="alert" aria-label="Voice transcription confirmation">
-    <div style="font-size:11px;color:var(--mu)">I heard:</div>
     <div class="vc-heard" id="vc-heard-text" aria-live="polite"></div>
     <div class="vc-btns">
       <button class="btn xs ghost" style="flex:1" aria-label="Listen again" onclick="_voiceRetry()">↺ Re-listen</button>
@@ -14119,11 +14113,10 @@ document.getElementById('ne-type').addEventListener('change',function(){
 // LOGIN / LOCK
 // ════════════════════════════════════════════════════════════
 async function login(){
-  const pw=document.getElementById('lpw').value;
   let tok=document.getElementById('ltok').value.trim();
-  // If no token typed but device is saved, try to decrypt it
+  // If no token typed but device is saved, restore it directly
   if(!tok && localStorage.getItem(DEVICE_KEY)){
-    tok=await _tryRestoreDeviceToken(pw)||'';
+    tok=localStorage.getItem(DEVICE_KEY)||'';
   }
   const err=document.getElementById('lerr');
   err.style.display='none';
@@ -14131,7 +14124,8 @@ async function login(){
     err.innerHTML='Encryption requires HTTPS. <a href="'+location.href.replace('http:','https:')+'" style="color:var(--ac)">Click here to switch →</a>';
     err.style.display='block'; return;
   }
-  if(!pw||!tok){err.textContent='Both fields required.';err.style.display='block';return;}
+  if(!tok){err.textContent='Access key required.';err.style.display='block';return;}
+  const pw=tok;
   document.getElementById('lbtn').disabled=true;
   document.getElementById('lbtn').textContent='Unlocking…';
   try{
@@ -14307,25 +14301,15 @@ async function _decryptForDevice(stored, pw){
   return new TextDecoder().decode(dec);
 }
 async function saveTrustedDevice(pw, tok){
-  try{
-    const encrypted=await _encryptForDevice(tok, pw);
-    localStorage.setItem(DEVICE_KEY, JSON.stringify(encrypted));
-    document.getElementById('trust-banner').classList.remove('on');
-    toast('Device saved — next visit just enter your password 🔐');
-  }catch(e){ toast('Could not save device: '+e.message,'fail'); }
+  localStorage.setItem(DEVICE_KEY, tok);
+  document.getElementById('trust-banner').classList.remove('on');
+  toast('Device saved — next visit signs in automatically 🔐');
 }
 function forgetDevice(){
   localStorage.removeItem(DEVICE_KEY);
   document.getElementById('saved-device-banner').classList.remove('on');
   document.getElementById('ltok').value='';
-  document.getElementById('ltok').style.display='';
   toast('Device forgotten');
-}
-async function _tryRestoreDeviceToken(pw){
-  const raw=localStorage.getItem(DEVICE_KEY);
-  if(!raw) return null;
-  try{ return await _decryptForDevice(JSON.parse(raw), pw); }
-  catch(e){ return null; }
 }
 
 // ── WEATHER ──────────────────────────────────────────────────
@@ -15518,7 +15502,6 @@ if(_st) document.getElementById('ltok').value=_st;
 (function(){
   if(localStorage.getItem('tcplants_device')){
     document.getElementById('saved-device-banner').classList.add('on');
-    document.getElementById('ltok').style.display='none'; // hide token field, will be auto-filled
   }
 })();
 // ── WELCOME SPLASH ───────────────────────────────────────────
