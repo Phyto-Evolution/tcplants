@@ -134,12 +134,12 @@ body{background:var(--bg);color:var(--tx);font-family:var(--font);font-size:14px
 #login-skin-btn{box-shadow:0 1px 4px rgba(0,0,0,.12)}
 [data-skin="ravana"] #login-skin-btn{background:linear-gradient(135deg,var(--ac),var(--pu));color:#fff;border-color:transparent;box-shadow:0 2px 10px rgba(88,166,255,.35)}
 label{display:block;font-size:13px;font-weight:600;margin-bottom:5px}
-input,select,textarea{
+input:not([type=checkbox]):not([type=radio]),select,textarea{
   width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:6px;
   color:var(--tx);font-family:var(--font);font-size:14px;padding:8px 11px;
   outline:none;transition:border-color .15s
 }
-input:focus,select:focus,textarea:focus{border-color:var(--ac)}
+input:not([type=checkbox]):not([type=radio]):focus,select:focus,textarea:focus{border-color:var(--ac)}
 select option{background:var(--sf2)}
 .field{margin-bottom:18px}
 .hint{font-size:12px;color:var(--mu);margin-top:4px}
