@@ -2438,6 +2438,20 @@ input, textarea, select {
       </div>
       <div class="row2">
         <div class="field">
+          <label>Size grade</label>
+          <select id="gh-size-grade">
+            <option value="seedling">🌱 Seedling</option>
+            <option value="small">🪴 Small</option>
+            <option value="medium">🌿 Medium</option>
+            <option value="adult">🌳 Adult</option>
+          </select>
+        </div>
+        <div class="field" style="display:flex;align-items:flex-end;padding-bottom:2px">
+          <div style="font-size:11px;color:var(--mu);line-height:1.5">Size grade is used by the Value Inventory to calculate vault value at market prices per grade.</div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
           <label>Date added</label>
           <input type="date" id="gh-date-added">
         </div>
@@ -3849,6 +3863,11 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
     <main id="supply-main" style="flex:1;overflow-y:auto"></main>
   </div>
 
+  <!-- ── VALUE INVENTORY ── -->
+  <div class="section fullpage" id="sec-value">
+    <main id="value-main" style="flex:1;overflow-y:auto;padding:24px 28px;max-width:860px"></main>
+  </div>
+
   <!-- ── ADVANCED SEARCH ── -->
   <div class="section" id="sec-search">
     <main id="search-main" style="flex:1;overflow-y:auto"></main>
@@ -4711,6 +4730,7 @@ SERVICE WORKER (sw.js):
       <button class="ndtab" data-sec="schedule" onclick="navTo('schedule')"><span class="nd-icon">📅</span>Schedule</button>
       <button class="ndtab" data-sec="insights" onclick="navTo('insights')"><span class="nd-icon">✨</span>Insights</button>
       <button class="ndtab" data-sec="supply" onclick="navTo('supply')"><span class="nd-icon">📦</span>Supplies</button>
+      <button class="ndtab" data-sec="value" onclick="navTo('value')"><span class="nd-icon">💰</span>Value</button>
       <button class="ndtab" data-sec="search" onclick="navTo('search')"><span class="nd-icon">🔍</span>Search</button>
       <div class="nd-divider"></div>
       <button class="ndtab" onclick="closeNavDrawer();openActLog()"><span class="nd-icon">⚡</span>Activity</button>
@@ -5388,6 +5408,7 @@ const BOT_F    = 'bottles/data.enc';
 const GH_F     = 'greenhouse/data.enc';
 const SUPPLY_F  = 'supplies/data.enc';
 const JOURNAL_F = 'journal/entries.enc';
+const VALUE_F   = 'value/data.enc';
 const KEYS_F = 'settings/keys.enc';
 const API    = 'https://api.github.com';
 
@@ -5425,6 +5446,8 @@ const S = {
   supplies: [], suppliesSha: null,
   // journal
   journal: [], journalSha: null, curJournal: null, editingJournal: null,
+  // value inventory
+  value: null, valueSha: null,
   // ui state
   analytics: null,
   blogPosts: [],
@@ -5683,6 +5706,16 @@ async function loadJournal(){
 }
 async function saveJournal(entries, sha){
   const res=await ghPut(JOURNAL_F, await enc(JSON.stringify({entries})), sha, `lab: journal — ${entries.length} entries`);
+  return res.content.sha;
+}
+async function loadValue(){
+  const f=await ghGet(VALUE_F);
+  if(!f) return {data:{prices:{},overrides:{}},sha:null};
+  const raw=JSON.parse(await dec(ghDec(f.content)));
+  return {data:{prices:raw.prices||{},overrides:raw.overrides||{}}, sha:f.sha};
+}
+async function saveValue(data, sha){
+  const res=await ghPut(VALUE_F, await enc(JSON.stringify(data)), sha, `lab: value inventory prices`);
   return res.content.sha;
 }
 
@@ -12778,6 +12811,7 @@ function _populateGHEditor(p){
   document.getElementById('gh-quantity').value=p?p.quantity||1:1;
   document.getElementById('gh-health').value=p?p.health||'healthy':'healthy';
   document.getElementById('gh-source').value=p?p.source||'lab':'lab';
+  document.getElementById('gh-size-grade').value=p?p.size_grade||'small':'small';
   document.getElementById('gh-location').value=p?p.location||'':'Q5JV+2X Kelambakkam, Tamil Nadu';
   document.getElementById('gh-notes-text').value=p?p.notes||'':'';
   document.getElementById('gh-date-added').value=p?p.date_added||new Date().toISOString().slice(0,10):new Date().toISOString().slice(0,10);
@@ -12813,6 +12847,7 @@ async function saveGHPlantAction(){
   const quantity=parseInt(document.getElementById('gh-quantity').value)||1;
   const health=document.getElementById('gh-health').value||'healthy';
   const source=document.getElementById('gh-source').value||'wild';
+  const size_grade=document.getElementById('gh-size-grade').value||'small';
   const location=document.getElementById('gh-location').value.trim()||null;
   const date_added=document.getElementById('gh-date-added').value||new Date().toISOString().slice(0,10);
   const next_inspection=document.getElementById('gh-next-inspection').value||null;
@@ -12838,14 +12873,14 @@ async function saveGHPlantAction(){
         const delta=quantity-(prev.quantity||0);
         quantity_log=[...quantity_log,{id:uid(),date:today,delta,reason:`Manual edit (${delta>0?'+':''}${delta})`,type:delta>0?'in':'out',created_at:now}];
       }
-      S.greenhouse[idx]={...prev,species:sp,quantity,health,source,location,date_added,next_inspection,accession_id,notes,condition_log,quantity_log,updated_at:now};
+      S.greenhouse[idx]={...prev,species:sp,quantity,health,source,size_grade,location,date_added,next_inspection,accession_id,notes,condition_log,quantity_log,updated_at:now};
       S.greenhouseSha=await saveGreenhouse(S.greenhouse,S.greenhouseSha);
       S.curGH=S.editingGH; S.editingGH=null;
       renderGHList(); openGHPlant(S.curGH); closeNavDrawer();
       toast(`🌱 ${sp} updated`);
     } else {
       const plant={
-        id:uid(),species:sp,quantity,health,source,location,date_added,next_inspection,accession_id,notes,
+        id:uid(),species:sp,quantity,health,source,size_grade,location,date_added,next_inspection,accession_id,notes,
         condition_log:[{id:uid(),date:today,health,note:'Initial entry',created_at:now}],
         quantity_log:[{id:uid(),date:today,delta:quantity,reason:'Initial entry',type:'in',created_at:now}],
         created_at:now,updated_at:now
@@ -14165,6 +14200,210 @@ function _renderRecOverview(){
     </div>`;
 }
 
+// VALUE INVENTORY
+// ════════════════════════════════════════════════════════════
+const VALUE_STAGES=['prepared','inoculated','growing','subcultured','rooting','hardening','weaned','dormant'];
+const VALUE_GH_GRADES=['seedling','small','medium','adult'];
+const VALUE_STAGE_LABEL={prepared:'Prepared',inoculated:'Inoculated',growing:'Growing',subcultured:'Subcultured',rooting:'Rooting',hardening:'Hardening',weaned:'Weaned',dormant:'Dormant'};
+const VALUE_GRADE_LABEL={seedling:'🌱 Seedling',small:'🪴 Small',medium:'🌿 Medium',adult:'🌳 Adult'};
+function fmtINR(n){
+  if(!n&&n!==0) return '—';
+  return '₹'+Number(n).toLocaleString('en-IN',{maximumFractionDigits:0});
+}
+
+function renderValueSection(){
+  const main=document.getElementById('value-main');
+  const prices=(S.value||{}).prices||{};
+  const overrides=(S.value||{}).overrides||{};
+
+  // ── compute vault ──────────────────────────────────────────
+  const bottles=S.bottles||[];
+  const ghPlants=S.greenhouse||[];
+
+  // in-vitro totals per stage
+  const stageCount={};
+  for(const b of bottles){
+    if(['discarded','contaminated'].includes(b.status)) continue;
+    const qty=parseInt(b.quantity)||1;
+    stageCount[b.status]=(stageCount[b.status]||0)+qty;
+  }
+
+  // GH totals per grade
+  const gradeCount={};
+  for(const p of ghPlants){
+    const grade=p.size_grade||'small';
+    gradeCount[grade]=(gradeCount[grade]||0)+(parseInt(p.quantity)||1);
+  }
+
+  // vault totals
+  let vaultInvitro=0, vaultGH=0;
+  for(const stage of VALUE_STAGES){
+    const cnt=stageCount[stage]||0;
+    const price=parseFloat(prices['stage_'+stage])||0;
+    vaultInvitro+=cnt*price;
+  }
+  for(const grade of VALUE_GH_GRADES){
+    const cnt=gradeCount[grade]||0;
+    const price=parseFloat(prices['gh_'+grade])||0;
+    vaultGH+=cnt*price;
+  }
+  const vaultTotal=vaultInvitro+vaultGH;
+
+  main.innerHTML=`
+    <h1 style="font-size:20px;font-weight:800;margin-bottom:4px">💰 Value Inventory</h1>
+    <p style="color:var(--mu);font-size:13px;margin-bottom:20px">Track the market value of your lab vault — in-vitro cultures by stage and greenhouse plants by size grade. Set your INR prices once; the vault updates live.</p>
+
+    <div style="display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap">
+      <div style="flex:1;min-width:150px;background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:16px 20px">
+        <div style="font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">In-vitro vault</div>
+        <div style="font-size:26px;font-weight:800;color:var(--ac)">${fmtINR(vaultInvitro)}</div>
+        <div style="font-size:11px;color:var(--mu);margin-top:3px">${Object.values(stageCount).reduce((a,b)=>a+b,0)} active bottles</div>
+      </div>
+      <div style="flex:1;min-width:150px;background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:16px 20px">
+        <div style="font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Greenhouse vault</div>
+        <div style="font-size:26px;font-weight:800;color:var(--gn)">${fmtINR(vaultGH)}</div>
+        <div style="font-size:11px;color:var(--mu);margin-top:3px">${Object.values(gradeCount).reduce((a,b)=>a+b,0)} plants</div>
+      </div>
+      <div style="flex:1;min-width:150px;background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:16px 20px">
+        <div style="font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Total vault value</div>
+        <div style="font-size:26px;font-weight:800;color:var(--yw)">${fmtINR(vaultTotal)}</div>
+        <div style="font-size:11px;color:var(--mu);margin-top:3px">Combined market value</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div style="display:flex;gap:0;border-bottom:1px solid var(--bd);margin-bottom:20px">
+      <button id="val-tab-prices" onclick="_valTab('prices')" style="padding:8px 18px;font-size:13px;font-weight:600;border:none;background:none;cursor:pointer;border-bottom:2px solid var(--ac);color:var(--ac)">💲 Prices</button>
+      <button id="val-tab-vault" onclick="_valTab('vault')" style="padding:8px 18px;font-size:13px;font-weight:600;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;color:var(--mu)">📦 Vault</button>
+    </div>
+
+    <div id="val-panel-prices">${_renderValuePricesPanel(prices)}</div>
+    <div id="val-panel-vault" style="display:none">${_renderValueVaultPanel(stageCount,gradeCount,prices)}</div>
+  `;
+}
+
+function _valTab(name){
+  document.getElementById('val-panel-prices').style.display=name==='prices'?'':'none';
+  document.getElementById('val-panel-vault').style.display=name==='vault'?'':'none';
+  document.getElementById('val-tab-prices').style.borderBottomColor=name==='prices'?'var(--ac)':'transparent';
+  document.getElementById('val-tab-prices').style.color=name==='prices'?'var(--ac)':'var(--mu)';
+  document.getElementById('val-tab-vault').style.borderBottomColor=name==='vault'?'var(--ac)':'transparent';
+  document.getElementById('val-tab-vault').style.color=name==='vault'?'var(--ac)':'var(--mu)';
+}
+
+function _renderValuePricesPanel(prices){
+  const stageRows=VALUE_STAGES.map(stage=>`
+    <tr>
+      <td style="padding:8px 10px;font-size:13px">${VALUE_STAGE_LABEL[stage]}</td>
+      <td style="padding:8px 10px">
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="color:var(--mu);font-size:13px">₹</span>
+          <input type="number" min="0" step="1" value="${parseFloat(prices['stage_'+stage])||''}" placeholder="0"
+            onchange="_valPriceSet('stage_${stage}',this.value)"
+            style="width:100px;background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:5px 8px;font-size:13px;color:var(--fg)">
+        </div>
+      </td>
+    </tr>`).join('');
+
+  const ghRows=VALUE_GH_GRADES.map(grade=>`
+    <tr>
+      <td style="padding:8px 10px;font-size:13px">${VALUE_GRADE_LABEL[grade]}</td>
+      <td style="padding:8px 10px">
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="color:var(--mu);font-size:13px">₹</span>
+          <input type="number" min="0" step="1" value="${parseFloat(prices['gh_'+grade])||''}" placeholder="0"
+            onchange="_valPriceSet('gh_${grade}',this.value)"
+            style="width:100px;background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:5px 8px;font-size:13px;color:var(--fg)">
+        </div>
+      </td>
+    </tr>`).join('');
+
+  return `
+    <p style="font-size:12px;color:var(--mu);margin-bottom:16px">Set your market price per unit for each stage and size grade. Changes are saved automatically and vault values update immediately.</p>
+    <h3 style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mu);margin-bottom:8px">In-vitro — by stage</h3>
+    <table style="width:100%;border-collapse:collapse;background:var(--sf);border:1px solid var(--bd);border-radius:8px;overflow:hidden;margin-bottom:20px">
+      <tr style="background:var(--sf2)"><th style="padding:8px 10px;text-align:left;font-size:11px;color:var(--mu);font-weight:600">Stage</th><th style="padding:8px 10px;text-align:left;font-size:11px;color:var(--mu);font-weight:600">Price per bottle (INR)</th></tr>
+      ${stageRows}
+    </table>
+    <h3 style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mu);margin-bottom:8px">Greenhouse — by size grade</h3>
+    <table style="width:100%;border-collapse:collapse;background:var(--sf);border:1px solid var(--bd);border-radius:8px;overflow:hidden;margin-bottom:20px">
+      <tr style="background:var(--sf2)"><th style="padding:8px 10px;text-align:left;font-size:11px;color:var(--mu);font-weight:600">Size grade</th><th style="padding:8px 10px;text-align:left;font-size:11px;color:var(--mu);font-weight:600">Price per plant (INR)</th></tr>
+      ${ghRows}
+    </table>
+    <div id="val-save-status" style="font-size:12px;color:var(--mu);min-height:18px"></div>
+  `;
+}
+
+function _renderValueVaultPanel(stageCount,gradeCount,prices){
+  const invitroRows=VALUE_STAGES.map(stage=>{
+    const cnt=stageCount[stage]||0;
+    const price=parseFloat(prices['stage_'+stage])||0;
+    const val=cnt*price;
+    return `<tr style="${cnt?'':'opacity:.45'}">
+      <td style="padding:8px 10px;font-size:13px">${VALUE_STAGE_LABEL[stage]}</td>
+      <td style="padding:8px 10px;font-size:13px;text-align:right">${cnt}</td>
+      <td style="padding:8px 10px;font-size:13px;text-align:right;color:var(--mu)">${fmtINR(price)}</td>
+      <td style="padding:8px 10px;font-size:13px;text-align:right;font-weight:${val?'700':'400'};color:${val?'var(--ac)':'var(--mu)'}">${fmtINR(val)}</td>
+    </tr>`;
+  }).join('');
+
+  const ghRows=VALUE_GH_GRADES.map(grade=>{
+    const cnt=gradeCount[grade]||0;
+    const price=parseFloat(prices['gh_'+grade])||0;
+    const val=cnt*price;
+    return `<tr style="${cnt?'':'opacity:.45'}">
+      <td style="padding:8px 10px;font-size:13px">${VALUE_GRADE_LABEL[grade]}</td>
+      <td style="padding:8px 10px;font-size:13px;text-align:right">${cnt}</td>
+      <td style="padding:8px 10px;font-size:13px;text-align:right;color:var(--mu)">${fmtINR(price)}</td>
+      <td style="padding:8px 10px;font-size:13px;text-align:right;font-weight:${val?'700':'400'};color:${val?'var(--gn)':'var(--mu)'}">${fmtINR(val)}</td>
+    </tr>`;
+  }).join('');
+
+  return `
+    <h3 style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mu);margin-bottom:8px">In-vitro vault</h3>
+    <table style="width:100%;border-collapse:collapse;background:var(--sf);border:1px solid var(--bd);border-radius:8px;overflow:hidden;margin-bottom:20px">
+      <tr style="background:var(--sf2)">
+        <th style="padding:8px 10px;text-align:left;font-size:11px;color:var(--mu);font-weight:600">Stage</th>
+        <th style="padding:8px 10px;text-align:right;font-size:11px;color:var(--mu);font-weight:600">Bottles</th>
+        <th style="padding:8px 10px;text-align:right;font-size:11px;color:var(--mu);font-weight:600">Price each</th>
+        <th style="padding:8px 10px;text-align:right;font-size:11px;color:var(--mu);font-weight:600">Value</th>
+      </tr>
+      ${invitroRows}
+    </table>
+    <h3 style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mu);margin-bottom:8px">Greenhouse vault</h3>
+    <table style="width:100%;border-collapse:collapse;background:var(--sf);border:1px solid var(--bd);border-radius:8px;overflow:hidden;margin-bottom:4px">
+      <tr style="background:var(--sf2)">
+        <th style="padding:8px 10px;text-align:left;font-size:11px;color:var(--mu);font-weight:600">Grade</th>
+        <th style="padding:8px 10px;text-align:right;font-size:11px;color:var(--mu);font-weight:600">Plants</th>
+        <th style="padding:8px 10px;text-align:right;font-size:11px;color:var(--mu);font-weight:600">Price each</th>
+        <th style="padding:8px 10px;text-align:right;font-size:11px;color:var(--mu);font-weight:600">Value</th>
+      </tr>
+      ${ghRows}
+    </table>
+    <p style="font-size:11px;color:var(--mu);margin-top:8px">Prices set in the Prices tab. Vault re-renders each time you open this section.</p>
+  `;
+}
+
+let _valSaveTimer=null;
+async function _valPriceSet(key, val){
+  if(!S.value) S.value={prices:{},overrides:{}};
+  const n=parseFloat(val);
+  if(isNaN(n)||n<0) return;
+  S.value.prices[key]=n;
+  // debounce save — 800ms
+  clearTimeout(_valSaveTimer);
+  const statusEl=document.getElementById('val-save-status');
+  if(statusEl) statusEl.textContent='Saving…';
+  _valSaveTimer=setTimeout(async()=>{
+    try{
+      S.valueSha=await saveValue(S.value,S.valueSha);
+      if(statusEl){ statusEl.textContent='✓ Saved'; statusEl.style.color='var(--gn)'; setTimeout(()=>{if(statusEl)statusEl.textContent='';},2000); }
+    }catch(e){
+      if(statusEl){ statusEl.textContent='Save failed'; statusEl.style.color='var(--rd)'; }
+    }
+  },800);
+}
+
 // REMINDERS
 // ════════════════════════════════════════════════════════════
 function renderReminders(){
@@ -14374,6 +14613,7 @@ function navTo(sec){
     else if(sec==='insights') RavanaInsights.renderInsightsPage();
     else if(sec==='supply') SupplyInventory.renderInventoryPage();
     else if(sec==='search') SearchSystem.renderSearchPage();
+    else if(sec==='value') renderValueSection();
     else if(sec==='logicflows'){} // static page — no render needed
   }
 }
@@ -14436,7 +14676,7 @@ async function login(){
       toast('⚡ Loaded from cache');
     }else{
       load('Loading all data…');
-      const [{notes,sha:nSha},{accs,sha:aSha},{recs,sha:rSha},{bottles,sessions:bSess,sha:bSha},{plants:ghPlants,transfers:ghTransf,sha:ghSha},{items:supItems,sha:supSha},{entries:jEntries,sha:jSha}]=await Promise.all([loadNotesIndex(),loadAccessions(),loadRecipes(),loadBottles(),loadGreenhouse(),loadSupplies(),loadJournal()]);
+      const [{notes,sha:nSha},{accs,sha:aSha},{recs,sha:rSha},{bottles,sessions:bSess,sha:bSha},{plants:ghPlants,transfers:ghTransf,sha:ghSha},{items:supItems,sha:supSha},{entries:jEntries,sha:jSha},{data:valData,sha:valSha}]=await Promise.all([loadNotesIndex(),loadAccessions(),loadRecipes(),loadBottles(),loadGreenhouse(),loadSupplies(),loadJournal(),loadValue()]);
       S.notes=notes; S.notesSha=nSha;
       S.accs=accs; S.accSha=aSha;
       S.recs=recs; S.recSha=rSha;
@@ -14444,6 +14684,7 @@ async function login(){
       S.greenhouse=ghPlants||[]; S.ghTransfers=ghTransf||[]; S.greenhouseSha=ghSha;
       S.supplies=supItems||[]; S.suppliesSha=supSha;
       S.journal=jEntries||[]; S.journalSha=jSha;
+      S.value=valData||{prices:{},overrides:{}}; S.valueSha=valSha;
       _writeCache();
     }
     document.getElementById('login').style.display='none';
