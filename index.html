@@ -14246,7 +14246,6 @@ function lock(){
   sessionStorage.clear();
   document.getElementById('app').classList.remove('on');
   document.getElementById('login').style.display='flex';
-  document.getElementById('lpw').value='';
   document.getElementById('ltok').value='';
 }
 
@@ -14343,9 +14342,8 @@ function _renderWeatherPop(){
 // EVENT WIRING
 // ════════════════════════════════════════════════════════════
 document.getElementById('lbtn').onclick=login;
-document.getElementById('lpw').onkeydown=e=>{if(e.key==='Enter')document.getElementById('ltok').focus();};
 document.getElementById('ltok').onkeydown=e=>{if(e.key==='Enter')login();};
-document.getElementById('trust-yes-btn').onclick=()=>saveTrustedDevice(document.getElementById('lpw').value, S.tok);
+document.getElementById('trust-yes-btn').onclick=()=>saveTrustedDevice(null, S.tok);
 document.getElementById('trust-no-btn').onclick=()=>document.getElementById('trust-banner').classList.remove('on');
 document.getElementById('lock-btn').onclick=lock;
 
@@ -16220,7 +16218,6 @@ async function _twaAutoLogin(pw,tok){
   document.getElementById('twa-status').textContent='Decrypting your lab data…';
   try{
     // Set credentials in the existing login form and call doLogin
-    document.getElementById('lpw').value=pw;
     document.getElementById('ltok').value=tok;
     await doLogin();
     // doLogin sets S.pw, S.tok — now render the launcher
@@ -16258,7 +16255,6 @@ async function _twaLogin(){
   if(!pw||!tok){TG?.HapticFeedback?.notificationOccurred('error');return;}
   TG?.MainButton?.showProgress();
   try{
-    document.getElementById('lpw').value=pw;
     document.getElementById('ltok').value=tok;
     await doLogin();
     // Save to CloudStorage so next open is automatic
