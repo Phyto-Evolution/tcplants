@@ -1,7 +1,6 @@
 # TC Plants Lab — Feature Roadmap
 
-Features discussed, agreed, and waiting to be built properly.
-Pinned on 2026-04-18. Revisit here before starting any new session.
+Updated: 2026-04-20. Read this before starting any session.
 
 ---
 
@@ -22,82 +21,128 @@ There is no ceiling on what Ravana can do once that framework is in place.
 
 ---
 
+## ✅ Shipped (no longer in queue)
+
+| Feature | Shipped in |
+|---------|-----------|
+| Batch Operations (checkboxes, bulk status update) | v3.7 + v3.9 (checkbox CSS fix) |
+| Supply Inventory (supplies/data.enc, expiry, cost) | v3.7 |
+| Dashboard Alerts (contam spike, overdue, expiry) | v3.7 |
+| Advanced Search (Ctrl+K, cross-section) | v3.7 |
+| Lab Schedule View | v3.7 |
+| navTo() cross-section wiring (13 broken links fixed) | v3.8 |
+| Logic Flows page (full dependency map) | v3.8 |
+| viewBatch() — batch barcode page with print/PDF | v3.8 / v3.9 |
+| Journal mic persistent + live transcription | v3.9 |
+| Auto-flair from #hashtags in journal | v3.9 |
+| Single-token login (token = encryption key) + migration tool | v3.9 |
+| GBIF Search portal tab (live, no local data) | v3.9 |
+| tc-fullname autocomplete wired | v3.9 |
+
+---
+
 ## Priority Queue
 
-### 1. Batch Operations (Bottles)
-Select multiple bottles and act on them in one move.
-- Multi-select checkboxes on bottle list
-- Batch actions: mark transferred, mark contaminated, update stage, discard
-- Clear selection / select all by filter
-- Useful for: end-of-autoclave-run bulk updates
+### 1. GBIF — deeper integration (taxonomy section)
+GBIF (gbif.org) is a free, no-key API with a lot we can use. Already using:
+species/match and iucnRedListCategory. What else is worth adding:
 
-### 2. Supply Inventory
-Track lab consumables — media batches, agar, hormones, vessels.
-- Add a batch: name, quantity, unit, cost, prepared date, expiry
-- Auto-decrement when bottles are created (optional linkage)
-- Expiry warnings on dashboard
-- Cost-per-bottle calculation from media used
-- Stored encrypted in GitHub like other data
+**A. Synonyms resolver** — when user types a name that is a synonym, GBIF match
+returns `synonym: true` and `acceptedUsageKey`. Show a banner: "This is a synonym
+of *Accepted name* — use accepted name?" One API call, zero storage.
+`GET /v1/species/match?name=Heliamphora nutans&verbose=true`
 
-### 3. Lab Analytics (per-species dashboard)
-Numbers that actually matter in a TC lab.
-- Contamination rate by species (30-day and all-time)
-- Success / survival rate by species
-- Multiplication factor (cultures out / cultures in per passage)
-- Average time in each stage (initiation → establishment → multiplication → rooting)
-- Visualised as simple bar/donut charts on the Analytics section
+**B. Common names auto-fill** — on GBIF import, fetch vernacular names and
+pre-fill the Common Name field with the English one (or first available).
+`GET /v1/species/{key}/vernacularNames`
 
-### 4. Dashboard Alerts
-Surface problems on the home screen before they're missed.
-- Overdue reviews (bottles past next_review date)
-- Contamination spike (>10% in last 30 days for any species)
-- Expiring supplies
-- GH plants due for inspection
-- Shown as a compact alert strip above the stat cards
+**C. Native distribution** — show which countries the species is native to,
+displayed as a compact tag row in the species detail panel. Useful for
+climate context when setting up TC conditions.
+`GET /v1/species/{key}/distributions`
 
-### 5. Advanced Search
-One search box across all sections.
-- Searches: notes, bottles, accessions, recipes, greenhouse plants
-- Filter by section, species, date range, tag
-- Keyboard shortcut: Ctrl+K
-- Results grouped by section, click to jump
+**D. Reference photo** — pull one photo from GBIF media (often iNaturalist
+observations) and show it as a reference image in species detail. Read-only,
+displayed via img src — nothing stored locally.
+`GET /v1/species/{key}/media?type=StillImage&limit=1`
 
-### 6. Lab Schedule View
-What needs to happen today and this week.
-- Transfers due (bottles with next_review in next 7 days)
-- Overdue reviews (past due, sorted by how late)
-- GH plants due for inspection
-- Today's agenda card: counts + clickable list
-- Replaces the current Calendar section or lives alongside it
+**E. Full taxonomy hierarchy** — family, order, class stored alongside custom
+species so Ravana and analytics can group by family (e.g. all Nepenthaceae).
+Already returned by species/match — just needs to be saved to taxCustom.
 
-### 7. Ravana Insights (AI per-species briefing)
+**F. Carnivorous plant checklist bulk import** — GBIF hosts the ICPS checklist
+and Catalogue of Life. Could offer a one-click "Import all carnivorous plant
+genera" to populate the taxonomy pack without manual entry.
+Relevant dataset: `GET /v1/species/search?highertaxonKey=6&rank=SPECIES&limit=300`
+(key 6 = Nepenthaceae, etc. — would need one call per family)
+
+Priority order: B → A → D → C → E → F
+
+---
+
+### 2. Ravana Insights (AI per-species briefing)
 Ask Ravana about a specific species and get a data-backed answer.
 - "How is my Nepenthes rajah doing?" → pulls all bottles, notes, analytics for that species
 - Identifies patterns: what stage keeps failing, what contamination type recurs
 - Suggests protocol adjustments based on your own data, not generic advice
 - Triggered from species detail panel or direct chat
-
-### 8. Lab Journal (if distinct from Notes)
-**Needs decision:** is this different enough from Notes to justify a separate section?
-- Option A: enhance Notes with a "journal entry" type and chronological view
-- Option B: dedicated journal section with date-first UI (diary style)
-- Leaning toward Option A — less duplication
+- Context: S.analytics + relevant bottles + notes + GBIF distribution for habitat context
 
 ---
 
-## Security / Quality (still pending from earlier audit)
+### 3. S.analytics freshness (code quality, low risk)
+`LabAnalytics.calculate()` only runs at login. After saving notes or bottles,
+S.analytics goes stale — Ravana AI gets outdated context.
+Fix: call `LabAnalytics.calculate()` after `saveNoteAction()` and `saveBottleAction()`.
+Two lines. Zero UI change. Safe.
 
-- Task #4: Voice language configurability (currently hardcoded en-IN)
-- Task #8: Token quota display and enforcement
-- Task #9: Whisper silence detection improvement
-- Task #10: Voice command confidence thresholds
-- Task #24: Content Security Policy headers
-- Task #25: ZIP/GitHub import data validation
+---
+
+### 4. Lab Analytics — per-species detail panel
+The Analytics section currently shows lab-wide numbers. Per-species breakdown:
+- Contamination rate (30-day + all-time) per species
+- Survival rate per species
+- Multiplication factor (cultures out / in per passage)
+- Average time per stage
+- Bar/donut chart per species
+Data all exists in S.bottles + S.notes — pure rendering work.
+
+---
+
+### 5. Two inventory systems (design decision needed)
+Stock (S_inv / inventory/data.enc) and Supply (S.supplies / supplies/data.enc)
+are completely separate. Dashboard low-stock alerts only read S_inv (Stock).
+Options:
+- Option A: merge them — one system, one file, one UI
+- Option B: keep separate but wire Supply into dashboard alerts too
+- Option C: deprecate Stock, redirect to Supply
+Leaning toward C — Supply is more complete and newer.
+
+---
+
+### 6. Offline check consistency (Haiku artifact)
+Only loadNotesIndex + saveNotesIndex are wrapped with `if(!navigator.onLine) throw`.
+The other 5 load functions (loadBottles, loadAccessions etc.) are not.
+Either wrap all 7 consistently, or remove the checks entirely (the fetch will
+fail naturally with a network error and the catch block handles it).
+Removing the checks is simpler and more predictable.
+
+---
+
+## Security / Quality (pending from earlier audit)
+
+- Voice language configurability (currently hardcoded en-IN)
+- Token quota display and enforcement
+- Whisper silence detection improvement
+- Voice command confidence thresholds
+- Content Security Policy headers
+- ZIP/GitHub import data validation
 
 ---
 
 ## Notes
 - All data stays encrypted in GitHub — no new backend needed for any of the above
-- Supply Inventory is the only new `.enc` file needed (`supplies/data.enc`)
-- Batch Ops and Search are pure UI — no new data files
+- GBIF items B/A/D are all read-only, no new .enc files needed
+- GBIF item E would extend taxCustom schema (add `family`, `order` fields)
+- GBIF item F would write to taxCustom — treat like any custom species save
 - Build one feature at a time, test before moving on
