@@ -3759,7 +3759,8 @@ input, textarea, select {
         <div id="journal-editor" style="display:none;height:100%;display:flex;flex-direction:column">
           <div style="padding:16px 20px;border-bottom:1px solid var(--bd);flex-shrink:0;display:flex;gap:10px;align-items:center">
             <input type="text" id="je-title" placeholder="Entry title (optional)" style="flex:1;padding:8px 12px;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-size:14px;font-weight:600">
-            <input type="text" id="je-tags" placeholder="tags, comma-separated" style="width:180px;padding:8px 12px;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-size:12px">
+            <input type="text" id="je-tags" placeholder="tags, comma-separated" style="width:160px;padding:8px 12px;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-size:12px">
+            <label title="Extract #hashtags from body and match to flairs automatically" style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--mu);cursor:pointer;white-space:nowrap;user-select:none"><input type="checkbox" id="je-auto-flair" style="cursor:pointer;accent-color:var(--pu)" onchange="_jeExtractFlairs()">auto-flair</label>
             <button class="btn sm ghost" id="je-mic-btn" onclick="_journalMicTap()" title="Dictate into journal (Native or Whisper)" style="padding:8px 10px;font-size:16px">🎤</button>
             <button class="btn sm green" onclick="saveJournalEntry()">Save</button>
             <button class="btn sm ghost" onclick="cancelJournalEdit()">Cancel</button>
@@ -3790,8 +3791,10 @@ input, textarea, select {
             <div class="tb-div"></div>
             <button class="tb-btn" id="je-preview-toggle" title="Toggle preview" onclick="_toggleJournalPreview()" style="color:var(--ac)">👁</button>
           </div>
+          <!-- Auto-flair pills row — shown when je-auto-flair is checked and matches exist -->
+          <div id="je-auto-flair-pills" style="display:none;flex-wrap:wrap;gap:5px;padding:5px 14px;border-bottom:1px solid var(--bd);background:var(--sf2);align-items:center"><span style="font-size:10px;color:var(--mu);margin-right:4px">matched flairs:</span></div>
           <!-- Body: write pane -->
-          <textarea id="je-body" placeholder="Write freely…
+          <textarea id="je-body" oninput="_jeExtractFlairs()" placeholder="Write freely…
 
 Ideas, observations, protocol thoughts, species notes — anything.
 Use Ravana to extract structured data once you're done writing." style="flex:1;padding:16px 20px;background:transparent;border:none;outline:none;resize:none;font-size:14px;line-height:1.8;color:var(--tx);font-family:var(--font)"></textarea>
@@ -5798,6 +5801,8 @@ function startNewJournalEntry(){
   document.getElementById('je-title').value='';
   document.getElementById('je-tags').value='';
   document.getElementById('je-body').value='';
+  window._jeMatchedFlairIds=[];
+  const afp=document.getElementById('je-auto-flair-pills'); if(afp) afp.style.display='none';
   // Reset preview to write mode
   const pv=document.getElementById('je-preview'); if(pv) pv.style.display='none';
   const ta=document.getElementById('je-body'); if(ta) ta.style.display='';
@@ -5814,6 +5819,8 @@ function editJournalEntry(){
   document.getElementById('je-title').value=e.title||'';
   document.getElementById('je-tags').value=(e.tags||[]).join(', ');
   document.getElementById('je-body').value=e.body||'';
+  window._jeMatchedFlairIds=e.flair_ids||[];
+  const afp=document.getElementById('je-auto-flair-pills'); if(afp) afp.style.display='none';
   // Reset preview to write mode
   const pv2=document.getElementById('je-preview'); if(pv2) pv2.style.display='none';
   const ta2=document.getElementById('je-body'); if(ta2) ta2.style.display='';
@@ -5827,6 +5834,9 @@ function cancelJournalEdit(){
 
 // ── Journal STT ───────────────────────────────────────────────
 let _journalSR=null;
+let _journalRecording=false;
+window.addEventListener('beforeunload',()=>{ if(_journalSR){ _journalRecording=false; try{_journalSR.stop();}catch{} } });
+
 function _journalMicTap(){
   const cfg=_voiceCfg();
   const btn=document.getElementById('je-mic-btn');
@@ -5840,38 +5850,60 @@ function _journalMicTap(){
       btn.textContent='🎤'; btn.style.color='';
       return;
     }
-    // Override Whisper callback to append to journal textarea instead of AI panel
-    const origTranscribe=_transcribeWhisper.toString(); // keep reference
     window._journalWhisperMode=true;
     _startWhisperSTT();
     btn.textContent='⏹ Stop'; btn.style.color='var(--rd)';
     return;
   }
 
-  // Native STT
-  if(_journalSR){ try{_journalSR.stop();}catch{} _journalSR=null; btn.textContent='🎤'; btn.style.color=''; return; }
+  // Native STT — stop if already running
+  if(_journalSR){
+    _journalRecording=false;
+    try{_journalSR.stop();}catch{}
+    _journalSR=null; btn.textContent='🎤'; btn.style.color='';
+    return;
+  }
   if(!('SpeechRecognition' in window||'webkitSpeechRecognition' in window)){
     toast('Speech recognition not available — try Whisper mode','fail'); return;
   }
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   _journalSR=new SR();
   _journalSR.lang=_getVoiceLanguage();
-  _journalSR.continuous=false;
+  _journalSR.continuous=true;
   _journalSR.interimResults=true;
+  _journalRecording=true;
   btn.textContent='⏹ Stop'; btn.style.color='var(--rd)';
   const before=textarea.value;
+  const prefix=before&&!before.endsWith('\n')?'\n':'';
+  // sessionBase tracks confirmed text across restarts; grows as finals accumulate
+  let sessionBase=before+prefix;
   _journalSR.onresult=e=>{
-    const results=Array.from(e.results);
-    const finals=results.filter(r=>r.isFinal).map(r=>r[0].transcript).join('');
-    const interim=results.filter(r=>!r.isFinal).map(r=>r[0].transcript).join('');
-    textarea.value=before+(before&&!before.endsWith('\n')?'\n':'')+finals+interim;
-    if(results.some(r=>r.isFinal)){
+    let finals='', interim='';
+    for(let i=0;i<e.results.length;i++){
+      if(e.results[i].isFinal) finals+=e.results[i][0].transcript;
+      else interim+=e.results[i][0].transcript;
+    }
+    textarea.value=sessionBase+finals+interim;
+    textarea.scrollTop=textarea.scrollHeight;
+    if(document.getElementById('je-auto-flair')?.checked) _jeExtractFlairs();
+  };
+  _journalSR.onerror=e=>{
+    if(e.error==='aborted'||e.error==='no-speech') return;
+    toast('Mic error: '+e.error,'fail');
+    _journalRecording=false; _journalSR=null; btn.textContent='🎤'; btn.style.color='';
+  };
+  _journalSR.onend=()=>{
+    if(_journalRecording&&_journalSR){
+      // Carry over current textarea content as base for next micro-session
+      sessionBase=textarea.value;
+      try{ _journalSR.start(); }catch(err){
+        _journalRecording=false; _journalSR=null; btn.textContent='🎤'; btn.style.color='';
+      }
+    } else {
       _journalSR=null; btn.textContent='🎤'; btn.style.color='';
     }
   };
-  _journalSR.onerror=()=>{ _journalSR=null; btn.textContent='🎤'; btn.style.color=''; };
-  _journalSR.onend=()=>{ _journalSR=null; btn.textContent='🎤'; btn.style.color=''; };
-  try{ _journalSR.start(); }catch(e){ toast('Could not start microphone: '+e.message,'fail'); _journalSR=null; btn.textContent='🎤'; btn.style.color=''; }
+  try{ _journalSR.start(); }catch(e){ toast('Could not start microphone: '+e.message,'fail'); _journalRecording=false; _journalSR=null; btn.textContent='🎤'; btn.style.color=''; }
 }
 
 
@@ -5879,6 +5911,8 @@ async function saveJournalEntry(){
   const title=document.getElementById('je-title').value.trim();
   const body=document.getElementById('je-body').value.trim();
   const tags=document.getElementById('je-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  const autoFlairOn=document.getElementById('je-auto-flair')?.checked;
+  const flair_ids=autoFlairOn?(window._jeMatchedFlairIds||[]):[];
   if(!body){ toast('Write something first','fail'); return; }
   const now=new Date();
   const nowIso=now.toISOString();
@@ -5888,12 +5922,12 @@ async function saveJournalEntry(){
     entry=S.journal.find(x=>x.id===S.editingJournal);
     if(entry){
       const bodyChanged=entry.body!==body;
-      entry.title=title||fmtJournalTs(nowIso); entry.body=body; entry.tags=tags;
+      entry.title=title||fmtJournalTs(nowIso); entry.body=body; entry.tags=tags; entry.flair_ids=flair_ids;
       entry.updatedAt=nowIso;
       if(bodyChanged){ entry.parsed=false; entry.parsedAt=null; entry.summary=null; entry.extracts=[]; }
     }
   } else {
-    entry={id:'j-'+uid(), date:nowIso, title:title||fmtJournalTs(nowIso), body, tags, parsed:false, parsedAt:null, summary:null, extracts:[], parseEnabled:true};
+    entry={id:'j-'+uid(), date:nowIso, title:title||fmtJournalTs(nowIso), body, tags, flair_ids, parsed:false, parsedAt:null, summary:null, extracts:[], parseEnabled:true};
     S.journal.unshift(entry);
   }
   load('Saving journal…');
@@ -5905,6 +5939,40 @@ async function saveJournalEntry(){
     openJournalEntry(entry.id);
   }catch(e){ toast('Save failed: '+e.message,'fail'); }
   unload();
+}
+
+function _jeExtractFlairs(){
+  const cb=document.getElementById('je-auto-flair');
+  const container=document.getElementById('je-auto-flair-pills');
+  if(!container) return;
+  if(!cb?.checked){ container.style.display='none'; return; }
+  const body=document.getElementById('je-body')?.value||'';
+  const raw=[...body.matchAll(/#([\w-]+)/g)].map(m=>m[1].toLowerCase());
+  const unique=[...new Set(raw)];
+  if(!unique.length){ container.style.display='none'; window._jeMatchedFlairIds=[]; return; }
+  const allFlairs=[...(S.taxFlairs||[]),...(S.taxCustom?.flairs||[])];
+  const matched=[], unmatchedTags=[];
+  unique.forEach(tag=>{
+    const f=allFlairs.find(x=>x.name.toLowerCase()===tag);
+    if(f) matched.push(f); else unmatchedTags.push(tag);
+  });
+  window._jeMatchedFlairIds=matched.map(f=>f.id);
+  if(matched.length){
+    container.style.display='flex';
+    container.innerHTML='<span style="font-size:10px;color:var(--mu);margin-right:4px">matched flairs:</span>'+
+      matched.map(f=>`<span class="flair-pill ${f.color||'blue'}">${f.emoji?esc(f.emoji)+' ':''}${esc(f.name)}</span>`).join('');
+  } else {
+    container.style.display='none';
+  }
+  // Merge unmatched hashtags into tags field without duplicating
+  if(unmatchedTags.length){
+    const tagsEl=document.getElementById('je-tags');
+    if(tagsEl){
+      const existing=tagsEl.value.split(',').map(t=>t.trim()).filter(Boolean);
+      const merged=[...new Set([...existing,...unmatchedTags])];
+      tagsEl.value=merged.join(', ');
+    }
+  }
 }
 
 async function deleteJournalEntry(){
@@ -13178,6 +13246,7 @@ async function saveSessionAction(){
     renderBottleList();
     _showSavedQRGrid(newBottles, `${newBottles.length} bottle${newBottles.length!==1?'s':''} across ${batches.length} batch${batches.length!==1?'es':''}`);
     toast(`🔥 Session saved — ${newBottles.length} bottles across ${batches.length} batch${batches.length!==1?'es':''}`, 'ok');
+    updateReminderBadge();
   }catch(e){ toast('Save failed: '+e.message,'fail'); }
   btn.disabled=false; btn.textContent='Save';
 }
@@ -13352,6 +13421,7 @@ async function saveBottleAction(){
       }
     }
     toast(toastMsg,'ok');
+    updateReminderBadge();
   } catch(e){ toast('Save failed: '+e.message,'fail'); }
   btn.disabled=false; btn.textContent='Save';
 }
@@ -13365,7 +13435,7 @@ async function updateBottleStatus(id, newStatus){
   }
   try{
     S.bottlesSha=await saveBottles(S.bottles, S.bottlesSha);
-    renderBottleList(); openBottle(id);
+    renderBottleList(); openBottle(id); updateReminderBadge();
     toast(`🫙 ${S.bottles[idx].code} → ${_botStatusLabel(newStatus)}`);
   }catch(e){ S.bottles[idx].status=prev; toast('Update failed: '+e.message,'fail'); }
 }
