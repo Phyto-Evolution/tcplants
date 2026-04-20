@@ -7436,11 +7436,11 @@ function _renderDashboard(){
 
   // ── Stat band ────────────────────────────────────────────────
   const stats=[
-    {icon:'📋',val:S.notes.length,label:'Notes',c:'var(--ac)',fn:"navTo('notes')"},
-    {icon:'🫙',val:allBots.length,label:`${activeBot.length} active`,c:'#1abc9c',fn:"navTo('bottles')"},
-    {icon:'🌿',val:S.accs.length,label:'Accessions',c:'var(--gn)',fn:"navTo('registry')"},
-    {icon:'🏡',val:(S.greenhouse||[]).length,label:`${ghTotal} plants`,c:'#52b788',fn:"navTo('greenhouse')"},
-    {icon:'⏰',val:overdueCount,label:'overdue',c:overdueCount?'var(--rd)':'var(--mu)',fn:"navTo('reminders')"},
+    {icon:'📋',val:S.notes.length,label:'Notes',c:'var(--ac)',fn:"_dashNav('notes')"},
+    {icon:'🫙',val:allBots.length,label:`${activeBot.length} active`,c:'#1abc9c',fn:"_dashNav('bottles')"},
+    {icon:'🌿',val:S.accs.length,label:'Accessions',c:'var(--gn)',fn:"_dashNav('registry')"},
+    {icon:'🏡',val:(S.greenhouse||[]).length,label:`${ghTotal} plants`,c:'#52b788',fn:"_dashNav('greenhouse')"},
+    {icon:'⏰',val:overdueCount,label:'overdue',c:overdueCount?'var(--rd)':'var(--mu)',fn:"_dashNav('reminders')"},
   ];
   el.innerHTML=stats.map((s,i)=>`<div onclick="${s.fn}" style="flex:1;padding:14px 16px;cursor:pointer;text-align:center;border-right:${i<stats.length-1?'1px solid var(--bd)':'none'};transition:background .12s" onmouseover="this.style.background='var(--sf2)'" onmouseout="this.style.background=''">
     <div style="font-size:22px;font-weight:800;color:${s.c};line-height:1">${s.val}</div>
@@ -14558,6 +14558,15 @@ function exportCSV(){
 // ════════════════════════════════════════════════════════════
 // NAVIGATION
 // ════════════════════════════════════════════════════════════
+// Navigate from dashboard / external link — switch section + show overview, NO drawer pop
+function _dashNav(sec){
+  closeNavDrawer();
+  switchSection(sec);
+  if(sec==='notes') showNote('empty');
+  else if(sec==='registry') showReg('empty');
+  else if(sec==='recipes') showRec('empty');
+}
+
 function switchSection(name){
   S.section=name;
   document.querySelectorAll('.section').forEach(el=>el.classList.remove('on'));
