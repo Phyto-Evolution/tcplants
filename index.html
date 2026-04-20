@@ -915,7 +915,10 @@ main > .dview, main > .editor{ margin:0 auto; }
 #lfb-mic.listening{background:var(--rd);color:#fff;animation:pulse-mic 1s infinite}
 #lfb-mic.processing{background:var(--yw);color:#0d1117}
 #lfb-model{background:transparent;border:1px solid var(--bd);color:var(--mu);font-size:10px;font-weight:700;border-radius:14px;width:auto;padding:0 8px;white-space:nowrap}
-#lfb-ai{background:linear-gradient(135deg,#4285f4,#8250df);color:#fff}
+#lfb-ai{background:linear-gradient(135deg,#4285f4,#8250df);color:#fff;position:relative}
+#lfb-ai-badge{position:absolute;top:2px;right:2px;width:8px;height:8px;border-radius:50%;border:1.5px solid var(--bg);display:none}
+#lfb-ai-badge.warn{display:block;background:var(--yw)}
+#lfb-ai-badge.over{display:block;background:var(--rd);animation:pulse-mic .8s infinite}
 #lfb-ql{background:var(--ac);color:#0d1117}
 @keyframes pulse-mic{0%,100%{box-shadow:0 0 0 0 rgba(248,81,73,.5)}50%{box-shadow:0 0 0 8px rgba(248,81,73,0)}}
 /* wake-word armed indicator */
@@ -4920,7 +4923,7 @@ SERVICE WORKER (sw.js):
 <div id="lab-footer-bar">
   <button class="lfb-btn" id="lfb-mic" aria-label="Voice input (tap or say 'Hey Ravana')" onclick="_voiceTap()" title="Voice input (tap or say Hey Lab)">🎤</button>
   <button class="lfb-btn" id="lfb-model" aria-label="Cycle AI model" onclick="_cycleAIModel()" title="Cycle AI model">⚡ Quick</button>
-  <button class="lfb-btn" id="lfb-ai" aria-label="Toggle Ravana AI assistant" onclick="_toggleAIPanel()" title="AI assistant">✦</button>
+  <button class="lfb-btn" id="lfb-ai" aria-label="Toggle Ravana AI assistant" onclick="_toggleAIPanel()" title="AI assistant">✦<span id="lfb-ai-badge"></span></button>
   <button class="lfb-btn" id="lfb-ql" aria-label="Quick log" onclick="showQuickLog()" title="Quick log">＋</button>
 </div>
 
@@ -10367,31 +10370,60 @@ function _renderAIUsageBar(){
   const lim=AI_LIMITS[modelKey]||{reqDay:1000,tokDay:100000};
   const d=u[modelKey]||{req:0,tok:0};
   const reqPct=Math.min(d.req/lim.reqDay*100,100);
-  const tokPct=Math.min(d.tok/lim.tokDay*100,100);
-  const col=reqPct>80||tokPct>80?'var(--rd)':reqPct>50||tokPct>50?'var(--yw)':'var(--gn)';
+  const tokPct=lim.tokDay?Math.min(d.tok/lim.tokDay*100,100):0;
+  const col=reqPct>80||(lim.tokDay&&tokPct>80)?'var(--rd)':reqPct>50||(lim.tokDay&&tokPct>50)?'var(--yw)':'var(--gn)';
+
+  // Whisper usage today
+  const wh=u['whisper-large-v3']||{req:0};
+  const whLim=AI_LIMITS['whisper-large-v3'];
+  const whPct=Math.min(wh.req/whLim.reqDay*100,100);
+  const whCol=whPct>80?'var(--rd)':whPct>50?'var(--yw)':'var(--gn)';
+
+  // Hours until midnight UTC
+  const now=new Date();
+  const msSinceMidnight=now.getUTCHours()*3600000+now.getUTCMinutes()*60000+now.getUTCSeconds()*1000;
+  const msToMidnight=86400000-msSinceMidnight;
+  const hToReset=Math.ceil(msToMidnight/3600000);
+  const resetLabel=hToReset<=1?'< 1h':hToReset+'h';
+
+  // Update FAB badge
+  const badge=document.getElementById('lfb-ai-badge');
+  if(badge){
+    const quota=_checkAIQuota();
+    badge.className=quota.exceeded?'over':quota.warning?'warn':'';
+  }
 
   // Show quota warning/exceeded message
   let quotaMsg='';
   const quota=_checkAIQuota();
   if(quota.exceeded){
     const unit=quota.reason==='requests'?'requests':'tokens';
-    quotaMsg=`<div style="padding:6px 8px;background:var(--rd);color:#fff;border-radius:4px;font-size:10px;font-weight:600;margin-bottom:6px">⚠️ Quota exceeded (${unit}). Resets at midnight UTC.</div>`;
+    quotaMsg=`<div style="padding:6px 8px;background:var(--rd);color:#fff;border-radius:4px;font-size:10px;font-weight:600;margin-bottom:6px">⚠️ Quota exceeded (${unit}). Resets in ~${resetLabel} UTC.</div>`;
   } else if(quota.warning){
-    quotaMsg=`<div style="padding:6px 8px;background:var(--yw);color:#000;border-radius:4px;font-size:10px;font-weight:600;margin-bottom:6px">⚡ Nearing quota: Req ${quota.reqPct}% · Tok ${quota.tokPct}%</div>`;
+    quotaMsg=`<div style="padding:6px 8px;background:var(--yw);color:#000;border-radius:4px;font-size:10px;font-weight:600;margin-bottom:6px">⚡ Nearing quota — resets in ~${resetLabel} UTC</div>`;
   }
+
+  const tokRow=lim.tokDay
+    ?`<div style="flex:1"><div style="display:flex;justify-content:space-between;margin-bottom:2px"><span>Tokens</span><span>${(d.tok/1000).toFixed(1)}k/${(lim.tokDay/1000).toFixed(0)}k</span></div><div style="height:4px;background:var(--sf3);border-radius:2px"><div style="height:4px;border-radius:2px;background:${col};width:${tokPct}%;transition:width .4s"></div></div></div>`
+    :'';
 
   bar.innerHTML=quotaMsg+`
     <div style="display:flex;gap:8px;align-items:center;font-size:10px;color:var(--mu)">
-      <span style="white-space:nowrap">${mi.icon} ${mi.label}</span>
+      <span style="white-space:nowrap;font-weight:600">${mi.icon} ${mi.label}</span>
       <div style="flex:1">
         <div style="display:flex;justify-content:space-between;margin-bottom:2px"><span>Req</span><span>${d.req}/${lim.reqDay}</span></div>
-        <div style="height:3px;background:var(--sf3);border-radius:2px"><div style="height:3px;border-radius:2px;background:${col};width:${reqPct}%;transition:width .4s"></div></div>
+        <div style="height:4px;background:var(--sf3);border-radius:2px"><div style="height:4px;border-radius:2px;background:${col};width:${reqPct}%;transition:width .4s"></div></div>
       </div>
+      ${tokRow}
+    </div>
+    ${wh.req>0?`<div style="display:flex;gap:8px;align-items:center;font-size:10px;color:var(--mu);margin-top:5px">
+      <span style="white-space:nowrap">🎤 Whisper</span>
       <div style="flex:1">
-        <div style="display:flex;justify-content:space-between;margin-bottom:2px"><span>Tokens</span><span>${(d.tok/1000).toFixed(1)}k/${(lim.tokDay/1000).toFixed(0)}k</span></div>
-        <div style="height:3px;background:var(--sf3);border-radius:2px"><div style="height:3px;border-radius:2px;background:${col};width:${tokPct}%;transition:width .4s"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:2px"><span>Transcriptions</span><span>${wh.req}/${whLim.reqDay}</span></div>
+        <div style="height:4px;background:var(--sf3);border-radius:2px"><div style="height:4px;border-radius:2px;background:${whCol};width:${whPct}%;transition:width .4s"></div></div>
       </div>
-    </div>`;
+    </div>`:''}
+    <div style="font-size:9px;color:var(--mu);margin-top:4px;text-align:right;opacity:.7">Resets in ~${resetLabel} UTC · local count</div>`;
 }
 
 function _cycleAIModel(){
@@ -11386,29 +11418,56 @@ async function _startWhisperSTT(){
   };
   _whisperRec.start(250);
   _setMicBtnState('listening');
-  // Optional silence auto-stop — only after 3.5s grace AND actual speech detected
-  const gate=(c.gate??10)+20; // higher threshold = real speech only
-  const silenceSec=c.whisperSilence||3;
+  // Silence auto-stop with adaptive noise floor
+  // Phase 1 (0–800ms): sample ambient noise to set dynamic gate
+  // Phase 2 (800–3500ms): continued grace, still no auto-stop
+  // Phase 3 (>3500ms): require 400ms sustained speech before hasSpeech=true, then stop after silenceSec silence
+  const silenceSec=c.whisperSilence||2.5;
   _whisperCtx=new AudioContext();
   _whisperAnalyser=_whisperCtx.createAnalyser();
-  _whisperAnalyser.fftSize=512;
+  _whisperAnalyser.fftSize=1024;
   _whisperCtx.createMediaStreamSource(_whisperStream).connect(_whisperAnalyser);
   const buf=new Uint8Array(_whisperAnalyser.frequencyBinCount);
   let silenceStart=null, hasSpeech=false;
-  const graceEnd=Date.now()+3500;
+  let speechOnsetStart=null;         // when continuous loud signal started
+  const startTs=Date.now();
+  const graceEnd=startTs+3500;
+  // Adaptive noise floor — accumulated during first 800ms
+  let noiseSamples=[], noiseFloor=20, gate=40;
   const checkSilence=()=>{
     if(!_whisperRec||_whisperRec.state!=='recording') return;
     _whisperAnalyser.getByteFrequencyData(buf);
-    const avg=buf.reduce((a,b)=>a+b,0)/buf.length;
-    if(Date.now()<graceEnd){ requestAnimationFrame(checkSilence); return; }
-    if(avg>gate) hasSpeech=true;
+    // Rolling average — use mid-frequency bins (speech range ~300–3400Hz)
+    const binHz=(_whisperCtx.sampleRate/2)/buf.length;
+    const lo=Math.floor(300/binHz), hi=Math.ceil(3400/binHz);
+    let sum=0; for(let i=lo;i<=hi;i++) sum+=buf[i];
+    const avg=sum/(hi-lo+1);
+    const now=Date.now();
+    const elapsed=now-startTs;
+    // Phase 1: sample noise floor
+    if(elapsed<800){ noiseSamples.push(avg); requestAnimationFrame(checkSilence); return; }
+    if(noiseSamples.length&&!gate){
+      noiseFloor=noiseSamples.reduce((a,b)=>a+b,0)/noiseSamples.length;
+      gate=Math.max(noiseFloor*2.8, 28); // at least 28/255 to avoid false trigger
+    } else if(!gate){ gate=40; }
+    // Phase 2/3: grace period — no auto-stop until graceEnd
+    if(now<graceEnd){ requestAnimationFrame(checkSilence); return; }
+    // Require 400ms sustained speech above gate before hasSpeech flips
+    if(!hasSpeech){
+      if(avg>gate){
+        if(!speechOnsetStart) speechOnsetStart=now;
+        else if(now-speechOnsetStart>=400) hasSpeech=true;
+      } else speechOnsetStart=null;
+    }
     if(hasSpeech){
-      if(avg<gate){ if(!silenceStart) silenceStart=Date.now();
-        else if(Date.now()-silenceStart>silenceSec*1000){ _stopWhisperSTT(); return; }
+      if(avg<gate){ if(!silenceStart) silenceStart=now;
+        else if(now-silenceStart>silenceSec*1000){ _stopWhisperSTT(); return; }
       } else silenceStart=null;
     }
     requestAnimationFrame(checkSilence);
   };
+  // Initialise gate to non-falsy placeholder until noise sample done
+  gate=0;
   requestAnimationFrame(checkSilence);
 }
 function _stopWhisperSTT(){
