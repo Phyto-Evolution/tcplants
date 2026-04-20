@@ -15738,51 +15738,72 @@ async function _gbifSearch(){
     const d=await r.json();
     const items=(d.results||[]);
     if(!items.length){res.innerHTML='<span style="color:var(--mu)">No results from GBIF.</span>';return;}
-    const iucnMap={'LC':'least_concern','NT':'near_threatened','VU':'vulnerable','EN':'endangered','CR':'critically_endangered','DD':'data_deficient'};
     res.innerHTML=items.map(sp=>{
       const name=sp.canonicalName||sp.scientificName||'';
       const family=sp.family||'';
       const kingdom=sp.kingdom||'';
-      const alreadyHave=(S.taxSpecies||[]).some(s=>s.full_name.toLowerCase()===name.toLowerCase())
-                      ||(S.taxCustom?.species||[]).some(s=>(s.name||'').toLowerCase()===name.toLowerCase());
-      return `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--sf);border:1px solid var(--bd);border-radius:8px;margin-bottom:5px">
+      const alreadyHave=_gbifAlreadyInTaxonomy(name);
+      const key=sp.usageKey||'';
+      return `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--sf);border:1px solid var(--bd);border-radius:8px;margin-bottom:5px" id="gbif-row-${key||name.replace(/\s+/g,'_')}">
         <div style="flex:1;min-width:0">
           <div style="font-size:13px;font-weight:600;font-style:italic">${esc(name)}</div>
           <div style="font-size:11px;color:var(--mu);margin-top:1px">${esc(kingdom)}${family?' › '+esc(family):''}</div>
         </div>
-        ${alreadyHave?'<span style="font-size:11px;color:var(--gn);flex-shrink:0">✓ In taxonomy</span>'
-          :`<button class="btn xs" onclick="_gbifImportSpecies(${JSON.stringify(name)},${JSON.stringify(family)},${JSON.stringify(sp.usageKey||'')})" style="flex-shrink:0">Import →</button>`}
+        ${alreadyHave
+          ?'<span style="font-size:11px;color:var(--gn);flex-shrink:0;font-weight:600">✓ In taxonomy</span>'
+          :`<button class="btn xs" id="gbif-btn-${key||name.replace(/\s+/g,'_')}" onclick="_gbifImportSpecies(${JSON.stringify(name)},${JSON.stringify(family)},${JSON.stringify(key)},this)" style="flex-shrink:0">Import →</button>`}
       </div>`;
     }).join('');
   }catch(e){res.innerHTML=`<span style="color:var(--rd)">GBIF error: ${esc(e.message)}</span>`;}
 }
-async function _gbifImportSpecies(name,family,usageKey){
-  // Switch to "In Culture" tab (where the custom species form lives)
-  _spTab('culture');
-  // Open and reset the add form properly
-  _taxOpenAddForm();
-  // Pre-fill name
-  const fn=document.getElementById('tc-fullname');
-  if(fn) fn.value=name;
-  // Fetch IUCN via GBIF if we have a usageKey
-  if(usageKey){
-    const res=document.getElementById('tc-gbif-result');
-    if(res){res.style.display='';res.textContent='Fetching conservation data…';}
-    try{
-      const r2=await fetch(`https://api.gbif.org/v1/species/${usageKey}/iucnRedListCategory`);
-      let iucn='';
-      if(r2.ok){const d2=await r2.json();iucn=d2.category||'';}
-      const iucnStatus=iucn&&iucnMap[iucn]?iucnMap[iucn]:'';
-      const sel=document.getElementById('tc-status');
-      if(iucnStatus&&sel) sel.value=iucnStatus;
-      const cls=iucn?iucn.toLowerCase():'';
-      if(res) res.innerHTML=`<strong>${esc(name)}</strong>${family?' · '+esc(family):''}${iucn?` · <span class="gbif-badge ${cls}">🌍 IUCN ${iucn}</span>`:''}
-        <br><a href="https://www.gbif.org/species/${usageKey}" target="_blank" rel="noopener" style="color:var(--ac);font-size:11px">View on GBIF ↗</a>`;
-    }catch(e){}
+function _gbifAlreadyInTaxonomy(name){
+  const low=name.toLowerCase();
+  return (S.taxSpecies||[]).some(s=>s.full_name.toLowerCase()===low)
+      ||(S.taxCustom?.species||[]).some(s=>(s.full_name||s.name||'').toLowerCase()===low);
+}
+async function _gbifImportSpecies(name,family,usageKey,btn){
+  // Disable button and show loading state immediately
+  if(btn){btn.disabled=true;btn.textContent='Saving…';}
+  try{
+    // Fetch IUCN status if we have a usageKey
+    let conservationStatus='';
+    if(usageKey){
+      try{
+        const r2=await fetch(`https://api.gbif.org/v1/species/${usageKey}/iucnRedListCategory`);
+        if(r2.ok){const d2=await r2.json();const cat=d2.category||'';conservationStatus=iucnMap[cat]||'';}
+      }catch(e){}
+    }
+    // Save directly to taxonomy — no form required
+    const sp={
+      id:uid(),
+      full_name:name,
+      common_name:'',
+      conservation_status:conservationStatus,
+      source:'gbif',
+      flair_ids:[],
+      gbif_key:usageKey||undefined,
+      gbif_family:family||undefined,
+    };
+    if(!S.taxCustom) S.taxCustom={species:[],flairs:[]};
+    if(!S.taxCustom.species) S.taxCustom.species=[];
+    S.taxCustom.species.push(sp);
+    S.taxSpecies.push({...sp,is_custom:true});
+    await saveCustomTaxonomy();
+    _writeCache();
+    // Update button to confirmed state
+    if(btn){
+      btn.textContent='✓ Imported';
+      btn.style.background='var(--gn)';
+      btn.style.color='#fff';
+      btn.style.borderColor='var(--gn)';
+      btn.disabled=true;
+    }
+    const iucnLabel=conservationStatus?` · IUCN ${Object.entries(iucnMap).find(([k,v])=>v===conservationStatus)?.[0]||''}` :'';
+    toast(`${name} added to taxonomy${iucnLabel}`);
+  }catch(e){
+    if(btn){btn.disabled=false;btn.textContent='Import →';}
+    toast('Import failed: '+e.message,'fail');
   }
-  // Scroll form into view
-  document.getElementById('tax-custom-form').scrollIntoView({behavior:'smooth',block:'start'});
-  toast('Pre-filled from GBIF — add flairs and save');
 }
 const iucnMap={'LC':'least_concern','NT':'near_threatened','VU':'vulnerable','EN':'endangered','CR':'critically_endangered','DD':'data_deficient'};
 
