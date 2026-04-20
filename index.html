@@ -7283,19 +7283,24 @@ const SearchSystem={
 
 // Dashboard alerts are now handled by _computeAlerts() + _renderDashboard()
 
+// ── Date/time formatters — standard: HH:mm:ss DD/MM/YYYY ──────
+const _p=n=>String(n).padStart(2,'0');
+function _fmtDate(d){ return `${_p(d.getDate())}/${_p(d.getMonth()+1)}/${d.getFullYear()}`; }
+function _fmtTime(d){ return `${_p(d.getHours())}:${_p(d.getMinutes())}:${_p(d.getSeconds())}`; }
+function _fmtDateTime(d){ return `${_fmtTime(d)} ${_fmtDate(d)}`; }
+const _DAY=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 function fmtDate(iso){
   if(!iso) return '';
-  return new Date(iso).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric',weekday:'short'});
+  const d=new Date(iso);
+  return `${_DAY[d.getDay()]} ${_fmtDate(d)}`;
 }
 function fmtDateShort(iso){
   if(!iso) return '';
-  return new Date(iso).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+  return _fmtDate(new Date(iso));
 }
 function fmtJournalTs(iso){
   if(!iso) return '';
-  const d=new Date(iso);
-  const p=n=>String(n).padStart(2,'0');
-  return `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}:${p(d.getDate())}:${p(d.getMonth()+1)}:${d.getFullYear()}`;
+  return _fmtDateTime(new Date(iso));
 }
 function daysFrom(iso){
   if(!iso) return null;
@@ -7797,7 +7802,7 @@ function _renderDashboard(){
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:6px">
         ${dump.map(e=>{
-          const ts=new Date(e.ts).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+          const ts=_fmtTime(new Date(e.ts));
           return`<div style="background:var(--sf2);border-radius:20px;padding:4px 12px;font-size:12px;max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
             <span style="color:var(--mu);font-size:10px;margin-right:5px">${ts}</span>${esc(e.text)}
           </div>`;
@@ -8260,7 +8265,7 @@ async function openNoteHistory(){
     if(!commits.length){ list.innerHTML='<p style="color:var(--mu);font-size:13px">No history found.</p>'; return; }
     list.innerHTML=commits.map((c,i)=>`
       <div class="hist-item">
-        <div class="hist-date">${new Date(c.commit.author.date).toLocaleString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+        <div class="hist-date">${_fmtDateTime(new Date(c.commit.author.date))}</div>
         <div class="hist-msg">${esc(c.commit.message)}</div>
         ${i===0?'<span style="font-size:11px;color:var(--gn)">● Current version</span>':`<button class="btn xs ghost" data-sha="${esc(c.sha)}">↩ Restore this version</button>`}
       </div>`).join('');
@@ -9288,7 +9293,7 @@ function _buildUsageCard(){
     const sections=Object.entries(raw).filter(([k])=>k.startsWith('section:')).map(([k,v])=>({name:k.replace('section:',''),count:v})).sort((a,b)=>b.count-a.count);
     if(!sections.length) return `<div class="an-card"><div class="an-title">Feature Usage</div><div class="an-empty">No usage data yet. Navigate around to track.</div></div>`;
     const maxCount=sections[0].count;
-    const lastUsed=raw._last?new Date(raw._last).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'—';
+    const lastUsed=raw._last?_fmtDate(new Date(raw._last)):'—';
     const bars=sections.map(s=>`<div class="an-bar-row">
       <div class="an-bar-label">${esc(s.name)}</div>
       <div class="an-bar-track"><div class="an-bar-fill" style="width:${Math.round(s.count/maxCount*100)}%;background:var(--ac)"></div></div>
@@ -9301,7 +9306,7 @@ function _buildUsageCard(){
 // ── ACTIVITY LOG ─────────────────────────────────────────────
 function exportLabReport(mode){
   const now=new Date();
-  const dateStr=now.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+  const dateStr=_fmtDate(now);
 
   if(mode==='csv'){
     // CSV export: bottles + notes + GH plants as separate sheets (3 files)
@@ -9440,7 +9445,7 @@ async function fetchActivityLog(){
         <div class="al-icon" style="color:${col}">${icon}</div>
         <div class="al-meta">
           <div class="al-msg">${_alFormatMsg(msg)}</div>
-          <div class="al-time">${ago} · ${new Date(c.commit.author.date).toLocaleDateString('en-IN',{day:'numeric',month:'short'})} <a href="${ghUrl}" target="_blank" rel="noopener" class="al-ghlink" title="View on GitHub">↗</a></div>
+          <div class="al-time">${ago} · ${_fmtDate(new Date(c.commit.author.date))} <a href="${ghUrl}" target="_blank" rel="noopener" class="al-ghlink" title="View on GitHub">↗</a></div>
         </div>
       </div>`;
     }).join('');
@@ -9453,7 +9458,7 @@ async function fetchActivityLog(){
         else toast('Note not found — may have been renamed','fail');
       });
     });
-    document.getElementById('actlog-updated').textContent=`Updated ${now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}`;
+    document.getElementById('actlog-updated').textContent=`Updated ${_fmtTime(now)}`;
     document.getElementById('actlog-count').textContent=`${commits.length} entries`;
   }catch(e){
     document.getElementById('actlog-list').innerHTML=`<div class="al-empty">Error loading: ${esc(String(e.message))}</div>`;
@@ -13346,7 +13351,7 @@ function viewBatch(batchId){
   if(!bottles.length){ toast('No bottles found for this batch','fail'); return; }
   const cfg=LABEL_CONFIGS[0];
   const species=[...new Set(bottles.map(b=>b.species).filter(Boolean))].join(', ')||'Unknown';
-  const date=bottles[0]?.date_prepared?new Date(bottles[0].date_prepared).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):'';
+  const date=bottles[0]?.date_prepared?_fmtDate(new Date(bottles[0].date_prepared)):'';
 
   // Build label HTML for print window
   const labelsHtml=bottles.map(b=>`
@@ -13357,7 +13362,7 @@ function viewBatch(batchId){
         <span class="bot-lbl-sp">${esc(b.species||'Unknown species')}</span>
         ${b.flair_note?`<span class="bot-lbl-flair">${esc(b.flair_note)}</span>`:''}
         <span class="bot-lbl-stage">${esc([b.stage,(S.recs.find(r=>r.id===b.recipe_id)||{}).name].filter(Boolean).join(' · '))}</span>
-        <span class="bot-lbl-ts">${b.date_prepared?new Date(b.date_prepared).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):''}</span>
+        <span class="bot-lbl-ts">${b.date_prepared?_fmtDate(new Date(b.date_prepared)):''}</span>
       </div>
     </div>`).join('');
 
@@ -13463,8 +13468,7 @@ function _botFlairHtml(flair_ids){
 
 function _fmtTs(iso){
   if(!iso) return '';
-  const d=new Date(iso);
-  return d.toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'2-digit'})+' '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false});
+  return _fmtDateTime(new Date(iso));
 }
 
 function openBottle(id){
@@ -14909,7 +14913,7 @@ function exportCSV(){
     return [
       n.id||'',
       n.title||'',
-      n.date?new Date(n.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'',
+      n.date?_fmtDate(new Date(n.date)):'',
       n.type||'',
       n.stage||'',
       n.species||'',
@@ -14930,7 +14934,7 @@ function exportCSV(){
   const botRows=(S.bottles||[]).map(b=>{
     const rec=S.recs.find(r=>r.id===b.recipe_id);
     const acc=S.accs.find(a=>a.id===b.accession_id);
-    return [b.code||'',b.batch_id||'',b.species||'',acc?acc.species||acc.accession||'':'',b.stage||'',b.status||'',b.date_prepared?new Date(b.date_prepared).toLocaleDateString('en-GB'):'',b.date_inoculated?new Date(b.date_inoculated).toLocaleDateString('en-GB'):'',b.next_review||'',b.media_volume||'',b.explants||'',rec?rec.name:'',b.flair_note||'',b.notes||'']
+    return [b.code||'',b.batch_id||'',b.species||'',acc?acc.species||acc.accession||'':'',b.stage||'',b.status||'',b.date_prepared?_fmtDate(new Date(b.date_prepared)):'',b.date_inoculated?_fmtDate(new Date(b.date_inoculated)):'',b.next_review||'',b.media_volume||'',b.explants||'',rec?rec.name:'',b.flair_note||'',b.notes||'']
       .map(v=>'"'+String(v).replace(/"/g,'""')+'"');
   });
   const botCsv=[botHeaders.map(h=>'"'+h+'"').join(','),...botRows.map(r=>r.join(','))].join('\n');
@@ -15361,7 +15365,7 @@ function _renderWeatherPop(){
   };
   fmtLoc('lab'); fmtLoc('gh');
   const t=d.updatedAt;
-  document.getElementById('wx-updated').textContent=`Updated ${t.toLocaleDateString('en-IN',{day:'numeric',month:'short'})} ${t.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}`;
+  document.getElementById('wx-updated').textContent=`Updated ${_fmtTime(t)} ${_fmtDate(t)}`;
 }
 
 // ════════════════════════════════════════════════════════════
@@ -17307,7 +17311,7 @@ function _printStockReport(){
 <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:12px;color:#0d1117;background:#fff;padding:20px}h1{font-size:18px;font-weight:800;margin-bottom:4px}h2{font-size:14px;font-weight:700;margin:14px 0 6px}table{border-collapse:collapse;width:100%;margin:6px 0;font-size:11px}th,td{border:1px solid #d0d7de;padding:6px 8px;text-align:left}th{background:#f6f8fa;font-weight:700}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px}.card{border:1px solid #d0d7de;border-radius:6px;padding:10px;text-align:center}.val{font-size:22px;font-weight:800}.lbl{font-size:9px;color:#656d76;text-transform:uppercase;margin-top:3px}svg text{fill:#0d1117}@media print{@page{margin:1.5cm}}</style>
 </head><body>
 <h1>📦 Lab Stock Report · TC Plants</h1>
-<div style="font-size:11px;color:#666;margin-bottom:14px">Generated ${new Date().toLocaleString('en-IN')}</div>
+<div style="font-size:11px;color:#666;margin-bottom:14px">Generated ${_fmtDateTime(new Date())}</div>
 ${inner.innerHTML}
 </body></html>`);
   w.document.close();
