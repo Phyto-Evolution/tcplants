@@ -38,6 +38,14 @@ There is no ceiling on what Ravana can do once that framework is in place.
 | Single-token login (token = encryption key) + migration tool | v3.9 |
 | GBIF Search portal tab (live, no local data) | v3.9 |
 | tc-fullname autocomplete wired | v3.9 |
+| Section overviews (Bottles, Registry, Recipes) | v3.10 |
+| .btn-loading pulse animation on async buttons | v3.10 |
+| Value Inventory page (vault value, INR prices, size grades) | v3.10 |
+| GBIF B: Common names auto-fill on import | v3.10 |
+| GBIF A: Synonym resolver banner (form + species detail) | v3.10 |
+| GBIF D: Reference photo in species detail panel | v3.10 |
+| S.analytics freshness (recalc after note/bottle save) | v3.10 |
+| Offline check consistency (removed Haiku monkey-patches) | v3.10 |
 
 ---
 
@@ -76,7 +84,8 @@ genera" to populate the taxonomy pack without manual entry.
 Relevant dataset: `GET /v1/species/search?highertaxonKey=6&rank=SPECIES&limit=300`
 (key 6 = Nepenthaceae, etc. — would need one call per family)
 
-Priority order: B → A → D → C → E → F
+Shipped: B (common names), A (synonym resolver), D (reference photo)
+Remaining priority order: C → E → F
 
 ---
 
@@ -90,15 +99,7 @@ Ask Ravana about a specific species and get a data-backed answer.
 
 ---
 
-### 3. S.analytics freshness (code quality, low risk)
-`LabAnalytics.calculate()` only runs at login. After saving notes or bottles,
-S.analytics goes stale — Ravana AI gets outdated context.
-Fix: call `LabAnalytics.calculate()` after `saveNoteAction()` and `saveBottleAction()`.
-Two lines. Zero UI change. Safe.
-
----
-
-### 4. Lab Analytics — per-species detail panel
+### 3. Lab Analytics — per-species detail panel
 The Analytics section currently shows lab-wide numbers. Per-species breakdown:
 - Contamination rate (30-day + all-time) per species
 - Survival rate per species
@@ -117,15 +118,6 @@ Options:
 - Option B: keep separate but wire Supply into dashboard alerts too
 - Option C: deprecate Stock, redirect to Supply
 Leaning toward C — Supply is more complete and newer.
-
----
-
-### 6. Offline check consistency (Haiku artifact)
-Only loadNotesIndex + saveNotesIndex are wrapped with `if(!navigator.onLine) throw`.
-The other 5 load functions (loadBottles, loadAccessions etc.) are not.
-Either wrap all 7 consistently, or remove the checks entirely (the fetch will
-fail naturally with a network error and the catch block handles it).
-Removing the checks is simpler and more predictable.
 
 ---
 

@@ -11534,6 +11534,7 @@ async function saveNoteAction(){
       S.notes=notes; S.notesSha=sha; S.cur=id;
     }
     _writeCache();
+    LabAnalytics.calculate();
     populateTagsDatalist();
     _clearDraft();
     updateReminderBadge();
@@ -13548,6 +13549,7 @@ async function saveBottleAction(){
     }
     toast(toastMsg,'ok');
     updateReminderBadge();
+    LabAnalytics.calculate();
   } catch(e){ toast('Save failed: '+e.message,'fail'); }
   btn.disabled=false; btn.textContent='Save';
 }
@@ -15177,19 +15179,6 @@ function _checkOnline(){
   return true;
 }
 
-// Wrap GitHub API calls with offline check
-const _originalLoadNotesIndex=loadNotesIndex;
-loadNotesIndex=async function(){
-  if(!_checkOnline()) throw new Error('offline');
-  return _originalLoadNotesIndex.call(this);
-};
-
-const _originalSaveNotesIndex=saveNotesIndex;
-saveNotesIndex=async function(patchFn){
-  if(!_checkOnline()) throw new Error('offline');
-  return _originalSaveNotesIndex.call(this,patchFn);
-};
-
 // Force HTTPS
 if(location.protocol==='http:'&&location.hostname!=='localhost'){
   location.replace('https:'+location.href.slice(location.protocol.length));
@@ -15881,6 +15870,8 @@ function openSpDetail(spName){
   nameEl.textContent=spName;
   taxLink.href=`https://phyto-evolution.github.io/PhytoCommerce/taxonomy/?q=${encodeURIComponent(spName)}`;
   panel.classList.add('open');
+  // Async: fetch GBIF reference photo + synonym check (GBIF A + D)
+  _loadSpDetailGBIF(spName);
 
   // Gather all data for this species
   const k=spName.toLowerCase();
@@ -15975,6 +15966,54 @@ function openSpDetail(spName){
 }
 function closeSpDetail(){
   document.getElementById('sp-detail-panel').classList.remove('open');
+}
+
+async function _loadSpDetailGBIF(spName){
+  // GBIF A: synonym check + GBIF D: reference photo — injected after panel opens
+  const body=document.getElementById('spd-body');
+  if(!body) return;
+  try{
+    const r=await fetch(`https://api.gbif.org/v1/species/match?name=${encodeURIComponent(spName)}&verbose=true`);
+    if(!r.ok) return;
+    const d=await r.json();
+    if(!d.usageKey) return;
+
+    // GBIF A: Synonym banner
+    const isSynonym=d.synonym===true||d.status==='SYNONYM';
+    if(isSynonym&&d.acceptedUsageKey){
+      try{
+        const rs=await fetch(`https://api.gbif.org/v1/species/${d.acceptedUsageKey}`);
+        if(rs.ok){
+          const ds=await rs.json();
+          const accepted=ds.canonicalName||ds.scientificName||'';
+          if(accepted&&body.isConnected){
+            const banner=document.createElement('div');
+            banner.style.cssText='background:rgba(229,192,21,.12);border:1px solid var(--yw);border-radius:7px;padding:9px 12px;margin-bottom:12px;font-size:12px;line-height:1.5';
+            banner.innerHTML=`⚠️ <strong>${esc(spName)}</strong> is a synonym of <em>${esc(accepted)}</em> — the currently accepted name.`;
+            body.prepend(banner);
+          }
+        }
+      }catch(_){}
+    }
+
+    // GBIF D: Reference photo
+    const rm=await fetch(`https://api.gbif.org/v1/species/${d.usageKey}/media?type=StillImage&limit=1`);
+    if(!rm.ok) return;
+    const dm=await rm.json();
+    const media=(dm.results||[])[0];
+    if(!media?.identifier||!body.isConnected) return;
+    const photoDiv=document.createElement('div');
+    photoDiv.className='spd-section';
+    photoDiv.innerHTML=`<div class="spd-section-title">Reference Photo <span style="font-size:10px;color:var(--mu);font-weight:400">(via GBIF / iNaturalist)</span></div>
+      <img src="${esc(media.identifier)}" alt="${esc(spName)}" loading="lazy"
+        style="width:100%;max-height:220px;object-fit:cover;border-radius:8px;border:1px solid var(--bd);margin-top:4px"
+        onerror="this.parentElement.style.display='none'">
+      ${media.rightsHolder?`<div style="font-size:10px;color:var(--mu);margin-top:4px">© ${esc(media.rightsHolder)}</div>`:''}`;
+    // Insert after summary block (first .spd-section)
+    const firstSection=body.querySelector('.spd-section');
+    if(firstSection&&firstSection.nextSibling) body.insertBefore(photoDiv,firstSection.nextSibling);
+    else body.appendChild(photoDiv);
+  }catch(_){}
 }
 
 // ════════════════════════════════════════════════════════════
@@ -16152,12 +16191,28 @@ async function _taxGBIFLookup(btn){
     const iucnMap={'LC':'least_concern','NT':'near_threatened','VU':'vulnerable','EN':'endangered','CR':'critically_endangered','DD':'data_deficient'};
     if(iucn&&iucnMap[iucn]) document.getElementById('tc-status').value=iucnMap[iucn];
     const cls=iucn?iucn.toLowerCase():'';
+    // Synonym resolver (GBIF A)
+    const isSynonym=d.synonym===true||d.status==='SYNONYM';
+    let synonymBanner='';
+    if(isSynonym&&d.acceptedUsageKey){
+      try{
+        const rs=await fetch(`https://api.gbif.org/v1/species/${d.acceptedUsageKey}`);
+        if(rs.ok){
+          const ds=await rs.json();
+          const accepted=ds.canonicalName||ds.scientificName||'';
+          synonymBanner=`<div style="background:rgba(229,192,21,.12);border:1px solid var(--yw);border-radius:6px;padding:8px 10px;margin-bottom:8px;font-size:12px">
+            ⚠️ <strong>${esc(name)}</strong> is a synonym of <em>${esc(accepted)}</em>.
+            <a style="color:var(--ac);cursor:pointer;margin-left:6px" onclick="document.getElementById('tc-fullname').value=${JSON.stringify(accepted)};document.getElementById('tc-gbif-result').textContent='';_taxGBIFLookup()">Use accepted name →</a>
+          </div>`;
+        }
+      }catch(_){}
+    }
     if(res){
       res.style.display='';
-      res.innerHTML=`<strong>GBIF match:</strong> ${esc(d.scientificName||name)}<br>
+      res.innerHTML=`${synonymBanner}<strong>GBIF match:</strong> ${esc(d.scientificName||name)}<br>
         ${kingdom?`<span style="color:var(--mu)">${esc(kingdom)} › ${esc(phylum||'')} › ${esc(family||'')}</span><br>`:''}
         ${iucn?`<span class="gbif-badge ${cls}">🌍 IUCN ${iucn}</span>`:''}
-        ${status?`<span style="margin-left:6px;font-size:11px">${esc(status)}</span>`:''}
+        ${status&&!isSynonym?`<span style="margin-left:6px;font-size:11px">${esc(status)}</span>`:''}
         <br><a href="https://www.gbif.org/species/${d.usageKey}" target="_blank" rel="noopener" style="color:var(--ac);font-size:11px">View on GBIF ↗</a>`;
     }
     toast('GBIF data loaded');
@@ -16213,19 +16268,26 @@ async function _gbifImportSpecies(name,family,usageKey,btn){
   // Disable button and show loading state immediately
   if(btn){btn.disabled=true;btn.textContent='Saving…';}
   try{
-    // Fetch IUCN status if we have a usageKey
-    let conservationStatus='';
+    // Fetch IUCN status + common name in parallel if we have a usageKey
+    let conservationStatus='', commonName='';
     if(usageKey){
-      try{
-        const r2=await fetch(`https://api.gbif.org/v1/species/${usageKey}/iucnRedListCategory`);
-        if(r2.ok){const d2=await r2.json();const cat=d2.category||'';conservationStatus=iucnMap[cat]||'';}
-      }catch(e){}
+      const [r2,r3]=await Promise.allSettled([
+        fetch(`https://api.gbif.org/v1/species/${usageKey}/iucnRedListCategory`),
+        fetch(`https://api.gbif.org/v1/species/${usageKey}/vernacularNames?limit=20`)
+      ]);
+      if(r2.status==='fulfilled'&&r2.value.ok){const d2=await r2.value.json();const cat=d2.category||'';conservationStatus=iucnMap[cat]||'';}
+      if(r3.status==='fulfilled'&&r3.value.ok){
+        const d3=await r3.value.json();
+        const results=d3.results||[];
+        const eng=results.find(v=>v.language==='eng')||results[0];
+        if(eng) commonName=eng.vernacularName||'';
+      }
     }
     // Save directly to taxonomy — no form required
     const sp={
       id:uid(),
       full_name:name,
-      common_name:'',
+      common_name:commonName,
       conservation_status:conservationStatus,
       source:'gbif',
       flair_ids:[],
