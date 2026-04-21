@@ -1732,7 +1732,7 @@ input, textarea, select {
 </div>
 
 <div id="login">
-  <canvas id="login-wave" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;transition:opacity .5s"></canvas>
+  <canvas id="login-wave" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;transition:opacity .5s;background:transparent"></canvas>
   <button id="login-wave-btn" onclick="_loginWaveToggle()" title="Toggle background waves" style="position:absolute;bottom:14px;right:14px;z-index:2;background:transparent;border:1px solid var(--bd);border-radius:14px;color:var(--mu);cursor:pointer;font-size:11px;padding:3px 10px;opacity:.5;transition:opacity .2s">〜</button>
   <!-- Login screen controls -->
   <div id="login-controls" style="position:absolute;top:18px;right:18px;display:flex;align-items:center;gap:8px;z-index:2">
@@ -17356,14 +17356,19 @@ function _loginToggleSkin(){
   let raf=null;
   let on=localStorage.getItem('tcplants_login_wave')!=='0';
 
-  const SPACING=26;  // dot grid spacing — half density
-  const DOT_R=1.4;
+  const SPACING=26;
+  const DOT_R=1.5;
 
-  // Three overlapping wave layers — combine for interference ripple
-  const WAVES=[
-    {amp:20, freq:0.020, speed:0.38, phase:0.0},
-    {amp:11, freq:0.038, speed:-0.24, phase:1.6},
-    {amp:7,  freq:0.012, speed:0.17,  phase:3.1},
+  // Y-displacement waves (horizontal roll)
+  const WY=[
+    {amp:28, freq:0.018, speed:0.36,  phase:0.0},
+    {amp:14, freq:0.036, speed:-0.22, phase:1.7},
+    {amp:8,  freq:0.011, speed:0.15,  phase:3.2},
+  ];
+  // X-displacement waves (vertical roll) — breaks rigid grid
+  const WX=[
+    {amp:14, freq:0.020, speed:0.28,  phase:0.8},
+    {amp:7,  freq:0.040, speed:-0.18, phase:2.4},
   ];
 
   function resize(){
@@ -17379,29 +17384,24 @@ function _loginToggleSkin(){
     if(canvas.width!==W||canvas.height!==H) resize();
     ctx.clearRect(0,0,W,H);
 
-    // Grey dots — same on all themes, subtle
-    ctx.fillStyle='rgba(128,128,128,0.30)';
+    ctx.fillStyle='rgba(140,140,140,0.32)';
     ctx.beginPath();
 
-    const cols=Math.ceil(W/SPACING)+2;
-    const rows=Math.ceil(H/SPACING)+2;
+    const cols=Math.ceil(W/SPACING)+4;
+    const rows=Math.ceil(H/SPACING)+4;
     for(let row=0;row<rows;row++){
       const baseY=row*SPACING;
       for(let col=0;col<cols;col++){
         const baseX=col*SPACING;
-        // Sum all wave layers for Y displacement of this dot
-        let dy=0;
-        for(let i=0;i<WAVES.length;i++){
-          const w=WAVES[i];
-          dy+=w.amp*Math.sin(w.freq*baseX+t*w.speed+w.phase+row*0.28);
-        }
-        const x=baseX;
-        const y=baseY+dy;
+        let dy=0,dx=0;
+        for(let i=0;i<WY.length;i++) dy+=WY[i].amp*Math.sin(WY[i].freq*baseX+t*WY[i].speed+WY[i].phase+row*0.3);
+        for(let i=0;i<WX.length;i++) dx+=WX[i].amp*Math.sin(WX[i].freq*baseY+t*WX[i].speed+WX[i].phase+col*0.25);
+        const x=baseX+dx, y=baseY+dy;
         ctx.moveTo(x+DOT_R,y);
         ctx.arc(x,y,DOT_R,0,Math.PI*2);
       }
     }
-    ctx.fill(); // single draw call for all dots
+    ctx.fill();
   }
 
   function _sync(){
