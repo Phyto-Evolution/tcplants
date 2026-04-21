@@ -2723,7 +2723,8 @@ input, textarea, select {
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
         <h1 style="font-size:22px;font-weight:800;margin:0">🌿 TC Plants Lab Notes</h1>
         <span class="help-version-badge">v3.9</span>
-        <button class="btn xs ghost" onclick="navTo('logicflows')" style="margin-left:auto;border-color:var(--ac);color:var(--ac)">🔗 Logic Flows →</button>
+        <button class="btn xs ghost" onclick="navTo('changelog')" style="border-color:var(--pu);color:var(--pu)">📋 Changelog →</button>
+        <button class="btn xs ghost" onclick="navTo('logicflows')" style="margin-left:4px;border-color:var(--ac);color:var(--ac)">🔗 Logic Flows →</button>
       </div>
       <p style="color:var(--mu);font-size:13px;margin-bottom:20px">April 2026 · Encrypted · GitHub-backed · Single-file PWA</p>
 
@@ -3858,6 +3859,18 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
   </div>
 
   <!-- ── LOGIC FLOWS ── -->
+  <!-- ── CHANGELOG ── -->
+  <div class="section fullpage" id="sec-changelog">
+    <div class="help-body">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+        <button class="btn xs ghost" onclick="navTo('help')">← Help</button>
+        <h1 style="font-size:20px;font-weight:800;margin:0;flex:1">📋 Updates &amp; Version Log</h1>
+        <button class="btn xs ghost" onclick="renderChangelog(true)" id="cl-refresh-btn">↻ Refresh</button>
+      </div>
+      <div id="cl-body"><div style="color:var(--mu);font-size:13px;padding:24px 0;text-align:center">Loading commits…</div></div>
+    </div>
+  </div>
+
   <div class="section fullpage" id="sec-logicflows">
     <main style="flex:1;overflow-y:auto;padding:28px 32px;max-width:980px">
       <h1 style="font-size:20px;font-weight:800;margin-bottom:4px">🔗 Logic Flows</h1>
@@ -15331,6 +15344,73 @@ function _dashNav(sec){
   }
 }
 
+// ════════════════════════════════════════════════════════════
+// CHANGELOG — live from GitHub commits
+// ════════════════════════════════════════════════════════════
+let _clCache=null;
+async function renderChangelog(force=false){
+  const el=document.getElementById('cl-body'); if(!el) return;
+  const btn=document.getElementById('cl-refresh-btn');
+  if(btn) btn.disabled=true;
+  if(!force&&_clCache){ el.innerHTML=_clCache; if(btn) btn.disabled=false; return; }
+  el.innerHTML='<div style="color:var(--mu);font-size:13px;padding:24px 0;text-align:center">Fetching commits…</div>';
+  try{
+    const repo='Phyto-Evolution/tcplants';
+    const headers={'Accept':'application/vnd.github+json'};
+    if(S.tok) headers['Authorization']='token '+S.tok;
+    // Fetch up to 100 commits
+    const r=await fetch(`https://api.github.com/repos/${repo}/commits?per_page=100`,{headers});
+    if(!r.ok) throw new Error('GitHub API '+r.status);
+    const commits=await r.json();
+    // Filter: skip chat/session dumps, keep code commits
+    const skip=/^(chat:|chore:\s*session|merge|initial commit)/i;
+    const coded=commits.filter(c=>!skip.test(c.commit.message));
+    if(!coded.length){ el.innerHTML='<div style="color:var(--mu);font-size:13px;padding:24px 0;text-align:center">No commits found.</div>'; return; }
+    // Type → colour/label
+    const typeStyle={
+      feat:{col:'var(--gn)',bg:'rgba(63,185,80,.12)',label:'feature'},
+      fix: {col:'var(--yw)',bg:'rgba(210,153,34,.12)',label:'fix'},
+      refactor:{col:'var(--ac)',bg:'rgba(88,166,255,.12)',label:'refactor'},
+      chore:{col:'var(--mu)',bg:'var(--sf2)',label:'chore'},
+      docs:{col:'var(--pu)',bg:'rgba(188,140,255,.12)',label:'docs'},
+    };
+    // Group by date
+    const byDate={};
+    coded.forEach(c=>{
+      const d=c.commit.author.date.slice(0,10);
+      if(!byDate[d]) byDate[d]=[];
+      byDate[d].push(c);
+    });
+    const html=Object.keys(byDate).sort((a,b)=>b.localeCompare(a)).map(date=>{
+      const rows=byDate[date].map(c=>{
+        const msg=c.commit.message.split('\n')[0].trim();
+        const typeMatch=msg.match(/^(\w+)(?:\([\w-]+\))?:\s*/);
+        const type=(typeMatch?.[1]||'').toLowerCase();
+        const ts=typeStyle[type]||{col:'var(--mu)',bg:'var(--sf2)',label:type||'commit'};
+        const body=msg.replace(/^(\w+)(?:\([\w-]+\))?:\s*/,'');
+        const sha=c.sha.slice(0,7);
+        return `<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--sf2)">
+          <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;background:${ts.bg};color:${ts.col};white-space:nowrap;margin-top:2px;flex-shrink:0">${ts.label}</span>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:600;line-height:1.4">${esc(body)}</div>
+            ${c.commit.message.includes('\n')?`<div style="font-size:11px;color:var(--mu);margin-top:4px;white-space:pre-wrap">${esc(c.commit.message.split('\n').slice(1).join('\n').trim().slice(0,400))}</div>`:''}
+          </div>
+          <a href="${esc(c.html_url)}" target="_blank" rel="noopener" style="font-size:10px;font-family:var(--mono);color:var(--mu);flex-shrink:0;padding-top:3px">${sha}</a>
+        </div>`;
+      }).join('');
+      return `<div style="margin-bottom:18px">
+        <div style="font-size:10px;font-weight:800;letter-spacing:.08em;color:var(--mu);text-transform:uppercase;margin-bottom:4px;padding:6px 0;border-bottom:2px solid var(--sf2)">${_fmtDate(new Date(date+'T00:00:00'))}</div>
+        ${rows}
+      </div>`;
+    }).join('');
+    _clCache=html;
+    el.innerHTML=html;
+  }catch(e){
+    el.innerHTML=`<div style="color:var(--rd);font-size:13px;padding:16px 0">Failed to load commits: ${esc(e.message)}</div>`;
+  }
+  if(btn) btn.disabled=false;
+}
+
 function switchSection(name){
   // Stock deprecated — redirect to Supply
   if(name==='stock'){ switchSection('supply'); return; }
@@ -15391,6 +15471,7 @@ function navTo(sec){
     else if(sec==='supply') SupplyInventory.renderInventoryPage();
     else if(sec==='search') SearchSystem.renderSearchPage();
     else if(sec==='value') renderValueSection();
+    else if(sec==='changelog') renderChangelog();
     else if(sec==='logicflows'){} // static page — no render needed
   }
 }
@@ -15922,15 +16003,17 @@ if(!navigator.onLine) document.getElementById('offline-pill').classList.add('on'
 // PWA SERVICE WORKER & OFFLINE SUPPORT (Task #21)
 // ════════════════════════════════════════════════════════════
 if('serviceWorker' in navigator){
+  // Capture BEFORE registration — null means no SW was running (first install)
+  const _swWasControlled=!!navigator.serviceWorker.controller;
   navigator.serviceWorker.register('/sw.js').then(reg=>{
-    // Periodically check for new SW (catches deploys while tab is open)
     setInterval(()=>reg.update(), 5*60*1000);
-    // SW_UPDATED message from new SW activate → show banner
+    // Only notify on genuine updates (not first-ever install)
     navigator.serviceWorker.addEventListener('message', e=>{
-      if(e.data?.type==='SW_UPDATED') _showUpdateBanner();
+      if(e.data?.type==='SW_UPDATED'&&_swWasControlled) _showUpdateBanner();
     });
-    // controllerchange fires when new SW takes over (skipWaiting path)
-    navigator.serviceWorker.addEventListener('controllerchange', _showUpdateBanner);
+    navigator.serviceWorker.addEventListener('controllerchange', ()=>{
+      if(_swWasControlled) _showUpdateBanner();
+    });
   }).catch(()=>{});
 }
 function _showUpdateBanner(){
