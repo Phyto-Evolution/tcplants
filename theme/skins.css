@@ -1,0 +1,77 @@
+/* ════════════════════════════════════════════════════════════
+ * TC Plants · theme/skins.css
+ *
+ * Add new skins:  [data-theme="name"] { --var: value; }
+ * Body textures:  [data-theme="name"] body { background-image }
+ * Component overrides go below each skin block.
+ * Zero app logic lives here — only CSS custom properties + textures.
+ * ════════════════════════════════════════════════════════════ */
+
+
+/* ── DARK — faint star dot grid ───────────────────────────── */
+[data-theme="dark"] body {
+  background-image: radial-gradient(circle, rgba(255,255,255,0.055) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+
+/* ── LIGHT — override vars (also kept in :root fallback) ──── */
+[data-theme="light"] body {
+  background-image: none;
+}
+
+
+/* ── PAPER — warm kraft parchment + fiber grain ───────────── */
+[data-theme="paper"] {
+  --bg:  #f0e2c8;
+  --sf:  #ede0c4;
+  --sf2: #e5d4b0;
+  --sf3: #d8c498;
+  --bd:  #c4a87a;
+  --tx:  #2c1a08;
+  --mu:  #7a5c3a;
+  --ac:  #8b4513;
+  --gn:  #4a7c3f;
+  --rd:  #c0392b;
+  --yw:  #9a6700;
+  --pu:  #6b4a8a;
+  --glass:    rgba(240,226,200,.65);
+  --glass-bd: rgba(139,69,19,.2);
+}
+
+/* Fiber grain via SVG feTurbulence — sits behind all content */
+[data-theme="paper"] body {
+  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='200' height='200' filter='url(%23n)' opacity='0.1'/></svg>");
+  background-size: 200px 200px;
+}
+
+/* Login page radial gradient adjusted for warm palette */
+[data-theme="paper"] #login {
+  background:
+    radial-gradient(ellipse 70% 60% at 25% 35%, rgba(139,69,19,.10) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 50% at 80% 75%, rgba(74,124,63,.08) 0%, transparent 70%),
+    var(--bg);
+}
+
+/* Welcome screen overlay */
+[data-theme="paper"] #vanakkam-greeting { background: rgba(240,226,200,.65); }
+[data-theme="paper"] .vk-card {
+  background: rgba(237,224,196,.95);
+  border-color: rgba(139,69,19,.25);
+  box-shadow: 0 16px 56px rgba(80,40,10,.18), 0 0 0 1px rgba(74,124,63,.12);
+}
+
+
+/* ════════════════════════════════════════════════════════════
+ * FUTURE SKINS — add blocks below here
+ *
+ * [data-theme="halo"] {
+ *   --bg:#0a120a; --tx:#8fd68f; --ac:#5fba5f; ...UNSC olive/titanium
+ * }
+ * [data-theme="biopunk"] {
+ *   --bg:#050f0a; --tx:#00ff88; --ac:#ff2d6b; ...neon on deep black
+ * }
+ * [data-theme="field"] {
+ *   --bg:#fffdf4; --tx:#1a1209; --ac:#2c5f2e; ...worn field notebook
+ * }
+ * ════════════════════════════════════════════════════════════ */

@@ -1,5 +1,5 @@
-const V = 'tcplants-v13';
-const SHELL = ['/', '/index.html', '/manifest.json', '/icon.svg', '/icon-192.png', '/icon-512.png'];
+const V = 'tcplants-v14';
+const SHELL = ['/', '/index.html', '/manifest.json', '/icon.svg', '/icon-192.png', '/icon-512.png', '/theme/skins.css'];
 const CDN_CACHE = 'tcplants-cdn-v2';
 const CDN_HOSTS = ['cdn.jsdelivr.net'];
 

@@ -1700,6 +1700,7 @@ input, textarea, select {
   border-radius: 8px;
 }
 </style>
+<link rel="stylesheet" href="theme/skins.css">
 <script>(function(){
   var t=localStorage.getItem('tcplants_theme')||'dark';
   document.documentElement.dataset.theme=t;
@@ -16936,8 +16937,9 @@ function openSettings(){
   _syncAISettingsPanel();
   document.getElementById('set-qr-enhance').checked=enhance;
   document.getElementById('set-qr-harder').checked=harder;
-  const isDark=document.documentElement.dataset.theme==='dark';
-  document.getElementById('set-theme-btn').textContent=isDark?'☀️ Switch Light':'🌙 Switch Dark';
+  const curTheme=document.documentElement.dataset.theme||'dark';
+  const nxtTheme=_themeNext(curTheme);
+  document.getElementById('set-theme-btn').textContent=_themeIcon(curTheme)+' '+nxtTheme[0].toUpperCase()+nxtTheme.slice(1);
   document.getElementById('settings-panel').classList.add('open');
   document.getElementById('settings-backdrop').classList.add('on');
 }
@@ -16946,12 +16948,7 @@ function closeSettings(){
   document.getElementById('settings-backdrop').classList.remove('on');
 }
 function _setToggleTheme(){
-  const next=document.documentElement.dataset.theme==='dark'?'light':'dark';
-  document.documentElement.dataset.theme=next;
-  localStorage.setItem('tcplants_theme',next);
-  document.getElementById('theme-btn').textContent=next==='dark'?'☀️':'🌙';
-  document.querySelector('meta[name="theme-color"]').setAttribute('content',next==='dark'?'#161b22':'#f6f8fa');
-  document.getElementById('set-theme-btn').textContent=next==='dark'?'☀️ Switch Light':'🌙 Switch Dark';
+  _applyTheme(_themeNext(document.documentElement.dataset.theme||'dark'));
 }
 function _setSkin(on){
   if(on){
@@ -17310,29 +17307,36 @@ if(_st) document.getElementById('ltok').value=_st;
   }, 950);
 })();
 
-// ── THEME ────────────────────────────────────────────────────
+// ── THEME (3-way cycle: dark → paper → light → dark) ─────────
+function _themeNext(t){ return t==='dark'?'paper':t==='paper'?'light':'dark'; }
+function _themeIcon(t){ return t==='dark'?'📄':t==='paper'?'☀️':'🌙'; } // shows NEXT destination
+function _themeColor(t){ return t==='dark'?'#161b22':t==='paper'?'#f0e2c8':'#f6f8fa'; }
+function _applyTheme(t){
+  document.documentElement.dataset.theme=t;
+  localStorage.setItem('tcplants_theme',t);
+  const icon=_themeIcon(t);
+  const tb=document.getElementById('theme-btn');
+  const lb=document.getElementById('login-theme-btn');
+  const sb=document.getElementById('set-theme-btn');
+  if(tb) tb.textContent=icon;
+  if(lb) lb.textContent=icon;
+  const nxt=_themeNext(t);
+  if(sb) sb.textContent=icon+' '+nxt[0].toUpperCase()+nxt.slice(1);
+  document.querySelector('meta[name="theme-color"]').setAttribute('content',_themeColor(t));
+}
 (function(){
-  const saved = localStorage.getItem('tcplants_theme') || 'dark';
-  document.getElementById('theme-btn').textContent = saved === 'dark' ? '☀️' : '🌙';
-  // Sync login theme button
-  const lb = document.getElementById('login-theme-btn');
-  if(lb) lb.textContent = saved === 'dark' ? '☀️' : '🌙';
+  const saved=localStorage.getItem('tcplants_theme')||'dark';
+  const icon=_themeIcon(saved);
+  const tb=document.getElementById('theme-btn');
+  const lb=document.getElementById('login-theme-btn');
+  if(tb) tb.textContent=icon;
+  if(lb) lb.textContent=icon;
 })();
-document.getElementById('theme-btn').addEventListener('click', function(){
-  const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-  document.documentElement.dataset.theme = next;
-  localStorage.setItem('tcplants_theme', next);
-  this.textContent = next === 'dark' ? '☀️' : '🌙';
-  document.querySelector('meta[name="theme-color"]').setAttribute('content', next === 'dark' ? '#161b22' : '#f6f8fa');
+document.getElementById('theme-btn').addEventListener('click',function(){
+  _applyTheme(_themeNext(document.documentElement.dataset.theme||'dark'));
 });
 function _loginToggleTheme(){
-  const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-  document.documentElement.dataset.theme = next;
-  localStorage.setItem('tcplants_theme', next);
-  const icon = next === 'dark' ? '☀️' : '🌙';
-  document.getElementById('theme-btn').textContent = icon;
-  document.getElementById('login-theme-btn').textContent = icon;
-  document.querySelector('meta[name="theme-color"]').setAttribute('content', next === 'dark' ? '#161b22' : '#f6f8fa');
+  _applyTheme(_themeNext(document.documentElement.dataset.theme||'dark'));
 }
 function _loginToggleSkin(){
   const on=document.documentElement.dataset.skin!=='ravana';
