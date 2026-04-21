@@ -9,16 +9,34 @@
 
 
 /* ── DARK — faint star dot grid ───────────────────────────── */
-[data-theme="dark"] body {
+[data-theme="dark"] body,
+[data-theme="dark"] #login {
   background-image: radial-gradient(circle, rgba(255,255,255,0.055) 1px, transparent 1px);
   background-size: 22px 22px;
 }
+[data-theme="dark"] #login {
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,0.055) 1px, transparent 1px),
+    radial-gradient(ellipse 70% 60% at 25% 35%,rgba(63,185,80,.12) 0%,transparent 70%),
+    radial-gradient(ellipse 60% 50% at 80% 75%,rgba(88,166,255,.09) 0%,transparent 70%),
+    radial-gradient(ellipse 40% 35% at 60% 20%,rgba(188,140,255,.07) 0%,transparent 60%);
+  background-size: 22px 22px, auto, auto, auto;
+  background-color: var(--bg);
+}
 
 
-/* ── LIGHT — soft dot grid to take the edge off bright white ─ */
+/* ── LIGHT — dot grid on body and login ─────────────────────── */
 [data-theme="light"] body {
   background-image: radial-gradient(circle, rgba(0,0,0,1.0) 1px, transparent 1px);
   background-size: 20px 20px;
+}
+[data-theme="light"] #login {
+  background-image:
+    radial-gradient(circle, rgba(0,0,0,1.0) 1px, transparent 1px),
+    radial-gradient(ellipse 70% 60% at 25% 35%,rgba(26,127,55,.1) 0%,transparent 70%),
+    radial-gradient(ellipse 60% 50% at 80% 75%,rgba(9,105,218,.08) 0%,transparent 70%);
+  background-size: 20px 20px, auto, auto;
+  background-color: var(--bg);
 }
 
 
