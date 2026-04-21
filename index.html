@@ -17348,7 +17348,7 @@ function _loginToggleSkin(){
   if(cb) cb.checked=on;
 }
 
-// ── LOGIN WAVE ANIMATION ─────────────────────────────────────
+// ── LOGIN WAVE ANIMATION — dots that move in wave patterns ───
 (function initLoginWave(){
   const canvas=document.getElementById('login-wave');
   if(!canvas) return;
@@ -17356,13 +17356,14 @@ function _loginToggleSkin(){
   let raf=null;
   let on=localStorage.getItem('tcplants_login_wave')!=='0';
 
-  // Wave definitions — distributed vertically, very slow
+  const SPACING=26;  // dot grid spacing — half density
+  const DOT_R=1.4;
+
+  // Three overlapping wave layers — combine for interference ripple
   const WAVES=[
-    {r:63, g:185,b:80, alpha:0.13,amp:75, freq:0.0028,speed:0.40,phase:0.0,vy:0.22},
-    {r:88, g:166,b:255,alpha:0.09,amp:95, freq:0.0019,speed:0.28,phase:2.1,vy:0.38},
-    {r:188,g:140,b:255,alpha:0.07,amp:60, freq:0.0034,speed:0.52,phase:4.3,vy:0.55},
-    {r:63, g:185,b:80, alpha:0.06,amp:115,freq:0.0013,speed:0.18,phase:1.0,vy:0.70},
-    {r:88, g:166,b:255,alpha:0.05,amp:80, freq:0.0022,speed:0.35,phase:3.5,vy:0.85},
+    {amp:20, freq:0.020, speed:0.38, phase:0.0},
+    {amp:11, freq:0.038, speed:-0.24, phase:1.6},
+    {amp:7,  freq:0.012, speed:0.17,  phase:3.1},
   ];
 
   function resize(){
@@ -17377,17 +17378,30 @@ function _loginToggleSkin(){
     const W=canvas.offsetWidth,H=canvas.offsetHeight;
     if(canvas.width!==W||canvas.height!==H) resize();
     ctx.clearRect(0,0,W,H);
-    WAVES.forEach(w=>{
-      ctx.beginPath();
-      ctx.strokeStyle=`rgba(${w.r},${w.g},${w.b},${w.alpha})`;
-      ctx.lineWidth=1.6;
-      const yBase=H*w.vy;
-      for(let x=0;x<=W;x+=3){
-        const y=yBase+w.amp*Math.sin(w.freq*x+t*w.speed+w.phase);
-        x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+
+    // Grey dots — same on all themes, subtle
+    ctx.fillStyle='rgba(128,128,128,0.30)';
+    ctx.beginPath();
+
+    const cols=Math.ceil(W/SPACING)+2;
+    const rows=Math.ceil(H/SPACING)+2;
+    for(let row=0;row<rows;row++){
+      const baseY=row*SPACING;
+      for(let col=0;col<cols;col++){
+        const baseX=col*SPACING;
+        // Sum all wave layers for Y displacement of this dot
+        let dy=0;
+        for(let i=0;i<WAVES.length;i++){
+          const w=WAVES[i];
+          dy+=w.amp*Math.sin(w.freq*baseX+t*w.speed+w.phase+row*0.28);
+        }
+        const x=baseX;
+        const y=baseY+dy;
+        ctx.moveTo(x+DOT_R,y);
+        ctx.arc(x,y,DOT_R,0,Math.PI*2);
       }
-      ctx.stroke();
-    });
+    }
+    ctx.fill(); // single draw call for all dots
   }
 
   function _sync(){
