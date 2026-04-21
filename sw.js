@@ -1,4 +1,4 @@
-const V = 'tcplants-v12';
+const V = 'tcplants-v13';
 const SHELL = ['/', '/index.html', '/manifest.json', '/icon.svg', '/icon-192.png', '/icon-512.png'];
 const CDN_CACHE = 'tcplants-cdn-v2';
 const CDN_HOSTS = ['cdn.jsdelivr.net'];
@@ -16,12 +16,7 @@ self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys =>
       Promise.all(keys.filter(k => k !== V && k !== CDN_CACHE).map(k => caches.delete(k)))
-    ).then(() => {
-      // Notify all open tabs that a new version is live
-      return self.clients.matchAll({ type: 'window' }).then(clients => {
-        clients.forEach(c => c.postMessage({ type: 'SW_UPDATED' }));
-      });
-    })
+    )
   );
   self.clients.claim();
 });
@@ -43,7 +38,7 @@ self.addEventListener('fetch', e => {
     e.respondWith(
       caches.match(e.request).then(r => r ||
         fetch(e.request).then(res => {
-          if (res.ok) caches.open(CDN_CACHE).then(c => c.put(e.request, res.clone()));
+          if (res.ok) { const clone = res.clone(); caches.open(CDN_CACHE).then(c => c.put(e.request, clone)); }
           return res;
         }).catch(() => caches.match(e.request))
       )
@@ -54,7 +49,7 @@ self.addEventListener('fetch', e => {
   // Network-first for main app — bypass HTTP cache so GitHub deploys are seen immediately
   e.respondWith(
     fetch(e.request, { cache: 'no-cache' }).then(res => {
-      if (res.ok) caches.open(V).then(c => c.put(e.request, res.clone()));
+      if (res.ok) { const clone = res.clone(); caches.open(V).then(c => c.put(e.request, clone)); }
       return res;
     }).catch(() =>
       caches.match(e.request).then(r => r || caches.match('/index.html'))
