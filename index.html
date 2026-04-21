@@ -841,6 +841,46 @@ main > .dview, main > .editor{ margin:0 auto; }
 .help-table td{padding:6px 10px;border:1px solid var(--bd);vertical-align:top;line-height:1.5}
 .help-table tr:nth-child(even) td{background:rgba(255,255,255,.02)}
 
+/* ── GALLERY ── */
+.gal-cats{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.gal-cat-btn{background:var(--sf);border:1px solid var(--bd);border-radius:20px;color:var(--mu);cursor:pointer;font-size:12px;font-weight:600;padding:4px 12px;transition:all .15s;white-space:nowrap}
+.gal-cat-btn:hover{background:var(--sf2)}
+.gal-cat-btn.active{background:var(--ac);border-color:var(--ac);color:#0d1117}
+.gal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.gal-thumb{position:relative;border-radius:8px;overflow:hidden;cursor:pointer;aspect-ratio:1;background:var(--sf);border:1px solid var(--bd)}
+.gal-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.gal-thumb:hover .gal-thumb-overlay{opacity:1}
+.gal-thumb-overlay{position:absolute;inset:0;background:rgba(0,0,0,.55);opacity:0;transition:opacity .2s;display:flex;flex-direction:column;justify-content:flex-end;padding:8px}
+.gal-thumb-title{color:#fff;font-size:11px;font-weight:600;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.gal-thumb-cat{color:rgba(255,255,255,.7);font-size:10px;margin-top:2px}
+.gal-empty{grid-column:1/-1;text-align:center;padding:40px;color:var(--mu);font-size:13px}
+/* Lightbox */
+#gal-lightbox{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.92);display:flex;align-items:stretch}
+#gal-lb-img-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:20px;min-width:0}
+#gal-lb-img-wrap img{max-width:100%;max-height:100%;object-fit:contain;border-radius:6px}
+#gal-lb-panel{width:320px;flex-shrink:0;background:var(--bg);border-left:1px solid var(--bd);overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
+#gal-lb-close{position:fixed;top:14px;right:14px;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:50%;width:34px;height:34px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;z-index:2001}
+.gal-meta-row{display:flex;flex-direction:column;gap:3px}
+.gal-meta-row label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mu)}
+.gal-meta-row input,.gal-meta-row textarea,.gal-meta-row select{font-size:13px}
+/* Upload modal */
+#gal-modal{position:fixed;inset:0;z-index:1900;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center}
+#gal-modal-inner{background:var(--bg);border:1px solid var(--bd);border-radius:14px;width:min(680px,96vw);max-height:92vh;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:16px}
+#gal-preview-wrap{position:relative;background:var(--sf);border-radius:8px;overflow:hidden;max-height:340px;display:flex;align-items:center;justify-content:center;min-height:200px}
+#gal-preview-wrap canvas{max-width:100%;max-height:340px;display:block}
+#gal-crop-overlay{position:absolute;inset:0;cursor:crosshair}
+/* Tree */
+.tree-node{padding:3px 0 3px 16px;border-left:1px dashed var(--bd)}
+.tree-node.root{border-left:none;padding-left:0}
+.tree-node-label{display:flex;align-items:center;gap:6px;font-size:12px;padding:3px 6px;border-radius:5px;cursor:pointer}
+.tree-node-label:hover{background:var(--sf2)}
+.tree-node-label.current{background:rgba(88,166,255,.12);color:var(--ac);font-weight:700}
+/* Climate sparkline */
+.climate-spark{display:inline-block;vertical-align:middle}
+/* Price history */
+.price-history-row{display:flex;gap:8px;align-items:center;padding:4px 0;border-bottom:1px solid var(--bd);font-size:12px}
+.price-history-row:last-child{border-bottom:none}
+
 /* ── WEATHER ── */
 #weather-chip{
   background:var(--sf2);border:1px solid var(--bd);border-radius:20px;
@@ -2473,6 +2513,16 @@ input, textarea, select {
     <p style="font-size:13px;color:var(--mu);margin-bottom:20px">All contamination log entries across the lab.</p>
     <div class="contam-summary" id="contam-summary"></div>
     <div id="contam-list"></div>
+    <!-- Batch Trace Tool -->
+    <div style="margin-top:28px;max-width:900px">
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:10px">🔍 Batch Trace</h3>
+      <p style="font-size:12px;color:var(--mu);margin-bottom:10px">Enter a bottle code to find all related bottles (same batch, session, or parent) and see which are contaminated.</p>
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <input type="text" id="contam-trace-input" placeholder="e.g. FSL-2026-0042" style="flex:1;max-width:280px">
+        <button class="btn sm" onclick="renderContamBatchTrace()">Trace →</button>
+      </div>
+      <div id="contam-trace-result"></div>
+    </div>
   </div>
 
   <!-- ── ANALYTICS ── -->
@@ -2536,6 +2586,18 @@ input, textarea, select {
           <button class="btn sm" onclick="scaleMedia()">Scale →</button>
           <div class="scaler-result" id="scaler-result"></div>
         </div>
+      </div>
+      <!-- Batch Calculator -->
+      <div style="background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:16px">
+        <div style="font-size:14px;font-weight:700;margin-bottom:12px">🧮 Batch Calculator</div>
+        <p style="font-size:12px;color:var(--mu);margin-bottom:12px">Select a saved recipe → enter bottle count → get scaled ingredient totals.</p>
+        <div style="display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:end;margin-bottom:10px">
+          <div class="field" style="margin:0"><label>Recipe</label><select id="bc-recipe-sel" style="font-size:13px"><option value="">— select —</option></select></div>
+          <div class="field" style="margin:0"><label>Bottles</label><input type="number" id="bc-bottles" placeholder="e.g. 60" min="1" style="width:80px"></div>
+          <div class="field" style="margin:0"><label>mL/bottle</label><input type="number" id="bc-ml" value="100" min="1" style="width:70px"></div>
+        </div>
+        <button class="btn sm" onclick="_bcCalc()">Calculate →</button>
+        <div id="bc-result" style="margin-top:10px"></div>
       </div>
     </div>
   </div>
@@ -2622,6 +2684,30 @@ input, textarea, select {
           <!-- Tips panel -->
           <div id="steril-tips" style="margin-top:14px;background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.2);border-radius:8px;padding:14px;font-size:12px;color:var(--mu);line-height:1.7;display:none"></div>
         </div>
+      </div>
+      <!-- ── AUTOCLAVE RUN LOG ── -->
+      <div style="margin-top:28px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+          <h3 style="font-size:16px;font-weight:700;margin:0">🔥 Autoclave Run Log</h3>
+          <button class="btn sm" onclick="_openSterilLogForm()">＋ Log Run</button>
+        </div>
+        <!-- Log form (hidden by default) -->
+        <div id="steril-log-form" style="display:none;background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:16px;margin-bottom:14px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+            <div class="field"><label>Protocol / name</label><input type="text" id="steril-log-protocol" placeholder="e.g. MS Stage 2"></div>
+            <div class="field"><label>Date</label><input type="date" id="steril-log-date"></div>
+            <div class="field" style="grid-column:1/-1"><label>Load contents</label><input type="text" id="steril-log-load" placeholder="e.g. 90 × MS+Gelrite bottles, 2× Hoaglands 500mL"></div>
+            <div class="field"><label>Status</label>
+              <select id="steril-log-status"><option value="success">✓ Success</option><option value="issue">⚠ Issue</option><option value="fail">✗ Fail</option></select>
+            </div>
+            <div class="field"><label>Notes</label><input type="text" id="steril-log-notes" placeholder="Any anomalies, pressure readings, etc."></div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn green sm" id="steril-log-save-btn" onclick="_saveSterilRun()">Save Run</button>
+            <button class="btn ghost sm" onclick="document.getElementById('steril-log-form').style.display='none'">Cancel</button>
+          </div>
+        </div>
+        <div id="steril-run-log"></div>
       </div>
     </div>
   </div>
@@ -3886,6 +3972,123 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
     </div>
   </div>
 
+  <!-- ── GALLERY ── -->
+  <div class="section fullpage" id="sec-gallery">
+    <div style="max-width:1200px;margin:0 auto;width:100%;padding-bottom:40px">
+      <!-- Init state (lazy load) -->
+      <div id="gal-init" style="text-align:center;padding:60px 20px">
+        <div style="font-size:48px;margin-bottom:16px">📸</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:8px">Photo Gallery</div>
+        <div style="font-size:13px;color:var(--mu);margin-bottom:20px;max-width:400px;margin-left:auto;margin-right:auto">Encrypted photo storage — watermarked, compressed to 300KB, with full metadata &amp; species links.</div>
+        <button class="btn green" onclick="loadGallery()">Load Gallery</button>
+      </div>
+      <!-- Loaded state -->
+      <div id="gal-outer" style="display:none">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+          <h2 style="font-size:20px;font-weight:700;margin:0">📸 Photo Gallery</h2>
+          <button class="btn sm green" onclick="_galStartUpload()">＋ Upload</button>
+          <span id="gal-count" style="color:var(--mu);font-size:12px;margin-left:auto"></span>
+        </div>
+        <div id="gal-cats" class="gal-cats"></div>
+        <div id="gal-grid" class="gal-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gallery upload modal -->
+  <div id="gal-modal" style="display:none;position:fixed;inset:0;z-index:1900;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center">
+    <div id="gal-modal-inner" style="background:var(--bg);border:1px solid var(--bd);border-radius:14px;width:min(700px,96vw);max-height:92vh;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <h3 style="font-size:16px;font-weight:700;margin:0;flex:1">📸 New Photo</h3>
+        <button class="btn xs ghost" onclick="_galCloseModal()">✕</button>
+      </div>
+      <!-- Preview canvas with crop overlay -->
+      <div id="gal-preview-wrap" style="position:relative;background:var(--sf);border-radius:8px;overflow:hidden;max-height:300px;display:flex;align-items:center;justify-content:center">
+        <canvas id="gal-preview-canvas" style="max-width:100%;max-height:300px;display:block"></canvas>
+        <div id="gal-crop-overlay" style="position:absolute;inset:0;cursor:crosshair;display:none"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span id="gal-filesize" style="font-size:11px;color:var(--mu)"></span>
+        <span style="font-size:11px;color:var(--gr)">✓ Watermarked · WebP</span>
+      </div>
+      <!-- Barcode row -->
+      <div id="gal-bc-row" style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:12px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <span style="font-size:12px;font-weight:700">Barcode / QR</span>
+          <span id="gal-bc-status" style="font-size:11px;color:var(--mu);flex:1"></span>
+          <button class="btn xs ghost" onclick="_galStartCrop()" title="Draw region over barcode to help detection">🎯 Mark region</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:8px">
+          <input type="text" id="gal-bc-value" placeholder="Barcode value (or enter manually)" style="font-size:12px">
+          <input type="text" id="gal-bc-type" placeholder="Type (e.g. QR_CODE)" style="font-size:12px;width:130px">
+        </div>
+      </div>
+      <!-- Metadata form (2-col grid) -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="field"><label>Title *</label><input type="text" id="gal-title" placeholder="e.g. Nepenthes Stage 2 multiplication"></div>
+        <div class="field"><label>Date</label><input type="date" id="gal-date"></div>
+        <div class="field"><label>Category</label>
+          <select id="gal-category">${GALLERY_CATS.filter(c=>c.id!=='all').map(c=>`<option value="${c.id}">${c.icon} ${c.label}</option>`).join('')}</select>
+        </div>
+        <div class="field"><label>Location</label>
+          <select id="gal-location"><option>Lab</option><option>Greenhouse</option><option>Hardening Chamber</option><option>Field</option><option>Other</option></select>
+        </div>
+        <div class="field"><label>Species</label><select id="gal-species"><option value="">— none —</option></select></div>
+        <div class="field"><label>Stage</label>
+          <select id="gal-stage"><option value="">—</option><option>Stage 1</option><option>Stage 2</option><option>Stage 3</option><option>Ex vitro</option><option>N/A</option></select>
+        </div>
+        <div class="field"><label>Bottle code (if applicable)</label><input type="text" id="gal-bottle-id" placeholder="FSL-2026-0042"></div>
+        <div class="field"><label>GH Plant ID (if applicable)</label><input type="text" id="gal-gh-id" placeholder="gh_..."></div>
+        <div class="field"><label>Passage #</label><input type="number" id="gal-passage" placeholder="e.g. 3" min="0" style="width:80px"></div>
+        <div class="field"><label>Health</label>
+          <select id="gal-health"><option value="">—</option><option>Excellent</option><option>Good</option><option>Fair</option><option>Poor</option><option>Contaminated</option></select>
+        </div>
+        <div class="field" style="grid-column:1/-1"><label>Batch / lot</label><input type="text" id="gal-batch" placeholder="e.g. B-2026-001"></div>
+        <div class="field" style="grid-column:1/-1"><label>Tags (comma separated)</label><input type="text" id="gal-tags" placeholder="e.g. multiplication, healthy, fungal contam"></div>
+        <div class="field" style="grid-column:1/-1"><label>Notes</label><textarea id="gal-notes" style="height:60px" placeholder="Any observations, anomalies, or context…"></textarea></div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn ghost" onclick="_galCloseModal()">Cancel</button>
+        <button class="btn green" id="gal-save-btn" onclick="_galSaveUpload()">Save Photo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gallery lightbox -->
+  <div id="gal-lightbox" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.93);flex-direction:row">
+    <button id="gal-lb-close" onclick="_galCloseLightbox()" style="position:fixed;top:14px;right:14px;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:50%;width:34px;height:34px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;z-index:2001">✕</button>
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:20px;min-width:0">
+      <img id="gal-lb-img" src="" alt="" style="max-width:100%;max-height:100vh;object-fit:contain;border-radius:6px">
+    </div>
+    <div style="width:320px;flex-shrink:0;background:var(--bg);border-left:1px solid var(--bd);overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:14px;font-weight:700">Photo Details</div>
+      <div class="gal-meta-row"><label>Title</label><input type="text" id="gal-lb-title"></div>
+      <div class="gal-meta-row"><label>Category</label>
+        <select id="gal-lb-cat">${GALLERY_CATS.filter(c=>c.id!=='all').map(c=>`<option value="${c.id}">${c.icon} ${c.label}</option>`).join('')}</select>
+      </div>
+      <div class="gal-meta-row"><label>Date</label><input type="date" id="gal-lb-date"></div>
+      <div class="gal-meta-row"><label>Species</label><input type="text" id="gal-lb-species" placeholder="species name or ID"></div>
+      <div class="gal-meta-row"><label>Bottle code</label><input type="text" id="gal-lb-bottle"></div>
+      <div class="gal-meta-row"><label>GH Plant ID</label><input type="text" id="gal-lb-ghplant"></div>
+      <div class="gal-meta-row"><label>Stage</label>
+        <select id="gal-lb-stage"><option value="">—</option><option>Stage 1</option><option>Stage 2</option><option>Stage 3</option><option>Ex vitro</option><option>N/A</option></select>
+      </div>
+      <div class="gal-meta-row"><label>Location</label>
+        <select id="gal-lb-location"><option>Lab</option><option>Greenhouse</option><option>Hardening Chamber</option><option>Field</option><option>Other</option></select>
+      </div>
+      <div class="gal-meta-row"><label>Health</label>
+        <select id="gal-lb-health"><option value="">—</option><option>Excellent</option><option>Good</option><option>Fair</option><option>Poor</option><option>Contaminated</option></select>
+      </div>
+      <div class="gal-meta-row"><label>Notes</label><textarea id="gal-lb-notes" style="height:70px"></textarea></div>
+      <div style="font-size:11px;color:var(--mu)">Barcode: <span id="gal-lb-barcode" style="color:var(--tx)">—</span></div>
+      <div id="gal-lb-info" style="font-size:10px;color:var(--mu)"></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn green sm" id="gal-lb-save-btn" onclick="_galLbSaveMeta()">Save Changes</button>
+        <button class="btn danger sm" onclick="_galDeletePhoto()">Delete</button>
+      </div>
+    </div>
+  </div>
+
   <div class="section fullpage" id="sec-logicflows">
     <main style="flex:1;overflow-y:auto;padding:28px 32px;max-width:980px">
       <h1 style="font-size:20px;font-weight:800;margin-bottom:4px">🔗 Logic Flows</h1>
@@ -4744,6 +4947,7 @@ SERVICE WORKER (sw.js):
       <button class="ndtab" data-sec="supply" onclick="navTo('supply')"><span class="nd-icon">📦</span>Supplies</button>
       <button class="ndtab" data-sec="value" onclick="navTo('value')"><span class="nd-icon">💰</span>Value</button>
       <button class="ndtab" data-sec="search" onclick="navTo('search')"><span class="nd-icon">🔍</span>Search</button>
+      <button class="ndtab" data-sec="gallery" onclick="navTo('gallery')"><span class="nd-icon">📸</span>Gallery</button>
       <div class="nd-divider"></div>
       <button class="ndtab" onclick="closeNavDrawer();openActLog()"><span class="nd-icon">⚡</span>Activity</button>
       <button class="ndtab" onclick="closeNavDrawer();lock()" style="color:var(--rd)"><span class="nd-icon">🔒</span>Lock</button>
@@ -5075,6 +5279,13 @@ SERVICE WORKER (sw.js):
     </div>
   </div>
   <div class="wx-updated" id="wx-updated"></div>
+  <div style="margin-top:12px;border-top:1px solid var(--bd);padding-top:12px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <span style="font-size:12px;font-weight:700">📈 Climate History</span>
+      <button class="btn xs ghost" onclick="renderClimateHistory()" style="margin-left:auto">Refresh</button>
+    </div>
+    <div id="climate-history-body" style="font-size:12px;color:var(--mu)">Click Refresh to load.</div>
+  </div>
 </div>
 <!-- Activity log -->
 <!-- ═══════════ SPECIES DETAIL PANEL ═══════════ -->
@@ -7132,9 +7343,12 @@ const SupplyInventory={
           ${item.expiry?`<span>Expires: ${fmtDateShort(item.expiry)}</span>`:''}
         </div>
         ${perfHtml}
-        <div style="display:flex;gap:6px;margin-top:10px">
+        <div id="supply-price-history-${item.id}" style="margin-top:8px"></div>
+        <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
           <button class="btn xs" onclick="SupplyInventory.markUsed('${item.id}')" style="flex:1;font-size:11px">+ Use 1</button>
           <button class="btn xs ghost" onclick="SupplyInventory.editUse('${item.id}')" style="flex:1;font-size:11px">Edit use</button>
+          <button class="btn xs ghost" onclick="_addPriceSnapshot('${item.id}')" title="Log a new price snapshot" style="font-size:11px">₹ Price</button>
+          <button class="btn xs ghost" onclick="document.getElementById('supply-price-history-${item.id}').innerHTML='';renderPriceHistory('${item.id}')" style="font-size:11px">📈 History</button>
         </div>
       </div>`;
     };
@@ -11158,9 +11372,8 @@ async function askAI(prompt){
   }catch(e){
     thinking.remove();
     let errMsg=e.message||'Unknown error';
-    if(e.status===429) errMsg='Rate limited — Groq free tier reached. Wait a minute or switch to 8B Quick.';
-    else if(e.status===503||e.status===502) errMsg='Groq service unavailable. Retried once — try again in a moment.';
-    else if(e.status===400) errMsg='Bad request: '+(e.message||'model error')+'. Try switching to 8B Quick.';
+    if(e.status===503||e.status===502) errMsg='AI service unavailable — tried fallback. Try again in a moment.';
+    else if(e.status===400) errMsg='Bad request — '+(e.message||'model error')+'.';
     msgs.innerHTML+=`<div class="ai-msg ai" style="color:var(--rd)">⚠️ ${esc(errMsg)}</div>`;
     toast('Ravana: '+errMsg.substring(0,60), 'fail');
     msgs.scrollTop=msgs.scrollHeight;
@@ -11186,6 +11399,11 @@ async function _callAIProxyFull(provider, model, messages, clientKey, _retry=0){
   if(!r.ok){
     let errMsg=`Proxy error ${r.status}`;
     try{ const d=await r.json(); if(d.error) errMsg=d.error; }catch{}
+    // 429: fall back to 8B immediately (separate rate limit window)
+    if(r.status===429&&model!=='llama-3.1-8b-instant'){
+      await new Promise(res=>setTimeout(res,1500));
+      return _callAIProxyFull(provider,'llama-3.1-8b-instant',messages,clientKey,_retry+1);
+    }
     // Auto-retry once for 400/503/502 after short delay (transient upstream errors)
     if(_retry===0&&[400,502,503].includes(r.status)){
       await new Promise(res=>setTimeout(res,4000));
@@ -11193,7 +11411,6 @@ async function _callAIProxyFull(provider, model, messages, clientKey, _retry=0){
     }
     // If 70B fails, fall back to 8B on second attempt
     if(_retry===1&&model==='llama-3.3-70b-versatile'){
-      toast('70B unavailable — retrying with 8B…','warn');
       await new Promise(res=>setTimeout(res,2000));
       return _callAIProxyFull(provider, 'llama-3.1-8b-instant', messages, clientKey, 2);
     }
@@ -13963,6 +14180,11 @@ function openBottle(id){
     ${stepperHtml?`<div class="bot-stepper-row">${stepperHtml}</div>`:''}
     ${b.notes?`<div class="bot-notes-body">${sanitizeMarkdown(b.notes)}</div>`:''}
     ${(b.batch_id&&batchMates.length)?`<div class="bot-batch-row">Batch: <a onclick="viewBatch('${b.batch_id}')">View all ${batchMates.length+1} bottles in this batch</a></div>`:''}
+    ${(b.parent_id||(S.bottles||[]).some(x=>x.parent_id===id))?`
+    <div style="padding:12px 16px;border-top:1px solid var(--bd)">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin-bottom:8px">🌳 Passage Lineage</div>
+      <div id="bottle-tree-pane" style="font-size:12px"></div>
+    </div>`:''}
   `;
   showBotDetail();
   // Generate QR code
@@ -13971,6 +14193,8 @@ function openBottle(id){
   if(canvas && typeof QRCode!=='undefined'){
     QRCode.toCanvas(canvas, url, {width:130, margin:1, color:{dark:'#000000',light:'#ffffff'}}, err=>{if(err) console.warn('QR err',err);});
   }
+  // Passage lineage tree
+  if(document.getElementById('bottle-tree-pane')) renderPassageTree(id);
 }
 
 function _populateBotEditor(b){
@@ -15479,7 +15703,8 @@ function switchSection(name){
   if(name==='reminders') renderReminders();
   if(name==='contam') renderContamDashboard();
   if(name==='analytics') renderAnalytics();
-  if(name==='sterilise'){ if(_sterilActiveId===undefined) loadCustomSterilProtocol(); else renderSterilPage(); }
+  if(name==='sterilise'){ if(_sterilActiveId===undefined) loadCustomSterilProtocol(); else renderSterilPage(); loadSterilRuns(); }
+  if(name==='tools') renderBatchCalc();
   if(name==='stock'){ loadInv().then(renderInv); } // kept for safety, unreachable due to redirect above
   if(name==='species') renderSpecies();
   if(name==='news'){ _renderPersistedPins(); if(document.getElementById('news-toggle').checked && !_newsData) handleNewsToggle(true); }
@@ -15528,6 +15753,7 @@ function navTo(sec){
     else if(sec==='search') SearchSystem.renderSearchPage();
     else if(sec==='value') renderValueSection();
     else if(sec==='changelog') renderChangelog();
+    else if(sec==='gallery'){}  // lazy — user clicks Load Gallery
     else if(sec==='logicflows'){} // static page — no render needed
   }
 }
@@ -15825,6 +16051,7 @@ async function fetchWeather(){
     S.weather.updatedAt=new Date();
     _renderWeatherChip();
     _renderWeatherPop();
+    _climateAfterFetch();
   }catch(e){ /* silent fail — chip stays at — */ }
 }
 function _renderWeatherChip(){
@@ -17926,6 +18153,676 @@ function _updateWidgetTray(){
 // Telegram removed — not used
 
 
+
+// ════════════════════════════════════════════════════════════
+// GALLERY MODULE
+// ════════════════════════════════════════════════════════════
+const GALLERY_CATS=[
+  {id:'all',label:'All',icon:'📷'},
+  {id:'in-bottle',label:'In-Bottle Culture',icon:'🫙'},
+  {id:'contamination',label:'Contamination',icon:'☣️'},
+  {id:'deflasked',label:'Deflasked / Acclimatising',icon:'🌱'},
+  {id:'pot-single',label:'In Pot — Single',icon:'🪴'},
+  {id:'pot-community',label:'Community Pot',icon:'🏺'},
+  {id:'bare-root',label:'Bare Root',icon:'🌿'},
+  {id:'seeds',label:'Seeds & Germination',icon:'🌾'},
+  {id:'seedling',label:'Seedling',icon:'🌿'},
+  {id:'mother-plant',label:'Mother Plant',icon:'🌳'},
+  {id:'explant',label:'Explant Material',icon:'🔬'},
+  {id:'media',label:'Media & Recipes',icon:'🧪'},
+  {id:'equipment',label:'Lab & Equipment',icon:'⚙️'},
+  {id:'microscopy',label:'Microscopy',icon:'🔭'},
+  {id:'dispatch',label:'Dispatch & Packaging',icon:'📦'},
+  {id:'field',label:'Field Collection',icon:'🌍'},
+  {id:'general',label:'General',icon:'📷'},
+];
+let _galCat='all', _galItems=[], _galSha=null, _galLoaded=false, _galLbId=null;
+
+async function loadGallery(){
+  const outer=document.getElementById('gal-outer');
+  const init=document.getElementById('gal-init');
+  if(_galLoaded){init.style.display='none';outer.style.display='';renderGalleryGrid();return;}
+  init.innerHTML='<div style="color:var(--mu);font-size:13px;padding:40px 20px">Loading gallery…</div>';
+  try{
+    const f=await ghGet('gallery/meta.enc');
+    if(f){_galItems=JSON.parse(await dec(f.content));_galSha=f.sha;}
+    else{_galItems=[];_galSha=null;}
+  }catch(e){_galItems=[];_galSha=null;}
+  _galLoaded=true;
+  init.style.display='none';
+  outer.style.display='';
+  renderGalleryGrid();
+}
+
+function renderGalleryGrid(){
+  // Category tabs
+  const cats=document.getElementById('gal-cats');
+  if(cats) cats.innerHTML=GALLERY_CATS.map(c=>`<button class="gal-cat-btn${_galCat===c.id?' active':''}" onclick="_galSetCat('${c.id}')">${c.icon} ${c.label}</button>`).join('');
+  // Count
+  const visible=_galCat==='all'?_galItems:_galItems.filter(i=>i.category===_galCat);
+  const countEl=document.getElementById('gal-count');
+  if(countEl) countEl.textContent=`${visible.length} photo${visible.length!==1?'s':''}`;
+  // Grid
+  const grid=document.getElementById('gal-grid');
+  if(!grid) return;
+  if(!visible.length){
+    grid.innerHTML=`<div class="gal-empty">No photos in this category yet.<br><button class="btn sm" style="margin-top:12px" onclick="_galStartUpload()">＋ Upload first photo</button></div>`;
+    return;
+  }
+  grid.innerHTML=visible.map(item=>`
+    <div class="gal-thumb" onclick="_galOpenLightbox('${esc(item.id)}')">
+      ${item.thumb?`<img src="${item.thumb}" loading="lazy" alt="${esc(item.title||'')}">`:
+        `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--mu);font-size:24px">${(GALLERY_CATS.find(c=>c.id===item.category)||GALLERY_CATS[0]).icon}</div>`}
+      <div class="gal-thumb-overlay">
+        <div class="gal-thumb-title">${esc(item.title||item.category)}</div>
+        <div class="gal-thumb-cat">${item.species_id?esc(item.species_id)+' · ':''} ${item.date||''}</div>
+      </div>
+    </div>`).join('');
+}
+
+function _galSetCat(cat){_galCat=cat;renderGalleryGrid();}
+
+// ── Upload flow ──
+let _galUploadCanvas=null, _galUploadBlob=null, _galUploadThumb=null, _galBarcodeInfo=null;
+let _galCropActive=false, _galCropStart=null;
+
+function _galStartUpload(){
+  const inp=document.createElement('input');
+  inp.type='file'; inp.accept='image/*'; inp.capture='environment';
+  inp.onchange=async()=>{
+    const file=inp.files[0]; if(!file) return;
+    const img=new Image();
+    const url=URL.createObjectURL(file);
+    img.onload=async()=>{
+      URL.revokeObjectURL(url);
+      const {blob,canvas}=await _galCompress(img);
+      _galUploadCanvas=canvas; _galUploadBlob=blob;
+      _galUploadThumb=await _galThumb(canvas);
+      _galBarcodeInfo=await _galDetectBarcode(canvas);
+      _galShowUploadModal(file.name, canvas);
+    };
+    img.src=url;
+  };
+  inp.click();
+}
+
+async function _galCompress(img, targetKB=300){
+  const MAX=2400;
+  let w=img.naturalWidth, h=img.naturalHeight;
+  if(Math.max(w,h)>MAX){const r=MAX/Math.max(w,h);w=Math.round(w*r);h=Math.round(h*r);}
+  const canvas=document.createElement('canvas');
+  canvas.width=w; canvas.height=h;
+  const ctx=canvas.getContext('2d');
+  ctx.drawImage(img,0,0,w,h);
+  _galWatermark(canvas,ctx);
+  let q=0.88, blob;
+  do{
+    blob=await new Promise(res=>canvas.toBlob(res,'image/webp',q));
+    q-=0.06;
+  }while(blob.size>targetKB*1024&&q>0.35);
+  return {blob,canvas};
+}
+
+function _galWatermark(canvas,ctx){
+  const w=canvas.width, h=canvas.height;
+  const minDim=Math.min(w,h);
+  const fontSize=Math.max(18,Math.round(minDim*0.044));
+  ctx.save();
+  ctx.font=`bold ${fontSize}px Arial,sans-serif`;
+  ctx.textAlign='center';
+  ctx.textBaseline='middle';
+  ctx.shadowColor='rgba(0,0,0,0.9)';
+  ctx.shadowBlur=Math.max(8,fontSize*0.35);
+  ctx.shadowOffsetX=1; ctx.shadowOffsetY=1;
+  ctx.fillStyle='rgba(255,255,255,0.5)';
+  ctx.fillText('Forest Studio Labs',w/2,h/2);
+  ctx.restore();
+}
+
+async function _galThumb(canvas){
+  const TW=160;
+  const tc=document.createElement('canvas');
+  const r=TW/canvas.width;
+  tc.width=TW; tc.height=Math.round(canvas.height*r);
+  tc.getContext('2d').drawImage(canvas,0,0,tc.width,tc.height);
+  const blob=await new Promise(res=>tc.toBlob(res,'image/webp',0.55));
+  return new Promise(res=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.readAsDataURL(blob);});
+}
+
+async function _galDetectBarcode(canvas){
+  if(!('BarcodeDetector' in window)) return null;
+  try{
+    const bd=new BarcodeDetector();
+    const codes=await bd.detect(canvas);
+    if(codes.length>0) return {value:codes[0].rawValue,format:codes[0].format};
+  }catch(e){}
+  return null;
+}
+
+function _galShowUploadModal(filename, canvas){
+  const m=document.getElementById('gal-modal');
+  const pWrap=document.getElementById('gal-preview-wrap');
+  const preview=document.getElementById('gal-modal-preview');
+  // Copy watermarked canvas to preview
+  const pc=document.getElementById('gal-preview-canvas');
+  pc.width=canvas.width; pc.height=canvas.height;
+  pc.getContext('2d').drawImage(canvas,0,0);
+  // Barcode info
+  const bcRow=document.getElementById('gal-bc-row');
+  const bcVal=document.getElementById('gal-bc-value');
+  if(_galBarcodeInfo){
+    bcRow.style.display='';
+    bcVal.value=_galBarcodeInfo.value;
+    document.getElementById('gal-bc-type').value=_galBarcodeInfo.format||'';
+    document.getElementById('gal-bc-status').textContent=`✓ Detected: ${_galBarcodeInfo.format}`;
+  } else {
+    bcRow.style.display='';
+    bcVal.value='';
+    document.getElementById('gal-bc-type').value='';
+    document.getElementById('gal-bc-status').textContent=
+      ('BarcodeDetector' in window)?'Not detected — mark region or enter manually':'Manual entry (BarcodeDetector unavailable in this browser)';
+  }
+  // File size
+  document.getElementById('gal-filesize').textContent=`${Math.round(_galUploadBlob.size/1024)}KB · ${canvas.width}×${canvas.height}`;
+  // Default date
+  document.getElementById('gal-date').value=new Date().toISOString().slice(0,10);
+  // Populate species select
+  _galPopulateSpecies();
+  // Populate bottle / GH options (simple text for now)
+  m.style.display='flex';
+}
+
+function _galPopulateSpecies(){
+  const sel=document.getElementById('gal-species');
+  const items=(S.taxCustom?.species||[]).concat(S.taxSpecies||[]);
+  const uniq=[...new Map(items.map(s=>[s.id||s.name,s])).values()];
+  sel.innerHTML='<option value="">— none —</option>'+uniq.slice(0,200).map(s=>`<option value="${esc(s.id||s.name)}">${esc(s.name||s.id)}</option>`).join('');
+}
+
+async function _galSaveUpload(){
+  if(!_galUploadBlob) return;
+  const id='gal_'+Date.now().toString(36);
+  const title=document.getElementById('gal-title').value.trim()||'Untitled';
+  const item={
+    id, title,
+    category:document.getElementById('gal-category').value||'general',
+    tags:document.getElementById('gal-tags').value.split(',').map(t=>t.trim()).filter(Boolean),
+    date:document.getElementById('gal-date').value,
+    notes:document.getElementById('gal-notes').value.trim(),
+    species_id:document.getElementById('gal-species').value,
+    bottle_id:document.getElementById('gal-bottle-id').value.trim(),
+    gh_plant_id:document.getElementById('gal-gh-id').value.trim(),
+    stage:document.getElementById('gal-stage').value,
+    passage_num:parseInt(document.getElementById('gal-passage').value)||null,
+    location:document.getElementById('gal-location').value,
+    health:document.getElementById('gal-health').value,
+    batch:document.getElementById('gal-batch').value.trim(),
+    barcode_value:document.getElementById('gal-bc-value').value.trim(),
+    barcode_type:document.getElementById('gal-bc-type').value.trim(),
+    dimensions:`${_galUploadCanvas.width}×${_galUploadCanvas.height}`,
+    file_size_kb:Math.round(_galUploadBlob.size/1024),
+    uploaded_by:_getRavanaUser()?.key||'shiva',
+    upload_date:new Date().toISOString(),
+    thumb:_galUploadThumb
+  };
+  const saveBtn=document.getElementById('gal-save-btn');
+  saveBtn.disabled=true; saveBtn.textContent='Saving…';
+  try{
+    // Encrypt & upload full image
+    const arrBuf=await _galUploadBlob.arrayBuffer();
+    const imgB64=btoa(String.fromCharCode(...new Uint8Array(arrBuf)));
+    const encImg=await enc(imgB64);
+    await ghPut(`gallery/${id}.enc`,encImg,null,`gallery: add ${title}`);
+    // Update meta
+    _galItems.unshift(item);
+    const encMeta=await enc(JSON.stringify(_galItems));
+    const res=await ghPut('gallery/meta.enc',encMeta,_galSha||undefined,'gallery: update meta');
+    _galSha=res?.content?.sha||_galSha;
+    toast('Photo saved ✓','ok');
+    _galCloseModal();
+    renderGalleryGrid();
+  }catch(e){
+    toast('Save failed: '+e.message,'fail');
+    saveBtn.disabled=false; saveBtn.textContent='Save Photo';
+  }
+}
+
+function _galCloseModal(){
+  document.getElementById('gal-modal').style.display='none';
+  _galUploadCanvas=null; _galUploadBlob=null; _galUploadThumb=null; _galBarcodeInfo=null;
+}
+
+// ── Lightbox ──
+async function _galOpenLightbox(id){
+  _galLbId=id;
+  const item=_galItems.find(i=>i.id===id); if(!item) return;
+  const lb=document.getElementById('gal-lightbox');
+  lb.style.display='flex';
+  _galFillLbMeta(item);
+  // Load full image
+  const imgEl=document.getElementById('gal-lb-img');
+  imgEl.src=''; imgEl.alt='Loading…';
+  try{
+    const f=await ghGet(`gallery/${id}.enc`);
+    if(f){
+      const imgB64=await dec(f.content);
+      const byteArr=Uint8Array.from(atob(imgB64),c=>c.charCodeAt(0));
+      const blob=new Blob([byteArr],{type:'image/webp'});
+      imgEl.src=URL.createObjectURL(blob);
+    }
+  }catch(e){imgEl.alt='Failed to load';}
+}
+
+function _galFillLbMeta(item){
+  document.getElementById('gal-lb-title').value=item.title||'';
+  document.getElementById('gal-lb-notes').value=item.notes||'';
+  document.getElementById('gal-lb-cat').value=item.category||'general';
+  document.getElementById('gal-lb-species').value=item.species_id||'';
+  document.getElementById('gal-lb-bottle').value=item.bottle_id||'';
+  document.getElementById('gal-lb-ghplant').value=item.gh_plant_id||'';
+  document.getElementById('gal-lb-stage').value=item.stage||'';
+  document.getElementById('gal-lb-date').value=item.date||'';
+  document.getElementById('gal-lb-location').value=item.location||'Lab';
+  document.getElementById('gal-lb-health').value=item.health||'';
+  document.getElementById('gal-lb-barcode').textContent=item.barcode_value?(item.barcode_value+(item.barcode_type?` [${item.barcode_type}]`:'')):'—';
+  document.getElementById('gal-lb-info').textContent=`${item.dimensions||''}  ${item.file_size_kb||'?'}KB  ${item.upload_date?new Date(item.upload_date).toLocaleDateString('en-IN'):''}`;
+}
+
+async function _galLbSaveMeta(){
+  const item=_galItems.find(i=>i.id===_galLbId); if(!item) return;
+  item.title=document.getElementById('gal-lb-title').value.trim();
+  item.notes=document.getElementById('gal-lb-notes').value.trim();
+  item.category=document.getElementById('gal-lb-cat').value;
+  item.species_id=document.getElementById('gal-lb-species').value;
+  item.bottle_id=document.getElementById('gal-lb-bottle').value.trim();
+  item.gh_plant_id=document.getElementById('gal-lb-ghplant').value.trim();
+  item.stage=document.getElementById('gal-lb-stage').value;
+  item.date=document.getElementById('gal-lb-date').value;
+  item.location=document.getElementById('gal-lb-location').value;
+  item.health=document.getElementById('gal-lb-health').value;
+  const btn=document.getElementById('gal-lb-save-btn');
+  btn.disabled=true; btn.textContent='Saving…';
+  try{
+    const encMeta=await enc(JSON.stringify(_galItems));
+    const res=await ghPut('gallery/meta.enc',encMeta,_galSha||undefined,'gallery: edit meta');
+    _galSha=res?.content?.sha||_galSha;
+    toast('Metadata saved ✓','ok');
+    renderGalleryGrid();
+  }catch(e){toast('Save failed: '+e.message,'fail');}
+  btn.disabled=false; btn.textContent='Save Changes';
+}
+
+async function _galDeletePhoto(){
+  if(!_galLbId) return;
+  if(!confirm('Delete this photo permanently?')) return;
+  const item=_galItems.find(i=>i.id===_galLbId); if(!item) return;
+  try{
+    const f=await ghGet(`gallery/${_galLbId}.enc`);
+    if(f) await ghDel(`gallery/${_galLbId}.enc`,f.sha,'gallery: delete photo');
+    _galItems=_galItems.filter(i=>i.id!==_galLbId);
+    const encMeta=await enc(JSON.stringify(_galItems));
+    const res=await ghPut('gallery/meta.enc',encMeta,_galSha||undefined,'gallery: delete meta');
+    _galSha=res?.content?.sha||_galSha;
+    toast('Photo deleted','ok');
+    _galCloseLightbox();
+    renderGalleryGrid();
+  }catch(e){toast('Delete failed: '+e.message,'fail');}
+}
+
+function _galCloseLightbox(){
+  const lb=document.getElementById('gal-lightbox');
+  lb.style.display='none';
+  const imgEl=document.getElementById('gal-lb-img');
+  if(imgEl.src&&imgEl.src.startsWith('blob:')) URL.revokeObjectURL(imgEl.src);
+  imgEl.src=''; _galLbId=null;
+}
+
+// ── Crop helper for barcode detection ──
+function _galStartCrop(){
+  const canvas=document.getElementById('gal-preview-canvas');
+  const overlay=document.getElementById('gal-crop-overlay');
+  let sel=null;
+  overlay.style.display='block';
+  overlay.onmousedown=e=>{
+    const r=overlay.getBoundingClientRect();
+    sel={x:e.clientX-r.left,y:e.clientY-r.top,w:0,h:0};
+    overlay._box=document.createElement('div');
+    Object.assign(overlay._box.style,{position:'absolute',border:'2px dashed #58a6ff',pointerEvents:'none'});
+    overlay.appendChild(overlay._box);
+  };
+  overlay.onmousemove=e=>{
+    if(!sel||!overlay._box) return;
+    const r=overlay.getBoundingClientRect();
+    sel.w=e.clientX-r.left-sel.x; sel.h=e.clientY-r.top-sel.y;
+    Object.assign(overlay._box.style,{left:Math.min(sel.x,sel.x+sel.w)+'px',top:Math.min(sel.y,sel.y+sel.h)+'px',width:Math.abs(sel.w)+'px',height:Math.abs(sel.h)+'px'});
+  };
+  overlay.onmouseup=async()=>{
+    overlay._box?.remove(); overlay.style.display='none';
+    if(!sel||!sel.w||!sel.h) return;
+    // Scale sel coords to canvas coords
+    const r=overlay.getBoundingClientRect();
+    const scaleX=canvas.width/r.width, scaleY=canvas.height/r.height;
+    const cx=Math.round(Math.min(sel.x,sel.x+sel.w)*scaleX);
+    const cy=Math.round(Math.min(sel.y,sel.y+sel.h)*scaleY);
+    const cw=Math.round(Math.abs(sel.w)*scaleX);
+    const ch=Math.round(Math.abs(sel.h)*scaleY);
+    const cropC=document.createElement('canvas');
+    cropC.width=cw; cropC.height=ch;
+    cropC.getContext('2d').drawImage(canvas,cx,cy,cw,ch,0,0,cw,ch);
+    const bc=await _galDetectBarcode(cropC);
+    const statusEl=document.getElementById('gal-bc-status');
+    if(bc){
+      document.getElementById('gal-bc-value').value=bc.value;
+      document.getElementById('gal-bc-type').value=bc.format||'';
+      statusEl.textContent=`✓ Detected: ${bc.format}`;
+      _galBarcodeInfo=bc;
+    } else {
+      statusEl.textContent='Still not detected — enter value manually below';
+    }
+    sel=null;
+  };
+}
+
+// ════════════════════════════════════════════════════════════
+// AUTOCLAVE RUN LOG
+// ════════════════════════════════════════════════════════════
+let _sterilRunsSha=null;
+
+async function loadSterilRuns(){
+  if(!S.tok) return;
+  try{
+    const f=await ghGet('sterilise/runs.enc');
+    if(f){S.sterilRuns=JSON.parse(await dec(f.content));_sterilRunsSha=f.sha;}
+    else{S.sterilRuns=[];_sterilRunsSha=null;}
+  }catch(e){S.sterilRuns=[];}
+  renderSterilRunLog();
+}
+
+function renderSterilRunLog(){
+  const el=document.getElementById('steril-run-log'); if(!el) return;
+  const runs=(S.sterilRuns||[]).slice().reverse();
+  if(!runs.length){el.innerHTML='<div style="color:var(--mu);font-size:12px;padding:8px 0">No runs logged yet — complete a protocol and hit "Log Run".</div>';return;}
+  el.innerHTML=runs.map(r=>`
+    <div style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:12px;margin-bottom:8px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <span style="font-weight:700;font-size:13px">${esc(r.protocol||'Custom')}</span>
+        <span style="background:${r.status==='success'?'var(--gr)':r.status==='issue'?'var(--yw)':'var(--rd)'};color:#0d1117;border-radius:10px;font-size:10px;font-weight:700;padding:1px 8px">${r.status||'?'}</span>
+        <span style="color:var(--mu);font-size:11px;margin-left:auto">${r.date||''}</span>
+      </div>
+      <div style="font-size:12px;color:var(--mu)">${esc(r.load_contents||'—')}</div>
+      ${r.notes?`<div style="font-size:12px;margin-top:4px">${esc(r.notes)}</div>`:''}
+    </div>`).join('');
+}
+
+function _openSterilLogForm(){
+  document.getElementById('steril-log-form').style.display='';
+  document.getElementById('steril-log-protocol').value=document.getElementById('steril-active-name')?.textContent||'Custom';
+  document.getElementById('steril-log-date').value=new Date().toISOString().slice(0,10);
+}
+
+async function _saveSterilRun(){
+  const run={
+    id:'sr_'+Date.now().toString(36),
+    protocol:document.getElementById('steril-log-protocol').value.trim(),
+    date:document.getElementById('steril-log-date').value,
+    load_contents:document.getElementById('steril-log-load').value.trim(),
+    status:document.getElementById('steril-log-status').value,
+    notes:document.getElementById('steril-log-notes').value.trim()
+  };
+  S.sterilRuns=(S.sterilRuns||[]).concat(run);
+  const btn=document.getElementById('steril-log-save-btn');
+  btn.disabled=true; btn.textContent='Saving…';
+  try{
+    const enc_data=await enc(JSON.stringify(S.sterilRuns));
+    const res=await ghPut('sterilise/runs.enc',enc_data,_sterilRunsSha||undefined,'sterilise: log run');
+    _sterilRunsSha=res?.content?.sha||_sterilRunsSha;
+    toast('Run logged ✓','ok');
+    document.getElementById('steril-log-form').style.display='none';
+    renderSterilRunLog();
+  }catch(e){toast('Save failed: '+e.message,'fail');}
+  btn.disabled=false; btn.textContent='Save Run';
+}
+
+// ════════════════════════════════════════════════════════════
+// MEDIA BATCH CALCULATOR (from recipe)
+// ════════════════════════════════════════════════════════════
+function renderBatchCalc(){
+  const sel=document.getElementById('bc-recipe-sel');
+  if(!sel) return;
+  sel.innerHTML='<option value="">— select recipe —</option>'+(S.recs||[]).map(r=>`<option value="${esc(r.id)}">${esc(r.name)}</option>`).join('');
+}
+
+function _bcCalc(){
+  const recId=document.getElementById('bc-recipe-sel').value;
+  const bottles=parseInt(document.getElementById('bc-bottles').value)||0;
+  const mlPerBot=parseFloat(document.getElementById('bc-ml').value)||100;
+  const out=document.getElementById('bc-result');
+  if(!recId||!bottles){out.innerHTML='<span style="color:var(--mu)">Select a recipe and enter bottle count.</span>';return;}
+  const rec=(S.recs||[]).find(r=>r.id===recId);
+  if(!rec){out.innerHTML='Recipe not found.';return;}
+  const total=bottles*mlPerBot;
+  // Parse ingredients from rec.ingredients (assume array of {name,amount,unit} or free text)
+  const ingHtml=_bcParseIngredients(rec,total,mlPerBot);
+  out.innerHTML=`
+    <div style="font-weight:700;font-size:13px;margin-bottom:10px">
+      ${esc(rec.name)} — ${bottles} bottles × ${mlPerBot}mL = <span style="color:var(--ac)">${total}mL total</span>
+    </div>
+    <table class="help-table" style="width:100%">${ingHtml}</table>
+    <div style="margin-top:8px;font-size:12px;color:var(--mu)">pH target: ${rec.ph||'5.8'} · Autoclave: ${rec.autoclave||'121°C 20min'}</div>`;
+}
+
+function _bcParseIngredients(rec, totalML, mlPerBot){
+  const base=rec.volume_per_bottle||mlPerBot||100;
+  const ratio=totalML/(base*(S.recs?.find(r=>r.id===rec.id)?.bottles||1)||totalML);
+  // Try structured ingredients
+  const ings=rec.ingredients||[];
+  if(Array.isArray(ings)&&ings.length){
+    return '<tr><th>Ingredient</th><th>Per Bottle</th><th>Total</th></tr>'+
+      ings.map(ing=>{
+        if(typeof ing==='string'){
+          const m=ing.match(/^(.*?):\s*([\d.]+)\s*(.*)$/);
+          if(!m) return `<tr><td colspan="3">${esc(ing)}</td></tr>`;
+          const scaled=parseFloat(m[2])*(totalML/(base||totalML));
+          const disp=scaled<0.01?scaled.toExponential(2):scaled<10?scaled.toPrecision(3):Math.round(scaled*10)/10;
+          return `<tr><td>${esc(m[1])}</td><td>${m[2]} ${m[3]}</td><td><strong>${disp} ${m[3]}</strong></td></tr>`;
+        }
+        const scaled=(ing.amount||0)*(totalML/(base||totalML));
+        const disp=scaled<0.01?scaled.toExponential(2):scaled<10?scaled.toPrecision(3):Math.round(scaled*10)/10;
+        return `<tr><td>${esc(ing.name||'')}</td><td>${ing.amount||''} ${ing.unit||''}</td><td><strong>${disp} ${ing.unit||''}</strong></td></tr>`;
+      }).join('');
+  }
+  return '<tr><td style="color:var(--mu)">No structured ingredients in this recipe.</td></tr>';
+}
+
+// ════════════════════════════════════════════════════════════
+// PASSAGE LINEAGE TREE
+// ════════════════════════════════════════════════════════════
+function renderPassageTree(bottleId){
+  const el=document.getElementById('bottle-tree-pane'); if(!el) return;
+  const bottles=S.bottles||[];
+  const root=_treeAncestor(bottleId, bottles);
+  el.innerHTML=_treeNodeHtml(root, bottleId, bottles, 0);
+  el.querySelectorAll('[data-bot-id]').forEach(n=>n.addEventListener('click',()=>{
+    const id=n.dataset.botId;
+    if(id!==bottleId){navTo('bottles');openBottle(id);}
+  }));
+}
+
+function _treeAncestor(id, bottles){
+  const b=bottles.find(x=>x.id===id); if(!b) return id;
+  return b.parent_id?_treeAncestor(b.parent_id,bottles):id;
+}
+
+function _treeNodeHtml(id, currentId, bottles, depth){
+  const b=bottles.find(x=>x.id===id);
+  const label=b?`${b.code||b.id} — ${b.species||'?'} ${b.stage?`[${b.stage}]`:''}`:id;
+  const isCurrent=id===currentId;
+  const children=bottles.filter(x=>x.parent_id===id);
+  const childrenHtml=children.map(c=>_treeNodeHtml(c.id,currentId,bottles,depth+1)).join('');
+  return `<div class="tree-node${depth===0?' root':''}">
+    <div class="tree-node-label${isCurrent?' current':''}" data-bot-id="${esc(id)}" title="Open bottle">${depth>0?'└ ':''}${esc(label)}</div>
+    ${childrenHtml}
+  </div>`;
+}
+
+// ════════════════════════════════════════════════════════════
+// CONTAMINATION BATCH TRACE
+// ════════════════════════════════════════════════════════════
+function renderContamBatchTrace(){
+  const el=document.getElementById('contam-trace-result'); if(!el) return;
+  const code=document.getElementById('contam-trace-input')?.value?.trim(); if(!code) return;
+  const bottles=S.bottles||[];
+  const target=bottles.find(b=>(b.code||'').toLowerCase()===code.toLowerCase()||(b.id||'').toLowerCase()===code.toLowerCase());
+  if(!target){el.innerHTML='<div style="color:var(--rd);font-size:13px">Bottle not found: '+esc(code)+'</div>';return;}
+  const related=new Set();
+  // Same batch
+  if(target.batch_id) bottles.filter(b=>b.batch_id===target.batch_id).forEach(b=>related.add(b.id));
+  // Same session
+  if(target.session_id) bottles.filter(b=>b.session_id===target.session_id).forEach(b=>related.add(b.id));
+  // Same parent
+  if(target.parent_id) bottles.filter(b=>b.parent_id===target.parent_id).forEach(b=>related.add(b.id));
+  // Siblings via parent
+  bottles.filter(b=>b.parent_id&&b.parent_id===target.id).forEach(b=>related.add(b.id));
+  related.delete(target.id);
+  const relArr=bottles.filter(b=>related.has(b.id));
+  const contaminated=relArr.filter(b=>b.status==='contaminated');
+  el.innerHTML=`
+    <div style="margin-bottom:10px">
+      <strong>${esc(target.code||target.id)}</strong> — ${esc(target.species||'?')} [${target.status||'?'}]<br>
+      <span style="font-size:12px;color:var(--mu)">
+        Batch: ${target.batch_id||'none'} · Session: ${target.session_id||'none'}
+      </span>
+    </div>
+    <div style="font-size:12px;font-weight:700;color:var(--mu);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em">
+      ${relArr.length} related bottles — ${contaminated.length} contaminated
+    </div>
+    ${relArr.length?`<table class="help-table" style="width:100%;font-size:12px">
+      <tr><th>Code</th><th>Species</th><th>Stage</th><th>Status</th><th>Link</th></tr>
+      ${relArr.map(b=>`<tr style="${b.status==='contaminated'?'background:rgba(248,81,73,.08)':''}">
+        <td>${esc(b.code||b.id)}</td>
+        <td>${esc(b.species||'—')}</td>
+        <td>${esc(b.stage||'—')}</td>
+        <td><span style="color:${b.status==='contaminated'?'var(--rd)':b.status==='growing'?'var(--gr)':'var(--tx)'}">${b.status||'—'}</span></td>
+        <td><button class="btn xs ghost" onclick="navTo('bottles');openBottle('${esc(b.id)}')">Open</button></td>
+      </tr>`).join('')}
+    </table>`:'<div style="color:var(--mu);font-size:12px">No related bottles found.</div>'}`;
+}
+
+// ════════════════════════════════════════════════════════════
+// CLIMATE HISTORY (localStorage-only, hourly snapshots, 7 days)
+// ════════════════════════════════════════════════════════════
+const _CLIMATE_LOG_KEY='tcplants_climate_log';
+
+function _climateLogReading(){
+  if(!S.weather?.lab?.apparent_temperature) return;
+  const now=new Date();
+  // Only log once per hour
+  const hourKey=now.toISOString().slice(0,13);
+  const raw=localStorage.getItem(_CLIMATE_LOG_KEY);
+  const log=raw?JSON.parse(raw):[];
+  if(log.length&&log[log.length-1].h===hourKey) return;
+  log.push({
+    h:hourKey,ts:now.toISOString(),
+    lt:S.weather.lab.apparent_temperature,
+    lh:S.weather.lab.relative_humidity_2m,
+    gt:S.weather.gh?.apparent_temperature,
+    gh_h:S.weather.gh?.relative_humidity_2m
+  });
+  // Keep last 168 entries (7 days × 24 hours)
+  if(log.length>168) log.splice(0,log.length-168);
+  localStorage.setItem(_CLIMATE_LOG_KEY,JSON.stringify(log));
+}
+
+function renderClimateHistory(){
+  const el=document.getElementById('climate-history-body'); if(!el) return;
+  const raw=localStorage.getItem(_CLIMATE_LOG_KEY);
+  const log=raw?JSON.parse(raw):[];
+  if(!log.length){el.innerHTML='<div style="color:var(--mu);font-size:12px">No history yet — readings log automatically every hour.</div>';return;}
+  // Last 48 points
+  const pts=log.slice(-48);
+  const labTemps=pts.map(p=>p.lt).filter(v=>v!=null);
+  const labHums=pts.map(p=>p.lh).filter(v=>v!=null);
+  const ghTemps=pts.map(p=>p.gt).filter(v=>v!=null);
+  const tMin=Math.min(...labTemps,...ghTemps)-2;
+  const tMax=Math.max(...labTemps,...ghTemps)+2;
+  const spark=(vals,min,max,col)=>{
+    if(!vals.length) return '';
+    const W=200,H=40,pad=2;
+    const pts=vals.map((v,i)=>{
+      const x=pad+(i/(vals.length-1||1))*(W-2*pad);
+      const y=H-pad-((v-min)/(max-min||1))*(H-2*pad);
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(' ');
+    return `<svg width="${W}" height="${H}" class="climate-spark"><polyline points="${pts}" fill="none" stroke="${col}" stroke-width="1.5"/></svg>`;
+  };
+  const last=pts[pts.length-1];
+  el.innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Lab Temperature</div>
+        <div style="font-size:18px;font-weight:700;color:var(--ac)">${last.lt??'—'}°C</div>
+        ${spark(labTemps,tMin,tMax,'var(--ac)')}
+        <div style="font-size:11px;color:var(--mu)">Humidity: ${last.lh??'—'}%</div>
+        ${spark(labHums,0,100,'var(--gr)')}
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Greenhouse Temp</div>
+        <div style="font-size:18px;font-weight:700;color:var(--yw)">${last.gt??'—'}°C</div>
+        ${ghTemps.length?spark(ghTemps,tMin,tMax,'var(--yw)'):'<div style="color:var(--mu);font-size:11px">No GH data</div>'}
+        <div style="font-size:11px;color:var(--mu)">Humidity: ${last.gh_h??'—'}%</div>
+        ${spark(pts.map(p=>p.gh_h).filter(v=>v!=null),0,100,'var(--yw)'):''}
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--mu);margin-top:8px">Last ${pts.length} hours · updated hourly</div>`;
+}
+
+// Hook into fetchWeather to log readings
+const _origFetchWeather=typeof fetchWeather!=='undefined'?fetchWeather:null;
+// Patched after fetchWeather definition via wrapper:
+function _climateAfterFetch(){_climateLogReading();}
+
+// ════════════════════════════════════════════════════════════
+// SUPPLIER PRICE HISTORY
+// ════════════════════════════════════════════════════════════
+function renderPriceHistory(itemId){
+  const el=document.getElementById(`supply-price-history-${itemId}`); if(!el) return;
+  const item=(S.supplies||[]).find(s=>s.id===itemId); if(!item){el.innerHTML='';return;}
+  const hist=(item.price_history||[]).slice().reverse();
+  if(!hist.length){
+    el.innerHTML='<div style="color:var(--mu);font-size:12px;padding:8px 0">No price history yet.</div>';
+    return;
+  }
+  el.innerHTML=`<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin-bottom:6px">Price History</div>`+
+    hist.map(h=>`<div class="price-history-row">
+      <span style="color:var(--mu);min-width:80px">${h.date||'?'}</span>
+      <span style="font-weight:700">₹${h.cost_per_unit||h.cost||'?'}/${h.unit||'unit'}</span>
+      <span style="color:var(--mu);flex:1">${esc(h.supplier||'')}</span>
+      <span style="color:var(--mu);font-size:11px">${esc(h.notes||'')}</span>
+    </div>`).join('');
+}
+
+async function _addPriceSnapshot(itemId){
+  const item=(S.supplies||[]).find(s=>s.id===itemId); if(!item) return;
+  const cost=prompt(`New price per unit for "${item.name}" (₹/unit):`); if(!cost) return;
+  const supplier=prompt('Supplier name (optional):','');
+  const notes=prompt('Notes (optional):','');
+  if(!item.price_history) item.price_history=[];
+  item.price_history.push({
+    date:new Date().toISOString().slice(0,10),
+    cost_per_unit:parseFloat(cost)||0,
+    unit:item.unit||'unit',
+    supplier:supplier||'',
+    notes:notes||''
+  });
+  try{
+    const encData=await enc(JSON.stringify(S.supplies));
+    const res=await ghPut('supplies/data.enc',encData,S.suppliesSha||undefined,'supply: add price snapshot');
+    S.suppliesSha=res?.content?.sha||S.suppliesSha;
+    toast('Price snapshot saved ✓','ok');
+    renderPriceHistory(itemId);
+    SupplyInventory.renderInventoryPage();
+  }catch(e){toast('Save failed: '+e.message,'fail');}
+}
 
 </script>
 <!-- Widget tray — fixed footer for minimised lab tools -->
