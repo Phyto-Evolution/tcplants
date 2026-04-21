@@ -5360,20 +5360,6 @@ SERVICE WORKER (sw.js):
         <div style="font-size:11px;color:var(--mu);margin-bottom:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase">Model</div>
         <div style="display:flex;flex-direction:column;gap:6px" id="set-model-list"></div>
         <div id="ai-key-row" style="display:none"></div>
-        <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px">
-          <div>
-            <div style="font-size:11px;font-weight:700;color:var(--mu);margin-bottom:4px">⚡ Groq key (8B + 70B)</div>
-            <div style="display:flex;gap:6px"><input type="password" id="set-groq-key-input" placeholder="gsk_…" style="flex:1;font-size:12px"><button class="btn xs green" onclick="_setGroqKeyFromSettings()">Save</button><a href="https://console.groq.com" target="_blank" class="btn xs ghost">Get ↗</a></div>
-          </div>
-          <div>
-            <div style="font-size:11px;font-weight:700;color:var(--mu);margin-bottom:4px">✦ Gemini Flash key (vision + chat)</div>
-            <div style="display:flex;gap:6px"><input type="password" id="set-gemini-key-input" placeholder="AIza…" style="flex:1;font-size:12px"><button class="btn xs green" onclick="_setGeminiKeyFromSettings()">Save</button><a href="https://aistudio.google.com/app/apikey" target="_blank" class="btn xs ghost">Get ↗</a></div>
-          </div>
-          <div>
-            <div style="font-size:11px;font-weight:700;color:var(--mu);margin-bottom:4px">◇ Claude key</div>
-            <div style="display:flex;gap:6px"><input type="password" id="set-ai-key-input" placeholder="sk-ant-…" style="flex:1;font-size:12px"><button class="btn xs green" onclick="_setAIKeyFromSettings()">Save</button><a href="https://console.anthropic.com/settings/keys" target="_blank" class="btn xs ghost">Get ↗</a></div>
-          </div>
-        </div>
       </div>
     </div>
     <!-- AI Proxy (Cloudflare Worker) -->
@@ -5755,16 +5741,14 @@ async function loadEncryptedKeys(){
     const obj=JSON.parse(await dec(ghDec(f.content)));
     if(obj.claudeKey)  localStorage.setItem('tcplants_claude_key',obj.claudeKey);
     if(obj.groqKey)    localStorage.setItem('tcplants_groq_key',obj.groqKey);
-    if(obj.geminiKey)  localStorage.setItem('tcplants_gemini_key',obj.geminiKey);
     if(obj.proxyURL)  { localStorage.setItem('tcplants_ai_proxy_url',obj.proxyURL); _aiProxyURL=obj.proxyURL; }
   }catch(e){ console.warn('keys.enc load failed:',e.message); }
 }
 async function saveEncryptedKeys(){
   const obj={
-    claudeKey:  localStorage.getItem('tcplants_claude_key')||'',
-    groqKey:    localStorage.getItem('tcplants_groq_key')||'',
-    geminiKey:  localStorage.getItem('tcplants_gemini_key')||'',
-    proxyURL:   localStorage.getItem('tcplants_ai_proxy_url')||''
+    claudeKey: localStorage.getItem('tcplants_claude_key')||'',
+    groqKey:   localStorage.getItem('tcplants_groq_key')||'',
+    proxyURL:  localStorage.getItem('tcplants_ai_proxy_url')||''
   };
   await ghPut(KEYS_F, await enc(JSON.stringify(obj)), _keysSha, 'lab: update api keys');
   const f=await ghGet(KEYS_F); if(f) _keysSha=f.sha;
@@ -10575,7 +10559,7 @@ const AI_MODELS={
   groq8: {name:'Quick',        icon:'⚡', lsKey:'tcplants_groq_key',   getKey:()=>localStorage.getItem('tcplants_groq_key')||'',   getLink:'https://console.groq.com',                         groqModel:'llama-3.1-8b-instant',   label:'Groq 8B'},
   groq70:{name:'Deep',         icon:'🔬', lsKey:'tcplants_groq_key',   getKey:()=>localStorage.getItem('tcplants_groq_key')||'',   getLink:'https://console.groq.com',                         groqModel:'llama-3.3-70b-versatile', label:'Groq 70B'},
   claude:{name:'Claude',       icon:'◇',  lsKey:'tcplants_claude_key', getKey:()=>localStorage.getItem('tcplants_claude_key')||'', getLink:'https://console.anthropic.com/settings/keys',      label:'Claude'},
-  gemini:{name:'Gemini Flash', icon:'✦',  lsKey:'tcplants_gemini_key', getKey:()=>localStorage.getItem('tcplants_gemini_key')||'', getLink:'https://aistudio.google.com/app/apikey',           label:'Gemini Flash'},
+  gemini:{name:'Gemini Flash', icon:'✦',  lsKey:null, getKey:()=>'proxy', getLink:'https://aistudio.google.com/app/apikey', label:'Gemini Flash'},
 };
 const AI_MODEL_ORDER=['groq8','groq70','gemini','claude'];
 let _aiModel=localStorage.getItem('tcplants_ai_model')||'groq8';
@@ -10694,15 +10678,6 @@ async function _setAIKeyFromSettings(){
   try{ await saveEncryptedKeys(); toast('Claude key saved & encrypted ✓'); }
   catch(e){ toast('Saved locally — sync failed: '+e.message,'fail'); }
 }
-async function _setGeminiKeyFromSettings(){
-  const k=document.getElementById('set-gemini-key-input')?.value.trim();
-  if(!k){toast('Paste Gemini key first','fail');return;}
-  localStorage.setItem('tcplants_gemini_key',k);
-  document.getElementById('set-gemini-key-input').value='';
-  toast('Saving to encrypted vault…');
-  try{ await saveEncryptedKeys(); toast('Gemini key saved & encrypted ✓'); }
-  catch(e){ toast('Saved locally — sync failed: '+e.message,'fail'); }
-}
 // ── Proxy settings ────────────────────────────────────────────
 function _saveProxySettings(){
   const url=(document.getElementById('set-proxy-url')?.value||'').trim().replace(/\/$/,'');
@@ -10775,7 +10750,7 @@ function _initAIKeyHint(){
   if(!mi.getKey()){
     const msg=document.getElementById('ai-msgs');
     const hint=_aiModel==='gemini'
-      ?'👋 No Gemini key set. Tap ⚙️ above or go to Settings → AI. Free key at <strong>aistudio.google.com</strong>'
+      ?'👋 Gemini runs via the Cloudflare proxy. Add <code>GEMINI_KEY</code> to your Worker env vars in the Cloudflare dashboard.'
       :_aiModel==='claude'
       ?'👋 No Claude key set. Tap ⚙️ above or go to Settings → AI.'
       :'👋 No Groq key set. Tap ⚙️ above or go to Settings → AI. Free key at <strong>console.groq.com</strong>';
@@ -11238,7 +11213,7 @@ async function askAI(prompt){
       rounds++;
       let raw;
       if(provider==='gemini'){
-        raw=await _callGemini(agentMessages, key);
+        raw=await _callGemini(agentMessages);
       } else if(_aiProxyURL){
         raw=await _callAIProxyFull(provider, model, agentMessages, key);
       } else {
@@ -11405,55 +11380,35 @@ async function _callAIDirect(provider, model, prompt, key){
   return {text, tokUsed, reqRem, tokRem};
 }
 
-async function _callGemini(messages, key){
-  // Convert OpenAI-style messages to Gemini format
-  const system=messages.find(m=>m.role==='system');
-  const contents=messages.filter(m=>m.role!=='system').map(m=>({
-    role:m.role==='assistant'?'model':'user',
-    parts:[{text:m.content}]
-  }));
-  const body={
-    contents,
-    ...(system?{systemInstruction:{parts:[{text:system.content}]}}:{}),
-    generationConfig:{temperature:0.7,maxOutputTokens:1024}
-  };
-  const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,{
-    method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify(body),signal:AbortSignal.timeout(30000)
+async function _callGemini(messages){
+  // Routes through Cloudflare proxy — key lives in GEMINI_KEY env var
+  if(!_aiProxyURL){throw new Error('Proxy URL not set — configure it in Settings → AI Proxy');}
+  const r=await fetch(_aiProxyURL+'/api/ai/chat',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({provider:'gemini',messages,max_tokens:1024}),
+    signal:AbortSignal.timeout(30000)
   });
-  if(r.status===429){await new Promise(res=>setTimeout(res,1500)); return _callGemini(messages,key);}
-  if(!r.ok) throw new Error(`Gemini error ${r.status}`);
-  const d=await r.json();
-  const text=d.candidates?.[0]?.content?.parts?.[0]?.text||'';
-  return {text,tool_call:null};
+  if(r.status===429){await new Promise(res=>setTimeout(res,1500));return _callGemini(messages);}
+  if(!r.ok){const d=await r.json().catch(()=>({}));throw new Error(d.error||'Gemini error '+r.status);}
+  return await r.json(); // {text, tool_call}
 }
 
-// Gemini vision — contamination deep scan
+// Gemini vision — contamination deep scan (via proxy /api/ai/gemini-vision)
 async function _galGeminiDeepScan(canvas){
-  const key=localStorage.getItem('tcplants_gemini_key');
-  if(!key){toast('Set Gemini key in Settings → AI first','fail');return null;}
+  if(!_aiProxyURL){toast('Proxy URL not set — configure in Settings → AI Proxy','fail');return null;}
   const blob=await new Promise(res=>canvas.toBlob(res,'image/webp',0.85));
   const ab=await blob.arrayBuffer();
   const b64=btoa(String.fromCharCode(...new Uint8Array(ab)));
-  const prompt=`This is a tissue culture vessel image from a plant lab. Background media may contain activated charcoal (black), food-safe dye, phenol red pH indicator (yellow/pink shift), or iron chelates (amber) — these uniform background colours are NORMAL, ignore them.
-
-Look ONLY for localised anomalies: (1) fuzzy or filamentous growth = fungal, (2) turbid/cloudy patches in liquid = bacterial, (3) unexpected discrete circular colonies, (4) irregular discolouration that differs from the surrounding media.
-
-Return ONLY valid JSON with no markdown fences: {"contaminated":true or false or "uncertain","type":"fungal" or "bacterial" or "mixed" or "none","confidence":0-100,"note":"one sentence observation"}`;
-  const body={
-    contents:[{parts:[
-      {inline_data:{mime_type:'image/webp',data:b64}},
-      {text:prompt}
-    ]}],
-    generationConfig:{temperature:0.1,maxOutputTokens:200}
-  };
-  const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,{
+  const prompt=`This is a tissue culture vessel image from a plant lab. Background media may contain activated charcoal (black), food-safe dye, phenol red pH indicator (yellow/pink shift), or iron chelates (amber) — these uniform background colours are NORMAL, ignore them.\n\nLook ONLY for localised anomalies: (1) fuzzy or filamentous growth = fungal, (2) turbid/cloudy patches in liquid = bacterial, (3) unexpected discrete circular colonies, (4) irregular discolouration differing from surrounding media.\n\nReturn ONLY valid JSON, no markdown: {"contaminated":true or false or "uncertain","type":"fungal" or "bacterial" or "mixed" or "none","confidence":0-100,"note":"one sentence observation"}`;
+  const r=await fetch(_aiProxyURL+'/api/ai/gemini-vision',{
     method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify(body),signal:AbortSignal.timeout(25000)
+    body:JSON.stringify({image_b64:b64,mime_type:'image/webp',prompt}),
+    signal:AbortSignal.timeout(25000)
   });
-  if(!r.ok) throw new Error(`Gemini vision error ${r.status}`);
+  if(!r.ok){const d=await r.json().catch(()=>({}));throw new Error(d.error||'Vision error '+r.status);}
   const d=await r.json();
-  const raw=(d.candidates?.[0]?.content?.parts?.[0]?.text||'').trim().replace(/```json|```/g,'').trim();
+  const raw=(d.text||'').trim().replace(/```json|```/g,'').trim();
   try{return JSON.parse(raw);}
   catch{return {contaminated:'uncertain',type:'unknown',confidence:0,note:raw.slice(0,120)};}
 }
