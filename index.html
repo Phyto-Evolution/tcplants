@@ -843,9 +843,13 @@ main > .dview, main > .editor{ margin:0 auto; }
 
 /* ── GALLERY ── */
 .gal-cats{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
-.gal-cat-btn{background:var(--sf);border:1px solid var(--bd);border-radius:20px;color:var(--mu);cursor:pointer;font-size:12px;font-weight:600;padding:4px 12px;transition:all .15s;white-space:nowrap}
+.gal-cat-btn{background:var(--sf);border:1px solid var(--bd);border-radius:20px;color:var(--mu);cursor:pointer;font-size:12px;font-weight:600;padding:4px 12px;transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:0}
 .gal-cat-btn:hover{background:var(--sf2)}
 .gal-cat-btn.active{background:var(--ac);border-color:var(--ac);color:#0d1117}
+.chip-cb{display:inline-flex;align-items:center;justify-content:center;width:12px;height:12px;border:1.5px solid currentColor;border-radius:2px;margin-right:5px;flex-shrink:0;font-size:8px;font-weight:900;line-height:1}
+.gal-cat-btn.active .chip-cb::before{content:'✓'}
+.chip-x{display:inline-flex;align-items:center;justify-content:center;margin-left:6px;width:15px;height:15px;border-radius:50%;background:rgba(0,0,0,.18);font-size:11px;line-height:1;cursor:pointer;flex-shrink:0}
+.chip-x:hover{background:rgba(0,0,0,.38)}
 .gal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
 .gal-thumb{position:relative;border-radius:8px;overflow:hidden;cursor:pointer;aspect-ratio:1;background:var(--sf);border:1px solid var(--bd)}
 .gal-thumb img{width:100%;height:100%;object-fit:cover;display:block}
@@ -2762,26 +2766,27 @@ input, textarea, select {
     <div style="max-width:1200px;margin:0 auto;width:100%;padding-bottom:40px">
       <h2 style="font-size:20px;font-weight:700;margin-bottom:4px">📰 TC Research News</h2>
       <p style="font-size:13px;color:var(--mu);margin-bottom:14px">Latest publications from PubMed — full abstracts, card grid, pinnable. Archived to your repo.</p>
-      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px" id="news-topic-chips">
-        <button class="gal-cat-btn active" data-topic="general"      onclick="_newsChipSelect(this)">🌿 TC &amp; Micropropagation</button>
-        <button class="gal-cat-btn"        data-topic="cp_micro"     onclick="_newsChipSelect(this)">🪲 Carnivorous Plants Micro</button>
-        <button class="gal-cat-btn"        data-topic="carnivorous"  onclick="_newsChipSelect(this)">🪴 Carnivorous Plants</button>
-        <button class="gal-cat-btn"        data-topic="nepenthes"    onclick="_newsChipSelect(this)">🏔 Nepenthes</button>
-        <button class="gal-cat-btn"        data-topic="orchids"      onclick="_newsChipSelect(this)">🌸 Orchids</button>
-        <button class="gal-cat-btn"        data-topic="mutation"     onclick="_newsChipSelect(this)">🧬 Plant Mutation</button>
-        <button class="gal-cat-btn"        data-topic="banana"       onclick="_newsChipSelect(this)">🍌 Banana / Musa</button>
-        <button class="gal-cat-btn"        data-topic="vanilla"      onclick="_newsChipSelect(this)">🌼 Vanilla</button>
-        <button class="gal-cat-btn"        data-topic="embryogenesis" onclick="_newsChipSelect(this)">🔬 Somatic Embryogenesis</button>
-        <button class="gal-cat-btn"        data-topic="organogenesis" onclick="_newsChipSelect(this)">🌱 Organogenesis</button>
-        <button class="gal-cat-btn"        data-topic="callus"       onclick="_newsChipSelect(this)">🧫 Callus Culture</button>
-        <button class="gal-cat-btn"        data-topic="rooting"      onclick="_newsChipSelect(this)">🌿 Rooting</button>
-        <button class="gal-cat-btn"        data-topic="pgr"          onclick="_newsChipSelect(this)">💉 PGRs</button>
-        <button class="gal-cat-btn"        data-topic="sterilisation" onclick="_newsChipSelect(this)">🧼 Sterilisation</button>
-        <button class="gal-cat-btn"        data-topic="contamination" onclick="_newsChipSelect(this)">☣️ Contamination</button>
-        <button class="gal-cat-btn"        data-topic="media"        onclick="_newsChipSelect(this)">⚗️ Media</button>
-        <button class="gal-cat-btn"        data-topic="cryopreservation" onclick="_newsChipSelect(this)">❄️ Cryopreservation</button>
-        <button class="gal-cat-btn"        data-topic="custom"       onclick="_newsChipSelect(this)">✏️ Custom</button>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px" id="news-topic-chips">
+        <button class="gal-cat-btn" data-topic="general"       onclick="_newsChipToggle(this)"><span class="chip-cb"></span>🌿 TC &amp; Micropropagation</button>
+        <button class="gal-cat-btn" data-topic="cp_micro"      onclick="_newsChipToggle(this)"><span class="chip-cb"></span>🪲 Carnivorous Plants Micro</button>
+        <button class="gal-cat-btn" data-topic="carnivorous"   onclick="_newsChipToggle(this)"><span class="chip-cb"></span>🪴 Carnivorous Plants</button>
+        <button class="gal-cat-btn" data-topic="nepenthes"     onclick="_newsChipToggle(this)"><span class="chip-cb"></span>🏔 Nepenthes</button>
+        <button class="gal-cat-btn" data-topic="orchids"       onclick="_newsChipToggle(this)"><span class="chip-cb"></span>🌸 Orchids</button>
+        <button class="gal-cat-btn" data-topic="mutation"      onclick="_newsChipToggle(this)"><span class="chip-cb"></span>🧬 Plant Mutation</button>
+        <button class="gal-cat-btn" data-topic="banana"        onclick="_newsChipToggle(this)"><span class="chip-cb"></span>🍌 Banana / Musa</button>
+        <button class="gal-cat-btn" data-topic="vanilla"       onclick="_newsChipToggle(this)"><span class="chip-cb"></span>🌼 Vanilla</button>
+        <button class="gal-cat-btn" data-topic="embryogenesis" onclick="_newsChipToggle(this)"><span class="chip-cb"></span>🔬 Somatic Embryogenesis</button>
+        <button class="gal-cat-btn" data-topic="organogenesis" onclick="_newsChipToggle(this)"><span class="chip-cb"></span>🌱 Organogenesis</button>
+        <button class="gal-cat-btn" data-topic="callus"        onclick="_newsChipToggle(this)"><span class="chip-cb"></span>🧫 Callus Culture</button>
+        <button class="gal-cat-btn" data-topic="rooting"       onclick="_newsChipToggle(this)"><span class="chip-cb"></span>🌿 Rooting</button>
+        <button class="gal-cat-btn" data-topic="pgr"           onclick="_newsChipToggle(this)"><span class="chip-cb"></span>💉 PGRs</button>
+        <button class="gal-cat-btn" data-topic="sterilisation" onclick="_newsChipToggle(this)"><span class="chip-cb"></span>🧼 Sterilisation</button>
+        <button class="gal-cat-btn" data-topic="contamination" onclick="_newsChipToggle(this)"><span class="chip-cb"></span>☣️ Contamination</button>
+        <button class="gal-cat-btn" data-topic="media"         onclick="_newsChipToggle(this)"><span class="chip-cb"></span>⚗️ Media</button>
+        <button class="gal-cat-btn" data-topic="cryopreservation" onclick="_newsChipToggle(this)"><span class="chip-cb"></span>❄️ Cryopreservation</button>
+        <button class="gal-cat-btn" data-topic="custom"        onclick="_newsChipToggle(this)"><span class="chip-cb"></span>✏️ Custom</button>
       </div>
+      <div id="news-custom-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">
         <input type="text" id="news-custom-kw" placeholder="Type keyword and press Load…" style="display:none;font-size:13px;padding:6px 10px;border:1px solid var(--bd);border-radius:6px;background:var(--sf2);color:var(--tx);min-width:200px;flex:1">
         <label class="toggle-switch" style="flex-shrink:0">
@@ -10334,24 +10339,64 @@ const NEWS_TOPICS={
 };
 const NEWS_MAX=60;
 
-function _newsChipSelect(btn){
-  document.querySelectorAll('#news-topic-chips .gal-cat-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  const topic=btn.dataset.topic;
+// ── News chip multi-select ─────────────────────────────────────
+const _NEWS_CUSTOM_KEY='tcplants_news_custom_chips';
+const _NEWS_CUSTOM_MAX=8;
+
+function _newsChipToggle(btn){
+  btn.classList.toggle('active');
+  // Show/hide custom kw input based on whether built-in 'custom' chip is checked
+  const customChipActive=!!document.querySelector('#news-topic-chips .gal-cat-btn[data-topic="custom"].active');
   const customInp=document.getElementById('news-custom-kw');
-  if(customInp) customInp.style.display=topic==='custom'?'':'none';
-  // Reset toggle so user explicitly reloads
+  if(customInp) customInp.style.display=customChipActive?'':'none';
+  // Reset toggle so user must re-click Load
   const tog=document.getElementById('news-toggle');
   if(tog.checked){ tog.checked=false; handleNewsToggle(false); }
 }
 
-function _newsTopicChange(){
-  const tog=document.getElementById('news-toggle');
-  if(tog.checked){ tog.checked=false; handleNewsToggle(false); }
-  const active=document.querySelector('#news-topic-chips .gal-cat-btn.active');
-  const topic=active?.dataset.topic||'general';
-  const customInp=document.getElementById('news-custom-kw');
-  if(customInp) customInp.style.display=topic==='custom'?'':'none';
+function _newsGetCheckedTopics(){
+  const topics=[];
+  document.querySelectorAll('#news-topic-chips .gal-cat-btn.active').forEach(btn=>{
+    const topic=btn.dataset.topic;
+    if(topic==='custom'){
+      const kw=document.getElementById('news-custom-kw')?.value.trim();
+      if(kw){
+        const words=kw.split(/\s+/).filter(Boolean);
+        const q=words.length===1?`${words[0]}[tiab]`:words.map(w=>`${w}[tiab]`).join(' AND ');
+        topics.push({label:kw, query:q, isCustomKw:true});
+      }
+    } else if(NEWS_TOPICS[topic]){
+      topics.push({label:topic, query:NEWS_TOPICS[topic]});
+    }
+  });
+  document.querySelectorAll('#news-custom-chips .gal-cat-btn.active').forEach(btn=>{
+    const q=btn.dataset.customQuery;
+    if(q) topics.push({label:btn.dataset.label||btn.dataset.topic, query:q});
+  });
+  return topics;
+}
+
+function _newsLoadCustomChips(){
+  const chips=JSON.parse(localStorage.getItem(_NEWS_CUSTOM_KEY)||'[]');
+  const container=document.getElementById('news-custom-chips');
+  if(!container) return;
+  container.innerHTML=chips.map(c=>`<button class="gal-cat-btn" data-topic="${esc(c.id)}" data-custom-query="${esc(c.query)}" data-label="${esc(c.label)}" onclick="_newsChipToggle(this)"><span class="chip-cb"></span>${esc(c.label)}<span class="chip-x" onclick="event.stopPropagation();_newsRemoveCustomChip('${esc(c.id)}')">×</span></button>`).join('');
+}
+
+function _newsAddCustomChip(label,query){
+  const chips=JSON.parse(localStorage.getItem(_NEWS_CUSTOM_KEY)||'[]');
+  if(chips.some(c=>c.label===label)) return; // no duplicate labels
+  const id='cc_'+Date.now();
+  chips.unshift({id,label,query});
+  if(chips.length>_NEWS_CUSTOM_MAX) chips.splice(_NEWS_CUSTOM_MAX);
+  localStorage.setItem(_NEWS_CUSTOM_KEY,JSON.stringify(chips));
+  _newsLoadCustomChips();
+}
+
+function _newsRemoveCustomChip(id){
+  const chips=JSON.parse(localStorage.getItem(_NEWS_CUSTOM_KEY)||'[]');
+  localStorage.setItem(_NEWS_CUSTOM_KEY,JSON.stringify(chips.filter(c=>c.id!==id)));
+  _newsLoadCustomChips();
 }
 
 async function handleNewsToggle(on){
@@ -10360,24 +10405,19 @@ async function handleNewsToggle(on){
   const countEl=document.getElementById('news-count');
   if(!on){
     _newsData=null;
-    content.innerHTML='<p class="news-status">Select a topic and toggle on to load papers from PubMed.</p>';
+    content.innerHTML='<p class="news-status">Check one or more topic chips, then toggle Load.</p>';
     label.textContent='Load';
     countEl.textContent='';
     return;
   }
-  const activeChip=document.querySelector('#news-topic-chips .gal-cat-btn.active');
-  const topic=activeChip?.dataset.topic||'general';
-  let query=NEWS_TOPICS[topic]||NEWS_TOPICS.general;
-  if(topic==='custom'){
-    const kw=document.getElementById('news-custom-kw')?.value.trim();
-    if(!kw){ content.innerHTML='<p class="news-status">Enter a keyword first.</p>'; document.getElementById('news-toggle').checked=false; return; }
-    // Build flexible query: each word as a separate [tw] term ANDed together
-    // e.g. "nepenthes inoculation" → nepenthes[tw] AND inoculation[tw]
-    const words=kw.split(/\s+/).filter(Boolean);
-    query=words.length===1
-      ?`${words[0]}[tiab]`
-      :words.map(w=>`${w}[tiab]`).join(' AND ');
+  const checked=_newsGetCheckedTopics();
+  if(!checked.length){
+    content.innerHTML='<p class="news-status">Check at least one topic chip first.</p>';
+    document.getElementById('news-toggle').checked=false;
+    return;
   }
+  const query=checked.length===1?checked[0].query:checked.map(t=>`(${t.query})`).join(' AND ');
+  const customKwEntry=checked.find(t=>t.isCustomKw);
   label.textContent='Fetching…';
   content.innerHTML='<p class="news-status">🔍 Searching PubMed…</p>';
   countEl.textContent='';
@@ -10438,6 +10478,8 @@ async function handleNewsToggle(on){
     countEl.textContent=`${articles.length} papers`;
     label.textContent='Loaded ✓';
     _saveNewsToRepo(articles);
+    // Auto-save custom keyword as a persistent chip
+    if(customKwEntry) _newsAddCustomChip(customKwEntry.label, customKwEntry.query);
   }catch(e){
     content.innerHTML=`<p class="news-status" style="color:var(--rd)">Error: ${esc(e.message)}</p>`;
     label.textContent='Load';
@@ -15652,7 +15694,7 @@ function switchSection(name){
   if(name==='tools') renderBatchCalc();
   if(name==='stock'){ loadInv().then(renderInv); } // kept for safety, unreachable due to redirect above
   if(name==='species') renderSpecies();
-  if(name==='news'){ _renderPersistedPins(); if(document.getElementById('news-toggle').checked && !_newsData) handleNewsToggle(true); }
+  if(name==='news'){ _renderPersistedPins(); _newsLoadCustomChips(); if(document.getElementById('news-toggle').checked && !_newsData) handleNewsToggle(true); }
   if(name==='calendar') renderCalendar();
   if(name==='bottles'){ renderBottleList(); showBotEmpty(); }
   if(name==='greenhouse'){ renderGHList(); showGHEmpty(); }
