@@ -138,6 +138,17 @@ nav{
 #nav-hamburger{background:transparent;border:none;color:var(--tx);cursor:pointer;font-size:18px;padding:4px 6px;border-radius:6px;line-height:1;display:flex;align-items:center;flex-shrink:0}
 #nav-hamburger:hover{background:var(--sf2)}
 .nav-spacer{flex:1}
+#nav-clock{
+  position:absolute;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:0;
+  cursor:pointer;padding:3px 12px;border-radius:10px;
+  border:1px solid transparent;transition:background .2s,border-color .2s,box-shadow .6s;
+  user-select:none;line-height:1.2
+}
+#nav-clock:hover{background:var(--sf2);border-color:var(--bd)}
+#nc-time{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:.04em;transition:color .6s,text-shadow .6s}
+#nc-day{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);transition:color .6s}
+#nc-icon{font-size:11px;position:absolute;top:2px;right:6px;line-height:1;opacity:.8}
 #weather-chip{
   background:transparent;border:none;color:var(--tx);cursor:pointer;
   font-size:11px;font-weight:500;padding:3px 8px;border-radius:14px;
@@ -1724,6 +1735,11 @@ input, textarea, select {
     <button class="nav-home-btn" title="Home" aria-label="Go to home" onclick="goHome()">🏠</button>
     <div class="brand" role="banner">🌿 TC Plants <span>/ Lab</span></div>
     <span class="nav-spacer"></span>
+    <div id="nav-clock" onclick="navTo('calendar')" title="Chennai IST · tap to open Calendar" aria-label="Current time in Chennai IST">
+      <span id="nc-icon">☀️</span>
+      <div id="nc-time">--:--:--</div>
+      <div id="nc-day">Loading</div>
+    </div>
     <button id="weather-chip" title="Lab &amp; Greenhouse weather" aria-label="Lab and greenhouse weather">🌡️ —</button>
     <span id="offline-pill" aria-label="Offline mode">● Offline</span>
     <button class="nav-icon-btn" title="Scan QR / Barcode" aria-label="Scan QR code or barcode" onclick="openQRScan()" style="font-size:15px">📷</button>
@@ -10480,6 +10496,52 @@ function _updateAIModelUI(){
   _renderAIUsageBar();
 }
 (()=>{ _updateAIModelUI(); })();
+
+// ── Nav clock (IST, 24h, fancy) ───────────────────────────────
+(()=>{
+  const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  // Time-of-day themes: [startHour, endHour, icon, colour, glowAlpha]
+  const THEMES=[
+    [0,  4,  '🌑','#6366f1',.35], // deep night — indigo
+    [4,  6,  '🌅','#f97316',.40], // pre-dawn  — orange
+    [6,  9,  '🌤','#fbbf24',.38], // morning   — amber
+    [9,  12, '☀️','#f59e0b',.40], // mid-morning — gold
+    [12, 15, '🌞','#eab308',.42], // noon      — yellow
+    [15, 17, '🌤','#fb923c',.38], // afternoon — warm orange
+    [17, 19, '🌆','#f97316',.42], // dusk      — orange
+    [19, 21, '🌙','#818cf8',.38], // evening   — soft indigo
+    [21, 24, '🌙','#6366f1',.40], // night     — indigo
+  ];
+  function _getTheme(h){
+    return THEMES.find(([s,e])=>h>=s&&h<e)||THEMES[THEMES.length-1];
+  }
+  function _tick(){
+    const now=new Date();
+    // IST = UTC+5:30
+    const ist=new Date(now.getTime()+((now.getTimezoneOffset()+330)*60000));
+    const hh=String(ist.getHours()).padStart(2,'0');
+    const mm=String(ist.getMinutes()).padStart(2,'0');
+    const ss=String(ist.getSeconds()).padStart(2,'0');
+    const h=ist.getHours();
+    const [,, icon,col,alpha]=_getTheme(h);
+    const timeEl=document.getElementById('nc-time');
+    const dayEl=document.getElementById('nc-day');
+    const iconEl=document.getElementById('nc-icon');
+    const clockEl=document.getElementById('nav-clock');
+    if(!timeEl) return;
+    timeEl.textContent=`${hh}:${mm}:${ss}`;
+    timeEl.style.color=col;
+    timeEl.style.textShadow=`0 0 12px ${col}${Math.round(alpha*255).toString(16).padStart(2,'0')}`;
+    dayEl.textContent=`${DAYS[ist.getDay()]} · ${String(ist.getDate()).padStart(2,'0')} ${MONTHS[ist.getMonth()]}`;
+    iconEl.textContent=icon;
+    clockEl.style.boxShadow=`0 0 18px ${col}${Math.round(alpha*.5*255).toString(16).padStart(2,'0')}`;
+    clockEl.style.borderColor=`${col}${Math.round(alpha*.6*255).toString(16).padStart(2,'0')}`;
+  }
+  _tick();
+  setInterval(_tick,1000);
+})();
+
 function _toggleAIKeyRow(){
   const row=document.getElementById('ai-key-row');
   const showing=row.style.display==='flex';
