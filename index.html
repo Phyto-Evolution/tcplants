@@ -4938,6 +4938,7 @@ SERVICE WORKER (sw.js):
 <div id="ai-panel" role="dialog" aria-label="Ravana AI Assistant">
   <div id="ai-head">
     <div class="ai-title" id="ai-title-label">⚡ Ravana</div>
+    <button id="ai-user-btn" onclick="_cycleRavanaUser()" title="Switch user — Shiva / Kumar" style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;background:var(--sf2);border:1px solid var(--bd);cursor:pointer;white-space:nowrap">👤 Shiva</button>
     <button class="al-hbtn" id="ai-model-toggle" aria-label="Cycle AI model: Quick, Deep, Claude" onclick="_cycleAIModel()" title="Tap to cycle: Quick → Deep → Claude" style="font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px;background:var(--sf2);border:1px solid var(--bd)">⚡ Quick</button>
     <button class="al-hbtn" aria-label="API key settings" onclick="_toggleAIKeyRow()" title="API key">⚙️</button>
     <button class="al-hbtn" aria-label="Maximize or restore Ravana panel" onclick="_toggleAIMaximise()" id="ai-max-btn" title="Expand">⛶</button>
@@ -4971,6 +4972,10 @@ SERVICE WORKER (sw.js):
     <button class="ai-chip" aria-label="Lab overview" onclick="askAI('Using the species summary and note history in context, give a brief cultivation assessment: which species are thriving, which are at risk, and what actions to prioritise.')">Lab overview</button>
     <button class="ai-chip" aria-label="Sterilization advice" onclick="askAI('What sterilisation protocol would you recommend for my current species and the contamination pattern I have shown?')">Sterilisation</button>
     <button class="ai-chip" aria-label="Multiplication rate" onclick="askAI('Based on my bottle records and subculture history, what is the estimated multiplication rate and what should I optimise next?')">Multiplication rate</button>
+    <button class="ai-chip" aria-label="Morning briefing" onclick="_triggerMorningBrief(true)">🌅 Morning brief</button>
+    <button class="ai-chip" aria-label="What did I do today" onclick="askAI('What did I do in the lab today? Summarise all notes and bottles logged today.')">Today's activity</button>
+    <button class="ai-chip" aria-label="Dormant species" onclick="askAI('Which species have I not worked on in the last 2 weeks? Call get_dormant_species.')">Dormant species</button>
+    <button class="ai-chip" aria-label="Cost summary" onclick="askAI('Give me a lab cost summary for the last 3 months. Call cost_summary.')">Cost summary</button>
   </div>
   <!-- Chat panel -->
   <div id="ai-msgs"><div class="ai-msg ai">Greetings! I am Ravana, your TC lab assistant. I can help with protocols, species info, PGR doses, contamination analysis, and note summaries. What would you like to know?</div></div>
@@ -10297,6 +10302,16 @@ When you complete a significant output — a full analysis, a protocol, a data s
 DOMAIN — what you work within
 TC protocols, media formulations, PGR concentrations (always cite mg/L and µM), contamination diagnosis and prevention, sterilisation, autoclave parameters, explant handling, species-specific cultivation, acclimatisation, lab economics (cost per bottle, media batch efficiency), supply and inventory management, workflow and time management when it connects to lab output. The lab is tropical — high humidity, warm temperatures — account for this in recommendations.
 
+WHO YOU ARE SPEAKING WITH
+The system indicates the current user in every context block. There are two people who use this lab:
+
+SHIVA — lab owner, biotechnologist, founder of Forest Studio Labs. He built this system. He knows tissue culture deeply. He works every single day — 7 days a week, 365 days a year. Even travelling, he is working. Even if unwell, he is thinking about the lab. There is no weekend. There is no off day. Match his energy. Do not suggest he rest, pause, or "come back to it later." When talking to Shiva: peer-to-peer, no hand-holding, lead with data, suggest next steps without being asked.
+
+KUMAR — Shiva's father. Organic chemistry graduate with deep molecular-level knowledge: reaction mechanisms, sterilisation chemistry, media composition at compound level, pH buffering. Retired professional banker with strong financial instincts: cost basis, ROI, capital efficiency, portfolio thinking. He assists Shiva with lab tasks. Less familiar with TC-specific protocols but grasps them immediately when framed in chemistry. When talking to Kumar: respectful and warm — he is a senior collaborator. Anchor TC explanations in organic chemistry (sterilisation = oxidative/hydrolytic destruction of proteins and membranes; Murashige & Skoog = defined salt formulation; agar = polysaccharide gel matrix). Frame economics in his language: cost basis, margins, working capital, inventory turn. Never talk down — he is formidable.
+
+PROACTIVE ENGAGEMENT
+Do not wait to be asked everything. When you see something worth raising — overdue work, a data pattern, an optimisation opportunity, a risk — say it. At the end of responses, if there is a natural follow-up or observation, offer it as "Worth noting:" or "One more thing —". One proactive point at a time. Lean, not padded.
+
 DOMAIN — what you do not do
 Anything outside lab operations and immediately related workflow. One refusal. Then done.
 
@@ -10684,7 +10699,104 @@ async function _buildAIContext(){
     if(pmCtx&&ctx.length+pmCtx.length<MAX_CONTEXT_SIZE) ctx+=pmCtx;
   }
 
+  // Current user context
+  const _cu=_getRavanaUser();
+  ctx+=`\n\n### CURRENT USER\nSpeaking with: ${_cu.name}\nBackground: ${_cu.bg}\nTone guidance: ${_cu.tone}`;
+
   return ctx;
+}
+
+// ════════════════════════════════════════════════════════════
+// RAVANA USER SYSTEM
+// ════════════════════════════════════════════════════════════
+const _RAVANA_USER_KEY='tcplants_ravana_user';
+const RAVANA_USERS={
+  shiva:{
+    name:'Shiva', key:'shiva',
+    bg:'Lab owner, biotechnologist, tissue culture expert. Built this system. Highly technical. Works 7 days, 365 days a year — no weekends, no days off.',
+    tone:'Direct peer-to-peer. No hand-holding. Lead with data. Suggest next steps without being asked. Match his drive and initiative.',
+  },
+  kumar:{
+    name:'Kumar', key:'kumar',
+    bg:"Shiva's father. Organic chemistry graduate (deep molecular-level knowledge of reactions, sterilisation, media chemistry). Retired professional banker (strong financial instincts: ROI, cost basis, capital efficiency). Assists Shiva with lab tasks. Less familiar with TC-specific protocols but fast to grasp through chemistry framing.",
+    tone:'Respectful and warm — senior collaborator. Anchor TC explanations in organic chemistry. Frame economics as ROI/cost basis/working capital. Never talk down — he is formidable.',
+  },
+};
+function _getRavanaUser(){
+  return RAVANA_USERS[localStorage.getItem(_RAVANA_USER_KEY)||'shiva']||RAVANA_USERS.shiva;
+}
+function _setRavanaUser(key){
+  if(!RAVANA_USERS[key]) return;
+  localStorage.setItem(_RAVANA_USER_KEY,key);
+  _updateRavanaUserUI();
+  const u=RAVANA_USERS[key];
+  toast(`Ravana: now speaking with ${u.name}`);
+  const msgs=document.getElementById('ai-msgs');
+  if(msgs) msgs.innerHTML+=`<div class="ai-msg ai" style="font-style:italic;color:var(--mu)">— switched to ${u.name} —</div>`;
+}
+function _cycleRavanaUser(){
+  const keys=Object.keys(RAVANA_USERS);
+  const cur=localStorage.getItem(_RAVANA_USER_KEY)||'shiva';
+  const next=keys[(keys.indexOf(cur)+1)%keys.length];
+  _setRavanaUser(next);
+}
+function _updateRavanaUserUI(){
+  const u=_getRavanaUser();
+  const btn=document.getElementById('ai-user-btn');
+  if(btn) btn.textContent='👤 '+u.name;
+}
+(()=>{ _updateRavanaUserUI(); })();
+
+// ════════════════════════════════════════════════════════════
+// MORNING BRIEFING
+// ════════════════════════════════════════════════════════════
+const _MORNING_BRIEF_KEY='tcplants_morning_brief';
+function _checkMorningBrief(){
+  const today=new Date().toISOString().slice(0,10);
+  if(localStorage.getItem(_MORNING_BRIEF_KEY)===today) return;
+  localStorage.setItem(_MORNING_BRIEF_KEY,today);
+  setTimeout(()=>_triggerMorningBrief(false), 700);
+}
+function _triggerMorningBrief(manual=false){
+  if(!_aiMaximised) _toggleAIMaximise();
+  _switchAITab('chat');
+  const u=_getRavanaUser();
+  const now=new Date();
+  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const dayName=days[now.getDay()];
+  const today=now.toISOString().slice(0,10);
+  // Week start (Monday)
+  const ws=new Date(now); ws.setDate(now.getDate()-((now.getDay()+6)%7));
+  const wsStr=ws.toISOString().slice(0,10);
+  const allBots=S.bottles||[];
+  const overdue=allBots.filter(b=>b.next_review&&['inoculated','growing'].includes(b.status)&&b.next_review<today);
+  const due7=allBots.filter(b=>b.next_review&&['inoculated','growing'].includes(b.status)&&b.next_review>=today&&b.next_review<=new Date(Date.now()+7*86400000).toISOString().slice(0,10)).sort((a,b)=>a.next_review.localeCompare(b.next_review));
+  const contamWk=(S.notes||[]).filter(n=>n.type==='Contamination Log'&&(n.date||'').slice(0,10)>=wsStr);
+  // Day-by-day activity this week
+  const dayAct=[];
+  for(let i=0;i<7;i++){
+    const d=new Date(ws); d.setDate(ws.getDate()+i);
+    const ds=d.toISOString().slice(0,10); if(ds>today) break;
+    const nc=(S.notes||[]).filter(n=>(n.date||'').slice(0,10)===ds).length;
+    const bc=allBots.filter(b=>(b.date_inoculated||'').slice(0,10)===ds).length;
+    if(nc||bc) dayAct.push(`${days[d.getDay()].slice(0,3)} ${ds.slice(5)}: ${nc} note${nc!==1?'s':''}, ${bc} bottle${bc!==1?'s':''} inoculated`);
+  }
+  // Dormant species (no activity in 14+ days)
+  const cut14=new Date(Date.now()-14*86400000).toISOString().slice(0,10);
+  const spLast={};
+  [...(S.notes||[]),...allBots].forEach(x=>{const sp=(x.species||'').toLowerCase();if(!sp)return;const d=(x.date||x.date_inoculated||'').slice(0,10);if(d>(spLast[sp]||''))spLast[sp]=d;});
+  const dormant=Object.entries(spLast).filter(([,d])=>d<cut14).map(([sp])=>sp).slice(0,4);
+  const prompt=`[MORNING BRIEFING — ${dayName} ${_fmtDate(now)}]
+Give ${u.name} a sharp morning briefing. Be direct. No filler. Structure:
+1. One-sentence lab status: ${allBots.filter(b=>['inoculated','growing'].includes(b.status)).length} active cultures, ${overdue.length} overdue, ${due7.length} due this week, ${contamWk.length} contaminations this week.
+2. This week so far: ${dayAct.join(' | ')||'no logged activity yet'}.
+3. Coming up (next 7 days): ${due7.slice(0,5).map(b=>`${b.code} ${b.species||'?'} → ${b.next_review}`).join(', ')||'nothing scheduled'}.
+4. Dormant species (no activity 14+ days): ${dormant.join(', ')||'all species active'}.
+5. One sharp proactive observation or recommendation based on the above.
+6. End with: "What are we starting with?"
+Speak directly to ${u.name}. This is the start of a working day.`;
+  document.getElementById('ai-panel').classList.add('on');
+  askAI(prompt);
 }
 
 // Configure API proxy (set via settings or detect from environment)
@@ -10702,10 +10814,17 @@ const AI_TOOLS=[
   {type:'function',function:{name:'fetch_taxonomy_updates',description:'Fetch accepted species list for a genus from GBIF. Returns new species not yet in lab taxonomy.',parameters:{type:'object',properties:{genus:{type:'string',description:'Genus name, e.g. Nepenthes'}},required:['genus']}}},
   {type:'function',function:{name:'search_lab',description:'Search across all lab sections: notes, bottles, accessions, recipes, greenhouse plants.',parameters:{type:'object',properties:{query:{type:'string'}},required:['query']}}},
   {type:'function',function:{name:'get_schedule',description:'Get overdue reviews, transfers due, and upcoming actions in the lab.',parameters:{type:'object',properties:{}}}},
+  {type:'function',function:{name:'create_note',description:'Create a new lab note (observation, protocol, contamination log, etc.).',parameters:{type:'object',properties:{title:{type:'string'},species:{type:'string'},type:{type:'string',enum:['TC Protocol','Contamination Log','Observation','Subculture','Media Prep','General']},body:{type:'string',description:'Note content'},stage:{type:'string'},cultures_out:{type:'number'}},required:['title']}}},
+  {type:'function',function:{name:'set_review_date',description:'Set next review date on a bottle by number of days from today.',parameters:{type:'object',properties:{bottle_id:{type:'string'},days_from_now:{type:'number',description:'Days from today (e.g. 7 = review in a week)'}},required:['bottle_id','days_from_now']}}},
+  {type:'function',function:{name:'log_contamination',description:'Mark a bottle as contaminated and create a contamination note.',parameters:{type:'object',properties:{bottle_id:{type:'string'},description:{type:'string',description:'Contamination type observed (colour, pattern, etc.)'}},required:['bottle_id']}}},
+  {type:'function',function:{name:'get_recipe_performance',description:'Compare recipe performance: cultures out per use, multiplication factor, contamination rate.',parameters:{type:'object',properties:{species:{type:'string',description:'Filter to a species (optional)'}}}}},
+  {type:'function',function:{name:'get_dormant_species',description:'List species with no notes or bottle activity in the last N days.',parameters:{type:'object',properties:{days:{type:'number',description:'Inactivity threshold in days (default 14)'}}}}},
+  {type:'function',function:{name:'cost_summary',description:'Lab cost summary: total supply spend, cost per bottle estimate, monthly trend.',parameters:{type:'object',properties:{months:{type:'number',description:'Months to look back (default 3)'}}}}},
+  {type:'function',function:{name:'get_passage_tree',description:'Get full passage lineage for a bottle: its parent chain and all descendant bottles.',parameters:{type:'object',properties:{bottle_id:{type:'string'}},required:['bottle_id']}}},
 ];
 
 // Write-operations that require user confirmation before executing
-const AI_TOOLS_CONFIRM=new Set(['update_bottle_status']);
+const AI_TOOLS_CONFIRM=new Set(['update_bottle_status','create_note','set_review_date','log_contamination']);
 
 async function _executeTool(name, params){
   switch(name){
@@ -10762,6 +10881,102 @@ async function _executeTool(name, params){
       const overdue=(S.bottles||[]).filter(b=>b.next_review&&['inoculated','growing'].includes(b.status)&&b.next_review<today).map(b=>({code:b.code,species:b.species,days_overdue:Math.floor((Date.now()-new Date(b.next_review))/86400000)}));
       const due7=(S.bottles||[]).filter(b=>b.next_review&&['inoculated','growing'].includes(b.status)&&b.next_review>=today&&b.next_review<=new Date(Date.now()+7*86400000).toISOString().slice(0,10));
       return {overdue:overdue.slice(0,10),due_this_week:due7.length,overdue_count:overdue.length};
+    }
+    case 'create_note':{
+      const id='n'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+      const note={id,title:params.title,species:params.species||'',type:params.type||'Observation',stage:params.stage||'',cultures_out:params.cultures_out??null,date:new Date().toISOString(),pinned:false,tags:[],flair:[]};
+      S.notes.unshift(note);
+      if(params.body) S.bodyCache[id]=params.body;
+      try{
+        if(params.body) await saveNote(id,{title:note.title,body:params.body});
+        S.notesSha=await saveNotesIndex(S.notes,S.notesSha);
+        renderNoteList(); _renderDashboard();
+        return {success:true,note_id:id,title:note.title,message:`Note "${note.title}" created.`};
+      }catch(e){ S.notes=S.notes.filter(n=>n.id!==id); return {error:e.message}; }
+    }
+    case 'set_review_date':{
+      const b=(S.bottles||[]).find(x=>x.id===params.bottle_id);
+      if(!b) return {error:'Bottle not found: '+params.bottle_id};
+      const d=new Date(); d.setDate(d.getDate()+(params.days_from_now||7));
+      const old=b.next_review;
+      b.next_review=d.toISOString().slice(0,10);
+      try{
+        S.bottlesSha=await saveBottles(S.bottles,S.bottlesSha);
+        renderBottleList(); _renderDashboard();
+        return {success:true,bottle:b.code,review_date:b.next_review,days:params.days_from_now};
+      }catch(e){ b.next_review=old; return {error:e.message}; }
+    }
+    case 'log_contamination':{
+      const b=(S.bottles||[]).find(x=>x.id===params.bottle_id);
+      if(!b) return {error:'Bottle not found: '+params.bottle_id};
+      const oldStatus=b.status; b.status='contaminated';
+      // Create contamination note
+      const nid='n'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+      const cnote={id:nid,title:`Contamination — ${b.species||b.code}`,species:b.species||'',type:'Contamination Log',stage:b.stage||'',date:new Date().toISOString(),pinned:false,tags:['contamination'],flair:[]};
+      S.notes.unshift(cnote);
+      if(params.description) S.bodyCache[nid]=`Bottle: ${b.code}\n\n${params.description}`;
+      try{
+        if(params.description) await saveNote(nid,{title:cnote.title,body:S.bodyCache[nid]});
+        S.notesSha=await saveNotesIndex(S.notes,S.notesSha);
+        S.bottlesSha=await saveBottles(S.bottles,S.bottlesSha);
+        renderNoteList(); renderBottleList(); _renderDashboard();
+        return {success:true,bottle:b.code,note_id:nid,message:`${b.code} marked contaminated, note logged.`};
+      }catch(e){ b.status=oldStatus; S.notes=S.notes.filter(n=>n.id!==nid); return {error:e.message}; }
+    }
+    case 'get_recipe_performance':{
+      const recs=S.recs||[];
+      const perf=recs.map(r=>{
+        const recNotes=(S.notes||[]).filter(n=>n.recipe_id===r.id);
+        const recBots=(S.bottles||[]).filter(b=>b.recipe_id===r.id);
+        const totalOut=recNotes.reduce((s,n)=>s+(n.cultures_out||0),0);
+        const contamCount=recNotes.filter(n=>n.type==='Contamination Log').length;
+        return {recipe_id:r.id,name:r.name,base:r.base||'',uses:recNotes.length,bottles:recBots.length,total_cultures_out:totalOut,avg_out_per_use:recNotes.length?(totalOut/recNotes.length).toFixed(1):null,contamination_notes:contamCount};
+      }).filter(r=>params.species?(S.notes||[]).some(n=>n.recipe_id===r.recipe_id&&(n.species||'').toLowerCase().includes((params.species||'').toLowerCase())):true);
+      return perf.sort((a,b)=>b.total_cultures_out-a.total_cultures_out).slice(0,10);
+    }
+    case 'get_dormant_species':{
+      const threshold=params.days||14;
+      const cut=new Date(Date.now()-threshold*86400000).toISOString().slice(0,10);
+      const spLast={};
+      [...(S.notes||[]),...(S.bottles||[])].forEach(x=>{const sp=(x.species||'').trim();if(!sp)return;const d=(x.date||x.date_inoculated||'').slice(0,10);if(d>(spLast[sp]||''))spLast[sp]=d;});
+      const dormant=Object.entries(spLast).filter(([,d])=>d<cut).map(([sp,d])=>({species:sp,last_activity:d,days_inactive:Math.floor((Date.now()-new Date(d))/86400000)})).sort((a,b)=>b.days_inactive-a.days_inactive);
+      return {threshold_days:threshold,dormant_count:dormant.length,species:dormant};
+    }
+    case 'cost_summary':{
+      const months=params.months||3;
+      const cut=new Date(); cut.setMonth(cut.getMonth()-months);
+      const cutStr=cut.toISOString().slice(0,10);
+      const supplies=(S.supplies||[]).filter(s=>s.date_prepared>=cutStr&&s.cost_total);
+      const totalSpend=supplies.reduce((s,x)=>s+(x.cost_total||0),0);
+      const totalBottles=(S.bottles||[]).filter(b=>(b.date_inoculated||'')>=cutStr).length;
+      const costPerBottle=totalBottles>0?(totalSpend/totalBottles).toFixed(2):null;
+      // Monthly breakdown
+      const monthly={};
+      supplies.forEach(s=>{const mo=(s.date_prepared||'').slice(0,7);if(!monthly[mo])monthly[mo]=0;monthly[mo]+=(s.cost_total||0);});
+      return {period_months:months,total_supply_spend:totalSpend,bottles_inoculated:totalBottles,estimated_cost_per_bottle:costPerBottle,monthly_breakdown:monthly};
+    }
+    case 'get_passage_tree':{
+      const allBots=S.bottles||[];
+      const root=allBots.find(b=>b.id===params.bottle_id);
+      if(!root) return {error:'Bottle not found: '+params.bottle_id};
+      // Walk up to find ancestor chain
+      const ancestors=[];
+      let cur=root;
+      while(cur.parent_id){
+        const p=allBots.find(b=>b.id===cur.parent_id);
+        if(!p||ancestors.some(a=>a.id===p.id)) break;
+        ancestors.unshift({id:p.id,code:p.code,species:p.species,status:p.status,date:p.date_inoculated});
+        cur=p;
+      }
+      // Walk down to find all descendants (BFS)
+      const descendants=[];
+      const queue=[root.id];
+      while(queue.length){
+        const pid=queue.shift();
+        const children=allBots.filter(b=>b.parent_id===pid);
+        children.forEach(c=>{ descendants.push({id:c.id,code:c.code,species:c.species,status:c.status,date:c.date_inoculated}); queue.push(c.id); });
+      }
+      return {bottle:{id:root.id,code:root.code,species:root.species,status:root.status},ancestors,descendants,passage_depth:ancestors.length,total_lineage:ancestors.length+1+descendants.length};
     }
     default: return {error:'Unknown tool: '+name};
   }
@@ -10868,6 +11083,8 @@ async function askAI(prompt){
     thinking.remove();
     msgs.innerHTML+=`<div class="ai-msg ai">${esc(text).replace(/\n/g,'<br>')}</div>`;
     msgs.scrollTop=msgs.scrollHeight;
+    // Auto-maximise panel if response overflows visible area
+    setTimeout(()=>{ if(!_aiMaximised&&msgs.scrollHeight>msgs.clientHeight+120) _toggleAIMaximise(); },80);
     return text;
   }catch(e){
     thinking.remove();
@@ -11200,7 +11417,9 @@ function _setMicBtnState(state){
 }
 function _toggleAIPanel(){
   const p=document.getElementById('ai-panel');
+  const wasOff=!p.classList.contains('on');
   p.classList.toggle('on');
+  if(wasOff) _checkMorningBrief();
 }
 function _closeAIPanel(){
   document.getElementById('ai-panel').classList.remove('on');
@@ -11751,6 +11970,45 @@ function _parseVoiceAction(text){
   // "export report" / "download report"
   if(/(?:export|download)\s+(?:lab\s+)?report/.test(t)){
     return ()=>{ exportLabReport('csv'); _ttsSpeak('Exporting lab report as CSV.'); };
+  }
+
+  // "talk to Kumar" / "switch to Shiva" / "switch user"
+  const userMatch=t.match(/(?:talk\s+to|switch\s+to|speak\s+to|change\s+to)\s+(shiva|kumar)/);
+  if(userMatch){
+    const who=userMatch[1].toLowerCase();
+    return ()=>{ _setRavanaUser(who); _ttsSpeak('Switching to '+RAVANA_USERS[who]?.name+'.'); };
+  }
+
+  // "morning briefing" / "start briefing" / "what's today"
+  if(/morning\s+brief|start\s+brief|daily\s+brief/.test(t)){
+    return ()=>{ _triggerMorningBrief(true); };
+  }
+
+  // "what did I do today" / "what did I do yesterday"
+  const activityMatch=t.match(/what\s+did\s+i\s+do\s+(today|yesterday)/);
+  if(activityMatch){
+    const isYesterday=activityMatch[1]==='yesterday';
+    return ()=>{
+      const d=new Date(); if(isYesterday) d.setDate(d.getDate()-1);
+      const ds=d.toISOString().slice(0,10);
+      const notes=(S.notes||[]).filter(n=>(n.date||'').slice(0,10)===ds);
+      const bots=(S.bottles||[]).filter(b=>(b.date_inoculated||'').slice(0,10)===ds);
+      if(!notes.length&&!bots.length){ _ttsSpeak(`Nothing logged ${activityMatch[1]}.`); return; }
+      const msg=`${activityMatch[1]==='today'?'Today':'Yesterday'}: ${notes.length} note${notes.length!==1?'s':''}, ${bots.length} bottle${bots.length!==1?'s':''} inoculated.`;
+      _ttsSpeak(msg);
+      document.getElementById('ai-panel').classList.add('on');
+      askAI(`Summarise what happened in the lab on ${ds}. Notes: ${notes.map(n=>n.title).join(', ')||'none'}. Bottles inoculated: ${bots.map(b=>b.code+' '+b.species).join(', ')||'none'}.`);
+    };
+  }
+
+  // "how is [species] doing" / "how's my [species]"
+  const speciesStatusMatch=t.match(/how(?:'s|\s+is)\s+(?:my\s+)?(.+?)\s+doing/);
+  if(speciesStatusMatch){
+    const sp=speciesStatusMatch[1].trim();
+    return ()=>{
+      document.getElementById('ai-panel').classList.add('on');
+      askAI(`How is ${sp} performing in my lab? Call get_species_analysis with species "${sp}" and give me a clear status.`);
+    };
   }
 
   return null;
