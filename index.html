@@ -2762,26 +2762,28 @@ input, textarea, select {
     <div style="max-width:1200px;margin:0 auto;width:100%;padding-bottom:40px">
       <h2 style="font-size:20px;font-weight:700;margin-bottom:4px">📰 TC Research News</h2>
       <p style="font-size:13px;color:var(--mu);margin-bottom:14px">Latest publications from PubMed — full abstracts, card grid, pinnable. Archived to your repo.</p>
-      <div class="news-topic-bar">
-        <select class="news-topic-sel" id="news-topic" onchange="_newsTopicChange()">
-          <option value="general">🌿 General TC</option>
-          <option value="carnivorous">🪲 Carnivorous Plants</option>
-          <option value="nepenthes">🏔 Nepenthes</option>
-          <option value="orchids">🌸 Orchids</option>
-          <option value="banana">🍌 Banana / Musa</option>
-          <option value="vanilla">🌼 Vanilla</option>
-          <option value="embryogenesis">🔬 Somatic Embryogenesis</option>
-          <option value="organogenesis">🌱 Organogenesis</option>
-          <option value="callus">🧫 Callus Culture</option>
-          <option value="rooting">🌿 Rooting &amp; Acclimatisation</option>
-          <option value="pgr">💉 PGRs / Cytokinins / Auxins</option>
-          <option value="sterilisation">🧼 Sterilisation &amp; Explants</option>
-          <option value="contamination">☣️ Contamination</option>
-          <option value="media">⚗️ Media Formulations</option>
-          <option value="cryopreservation">❄️ Cryopreservation</option>
-          <option value="custom">✏️ Custom keyword…</option>
-        </select>
-        <input type="text" id="news-custom-kw" placeholder="Type keyword and load…" style="display:none;font-size:13px;padding:6px 10px;border:1px solid var(--bd);border-radius:6px;background:var(--sf2);color:var(--tx);min-width:180px">
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px" id="news-topic-chips">
+        <button class="gal-cat-btn active" data-topic="general"      onclick="_newsChipSelect(this)">🌿 TC &amp; Micropropagation</button>
+        <button class="gal-cat-btn"        data-topic="cp_micro"     onclick="_newsChipSelect(this)">🪲 Carnivorous Plants Micro</button>
+        <button class="gal-cat-btn"        data-topic="carnivorous"  onclick="_newsChipSelect(this)">🪴 Carnivorous Plants</button>
+        <button class="gal-cat-btn"        data-topic="nepenthes"    onclick="_newsChipSelect(this)">🏔 Nepenthes</button>
+        <button class="gal-cat-btn"        data-topic="orchids"      onclick="_newsChipSelect(this)">🌸 Orchids</button>
+        <button class="gal-cat-btn"        data-topic="mutation"     onclick="_newsChipSelect(this)">🧬 Plant Mutation</button>
+        <button class="gal-cat-btn"        data-topic="banana"       onclick="_newsChipSelect(this)">🍌 Banana / Musa</button>
+        <button class="gal-cat-btn"        data-topic="vanilla"      onclick="_newsChipSelect(this)">🌼 Vanilla</button>
+        <button class="gal-cat-btn"        data-topic="embryogenesis" onclick="_newsChipSelect(this)">🔬 Somatic Embryogenesis</button>
+        <button class="gal-cat-btn"        data-topic="organogenesis" onclick="_newsChipSelect(this)">🌱 Organogenesis</button>
+        <button class="gal-cat-btn"        data-topic="callus"       onclick="_newsChipSelect(this)">🧫 Callus Culture</button>
+        <button class="gal-cat-btn"        data-topic="rooting"      onclick="_newsChipSelect(this)">🌿 Rooting</button>
+        <button class="gal-cat-btn"        data-topic="pgr"          onclick="_newsChipSelect(this)">💉 PGRs</button>
+        <button class="gal-cat-btn"        data-topic="sterilisation" onclick="_newsChipSelect(this)">🧼 Sterilisation</button>
+        <button class="gal-cat-btn"        data-topic="contamination" onclick="_newsChipSelect(this)">☣️ Contamination</button>
+        <button class="gal-cat-btn"        data-topic="media"        onclick="_newsChipSelect(this)">⚗️ Media</button>
+        <button class="gal-cat-btn"        data-topic="cryopreservation" onclick="_newsChipSelect(this)">❄️ Cryopreservation</button>
+        <button class="gal-cat-btn"        data-topic="custom"       onclick="_newsChipSelect(this)">✏️ Custom</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+        <input type="text" id="news-custom-kw" placeholder="Type keyword and press Load…" style="display:none;font-size:13px;padding:6px 10px;border:1px solid var(--bd);border-radius:6px;background:var(--sf2);color:var(--tx);min-width:200px;flex:1">
         <label class="toggle-switch" style="flex-shrink:0">
           <input type="checkbox" id="news-toggle" onchange="handleNewsToggle(this.checked)">
           <div class="toggle-track"></div>
@@ -10312,10 +10314,12 @@ function _deletePinData(pmid){ delete _newsPinData[pmid]; localStorage.setItem('
 function _getPinnedArticles(){ return Object.values(_newsPinData).filter(a=>_newsPins.has(a.pmid)); }
 
 const NEWS_TOPICS={
-  general:'("plant tissue culture"[ti] OR "micropropagation"[ti] OR "in vitro propagation"[ti] OR "plant cell culture"[ti])',
-  carnivorous:'("Nepenthes"[ti] OR "Drosera"[ti] OR "Sarracenia"[ti] OR "carnivorous plant"[ti] OR "Dionaea"[ti] OR "Pinguicula"[ti] OR "Heliamphora"[ti] OR "Cephalotus"[ti]) AND ("tissue culture"[tw] OR "in vitro"[tw] OR "micropropagation"[tw])',
+  general:'("plant tissue culture"[ti] OR "micropropagation"[ti] OR "in vitro propagation"[ti] OR "plant cell culture"[ti] OR "in vitro plant propagation"[ti])',
+  cp_micro:'("Nepenthes"[ti] OR "Drosera"[ti] OR "Sarracenia"[ti] OR "Dionaea"[ti] OR "Pinguicula"[ti] OR "Heliamphora"[ti] OR "Cephalotus"[ti] OR "Utricularia"[ti] OR "Aldrovanda"[ti] OR "Darlingtonia"[ti]) AND ("tissue culture"[tw] OR "in vitro"[tw] OR "micropropagation"[tw] OR "in vitro propagation"[tw])',
+  carnivorous:'("Nepenthes"[tiab] OR "Drosera"[tiab] OR "Sarracenia"[tiab] OR "carnivorous plant"[tiab] OR "Dionaea"[tiab] OR "Pinguicula"[tiab] OR "Heliamphora"[tiab] OR "Cephalotus"[tiab] OR "Utricularia"[tiab])',
   nepenthes:'"Nepenthes"[ti] AND ("tissue culture"[tw] OR "in vitro"[tw] OR "micropropagation"[tw])',
   orchids:'("Paphiopedilum"[ti] OR "Dendrobium"[ti] OR "Vanilla"[ti] OR "Phalaenopsis"[ti] OR "Cattleya"[ti] OR "orchid"[ti]) AND ("tissue culture"[tw] OR "in vitro"[tw] OR "micropropagation"[tw])',
+  mutation:'("somaclonal variation"[ti] OR "plant mutation"[ti] OR "induced mutation"[ti] OR "mutagenesis"[ti] OR "polyploidy"[ti] OR "chromosome doubling"[ti] OR "colchicine"[ti] OR "EMS mutagenesis"[ti] OR "gamma irradiation"[ti] OR "somatic mutation"[ti]) AND ("plant"[tw] OR "in vitro"[tw] OR "tissue culture"[tw] OR "micropropagation"[tw])',
   banana:'("Musa"[ti] OR "banana"[ti] OR "plantain"[ti]) AND ("tissue culture"[tw] OR "in vitro"[tw] OR "micropropagation"[tw])',
   vanilla:'"Vanilla planifolia"[ti] OR ("Vanilla"[ti] AND ("tissue culture"[tw] OR "in vitro"[tw]))',
   embryogenesis:'"somatic embryogenesis"[ti] AND ("plant"[tw] OR "in vitro"[tw])',
@@ -10330,10 +10334,22 @@ const NEWS_TOPICS={
 };
 const NEWS_MAX=60;
 
+function _newsChipSelect(btn){
+  document.querySelectorAll('#news-topic-chips .gal-cat-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const topic=btn.dataset.topic;
+  const customInp=document.getElementById('news-custom-kw');
+  if(customInp) customInp.style.display=topic==='custom'?'':'none';
+  // Reset toggle so user explicitly reloads
+  const tog=document.getElementById('news-toggle');
+  if(tog.checked){ tog.checked=false; handleNewsToggle(false); }
+}
+
 function _newsTopicChange(){
   const tog=document.getElementById('news-toggle');
   if(tog.checked){ tog.checked=false; handleNewsToggle(false); }
-  const topic=document.getElementById('news-topic').value;
+  const active=document.querySelector('#news-topic-chips .gal-cat-btn.active');
+  const topic=active?.dataset.topic||'general';
   const customInp=document.getElementById('news-custom-kw');
   if(customInp) customInp.style.display=topic==='custom'?'':'none';
 }
@@ -10349,7 +10365,8 @@ async function handleNewsToggle(on){
     countEl.textContent='';
     return;
   }
-  const topic=document.getElementById('news-topic').value;
+  const activeChip=document.querySelector('#news-topic-chips .gal-cat-btn.active');
+  const topic=activeChip?.dataset.topic||'general';
   let query=NEWS_TOPICS[topic]||NEWS_TOPICS.general;
   if(topic==='custom'){
     const kw=document.getElementById('news-custom-kw')?.value.trim();
@@ -10404,11 +10421,12 @@ async function handleNewsToggle(on){
     const articles=ids.map(id=>{
       const d=sumData.result?.[id]; if(!d) return null;
       const doi=d.articleids?.find(a=>a.idtype==='doi')?.value||'';
+      const pmc=d.articleids?.find(a=>a.idtype==='pmc')?.value||'';
       const authors=(d.authors||[]).slice(0,3).map(a=>a.name).join(', ')+(d.authors?.length>3?' et al.':'');
       return {
         id, title:d.title||'Untitled', authors,
         journal:d.source||'', year:d.pubdate?.slice(0,4)||'',
-        doi, pubdate:d.pubdate||'',
+        doi, pmc, pubdate:d.pubdate||'',
         abstract:abstractMap[id]||'',
         url:doi?`https://doi.org/${doi}`:`https://pubmed.ncbi.nlm.nih.gov/${id}/`,
         pmid:id
@@ -10442,6 +10460,7 @@ function _newsCardHtml(a, inPinsArea){
     ${a.abstract?`<div class="article-abstract" id="nab-${a.pmid}">${esc(a.abstract)}<div class="article-abstract-fade" id="nab-fade-${a.pmid}"></div></div>
     <a href="#" style="font-size:11px;color:var(--ac);text-decoration:none" onclick="event.preventDefault();_toggleAbstract('${a.pmid}')">Read more ↓</a>`:''}
     ${a.doi?`<div class="article-doi" style="margin-top:2px">DOI: <a href="https://doi.org/${esc(a.doi)}" target="_blank" rel="noopener">${esc(a.doi)}</a></div>`:''}
+    ${a.pmc?`<div style="margin-top:4px"><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC${esc(a.pmc)}/pdf/" target="_blank" rel="noopener" style="font-size:12px;color:var(--gn);font-weight:600">📄 Download PDF (PMC)</a></div>`:''}
     <div style="margin-top:2px"><a href="https://pubmed.ncbi.nlm.nih.gov/${esc(a.pmid)}/" target="_blank" rel="noopener" style="font-size:11px;color:var(--mu)">PubMed ↗</a></div>
   </div>`;
 }
