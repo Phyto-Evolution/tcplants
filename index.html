@@ -16065,17 +16065,33 @@ if(!navigator.onLine) document.getElementById('offline-pill').classList.add('on'
 // PWA SERVICE WORKER & OFFLINE SUPPORT (Task #21)
 // ════════════════════════════════════════════════════════════
 if('serviceWorker' in navigator){
-  // Capture BEFORE registration — null means no SW was running (first install)
+  // Capture BEFORE registration — false = no SW yet = first install, skip banner
   const _swWasControlled=!!navigator.serviceWorker.controller;
+
+  // Register listeners SYNCHRONOUSLY — before register() so we never miss an event
+  // that fires before the Promise resolves (skipWaiting activates immediately)
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{
+    if(_swWasControlled) _showUpdateBanner();
+  });
+  navigator.serviceWorker.addEventListener('message',e=>{
+    if(e.data?.type==='SW_UPDATED'&&_swWasControlled) _showUpdateBanner();
+  });
+
   navigator.serviceWorker.register('/sw.js').then(reg=>{
-    setInterval(()=>reg.update(), 5*60*1000);
-    // Only notify on genuine updates (not first-ever install)
-    navigator.serviceWorker.addEventListener('message', e=>{
-      if(e.data?.type==='SW_UPDATED'&&_swWasControlled) _showUpdateBanner();
+    // Already a waiting SW when page loaded (update installed before this load)
+    if(reg.waiting&&_swWasControlled) _showUpdateBanner();
+
+    // Watch for new SW installing while page is open (e.g. after reg.update() fires)
+    reg.addEventListener('updatefound',()=>{
+      const nw=reg.installing;
+      nw?.addEventListener('statechange',()=>{
+        // 'installed' = downloaded & waiting; controller check = not first install
+        if(nw.state==='installed'&&navigator.serviceWorker.controller) _showUpdateBanner();
+      });
     });
-    navigator.serviceWorker.addEventListener('controllerchange', ()=>{
-      if(_swWasControlled) _showUpdateBanner();
-    });
+
+    // Poll for updates every 5 min while tab is open
+    setInterval(()=>reg.update(),5*60*1000);
   }).catch(()=>{});
 }
 function _showUpdateBanner(){
