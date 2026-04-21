@@ -18620,7 +18620,7 @@ function renderClimateHistory(){
         <div style="font-size:18px;font-weight:700;color:var(--yw)">${last.gt??'—'}°C</div>
         ${ghTemps.length?spark(ghTemps,tMin,tMax,'var(--yw)'):'<div style="color:var(--mu);font-size:11px">No GH data</div>'}
         <div style="font-size:11px;color:var(--mu)">Humidity: ${last.gh_h??'—'}%</div>
-        ${spark(pts.map(p=>p.gh_h).filter(v=>v!=null),0,100,'var(--yw)'):''}
+        ${pts.map(p=>p.gh_h).filter(v=>v!=null).length?spark(pts.map(p=>p.gh_h).filter(v=>v!=null),0,100,'var(--yw)'):''}
       </div>
     </div>
     <div style="font-size:11px;color:var(--mu);margin-top:8px">Last ${pts.length} hours · updated hourly</div>`;
