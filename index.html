@@ -77,7 +77,7 @@ body{background:var(--bg);color:var(--tx);font-family:var(--font);font-size:14px
   background:radial-gradient(ellipse 70% 60% at 25% 35%,rgba(26,127,55,.1) 0%,transparent 70%),
              radial-gradient(ellipse 60% 50% at 80% 75%,rgba(9,105,218,.08) 0%,transparent 70%),
              var(--bg)}
-.lbox{background:var(--glass);border:1px solid var(--glass-bd);border-radius:14px;padding:32px;width:400px;max-width:96vw;box-shadow:0 8px 40px rgba(0,0,0,.22);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.lbox{background:var(--glass);border:1px solid var(--glass-bd);border-radius:14px;padding:32px;width:400px;max-width:96vw;box-shadow:0 8px 40px rgba(0,0,0,.22);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);position:relative;z-index:1}
 .llogo{text-align:center;margin-bottom:24px}
 .llogo .ic{font-size:42px;display:block;margin-bottom:8px}
 .llogo h1{font-size:20px;font-weight:700}
@@ -1732,8 +1732,10 @@ input, textarea, select {
 </div>
 
 <div id="login">
+  <canvas id="login-wave" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;transition:opacity .5s"></canvas>
+  <button id="login-wave-btn" onclick="_loginWaveToggle()" title="Toggle background waves" style="position:absolute;bottom:14px;right:14px;z-index:2;background:transparent;border:1px solid var(--bd);border-radius:14px;color:var(--mu);cursor:pointer;font-size:11px;padding:3px 10px;opacity:.5;transition:opacity .2s">〜</button>
   <!-- Login screen controls -->
-  <div id="login-controls" style="position:absolute;top:18px;right:18px;display:flex;align-items:center;gap:8px">
+  <div id="login-controls" style="position:absolute;top:18px;right:18px;display:flex;align-items:center;gap:8px;z-index:2">
     <button id="login-skin-btn" title="Toggle Ravana skin" onclick="_loginToggleSkin()" style="background:var(--sf);border:1px solid var(--bd);border-radius:20px;cursor:pointer;font-size:11px;font-weight:700;padding:5px 12px;transition:all .2s;color:var(--mu)">✦ Skin</button>
     <button id="login-theme-btn" title="Toggle theme" onclick="_loginToggleTheme()">☀️</button>
   </div>
@@ -17345,6 +17347,67 @@ function _loginToggleSkin(){
   const cb=document.getElementById('set-skin-toggle');
   if(cb) cb.checked=on;
 }
+
+// ── LOGIN WAVE ANIMATION ─────────────────────────────────────
+(function initLoginWave(){
+  const canvas=document.getElementById('login-wave');
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  let raf=null;
+  let on=localStorage.getItem('tcplants_login_wave')!=='0';
+
+  // Wave definitions — distributed vertically, very slow
+  const WAVES=[
+    {r:63, g:185,b:80, alpha:0.13,amp:75, freq:0.0028,speed:0.40,phase:0.0,vy:0.22},
+    {r:88, g:166,b:255,alpha:0.09,amp:95, freq:0.0019,speed:0.28,phase:2.1,vy:0.38},
+    {r:188,g:140,b:255,alpha:0.07,amp:60, freq:0.0034,speed:0.52,phase:4.3,vy:0.55},
+    {r:63, g:185,b:80, alpha:0.06,amp:115,freq:0.0013,speed:0.18,phase:1.0,vy:0.70},
+    {r:88, g:166,b:255,alpha:0.05,amp:80, freq:0.0022,speed:0.35,phase:3.5,vy:0.85},
+  ];
+
+  function resize(){
+    canvas.width=canvas.offsetWidth;
+    canvas.height=canvas.offsetHeight;
+  }
+
+  function frame(ts){
+    if(!on){raf=null;return;}
+    raf=requestAnimationFrame(frame);
+    const t=ts*0.001;
+    const W=canvas.offsetWidth,H=canvas.offsetHeight;
+    if(canvas.width!==W||canvas.height!==H) resize();
+    ctx.clearRect(0,0,W,H);
+    WAVES.forEach(w=>{
+      ctx.beginPath();
+      ctx.strokeStyle=`rgba(${w.r},${w.g},${w.b},${w.alpha})`;
+      ctx.lineWidth=1.6;
+      const yBase=H*w.vy;
+      for(let x=0;x<=W;x+=3){
+        const y=yBase+w.amp*Math.sin(w.freq*x+t*w.speed+w.phase);
+        x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+    });
+  }
+
+  function _sync(){
+    canvas.style.opacity=on?'1':'0';
+    const btn=document.getElementById('login-wave-btn');
+    if(btn) btn.textContent=on?'〜 on':'〜 off';
+  }
+
+  resize();
+  window.addEventListener('resize',()=>{if(canvas.closest('#login')) resize();});
+  _sync();
+  if(on) raf=requestAnimationFrame(frame);
+
+  window._loginWaveToggle=function(){
+    on=!on;
+    localStorage.setItem('tcplants_login_wave',on?'1':'0');
+    _sync();
+    if(on&&!raf) raf=requestAnimationFrame(frame);
+  };
+})();
 
 // ════════════════════════════════════════════════════════════
 // 1. GBIF SPECIES LOOKUP
