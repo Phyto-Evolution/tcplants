@@ -747,24 +747,30 @@ main > .dview, main > .editor{ margin:0 auto; }
 .scaler-result{background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:10px;font-family:var(--mono);font-size:13px;margin-top:8px;white-space:pre-wrap;min-height:40px;line-height:1.8}
 /* dashboard */
 /* ── DASHBOARD REDESIGN ── */
-#dash-panels{display:grid;gap:12px;grid-template-columns:repeat(6,1fr);grid-template-areas:
-  "donut  donut  alerts  alerts  activity activity"
-  "contam contam contam  contam  contam   contam"
-  "species species species gh     gh       gh"
-  "recent recent pinned  pinned  research research"
-  "aibar  aibar  aibar   aibar   aibar    aibar"
-  "voice  voice  voice   voice   voice    voice";
+#dash-panels{display:grid;gap:12px;grid-template-columns:repeat(24,1fr);grid-template-areas:
+  "donut donut donut donut donut donut donut donut alerts alerts alerts alerts alerts alerts alerts alerts activity activity activity activity activity activity activity activity"
+  "contam contam contam contam contam contam contam contam contam contam contam contam contam contam contam contam contam contam contam contam contam contam contam contam"
+  "species species species species species species species species species species species species gh gh gh gh gh gh gh gh gh gh gh gh"
+  "recent recent recent recent recent recent recent recent pinned pinned pinned pinned pinned pinned pinned pinned research research research research research research research research"
+  "aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar"
+  "voice voice voice voice voice voice voice voice voice voice voice voice voice voice voice voice voice voice voice voice voice voice voice voice";
 }
-@media(max-width:900px){#dash-panels{grid-template-columns:1fr 1fr;grid-template-areas:"donut alerts""activity contam""species species""gh gh""recent pinned""research research""aibar aibar""voice voice";}}
+@media(max-width:900px){#dash-panels{grid-template-columns:repeat(12,1fr);grid-template-areas:"donut donut donut donut donut donut alerts alerts alerts alerts alerts alerts""activity activity activity activity activity activity contam contam contam contam contam contam""species species species species species species species species species species species species""gh gh gh gh gh gh gh gh gh gh gh gh""recent recent recent recent recent recent pinned pinned pinned pinned pinned pinned""research research research research research research research research research research research research""aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar""voice voice voice voice voice voice voice voice voice voice voice voice";}}
 @media(max-width:580px){#dash-panels{grid-template-columns:1fr;grid-template-areas:"donut""alerts""activity""contam""species""gh""recent""pinned""research""aibar""voice";}}
 .dc{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;min-width:0;overflow:hidden}
 .dc-label{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
 .dc-label a,.dc-label span[onclick]{color:var(--ac);cursor:pointer;font-size:9px;font-weight:700;text-transform:none;letter-spacing:0}
 .dc-num{font-size:32px;font-weight:800;line-height:1;margin-bottom:2px}
 .dc-sub{font-size:11px;color:var(--mu)}
-.dc-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--sf2);cursor:pointer}
+.dc-row{display:flex;align-items:center;gap:8px;padding:7px 4px;border-bottom:1px solid var(--sf2);cursor:pointer;width:100%;box-sizing:border-box;border-radius:0}
 .dc-row:last-child{border-bottom:none}
-.dc-row:hover{background:var(--sf2);margin:0 -4px;padding-left:4px;padding-right:4px;border-radius:4px;border-bottom-color:transparent}
+.dc-row:hover{background:var(--sf2);border-radius:5px;border-bottom-color:transparent}
+/* scrollable list container inside a card */
+.dc-scroll{max-height:220px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;margin:0 -18px;padding:0 18px}
+.dc-scroll::-webkit-scrollbar{display:none}
+/* fade-out gradient at bottom when list overflows */
+.dc-fade{position:relative;flex:1;min-height:0}
+.dc-fade::after{content:'';position:absolute;bottom:0;left:0;right:0;height:36px;background:linear-gradient(transparent,var(--sf));pointer-events:none;border-radius:0 0 10px 10px}
 .dc-tag{display:inline-flex;align-items:center;gap:4px;background:var(--sf2);border:1px solid var(--bd);border-radius:16px;padding:4px 10px;font-size:11px;white-space:nowrap;cursor:pointer;transition:border-color .1s}
 .dc-tag:hover{border-color:var(--ac);color:var(--ac)}
 /* legacy compat */
@@ -7623,6 +7629,7 @@ function _renderDashboard(){
         </div>
         ${badge?`<span style="font-size:11px;font-weight:700;color:${badgeCol};flex-shrink:0">${badge}</span>`:''}
       </div>`;
+    const Scroll=content=>`<div class="dc-fade"><div class="dc-scroll">${content}</div></div>`;
 
     // ── 1. CULTURES — donut + stage list ──────────────────────
     const donutHTML=C('donut',`
@@ -7630,13 +7637,13 @@ function _renderDashboard(){
       ${allBots.length?`
         <div style="display:flex;gap:16px;align-items:flex-start">
           <div style="flex-shrink:0;margin-top:4px">${_donutSvg(donutSegs)}</div>
-          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
-            ${stageOrder.filter(s=>stageCounts[s]).map(s=>`
-              <div onclick="navTo('bottles');setBotFilter('${s}');renderBottleList()" class="dc-row" style="padding:4px 0;border-bottom-color:var(--sf2)">
+          <div style="flex:1;min-width:0">
+            ${Scroll(stageOrder.filter(s=>stageCounts[s]).map(s=>`
+              <div onclick="navTo('bottles');setBotFilter('${s}');renderBottleList()" class="dc-row" style="padding:4px 0">
                 <div style="width:10px;height:10px;border-radius:2px;flex-shrink:0;background:${stageCols[s]}"></div>
                 <span style="flex:1;font-size:12px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${stageLabel[s].replace(/^\S+\s/,'')}</span>
                 <span style="font-size:13px;font-weight:700">${stageCounts[s]}</span>
-              </div>`).join('')}
+              </div>`).join(''))}
           </div>
         </div>
         <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--sf2);display:flex;justify-content:space-between">
@@ -7663,11 +7670,11 @@ function _renderDashboard(){
     }).join('');
     const alertsHTML=C('alerts',`
       ${H('⚠️ ATTENTION',`navTo('reminders')`,'All reminders →')}
-      ${upcoming.length?alertItems:'<div style="padding:12px 0;text-align:center;color:var(--gn);font-size:13px">✓ Nothing overdue</div>'}
+      ${Scroll(`${upcoming.length?alertItems:'<div style="padding:12px 0;text-align:center;color:var(--gn);font-size:13px">✓ Nothing overdue</div>'}
       ${xferItems?`<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--sf2)">
         <div style="font-size:9px;font-weight:800;letter-spacing:.08em;color:var(--mu);margin-bottom:6px">TRANSFER DUE</div>
         ${xferItems}
-      </div>`:''}`);
+      </div>`:''}`)}`);
 
     // ── 3. ACTIVITY — 7-day bar + quick stats ─────────────────
     const actHTML=C('activity',`
@@ -7727,34 +7734,34 @@ function _renderDashboard(){
         <div><div style="font-size:24px;font-weight:800;color:var(--gn)">${ghTotal}</div><div style="font-size:10px;color:var(--mu)">plants</div></div>
         <div><div style="font-size:24px;font-weight:800">${ghHealthy.length}</div><div style="font-size:10px;color:var(--mu)">healthy</div></div>
       </div>
-      ${ghHealthy.slice(0,5).map(p=>Row('',`${esc(p.species||'?')}`,`${p.quantity||1} plant${(p.quantity||1)>1?'s':''}`,`navTo('greenhouse');openGHPlant('${p.id}')`)).join('')}
+      ${Scroll(ghHealthy.map(p=>Row('',`${esc(p.species||'?')}`,`${p.quantity||1} plant${(p.quantity||1)>1?'s':''}`,`navTo('greenhouse');openGHPlant('${p.id}')`)).join(''))}
       ${spWithSubcult.length?`<div style="font-size:11px;color:var(--yw);margin-top:8px;padding-top:8px;border-top:1px solid var(--sf2)">⚗️ Lab → GH: ${spWithSubcult.slice(0,3).map(s=>esc(s)).join(', ')}${spWithSubcult.length>3?'…':''}</div>`:''}`):
     C('gh',`${H('🏡 GREENHOUSE',`navTo('greenhouse')`,'Set up →')}<div style="color:var(--mu);font-size:13px;padding:12px 0">No greenhouse plants yet.</div>`);
 
     // ── 7. RECENT NOTES ───────────────────────────────────────
     const recentHTML=C('recent',`
       ${H('📋 RECENT NOTES',`navTo('notes')`,'All notes →')}
-      ${recent.map(n=>Row('',esc(n.title),`${fmtDateShort(n.date)}${n.species?' · '+esc(n.species):''}`,`openNote('${n.id}')`)).join('')
-        ||'<div style="color:var(--mu);font-size:13px;padding:12px 0">No notes yet.</div>'}`);
+      ${Scroll(recent.map(n=>Row('',esc(n.title),`${fmtDateShort(n.date)}${n.species?' · '+esc(n.species):''}`,`openNote('${n.id}')`)).join('')
+        ||'<div style="color:var(--mu);font-size:13px;padding:12px 0">No notes yet.</div>')}`);
 
     // ── 8. PINNED NOTES ───────────────────────────────────────
     const pinnedNotes=S.notes.filter(n=>n.pinned).slice(0,5);
     const recentRecs2=(S.recs||[]).slice(0,4);
     const pinnedHTML=C('pinned',`
       ${H('📌 PINNED',`navTo('notes');_setNoteTypeFilter('pinned',document.querySelector('[data-ntype=pinned]'))`,'All →')}
-      ${pinnedNotes.length
+      ${Scroll(`${pinnedNotes.length
         ?pinnedNotes.map(n=>Row('',esc(n.title),fmtDateShort(n.date),`openNote('${n.id}')`)).join('')
         :`<div style="color:var(--mu);font-size:13px;padding:8px 0">No pinned notes.</div>`}
       ${recentRecs2.length?`<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--sf2)">
         <div style="font-size:9px;font-weight:800;letter-spacing:.08em;color:var(--mu);margin-bottom:8px">🧪 RECIPES</div>
         ${recentRecs2.map(r=>Row('',esc(r.name),esc(r.base||''),`navTo('recipes');openRecipe('${r.id}')`)).join('')}
-      </div>`:''}`);
+      </div>`:''}`)}`);;
 
     // ── 9. RESEARCH ───────────────────────────────────────────
     const pinnedArts=_getPinnedArticles().slice(0,4);
     const researchHTML=C('research',`
       ${H('📌 RESEARCH',`navTo('news')`,'Open News →')}
-      ${pinnedArts.length
+      ${Scroll(pinnedArts.length
         ?pinnedArts.map(a=>`
           <div class="dc-row" onclick="window.open('${esc(a.url)}','_blank')">
             <div style="flex:1;min-width:0">
@@ -7762,7 +7769,7 @@ function _renderDashboard(){
               <div style="font-size:10px;color:var(--mu);margin-top:2px">${esc(a.authors?.split(',')[0]||'')} · ${esc(a.year||'')}</div>
             </div>
           </div>`).join('')
-        :`<div style="color:var(--mu);font-size:13px;padding:8px 0">Pin papers in News to see them here.</div>`}`);
+        :`<div style="color:var(--mu);font-size:13px;padding:8px 0">Pin papers in News to see them here.</div>`)}`);
 
     // ── 10. AI USAGE — compact full-width bar ─────────────────
     const today=new Date().toISOString().slice(0,10);
