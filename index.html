@@ -972,9 +972,6 @@ main > .dview, main > .editor{ margin:0 auto; }
 #lfb-mic.processing{background:var(--yw);color:#0d1117}
 #lfb-model{background:transparent;border:1px solid var(--bd);color:var(--mu);font-size:10px;font-weight:700;border-radius:14px;width:auto;padding:0 8px;white-space:nowrap}
 #lfb-ai{background:linear-gradient(135deg,#4285f4,#8250df);color:#fff;position:relative}
-#lfb-ai-badge{position:absolute;top:2px;right:2px;width:8px;height:8px;border-radius:50%;border:1.5px solid var(--bg);display:none}
-#lfb-ai-badge.warn{display:block;background:var(--yw)}
-#lfb-ai-badge.over{display:block;background:var(--rd);animation:pulse-mic .8s infinite}
 #lfb-ql{background:var(--ac);color:#0d1117}
 @keyframes pulse-mic{0%,100%{box-shadow:0 0 0 0 rgba(248,81,73,.5)}50%{box-shadow:0 0 0 8px rgba(248,81,73,0)}}
 /* wake-word armed indicator */
@@ -5161,7 +5158,7 @@ SERVICE WORKER (sw.js):
 <div id="lab-footer-bar">
   <button class="lfb-btn" id="lfb-mic" aria-label="Voice input (tap or say 'Hey Ravana')" onclick="_voiceTap()" title="Voice input (tap or say Hey Lab)">🎤</button>
   <button class="lfb-btn" id="lfb-model" aria-label="Cycle AI model" onclick="_cycleAIModel()" title="Cycle AI model">⚡ Quick</button>
-  <button class="lfb-btn" id="lfb-ai" aria-label="Toggle Ravana AI assistant" onclick="_toggleAIPanel()" title="AI assistant">✦<span id="lfb-ai-badge"></span></button>
+  <button class="lfb-btn" id="lfb-ai" aria-label="Toggle Ravana AI assistant" onclick="_toggleAIPanel()" title="AI assistant">✦</button>
   <button class="lfb-btn" id="lfb-ql" aria-label="Quick log" onclick="showQuickLog()" title="Quick log">＋</button>
 </div>
 
@@ -5181,7 +5178,6 @@ SERVICE WORKER (sw.js):
     <button class="btn xs green" aria-label="Save API key" onclick="_saveCurrentModelKey()">Save</button>
     <a id="ai-key-link" href="https://console.groq.com" target="_blank" rel="noopener" class="btn xs ghost" aria-label="Get API key from provider">Get key ↗</a>
   </div>
-  <div id="ai-usage-bar" style="padding:6px 12px;border-bottom:1px solid var(--bd);background:var(--sf2);flex-shrink:0"></div>
   <!-- Voice confirm overlay -->
   <div id="ai-voice-confirm" role="alert" aria-label="Voice transcription confirmation">
     <div class="vc-heard" id="vc-heard-text" aria-live="polite"></div>
@@ -8018,37 +8014,7 @@ function _renderDashboard(){
           </div>`).join('')
         :`<div style="color:var(--mu);font-size:13px;padding:8px 0">Pin papers in News to see them here.</div>`)}`);
 
-    // ── 10. AI USAGE — compact full-width bar ─────────────────
-    const today=new Date().toISOString().slice(0,10);
-    const u=_aiUsage();
-    const aiMs=[
-      {key:'llama-3.1-8b-instant',  label:'⚡ Quick 8B',  lim:AI_LIMITS['llama-3.1-8b-instant'],    col:'#1abc9c'},
-      {key:'llama-3.3-70b-versatile',label:'🔬 Deep 70B', lim:AI_LIMITS['llama-3.3-70b-versatile'], col:'var(--ac)'},
-      {key:'claude',                 label:'◇ Claude',    lim:AI_LIMITS['claude'],                   col:'var(--pu)'},
-      {key:'whisper-large-v3',       label:'🎤 Whisper',  lim:AI_LIMITS['whisper-large-v3'],         col:'var(--yw)'},
-    ];
-    const last30=Object.keys(u).filter(d=>d<=today).sort().slice(-30);
-    const heatCols=['#161b22','#0d4429','#006d32','#26a641','#39d353'];
-    const heat=last30.map(d=>{
-      const tot=aiMs.reduce((s,m)=>s+((u[d]||{})[m.key]?.req||0),0);
-      const i=tot===0?0:tot<5?1:tot<20?2:tot<50?3:4;
-      return`<div title="${d}: ${tot} requests" style="width:11px;height:11px;border-radius:2px;flex-shrink:0;background:${heatCols[i]}"></div>`;
-    }).join('');
-    const aibarHTML=C('aibar',`
-      <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">
-        <span style="font-size:9px;font-weight:800;letter-spacing:.1em;color:var(--mu);white-space:nowrap;text-transform:uppercase">🤖 AI Usage today</span>
-        ${aiMs.map(m=>{
-          const d=(u[today]||{})[m.key]||{req:0};
-          const pct=Math.min(d.req/m.lim.reqDay*100,100);
-          const warn=pct>80?'var(--rd)':pct>50?'var(--yw)':m.col;
-          return`<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-            <span style="font-size:11px;color:var(--mu)">${m.label}</span>
-            <div style="width:80px;height:4px;background:var(--sf3);border-radius:2px"><div style="height:4px;border-radius:2px;background:${warn};width:${pct}%;transition:width .4s"></div></div>
-            <span style="font-size:11px;font-weight:700;color:${warn}">${d.req}<span style="font-weight:400;color:var(--mu)">/${m.lim.reqDay<1000?m.lim.reqDay:Math.round(m.lim.reqDay/1000)+'k'}</span></span>
-          </div>`;
-        }).join('')}
-        <div style="flex:1;display:flex;flex-wrap:wrap;gap:2px;justify-content:flex-end">${heat}</div>
-      </div>`,'padding:12px 18px');
+    const aibarHTML='';
 
     // ── 11. VOICE LOG — only if transcripts exist ─────────────
     const dump=_getVoiceDump().slice(-10).reverse();
@@ -10569,126 +10535,9 @@ const AI_MODELS={
 const AI_MODEL_ORDER=['groq8','groq70','claude'];
 let _aiModel=localStorage.getItem('tcplants_ai_model')||'groq70';
 
-// ── Usage tracking ────────────────────────────────────────────
-const _AI_USAGE_KEY='tcplants_ai_usage';
-function _aiUsage(){
-  try{ return JSON.parse(localStorage.getItem(_AI_USAGE_KEY)||'{}'); }catch{ return {}; }
-}
-function _aiUsageSave(o){ localStorage.setItem(_AI_USAGE_KEY,JSON.stringify(o)); }
-function _aiRecordUsage(model, reqRem, tokRem, tokUsed){
-  const today=new Date().toISOString().slice(0,10);
-  const u=_aiUsage();
-  if(!u[today]) u[today]={};
-  if(!u[today][model]) u[today][model]={req:0,tok:0};
-  u[today][model].tok+=(tokUsed||0);
-  u[today][model].req+=1;
-  if(reqRem!==null) u[today][model].reqRem=reqRem;
-  if(tokRem!==null) u[today][model].tokRem=tokRem;
-  // keep 30 days only
-  const cutoff=new Date(); cutoff.setDate(cutoff.getDate()-30);
-  Object.keys(u).forEach(k=>{ if(new Date(k)<cutoff) delete u[k]; });
-  _aiUsageSave(u);
-  _renderAIUsageBar();
-  _renderDashboard();
-}
+function _aiRecordUsage(){} // no-op — quota tracking removed
 
-const AI_LIMITS={
-  'llama-3.3-70b-versatile':{reqDay:1000,  tokDay:100000},
-  'llama-3.1-8b-instant':   {reqDay:14400, tokDay:500000},
-  claude:                   {reqDay:1000,  tokDay:100000},
-  'whisper-large-v3':       {reqDay:2000,  tokDay:null},   // Groq Whisper — req only, no token limit
-};
-
-// Check if we're at quota (Task #8)
-function _checkAIQuota(){
-  const today=new Date().toISOString().slice(0,10);
-  const u=_aiUsage()[today]||{};
-  const mi=AI_MODELS[_aiModel];
-  const isGroq=_aiModel!=='claude';
-  const modelKey=isGroq?mi.groqModel:'claude';
-  const lim=AI_LIMITS[modelKey]||{reqDay:1000,tokDay:100000};
-  const d=u[modelKey]||{req:0,tok:0};
-
-  // Check request quota
-  if(d.req>=lim.reqDay){
-    return {exceeded:true,reason:'requests',used:d.req,limit:lim.reqDay};
-  }
-  // Check token quota (if applicable)
-  if(lim.tokDay&&d.tok>=lim.tokDay){
-    return {exceeded:true,reason:'tokens',used:d.tok,limit:lim.tokDay};
-  }
-  // Warn if >80% of either quota
-  if(d.req/lim.reqDay>0.8||lim.tokDay&&d.tok/lim.tokDay>0.8){
-    return {warning:true,reqPct:(d.req/lim.reqDay*100).toFixed(0),tokPct:lim.tokDay?(d.tok/lim.tokDay*100).toFixed(0):'—'};
-  }
-  return {ok:true};
-}
-
-function _renderAIUsageBar(){
-  const bar=document.getElementById('ai-usage-bar'); if(!bar) return;
-  const today=new Date().toISOString().slice(0,10);
-  const u=_aiUsage()[today]||{};
-  const mi=AI_MODELS[_aiModel];
-  const isGroq=_aiModel!=='claude';
-  const modelKey=isGroq?mi.groqModel:'claude';
-  const lim=AI_LIMITS[modelKey]||{reqDay:1000,tokDay:100000};
-  const d=u[modelKey]||{req:0,tok:0};
-  const reqPct=Math.min(d.req/lim.reqDay*100,100);
-  const tokPct=lim.tokDay?Math.min(d.tok/lim.tokDay*100,100):0;
-  const col=reqPct>80||(lim.tokDay&&tokPct>80)?'var(--rd)':reqPct>50||(lim.tokDay&&tokPct>50)?'var(--yw)':'var(--gn)';
-
-  // Whisper usage today
-  const wh=u['whisper-large-v3']||{req:0};
-  const whLim=AI_LIMITS['whisper-large-v3'];
-  const whPct=Math.min(wh.req/whLim.reqDay*100,100);
-  const whCol=whPct>80?'var(--rd)':whPct>50?'var(--yw)':'var(--gn)';
-
-  // Hours until midnight UTC
-  const now=new Date();
-  const msSinceMidnight=now.getUTCHours()*3600000+now.getUTCMinutes()*60000+now.getUTCSeconds()*1000;
-  const msToMidnight=86400000-msSinceMidnight;
-  const hToReset=Math.ceil(msToMidnight/3600000);
-  const resetLabel=hToReset<=1?'< 1h':hToReset+'h';
-
-  // Update FAB badge
-  const badge=document.getElementById('lfb-ai-badge');
-  if(badge){
-    const quota=_checkAIQuota();
-    badge.className=quota.exceeded?'over':quota.warning?'warn':'';
-  }
-
-  // Show quota warning/exceeded message
-  let quotaMsg='';
-  const quota=_checkAIQuota();
-  if(quota.exceeded){
-    const unit=quota.reason==='requests'?'requests':'tokens';
-    quotaMsg=`<div style="padding:6px 8px;background:var(--rd);color:#fff;border-radius:4px;font-size:10px;font-weight:600;margin-bottom:6px">⚠️ Quota exceeded (${unit}). Resets in ~${resetLabel} UTC.</div>`;
-  } else if(quota.warning){
-    quotaMsg=`<div style="padding:6px 8px;background:var(--yw);color:#000;border-radius:4px;font-size:10px;font-weight:600;margin-bottom:6px">⚡ Nearing quota — resets in ~${resetLabel} UTC</div>`;
-  }
-
-  const tokRow=lim.tokDay
-    ?`<div style="flex:1"><div style="display:flex;justify-content:space-between;margin-bottom:2px"><span>Tokens</span><span>${(d.tok/1000).toFixed(1)}k/${(lim.tokDay/1000).toFixed(0)}k</span></div><div style="height:4px;background:var(--sf3);border-radius:2px"><div style="height:4px;border-radius:2px;background:${col};width:${tokPct}%;transition:width .4s"></div></div></div>`
-    :'';
-
-  bar.innerHTML=quotaMsg+`
-    <div style="display:flex;gap:8px;align-items:center;font-size:10px;color:var(--mu)">
-      <span style="white-space:nowrap;font-weight:600">${mi.icon} ${mi.label}</span>
-      <div style="flex:1">
-        <div style="display:flex;justify-content:space-between;margin-bottom:2px"><span>Req</span><span>${d.req}/${lim.reqDay}</span></div>
-        <div style="height:4px;background:var(--sf3);border-radius:2px"><div style="height:4px;border-radius:2px;background:${col};width:${reqPct}%;transition:width .4s"></div></div>
-      </div>
-      ${tokRow}
-    </div>
-    ${wh.req>0?`<div style="display:flex;gap:8px;align-items:center;font-size:10px;color:var(--mu);margin-top:5px">
-      <span style="white-space:nowrap">🎤 Whisper</span>
-      <div style="flex:1">
-        <div style="display:flex;justify-content:space-between;margin-bottom:2px"><span>Transcriptions</span><span>${wh.req}/${whLim.reqDay}</span></div>
-        <div style="height:4px;background:var(--sf3);border-radius:2px"><div style="height:4px;border-radius:2px;background:${whCol};width:${whPct}%;transition:width .4s"></div></div>
-      </div>
-    </div>`:''}
-    <div style="font-size:9px;color:var(--mu);margin-top:4px;text-align:right;opacity:.7">Resets in ~${resetLabel} UTC · local count</div>`;
-}
+function _renderAIUsageBar(){} // removed — quota tracking gone
 
 function _cycleAIModel(){
   const idx=(AI_MODEL_ORDER.indexOf(_aiModel)+1)%AI_MODEL_ORDER.length;
@@ -10706,7 +10555,7 @@ function _updateAIModelUI(){
   if(fab) fab.textContent=mi.icon+' '+mi.label;
   if(title) title.textContent=mi.icon+' Lab AI';
   if(lnk) lnk.href=mi.getLink;
-  _renderAIUsageBar();
+
 }
 (()=>{ _updateAIModelUI(); })();
 
@@ -10868,7 +10717,7 @@ function _toggleAIMaximise(){
 }
 function _initAIKeyHint(){
   const mi=AI_MODELS[_aiModel]||AI_MODELS.groq70;
-  _renderAIUsageBar();
+
   if(!mi.getKey()){
     const msg=document.getElementById('ai-msgs');
     const hint=_aiModel!=='claude'
@@ -11309,16 +11158,6 @@ async function askAI(prompt){
     thinking.remove();
     msgs.innerHTML+=`<div class="ai-msg ai">⚙️ No ${mi.label} key configured. Tap ⚙️ to set one.</div>`;
     document.getElementById('ai-key-row').style.display='flex';
-    return;
-  }
-
-  // Check quota BEFORE making API call (Task #8)
-  const quota=_checkAIQuota();
-  if(quota.exceeded){
-    thinking.remove();
-    const unit=quota.reason==='requests'?'requests':'tokens';
-    msgs.innerHTML+=`<div class="ai-msg ai" style="color:var(--rd)">❌ <strong>Daily limit reached</strong><br>Used ${quota.used}/${quota.limit} ${unit}.<br>Resets at midnight UTC (${new Date().toISOString().split('T')[0]} end).</div>`;
-    toast('Ravana: Daily quota exceeded', 'fail');
     return;
   }
 
@@ -15816,7 +15655,18 @@ async function login(){
       toast('⚡ Loaded from cache');
     }else{
       load('Loading all data…');
-      const [{notes,sha:nSha},{accs,sha:aSha},{recs,sha:rSha},{bottles,sessions:bSess,sha:bSha},{plants:ghPlants,transfers:ghTransf,sha:ghSha},{items:supItems,sha:supSha},{entries:jEntries,sha:jSha},{data:valData,sha:valSha}]=await Promise.all([loadNotesIndex(),loadAccessions(),loadRecipes(),loadBottles(),loadGreenhouse(),loadSupplies(),loadJournal(),loadValue()]);
+      const _safe=fn=>fn.catch(()=>null);
+      const [_nR,_aR,_rR,_bR,_gR,_sR,_jR,_vR]=await Promise.all([_safe(loadNotesIndex()),_safe(loadAccessions()),_safe(loadRecipes()),_safe(loadBottles()),_safe(loadGreenhouse()),_safe(loadSupplies()),_safe(loadJournal()),_safe(loadValue())]);
+      const {notes=[],sha:nSha=null}=_nR||{};
+      const {accs=[],sha:aSha=null}=_aR||{};
+      const {recs=[],sha:rSha=null}=_rR||{};
+      const {bottles=[],sessions:bSess=[],sha:bSha=null}=_bR||{};
+      const {plants:ghPlants=[],transfers:ghTransf=[],sha:ghSha=null}=_gR||{};
+      const {items:supItems=[],sha:supSha=null}=_sR||{};
+      const {entries:jEntries=[],sha:jSha=null}=_jR||{};
+      const {data:valData=null,sha:valSha=null}=_vR||{};
+      // warn if any load failed
+      if([_nR,_aR,_rR,_bR,_gR,_sR,_jR,_vR].some(r=>r===null)) toast('⚠️ Some data files failed to load — partial data shown','warn');
       S.notes=notes; S.notesSha=nSha;
       S.accs=accs; S.accSha=aSha;
       S.recs=recs; S.recSha=rSha;
