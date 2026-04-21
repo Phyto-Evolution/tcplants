@@ -15,9 +15,10 @@
 }
 
 
-/* ── LIGHT — override vars (also kept in :root fallback) ──── */
+/* ── LIGHT — soft dot grid to take the edge off bright white ─ */
 [data-theme="light"] body {
-  background-image: none;
+  background-image: radial-gradient(circle, rgba(0,0,0,0.07) 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
 
