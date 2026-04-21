@@ -3984,6 +3984,7 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
           <h2 style="font-size:20px;font-weight:700;margin:0">📸 Photo Gallery</h2>
           <button class="btn sm green" onclick="_galStartUpload()">＋ Upload</button>
+          <button class="btn sm" onclick="_galStartCamera()" style="background:var(--sf2);border:1px solid var(--bd)">📷 Camera</button>
           <span id="gal-count" style="color:var(--mu);font-size:12px;margin-left:auto"></span>
         </div>
         <div id="gal-cats" class="gal-cats"></div>
@@ -4048,6 +4049,19 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
         <button class="btn ghost" onclick="_galCloseModal()">Cancel</button>
         <button class="btn green" id="gal-save-btn" onclick="_galSaveUpload()">Save Photo</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Gallery camera modal -->
+  <div id="gal-cam-modal" style="display:none;position:fixed;inset:0;z-index:1950;background:#000;flex-direction:column;align-items:center;justify-content:center">
+    <div style="position:relative;flex:1;display:flex;align-items:center;justify-content:center;width:100%;padding:10px;min-height:0">
+      <video id="gal-cam-video" autoplay playsinline muted style="max-width:100%;max-height:calc(100vh - 140px);border-radius:8px;display:block"></video>
+      <div id="gal-cam-bc-status" style="position:absolute;top:14px;left:50%;transform:translateX(-50%);background:rgba(22,160,60,.9);color:#fff;padding:7px 18px;border-radius:24px;font-size:13px;font-weight:700;white-space:nowrap;display:none;max-width:90vw;overflow:hidden;text-overflow:ellipsis"></div>
+    </div>
+    <div style="width:100%;padding:16px 24px 32px;display:flex;align-items:center;justify-content:center;gap:28px">
+      <button onclick="_galStopCamera()" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;padding:10px 22px;border-radius:24px;cursor:pointer;font-size:14px;font-weight:600">✕ Cancel</button>
+      <button id="gal-cam-capture-btn" onclick="_galCameraCapture()" style="width:70px;height:70px;border-radius:50%;background:#fff;border:5px solid rgba(255,255,255,.35);cursor:pointer;font-size:26px;display:flex;align-items:center;justify-content:center;transition:transform .1s">📸</button>
+      <button onclick="_galFlipCamera()" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;padding:10px 22px;border-radius:24px;cursor:pointer;font-size:14px;font-weight:600">🔄 Flip</button>
     </div>
   </div>
 
@@ -18089,6 +18103,7 @@ function _galStartUpload(){
       _galUploadCanvas=canvas; _galUploadBlob=blob;
       _galUploadThumb=await _galThumb(canvas);
       _galBarcodeInfo=await _galDetectBarcode(canvas);
+      _galContamResult=_galAnalyzeContam(canvas);
       _galShowUploadModal(file.name, canvas);
     };
     img.src=url;
@@ -18098,7 +18113,7 @@ function _galStartUpload(){
 
 async function _galCompress(img, targetKB=300){
   const MAX=2400;
-  let w=img.naturalWidth, h=img.naturalHeight;
+  let w=img.naturalWidth||img.width, h=img.naturalHeight||img.height;
   if(Math.max(w,h)>MAX){const r=MAX/Math.max(w,h);w=Math.round(w*r);h=Math.round(h*r);}
   const canvas=document.createElement('canvas');
   canvas.width=w; canvas.height=h;
@@ -18149,6 +18164,158 @@ async function _galDetectBarcode(canvas){
   return null;
 }
 
+// ── Contamination colour-anomaly analysis ─────────────────────
+function _galAnalyzeContam(canvas){
+  const ctx=canvas.getContext('2d');
+  const w=canvas.width, h=canvas.height;
+  // Sample at most 60k pixels for speed (stride over image)
+  const stride=Math.max(1,Math.round(Math.sqrt((w*h)/60000)));
+  const data=ctx.getImageData(0,0,w,h).data;
+  // Pass 1: compute median RGB (use mean for speed)
+  let rSum=0,gSum=0,bSum=0,count=0;
+  for(let y=0;y<h;y+=stride){
+    for(let x=0;x<w;x+=stride){
+      const i=(y*w+x)*4;
+      rSum+=data[i]; gSum+=data[i+1]; bSum+=data[i+2]; count++;
+    }
+  }
+  const rMed=rSum/count, gMed=gSum/count, bMed=bSum/count;
+  // Pass 2: subtract background (median), find anomalous pixels
+  // Anomalous = euclidean distance in RGB > threshold
+  const THRESH=55;
+  let anomCount=0;
+  // Track colour buckets for anomalous pixels (HSL hue sectors)
+  const hueBuckets={red:0,orange:0,yellow:0,green:0,blue:0,purple:0,brown:0,dark:0,grey:0};
+  for(let y=0;y<h;y+=stride){
+    for(let x=0;x<w;x+=stride){
+      const i=(y*w+x)*4;
+      const dr=data[i]-rMed, dg=data[i+1]-gMed, db=data[i+2]-bMed;
+      const dist=Math.sqrt(dr*dr+dg*dg+db*db);
+      if(dist>THRESH){
+        anomCount++;
+        // Classify hue of anomalous pixel
+        const r=data[i],g=data[i+1],b=data[i+2];
+        const brightness=(r+g+b)/3;
+        if(brightness<45){hueBuckets.dark++; continue;}
+        const max=Math.max(r,g,b), min=Math.min(r,g,b);
+        if(max-min<25){hueBuckets.grey++; continue;}
+        const hue=_rgbToHue(r,g,b);
+        if(hue<20||hue>=340)hueBuckets.red++;
+        else if(hue<45)hueBuckets.orange++;
+        else if(hue<75)hueBuckets.yellow++;
+        else if(hue<155)hueBuckets.green++;
+        else if(hue<255)hueBuckets.blue++;
+        else if(hue<290)hueBuckets.purple++;
+        else hueBuckets.brown++;
+      }
+    }
+  }
+  const anomaly_pct=anomCount/count*100;
+  // Contamination-relevant colours: dark (mould), grey (fungal), orange/pink (bacterial)
+  const contam_pct=(hueBuckets.dark+hueBuckets.grey+hueBuckets.orange+hueBuckets.brown)/count*100;
+  const score=Math.min(1,(contam_pct/count*count/count)*0.5+(anomaly_pct/100)*0.5);
+  // Dominant anomaly colour name
+  const topBucket=Object.entries(hueBuckets).sort((a,b)=>b[1]-a[1])[0];
+  const anomaly_color=topBucket[1]>0?topBucket[0]:'none';
+  return {score,anomaly_pct,contam_pct,anomaly_color,bg_rgb:[Math.round(rMed),Math.round(gMed),Math.round(bMed)]};
+}
+function _rgbToHue(r,g,b){
+  r/=255;g/=255;b/=255;
+  const max=Math.max(r,g,b),min=Math.min(r,g,b);
+  let h;
+  if(max===min) return 0;
+  const d=max-min;
+  if(max===r) h=(g-b)/d+(g<b?6:0);
+  else if(max===g) h=(b-r)/d+2;
+  else h=(r-g)/d+4;
+  return h*60;
+}
+
+// ── Camera ────────────────────────────────────────────────────
+let _galStream=null,_galFacing='environment',_galBcLoop=null,_galLiveBc=null,_galContamResult=null;
+
+async function _galStartCamera(){
+  const modal=document.getElementById('gal-cam-modal');
+  modal.style.display='flex';
+  await _galOpenStream();
+}
+
+async function _galOpenStream(){
+  if(_galStream){_galStream.getTracks().forEach(t=>t.stop());}
+  try{
+    _galStream=await navigator.mediaDevices.getUserMedia({
+      video:{facingMode:{ideal:_galFacing},width:{ideal:1920},height:{ideal:1080}},
+      audio:false
+    });
+    const video=document.getElementById('gal-cam-video');
+    video.srcObject=_galStream;
+    _galStartBcLoop(video);
+  }catch(e){
+    toast('Camera access denied: '+e.message,'fail');
+    _galStopCamera();
+  }
+}
+
+function _galStartBcLoop(video){
+  clearInterval(_galBcLoop);
+  if(!('BarcodeDetector' in window)) return;
+  const bd=new BarcodeDetector();
+  const status=document.getElementById('gal-cam-bc-status');
+  _galBcLoop=setInterval(async()=>{
+    if(video.readyState<2) return;
+    try{
+      const codes=await bd.detect(video);
+      if(codes.length>0){
+        _galLiveBc={value:codes[0].rawValue,format:codes[0].format};
+        status.textContent=`✓ ${codes[0].format}: ${codes[0].rawValue}`;
+        status.style.display='block';
+      } else {
+        _galLiveBc=null;
+        status.style.display='none';
+      }
+    }catch{}
+  },600);
+}
+
+async function _galCameraCapture(){
+  const video=document.getElementById('gal-cam-video');
+  if(!video.srcObject) return;
+  const btn=document.getElementById('gal-cam-capture-btn');
+  btn.disabled=true;
+  // Flash
+  video.style.transition='opacity .08s'; video.style.opacity='0.2';
+  setTimeout(()=>{video.style.opacity='1';},130);
+  // Snapshot to canvas
+  const snap=document.createElement('canvas');
+  snap.width=video.videoWidth; snap.height=video.videoHeight;
+  snap.getContext('2d').drawImage(video,0,0);
+  // Stop camera before expensive processing
+  _galStopCamera();
+  btn.disabled=false;
+  // Run through full pipeline (canvas → compress works because we fixed naturalWidth fallback)
+  const {blob,canvas}=await _galCompress(snap);
+  _galUploadCanvas=canvas; _galUploadBlob=blob;
+  _galUploadThumb=await _galThumb(canvas);
+  _galBarcodeInfo=_galLiveBc||(await _galDetectBarcode(canvas));
+  _galContamResult=_galAnalyzeContam(canvas);
+  _galShowUploadModal('camera_capture',canvas);
+}
+
+async function _galFlipCamera(){
+  _galFacing=_galFacing==='environment'?'user':'environment';
+  await _galOpenStream();
+}
+
+function _galStopCamera(){
+  clearInterval(_galBcLoop); _galBcLoop=null;
+  if(_galStream){_galStream.getTracks().forEach(t=>t.stop()); _galStream=null;}
+  const video=document.getElementById('gal-cam-video');
+  if(video) video.srcObject=null;
+  const modal=document.getElementById('gal-cam-modal');
+  if(modal) modal.style.display='none';
+  _galLiveBc=null;
+}
+
 function _galShowUploadModal(filename, canvas){
   const m=document.getElementById('gal-modal');
   const pWrap=document.getElementById('gal-preview-wrap');
@@ -18176,9 +18343,29 @@ function _galShowUploadModal(filename, canvas){
   document.getElementById('gal-filesize').textContent=`${Math.round(_galUploadBlob.size/1024)}KB · ${canvas.width}×${canvas.height}`;
   // Default date
   document.getElementById('gal-date').value=new Date().toISOString().slice(0,10);
+  // Contamination analysis result
+  const cr=_galContamResult;
+  let contamBanner=document.getElementById('gal-contam-banner');
+  if(!contamBanner){
+    contamBanner=document.createElement('div');
+    contamBanner.id='gal-contam-banner';
+    contamBanner.style.cssText='border-radius:8px;padding:10px 14px;font-size:12px;font-weight:600;margin-bottom:0';
+    document.getElementById('gal-bc-row').parentNode.insertBefore(contamBanner, document.getElementById('gal-bc-row'));
+  }
+  if(cr&&cr.score>0.18){
+    const lvl=cr.score>0.45?'High':'Possible';
+    const col=cr.score>0.45?'var(--rd)':'var(--yw)';
+    const txCol=cr.score>0.45?'#fff':'#000';
+    contamBanner.style.cssText=`border-radius:8px;padding:10px 14px;font-size:12px;font-weight:600;background:${col};color:${txCol};margin-bottom:0`;
+    contamBanner.innerHTML=`☣️ ${lvl} contamination risk — ${(cr.score*100).toFixed(0)}% anomaly · ${cr.anomaly_pct.toFixed(1)}% pixels deviate · dominant anomaly: ${cr.anomaly_color}`;
+    contamBanner.style.display='block';
+    document.getElementById('gal-health').value='Contaminated';
+  } else {
+    contamBanner.style.display='none';
+    if(cr) document.getElementById('gal-health').value='Good';
+  }
   // Populate species select
   _galPopulateSpecies();
-  // Populate bottle / GH options (simple text for now)
   m.style.display='flex';
 }
 
@@ -18213,7 +18400,9 @@ async function _galSaveUpload(){
     file_size_kb:Math.round(_galUploadBlob.size/1024),
     uploaded_by:_getRavanaUser()?.key||'shiva',
     upload_date:new Date().toISOString(),
-    thumb:_galUploadThumb
+    thumb:_galUploadThumb,
+    contam_score:_galContamResult?Math.round(_galContamResult.score*100):null,
+    contam_color:_galContamResult?.anomaly_color||null
   };
   const saveBtn=document.getElementById('gal-save-btn');
   saveBtn.disabled=true; saveBtn.textContent='Saving…';
