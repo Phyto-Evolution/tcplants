@@ -10745,7 +10745,7 @@ function _updateRavanaUserUI(){
   const btn=document.getElementById('ai-user-btn');
   if(btn) btn.textContent='👤 '+u.name;
 }
-(()=>{ _updateRavanaUserUI(); })();
+(()=>{ localStorage.setItem(_RAVANA_USER_KEY,'shiva'); _updateRavanaUserUI(); })();
 
 // ════════════════════════════════════════════════════════════
 // MORNING BRIEFING
