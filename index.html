@@ -141,14 +141,13 @@ nav{
 #nav-clock{
   position:absolute;left:50%;transform:translateX(-50%);
   display:flex;flex-direction:column;align-items:center;gap:0;
-  cursor:pointer;padding:3px 12px;border-radius:10px;
-  border:1px solid transparent;transition:background .2s,border-color .2s,box-shadow .6s;
+  cursor:pointer;padding:3px 10px;border-radius:8px;
+  transition:background .2s;
   user-select:none;line-height:1.2
 }
-#nav-clock:hover{background:var(--sf2);border-color:var(--bd)}
+#nav-clock:hover{background:var(--sf2)}
 #nc-time{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:.04em;transition:color .6s,text-shadow .6s}
-#nc-day{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);transition:color .6s}
-#nc-icon{font-size:11px;position:absolute;top:2px;right:6px;line-height:1;opacity:.8}
+#nc-day{font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--mu);transition:color .6s}
 #weather-chip{
   background:transparent;border:none;color:var(--tx);cursor:pointer;
   font-size:11px;font-weight:500;padding:3px 8px;border-radius:14px;
@@ -1736,7 +1735,6 @@ input, textarea, select {
     <div class="brand" role="banner">🌿 TC Plants <span>/ Lab</span></div>
     <span class="nav-spacer"></span>
     <div id="nav-clock" onclick="navTo('calendar')" title="Chennai IST · tap to open Calendar" aria-label="Current time in Chennai IST">
-      <span id="nc-icon">☀️</span>
       <div id="nc-time">--:--:--</div>
       <div id="nc-day">Loading</div>
     </div>
@@ -10527,16 +10525,11 @@ function _updateAIModelUI(){
     const [,, icon,col,alpha]=_getTheme(h);
     const timeEl=document.getElementById('nc-time');
     const dayEl=document.getElementById('nc-day');
-    const iconEl=document.getElementById('nc-icon');
-    const clockEl=document.getElementById('nav-clock');
     if(!timeEl) return;
     timeEl.textContent=`${hh}:${mm}:${ss}`;
     timeEl.style.color=col;
-    timeEl.style.textShadow=`0 0 12px ${col}${Math.round(alpha*255).toString(16).padStart(2,'0')}`;
-    dayEl.textContent=`${DAYS[ist.getDay()]} · ${String(ist.getDate()).padStart(2,'0')} ${MONTHS[ist.getMonth()]}`;
-    iconEl.textContent=icon;
-    clockEl.style.boxShadow=`0 0 18px ${col}${Math.round(alpha*.5*255).toString(16).padStart(2,'0')}`;
-    clockEl.style.borderColor=`${col}${Math.round(alpha*.6*255).toString(16).padStart(2,'0')}`;
+    timeEl.style.textShadow=`0 0 10px ${col}${Math.round(alpha*255).toString(16).padStart(2,'0')}`;
+    dayEl.textContent=`${icon} ${DAYS[ist.getDay()]} · ${String(ist.getDate()).padStart(2,'0')} ${MONTHS[ist.getMonth()]}`;
   }
   _tick();
   setInterval(_tick,1000);
@@ -16102,6 +16095,20 @@ function _showUpdateBanner(){
   Object.assign(b.style,{position:'fixed',bottom:'72px',left:'50%',transform:'translateX(-50%)',background:'var(--ac)',color:'#0d1117',padding:'8px 16px',borderRadius:'20px',fontSize:'13px',fontWeight:'600',zIndex:'9999',boxShadow:'0 4px 16px rgba(0,0,0,.3)',whiteSpace:'nowrap'});
   document.body.appendChild(b);
 }
+
+// Poll for deploys: compare Last-Modified of index.html against page-load value.
+// Catches index.html-only pushes where sw.js never changes.
+(()=>{
+  const _pageTs=new Date(document.lastModified).getTime();
+  setInterval(()=>{
+    fetch('/index.html',{method:'HEAD',cache:'no-cache'})
+      .then(r=>{
+        const lm=r.headers.get('last-modified');
+        if(lm&&new Date(lm).getTime()>_pageTs) _showUpdateBanner();
+      })
+      .catch(()=>{});
+  },3*60*1000); // check every 3 minutes
+})();
 
 // Offline mode detection and handling
 function _updateOfflineState(){
