@@ -15922,7 +15922,24 @@ if(!navigator.onLine) document.getElementById('offline-pill').classList.add('on'
 // PWA SERVICE WORKER & OFFLINE SUPPORT (Task #21)
 // ════════════════════════════════════════════════════════════
 if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  navigator.serviceWorker.register('/sw.js').then(reg=>{
+    // Periodically check for new SW (catches deploys while tab is open)
+    setInterval(()=>reg.update(), 5*60*1000);
+    // SW_UPDATED message from new SW activate → show banner
+    navigator.serviceWorker.addEventListener('message', e=>{
+      if(e.data?.type==='SW_UPDATED') _showUpdateBanner();
+    });
+    // controllerchange fires when new SW takes over (skipWaiting path)
+    navigator.serviceWorker.addEventListener('controllerchange', _showUpdateBanner);
+  }).catch(()=>{});
+}
+function _showUpdateBanner(){
+  if(document.getElementById('sw-update-banner')) return; // already showing
+  const b=document.createElement('div');
+  b.id='sw-update-banner';
+  b.innerHTML='🔄 New version deployed — <strong style="cursor:pointer;text-decoration:underline" onclick="window.location.reload()">tap to update</strong> <span onclick="this.parentElement.remove()" style="margin-left:10px;cursor:pointer;opacity:.6">✕</span>';
+  Object.assign(b.style,{position:'fixed',bottom:'72px',left:'50%',transform:'translateX(-50%)',background:'var(--ac)',color:'#0d1117',padding:'8px 16px',borderRadius:'20px',fontSize:'13px',fontWeight:'600',zIndex:'9999',boxShadow:'0 4px 16px rgba(0,0,0,.3)',whiteSpace:'nowrap'});
+  document.body.appendChild(b);
 }
 
 // Offline mode detection and handling

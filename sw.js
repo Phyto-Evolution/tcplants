@@ -1,36 +1,27 @@
-const V = 'tcplants-v11';
+const V = 'tcplants-v12';
 const SHELL = ['/', '/index.html', '/manifest.json', '/icon.svg', '/icon-192.png', '/icon-512.png'];
-const CDN_CACHE = 'tcplants-cdn-v1';
-const CDN_URLS = [
-  'https://cdn.jsdelivr.net',
-  'https://telegram.org/js/telegram-web-app.js'
-];
+const CDN_CACHE = 'tcplants-cdn-v2';
+const CDN_HOSTS = ['cdn.jsdelivr.net'];
 
 // Install: cache shell files
 self.addEventListener('install', e => {
   e.waitUntil(
-    caches.open(V).then(c => c.addAll(SHELL)).then(() => {
-      // Pre-cache critical CDN assets for offline support
-      return caches.open(CDN_CACHE).then(c => {
-        c.addAll(CDN_URLS).catch(() => {
-          // Ignore if some fail
-        });
-      });
-    })
+    caches.open(V).then(c => c.addAll(SHELL).catch(() => {}))
   );
   self.skipWaiting();
 });
 
-// Activate: clean up old caches
+// Activate: clean up old caches, claim all clients immediately
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(
-        keys
-          .filter(k => k !== V && k !== CDN_CACHE)
-          .map(k => caches.delete(k))
-      )
-    )
+      Promise.all(keys.filter(k => k !== V && k !== CDN_CACHE).map(k => caches.delete(k)))
+    ).then(() => {
+      // Notify all open tabs that a new version is live
+      return self.clients.matchAll({ type: 'window' }).then(clients => {
+        clients.forEach(c => c.postMessage({ type: 'SW_UPDATED' }));
+      });
+    })
   );
   self.clients.claim();
 });
@@ -39,13 +30,16 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const url = e.request.url;
 
-  // Skip API calls (let them fail naturally offline)
-  if (url.includes('api.github.com') || url.includes('api.groq.com') || url.includes('api.anthropic.com')) {
-    return;
-  }
+  // Skip API calls entirely
+  if (
+    url.includes('api.github.com') ||
+    url.includes('api.groq.com') ||
+    url.includes('api.anthropic.com') ||
+    url.includes('plantking.ape.workers.dev')
+  ) return;
 
-  // Cache-first for CDN assets
-  if (url.includes('cdn.jsdelivr.net') || url.includes('telegram.org')) {
+  // Cache-first for CDN assets (fonts, libraries — rarely change)
+  if (CDN_HOSTS.some(h => url.includes(h))) {
     e.respondWith(
       caches.match(e.request).then(r => r ||
         fetch(e.request).then(res => {
@@ -57,9 +51,9 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // Network-first for main app
+  // Network-first for main app — bypass HTTP cache so GitHub deploys are seen immediately
   e.respondWith(
-    fetch(e.request).then(res => {
+    fetch(e.request, { cache: 'no-cache' }).then(res => {
       if (res.ok) caches.open(V).then(c => c.put(e.request, res.clone()));
       return res;
     }).catch(() =>
