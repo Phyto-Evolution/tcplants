@@ -1746,6 +1746,7 @@ input, textarea, select {
     <button class="nav-icon-btn" id="lock-btn" title="Lock" aria-label="Lock or unlock" style="display:flex;align-items:center;gap:4px;font-size:13px;color:var(--mu);padding:4px 9px;border:1px solid var(--bd);border-radius:6px">🔒 <span class="lock-label">Lock</span></button>
     <button class="nav-icon-btn" title="Settings" aria-label="Open settings" onclick="openSettings()" style="font-size:16px">⚙️</button>
     <button id="theme-btn" title="Toggle theme" aria-label="Toggle light or dark theme">☀️</button>
+    <button class="nav-icon-btn" onclick="window.location.reload()" title="Reload app" aria-label="Reload app" style="font-size:13px;opacity:.6">↺</button>
   </nav>
 
   <!-- ── NOTES ── -->
@@ -16058,57 +16059,8 @@ if(!navigator.onLine) document.getElementById('offline-pill').classList.add('on'
 // PWA SERVICE WORKER & OFFLINE SUPPORT (Task #21)
 // ════════════════════════════════════════════════════════════
 if('serviceWorker' in navigator){
-  // Capture BEFORE registration — false = no SW yet = first install, skip banner
-  const _swWasControlled=!!navigator.serviceWorker.controller;
-
-  // Register listeners SYNCHRONOUSLY — before register() so we never miss an event
-  // that fires before the Promise resolves (skipWaiting activates immediately)
-  navigator.serviceWorker.addEventListener('controllerchange',()=>{
-    if(_swWasControlled) _showUpdateBanner();
-  });
-  navigator.serviceWorker.addEventListener('message',e=>{
-    if(e.data?.type==='SW_UPDATED'&&_swWasControlled) _showUpdateBanner();
-  });
-
-  navigator.serviceWorker.register('/sw.js').then(reg=>{
-    // Already a waiting SW when page loaded (update installed before this load)
-    if(reg.waiting&&_swWasControlled) _showUpdateBanner();
-
-    // Watch for new SW installing while page is open (e.g. after reg.update() fires)
-    reg.addEventListener('updatefound',()=>{
-      const nw=reg.installing;
-      nw?.addEventListener('statechange',()=>{
-        // 'installed' = downloaded & waiting; controller check = not first install
-        if(nw.state==='installed'&&navigator.serviceWorker.controller) _showUpdateBanner();
-      });
-    });
-
-    // Poll for updates every 5 min while tab is open
-    setInterval(()=>reg.update(),5*60*1000);
-  }).catch(()=>{});
+  navigator.serviceWorker.register('/sw.js').catch(()=>{});
 }
-function _showUpdateBanner(){
-  if(document.getElementById('sw-update-banner')) return; // already showing
-  const b=document.createElement('div');
-  b.id='sw-update-banner';
-  b.innerHTML='🔄 New version deployed — <strong style="cursor:pointer;text-decoration:underline" onclick="window.location.reload()">tap to update</strong> <span onclick="this.parentElement.remove()" style="margin-left:10px;cursor:pointer;opacity:.6">✕</span>';
-  Object.assign(b.style,{position:'fixed',bottom:'72px',left:'50%',transform:'translateX(-50%)',background:'var(--ac)',color:'#0d1117',padding:'8px 16px',borderRadius:'20px',fontSize:'13px',fontWeight:'600',zIndex:'9999',boxShadow:'0 4px 16px rgba(0,0,0,.3)',whiteSpace:'nowrap'});
-  document.body.appendChild(b);
-}
-
-// Poll for deploys: compare Last-Modified of index.html against page-load value.
-// Catches index.html-only pushes where sw.js never changes.
-(()=>{
-  const _pageTs=new Date(document.lastModified).getTime();
-  setInterval(()=>{
-    fetch('/index.html',{method:'HEAD',cache:'no-cache'})
-      .then(r=>{
-        const lm=r.headers.get('last-modified');
-        if(lm&&new Date(lm).getTime()>_pageTs) _showUpdateBanner();
-      })
-      .catch(()=>{});
-  },3*60*1000); // check every 3 minutes
-})();
 
 // Offline mode detection and handling
 function _updateOfflineState(){
