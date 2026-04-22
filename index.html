@@ -2843,24 +2843,39 @@ input, textarea, select {
       <!-- VERSION HEADER -->
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
         <h1 style="font-size:22px;font-weight:800;margin:0">🌿 TC Plants Lab Notes</h1>
-        <span class="help-version-badge">v3.9</span>
+        <span class="help-version-badge">v3.11</span>
         <button class="btn xs ghost" onclick="navTo('changelog')" style="border-color:var(--pu);color:var(--pu)">📋 Changelog →</button>
         <button class="btn xs ghost" onclick="navTo('logicflows')" style="margin-left:4px;border-color:var(--ac);color:var(--ac)">🔗 Logic Flows →</button>
       </div>
       <p style="color:var(--mu);font-size:13px;margin-bottom:20px">April 2026 · Encrypted · GitHub-backed · Single-file PWA</p>
 
-      <!-- WHAT'S NEW v3.9 -->
-      <div style="background:linear-gradient(135deg,rgba(63,185,80,.1),rgba(88,166,255,.08));border:1px solid rgba(63,185,80,.3);border-radius:10px;padding:18px 20px;margin-bottom:14px">
-        <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v3.9</div>
+      <!-- WHAT'S NEW v3.11 -->
+      <div style="background:linear-gradient(135deg,rgba(63,185,80,.1),rgba(88,166,255,.08));border:1px solid rgba(63,185,80,.3);border-radius:10px;padding:18px 20px;margin-bottom:10px">
+        <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v3.11</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
-          <div style="font-size:13px;line-height:1.6"><strong>☑ Batch checkboxes fixed</strong> — global CSS <code>width:100%</code> was applied to all inputs including checkboxes, stretching them invisible. Scoped to text inputs only. Checkboxes now render correctly in the bottle list.</div>
-          <div style="font-size:13px;line-height:1.6"><strong>📦 Stock section decode fixed</strong> — loadInv() was missing the ghDec() step, which would have silently corrupted data on first save. Stock data now decrypts correctly.</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🔐 Single-token login</strong> — removed username/passphrase field. Your GitHub token is now the only credential — it authenticates AND encrypts. One-time migration tool re-encrypts all files with new key.</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🎤 Journal mic persistent</strong> — mic stays open continuously until manually stopped. Live transcription printed as you speak. Auto-flair from #hashtags if checkbox checked.</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🖨 View batch → barcode page</strong> — "View all X bottles in this batch" now opens a dedicated full-page QR barcode sheet with Print + Download PDF buttons, not the nav drawer.</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🔧 validateBottleData fixed</strong> — status whitelist now includes all 10 statuses (prepared, inoculated, growing, subcultured, rooting, hardening, weaned, dormant, discarded, contaminated).</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🌍 GBIF C/E/F complete</strong> — Native distribution tag row in species detail, taxonomy hierarchy (order/class/kingdom) saved on import, and one-tap bulk import of all accepted CP genera from 5 families.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>📊 Species Performance Ranking</strong> — new Analytics card: scored table (score/100, contam%, multiplication×, avg cycle days, active bottles) for every species with ≥2 notes.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>💰 Lab Cost Tracking</strong> — new Analytics card: 6-month supply spend bar chart + estimated ₹ cost per bottle (total supply spend ÷ total bottles created).</div>
+          <div style="font-size:13px;line-height:1.6"><strong>📥 Export Report</strong> — one-click 3-CSV download (bottles, notes, greenhouse) + print-ready HTML report. Also triggered by voice: "export report".</div>
+          <div style="font-size:13px;line-height:1.6"><strong>📷 QR on GH Plants</strong> — greenhouse plant detail now has a 📷 QR tab with scannable code, print + copy buttons. Scanner and URL params (<code>?gh=id</code>) route directly to the plant.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🔗 Passage Tracking</strong> — bottles can now reference a parent bottle (source code lookup). Lineage shown in detail: "Passaged from" + "Passaged to" chips.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🎙 New voice commands</strong> — "add N bottles of [species]", "open bottle FSL-XXXX", "show species [name]", "export report" — all instant, no AI call.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>📦 Dashboard 10-card stat band</strong> — added Recipes, Supplies low-stock, Contam 30d, Vault value (₹), Journal 7d alongside the original 5. 2-row wrap layout.</div>
         </div>
       </div>
+
+      <!-- v3.9 / v3.10 collapse -->
+      <details style="margin-bottom:8px">
+        <summary style="cursor:pointer;font-size:12px;color:var(--mu);padding:6px 0;font-weight:600;letter-spacing:.04em">▸ v3.9 / v3.10 release notes</summary>
+        <div style="background:var(--sf2);border-radius:8px;padding:12px;margin-top:6px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px">
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">🔐 Single-token login</strong> — GitHub token IS the encryption key. Migration tool for existing data.</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">💰 Value Inventory</strong> — 💰 Value page: set 8 stage/size prices, view live vault total.</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">🌍 GBIF A/B/D</strong> — Synonym resolver, common names auto-fill, reference photo in species detail.</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">📊 S.analytics freshness</strong> — LabAnalytics.calculate() called after every save (not just login).</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">🌿 3-way theme</strong> — Dark / Light / Paper themes + skins.css (wavy login dots in light mode).</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">📰 News chips</strong> — 18 topic chips replacing the dropdown. CP micro, Nepenthes, orchids, cryopreservation, media, and more. PMC PDF links when available.</div>
+        </div>
+      </details>
 
       <!-- v3.8 release notes (collapsed) -->
       <details style="margin-bottom:8px">
@@ -2911,21 +2926,7 @@ input, textarea, select {
           <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">📊 Heatmap widgets</strong> — Lab Activity, Bottle Prep, Contamination (expand 7/14/26 wk)</div>
         </div>
       </details>
-      <!-- WHAT'S NEW v3.5 (now collapsed above) -->
-      <!-- WHAT'S NEW v3.5 -->
-      <div style="background:linear-gradient(135deg,rgba(63,185,80,.1),rgba(88,166,255,.08));border:1px solid rgba(63,185,80,.3);border-radius:10px;padding:18px 20px;margin-bottom:14px">
-        <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v3.5</div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
-          <div style="font-size:13px;line-height:1.6"><strong>🧫 Sterilisation Lab</strong> — dedicated page with 10 biologically accurate protocol presets, per-step timers, temp notes, and a custom protocol builder</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🏠 Dashboard redesign</strong> — TC Stage Donut (SVG), 14-week Contamination Heatmap, QR shortcut card, Transfer Window, species grid, recipe strip</div>
-          <div style="font-size:13px;line-height:1.6"><strong>📰 News overhaul</strong> — topic dropdown (Carnivorous Plants, Nepenthes, Orchids…), 2-col card grid, full abstracts, 📌 pin articles</div>
-          <div style="font-size:13px;line-height:1.6"><strong>📷 Species photos</strong> — upload a photo to any custom taxonomy species; canvas-compressed, displayed as thumbnail in the list</div>
-          <div style="font-size:13px;line-height:1.6"><strong>▂ Minimise-to-tray</strong> — Timers, Stopwatches, and Stepper can be minimised to a fixed footer bar and run while navigating other sections</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🌿 Gelrite default 1.9 g/L</strong> — renamed from Agar/Gelrite; default changed to 1.9 g/L in all new recipes</div>
-          <div style="font-size:13px;line-height:1.6"><strong>⬆ CSV → Taxonomy</strong> — CSV greenhouse imports auto-register unknown species as Custom Species with GH flair in the taxonomy</div>
-          <div style="font-size:13px;line-height:1.6"><strong>📍 GH location default</strong> — new plants default to Q5JV+2X Kelambakkam, Tamil Nadu with map hyperlink for climate reference</div>
-        </div>
-      </div>
+      <!-- WHAT'S NEW v3.5 collapsed -->
       <!-- v3.3 release notes (collapsed) -->
       <details style="margin-bottom:8px">
         <summary style="cursor:pointer;font-size:12px;color:var(--mu);padding:6px 0;font-weight:600;letter-spacing:.04em">▸ v3.3 release notes</summary>
@@ -2995,6 +2996,7 @@ input, textarea, select {
         <a href="#h-actlog">Activity Log</a>
         <a href="#h-settings">Settings</a>
         <a href="#h-export">Export</a>
+        <a href="#h-value">Value Vault</a>
         <a href="#h-weather">Weather</a>
         <a href="#h-security">Security</a>
       </div>
@@ -3002,15 +3004,15 @@ input, textarea, select {
       <h2 id="h-start">Getting Started</h2>
       <div class="help-section-card">
         <h3>Signing In</h3>
-        <p>Enter your <strong>Username</strong> (your encryption passphrase — chosen by you, never leaves your browser) and <strong>Password</strong> (your GitHub Personal Access Token with <code>repo</code> scope).</p>
+        <p>Enter your <strong>GitHub Personal Access Token</strong> (with <code>repo</code> scope). The token is <em>both</em> your authentication credential and your AES-256-GCM encryption key — one field, one secret.</p>
         <p>Create a token: <code>github.com → Settings → Developer settings → Personal access tokens → Classic → New token → tick repo → Generate</code></p>
-        <div class="help-warn">⚠️ <strong>Never lose your passphrase.</strong> There is no recovery — all data is AES-256-GCM encrypted client-side. The GitHub repo stores only ciphertext.</div>
+        <div class="help-warn">⚠️ <strong>Never lose your token.</strong> There is no recovery — all data is AES-256-GCM encrypted client-side. The GitHub repo stores only ciphertext.</div>
         <h3>Login Screen</h3>
         <table><tr><th>Element</th><th>What it does</th></tr>
-          <tr><td>Username field</td><td>Your encryption passphrase. Stays in memory only — never sent anywhere.</td></tr>
-          <tr><td>Password field</td><td>Your GitHub Personal Access Token. Used to read/write encrypted files to the repo.</td></tr>
-          <tr><td>☀️ / 🌙 button (top-right)</td><td>Toggle dark/light theme before signing in. Preference is saved.</td></tr>
-          <tr><td>Trust banner (after login)</td><td>Tap <strong>Yes, save</strong> to encrypt and store the token in <code>localStorage</code> — next visit only needs the passphrase.</td></tr>
+          <tr><td>Token field</td><td>Your GitHub Personal Access Token — authenticates AND encrypts. Never sent to any third party.</td></tr>
+          <tr><td>☀️ / 🌙 / 📄 Theme (top-right)</td><td>Toggle Dark / Light / Paper theme before signing in. Preference is saved.</td></tr>
+          <tr><td>〜 Wave button (bottom-right)</td><td>Toggle animated dot wave background on login screen (light mode only)</td></tr>
+          <tr><td>Trust banner (after login)</td><td>Tap <strong>Yes, save</strong> to store the token in <code>localStorage</code> — next visit signs in automatically.</td></tr>
           <tr><td>⚡ Loaded from cache</td><td>If session cache is fresh (&lt;10 min), data loads instantly without re-fetching from GitHub.</td></tr>
         </table>
         <h3>Top Navigation Bar</h3>
@@ -3194,6 +3196,8 @@ input, textarea, select {
           <tr><td>Session notes</td><td>Optional free text — e.g. "First run after equipment service"</td></tr>
         </table>
         <p>On Save, all bottles are created immediately. Each batch within the session gets its own <code>batch_id</code>; all share the <code>session_id</code>. A purple <strong>S</strong> badge appears in the list for session bottles. The bottle detail shows session date, batch count, and autoclave parameters.</p>
+        <h3>Passage Tracking (v3.11)</h3>
+        <p>In the bottle editor, fill <strong>Source bottle (passage)</strong> with the parent bottle's code (e.g. <code>FSL-2026-0012</code>). A live hint confirms the match (green = found, red = not found). The saved bottle shows a <strong>Passaged from →</strong> link to the parent and a <strong>Passaged to ↓</strong> chip section listing all child bottles.</p>
         <h3>Send to Greenhouse</h3>
         <p>Every bottle detail shows a <strong>🏡 Send to GH</strong> button. Tap it when a culture is subcultured and plants are ready to go back to the greenhouse. You choose how many plants, and the app merges them into an existing greenhouse entry for that species (or creates a new one). A transfer event is logged for traceability.</p>
         <h3>List Filters</h3>
@@ -3233,12 +3237,13 @@ input, textarea, select {
           <tr><td>Notes</td><td>Markdown — phenotype, provenance, permits.</td></tr>
         </table>
 
-        <h3>Plant Detail — 4 Tabs</h3>
+        <h3>Plant Detail — 5 Tabs</h3>
         <table><tr><th>Tab</th><th>Contents</th></tr>
           <tr><td>📋 Overview</td><td>Core info table, Take Explant buttons, linked bottles list, notes body</td></tr>
           <tr><td>📦 Ledger</td><td>Full stock movement history as a running-balance table. ＋ Adjust opens an inline form to log any change.</td></tr>
           <tr><td>🩺 Health</td><td>Timestamped condition timeline with coloured dots. ＋ Log opens an inline form (health dropdown + date + observation text).</td></tr>
           <tr><td>⚗️ Plan</td><td>Production overview: GH stock count, bottles in culture, subcultured-ready count, harvest estimate (bottles / sessions), lab pipeline note.</td></tr>
+          <tr><td>📷 QR <span style="color:var(--gn)">(v3.11)</span></td><td>Scannable QR code for this plant (URL: <code>?gh=id</code>). Print and Copy buttons. Scanner routes directly here when scanned in the field.</td></tr>
         </table>
 
         <h3>📦 Quantity Ledger</h3>
@@ -3346,8 +3351,8 @@ input, textarea, select {
           <tr><td>📷 Scan QR</td><td>Open QR scanner in route mode</td></tr>
           <tr><td>📊 Analytics</td><td>Navigate to analytics</td></tr>
         </table>
-        <h3>Stat Pills (5)</h3>
-        <p>Notes · Bottles (N active) · Accessions · Greenhouse (total plants) · Overdue count. Each clickable.</p>
+        <h3>Stat Band (10 cards)</h3>
+        <p>Two-row wrap grid of clickable stat cards: <strong>Notes</strong> · <strong>Bottles</strong> (active count) · <strong>Accessions</strong> · <strong>Greenhouse</strong> (total plants) · <strong>Overdue</strong> · <strong>Recipes</strong> · <strong>Supplies</strong> (low-stock, yellow when &gt;0) · <strong>Contam 30d</strong> (red when &gt;0) · <strong>Vault ₹</strong> (live value) · <strong>Journal 7d</strong>. Each card navigates to the relevant section.</p>
         <h3>Row 1 — Hero Trio</h3>
         <table><tr><th>Card</th><th>What it shows</th></tr>
           <tr><td>⚗️ TC Stage Distribution</td><td>SVG donut chart of all bottles by stage. Each segment is clickable — jumps to that filtered bottle list. Legend alongside.</td></tr>
@@ -3432,20 +3437,23 @@ input, textarea, select {
 
       <h2 id="h-analytics">📊 Lab Analytics</h2>
       <div class="help-section-card">
-        <p>All metrics are computed in-browser from your already-decrypted data. Nothing is sent anywhere.</p>
+        <p>All metrics are computed in-browser from your already-decrypted data. Nothing is sent anywhere. Click <strong>📥 Export CSV</strong> or <strong>🖨 Print Report</strong> in the Analytics header to export.</p>
         <table><tr><th>Chart / Card</th><th>What it shows</th></tr>
           <tr><td>Notes / Month</td><td>Line chart — entries created per calendar month (last 6 months)</td></tr>
           <tr><td>Stage Distribution</td><td>Donut — proportion of notes at each TC stage (I–IV, Contam, Unclassified)</td></tr>
-          <tr><td>Species Success Rate</td><td>Horizontal bars — % of non-contamination notes per species (≥2 notes required). Green &gt;70 %, yellow 40–70 %, red &lt;40 %</td></tr>
+          <tr><td>Species Success Rate</td><td>Horizontal bars — % of non-contamination notes per species (≥2 notes required). Green &gt;70%, yellow 40–70%, red &lt;40%</td></tr>
           <tr><td>Contamination Trend</td><td>Line chart — contamination entries per month (last 6 months)</td></tr>
           <tr><td>Recipe Usage</td><td>Bars — how many notes reference each recipe (top 6)</td></tr>
           <tr><td>Tag Cloud</td><td>30 most-used tags as sized pills — larger = more frequent</td></tr>
           <tr><td>Stage Funnel by Species</td><td>Stacked bars for top 5 species — Stage I → II → III → IV distribution</td></tr>
           <tr><td>Avg Days Between Entries</td><td>Badge cards per species (≥3 notes) — approximate subculture interval</td></tr>
           <tr><td>Media Efficiency</td><td>Ranked table: Recipe × Species × Stage. Score = (Avg Out / global avg) × (1 − contam rate) × 100</td></tr>
+          <tr><td>Culture Lifecycle Status</td><td>Active bottles grouped by progress vs expected duration: On track / Due soon / Transfer due / Delayed</td></tr>
+          <tr><td>Species Performance Ranking <span style="color:var(--gn)">(v3.11)</span></td><td>Score/100, contam%, multiplication×, avg cycle days, active bottles — ranked table for all species ≥2 notes</td></tr>
+          <tr><td>Lab Cost Tracking <span style="color:var(--gn)">(v3.11)</span></td><td>6-month supply spend bar chart + estimated ₹ cost per bottle</td></tr>
           <tr><td>Feature Usage</td><td>Bars — section visit frequency since tracking began (reset in Settings)</td></tr>
         </table>
-        <div class="help-tip">💡 Always fill <strong>Cultures Out</strong> on Multiplication and Rooting notes to get meaningful Avg Out and Score data in the Media Efficiency table.</div>
+        <div class="help-tip">💡 Always fill <strong>Cultures Out</strong> on Multiplication and Rooting notes to get meaningful data in Media Efficiency and Species Performance Ranking.</div>
       </div>
 
       <h2 id="h-calendar">📅 Calendar</h2>
@@ -3576,6 +3584,10 @@ input, textarea, select {
           <tr><td>"whisper mode" / "native mode"</td><td>Switch STT mode</td></tr>
           <tr><td>"stop reading" / "stop"</td><td>Stop TTS mid-sentence</td></tr>
           <tr><td>"close"</td><td>Close AI panel</td></tr>
+          <tr><td>"add N bottles of [species]" <span style="color:var(--gn)">(v3.11)</span></td><td>Opens Batch mode, prefills species + quantity, starts creation</td></tr>
+          <tr><td>"open bottle FSL-XXXX" <span style="color:var(--gn)">(v3.11)</span></td><td>Finds bottle by code, opens detail view</td></tr>
+          <tr><td>"show species [name]" / "open species [name]" <span style="color:var(--gn)">(v3.11)</span></td><td>Navigates to Species section, opens that species detail panel</td></tr>
+          <tr><td>"export report" / "download report" <span style="color:var(--gn)">(v3.11)</span></td><td>Downloads 3-CSV lab report immediately</td></tr>
         </table>
         <h3>Wake Word</h3>
         <p><strong>"Hey Lab"</strong> — say it anywhere in the app to open the AI panel and start a voice session (Native mode only). Enable in Settings → Voice &amp; Lab Mode. A small pulsing indicator appears when armed.</p>
@@ -3591,19 +3603,29 @@ input, textarea, select {
 
       <h2 id="h-news">📰 TC Research News</h2>
       <div class="help-section-card">
-        <p>Click <strong>📰 News</strong> in the nav drawer. Select a topic, then toggle the switch to load up to 60 publications from <strong>PubMed</strong>. Changing the topic resets the toggle so you can reload with the new query.</p>
-        <h3>Topic Dropdown</h3>
-        <table><tr><th>Topic</th><th>PubMed Query covers</th></tr>
-          <tr><td>🌿 General TC</td><td>Plant tissue culture, micropropagation, in vitro propagation, plant cell culture</td></tr>
-          <tr><td>🪲 Carnivorous Plants</td><td>Nepenthes, Drosera, Sarracenia, Dionaea, Pinguicula, Heliamphora + TC terms</td></tr>
+        <p>Click <strong>📰 News</strong> in the nav drawer. Tap a topic chip, then toggle the switch to load up to 60 publications from <strong>PubMed</strong>. Changing the chip resets the toggle so you can reload with the new query.</p>
+        <h3>Topic Chips (18 + Custom)</h3>
+        <table><tr><th>Chip</th><th>PubMed query covers</th></tr>
+          <tr><td>🌿 TC &amp; Micropropagation</td><td>Plant tissue culture, micropropagation, in vitro propagation, plant cell culture</td></tr>
+          <tr><td>🪲 Carnivorous Plants Micro</td><td>CP + TC/micropropagation terms</td></tr>
+          <tr><td>🪴 Carnivorous Plants</td><td>Nepenthes, Drosera, Sarracenia, Dionaea, Pinguicula, Heliamphora (broad)</td></tr>
           <tr><td>🏔 Nepenthes</td><td>Nepenthes specifically + TC terms</td></tr>
           <tr><td>🌸 Orchids</td><td>Paphiopedilum, Dendrobium, Phalaenopsis, Vanilla, orchid + TC terms</td></tr>
+          <tr><td>🧬 Plant Mutation</td><td>Somaclonal variation, mutagenesis, in vitro mutation</td></tr>
           <tr><td>🍌 Banana / Musa</td><td>Musa, banana, plantain + TC terms</td></tr>
           <tr><td>🌼 Vanilla</td><td>Vanilla planifolia / Vanilla spp. + in vitro</td></tr>
           <tr><td>🔬 Somatic Embryogenesis</td><td>Somatic embryogenesis + plant</td></tr>
+          <tr><td>🌱 Organogenesis</td><td>Organogenesis, shoot organogenesis, plant regeneration</td></tr>
+          <tr><td>🧫 Callus Culture</td><td>Callus induction, callus culture, dedifferentiation</td></tr>
+          <tr><td>🌿 Rooting</td><td>In vitro rooting, auxin rooting, root induction</td></tr>
+          <tr><td>💉 PGRs</td><td>Plant growth regulators, cytokinin, auxin, BAP, NAA, TDZ + TC</td></tr>
+          <tr><td>🧼 Sterilisation</td><td>Surface sterilisation, sodium hypochlorite, explant sterilisation</td></tr>
           <tr><td>☣️ Contamination</td><td>Fungal/bacterial contamination in tissue culture</td></tr>
-          <tr><td>⚗️ Media &amp; Hormones</td><td>PGRs, cytokinins, auxins, Murashige, culture media</td></tr>
+          <tr><td>⚗️ Media</td><td>Murashige Skoog, culture media, macro/micro nutrients</td></tr>
+          <tr><td>❄️ Cryopreservation</td><td>Plant cryopreservation, vitrification, slow cooling</td></tr>
+          <tr><td>✏️ Custom</td><td>Type any PubMed query — free-form search</td></tr>
         </table>
+        <p>Each article card shows: PMC PDF link (when available), DOI link, abstract toggle, and 📌 pin button.</p>
         <h3>Card Grid</h3>
         <p>Results appear in a responsive 2-column card grid. Each card shows: title (DOI link), authors, journal, year, and a collapsible full abstract (<strong>Read more ↓</strong> toggle). DOI and PubMed ↗ links open in a new tab.</p>
         <h3>Pinning Articles</h3>
@@ -3815,13 +3837,34 @@ input, textarea, select {
 
       <h2 id="h-export">Export &amp; Backup</h2>
       <div class="help-section-card">
+        <h3>Lab Report Export (v3.11)</h3>
+        <table><tr><th>Mode</th><th>Contents</th></tr>
+          <tr><td>📥 Export CSV (from Analytics)</td><td>3 downloads: <strong>bottles.csv</strong> (code, species, stage, status, dates, recipe, parent), <strong>notes.csv</strong> (date, title, type, stage, species, cultures out, tags), <strong>greenhouse.csv</strong> (species, location, qty, health, size_grade)</td></tr>
+          <tr><td>🖨 Print Report (from Analytics)</td><td>Styled HTML with stat band + active bottles table + GH plants table — opens in new window, auto-prints</td></tr>
+          <tr><td>Voice: "export report"</td><td>Triggers CSV export immediately</td></tr>
+        </table>
+        <h3>Other exports</h3>
         <table><tr><th>Export</th><th>Contents</th></tr>
-          <tr><td>⬇ ZIP</td><td>All notes as decrypted Markdown (with YAML front matter) + accessions &amp; recipes as JSON</td></tr>
-          <tr><td>CSV</td><td>Two files: all note metadata (id, title, date, type, stage, species, tags, next review, recipe, cultures out) + all accessions</td></tr>
-          <tr><td>🖨 Print / PDF</td><td>Open any note or recipe → Print / PDF → browser print dialog → Save as PDF</td></tr>
-          <tr><td>📅 Calendar export</td><td>This week / This month → print-ready HTML with all entries and note bodies</td></tr>
+          <tr><td>⬇ ZIP (top bar)</td><td>All notes as decrypted Markdown + accessions + recipes as JSON</td></tr>
+          <tr><td>CSV (top bar)</td><td>Note metadata CSV + accessions CSV</td></tr>
+          <tr><td>🖨 Print / PDF</td><td>Open any note or recipe → browser print dialog → Save as PDF</td></tr>
+          <tr><td>📅 Calendar export</td><td>This week / This month → print-ready HTML with all entries</td></tr>
         </table>
         <p>Your data is always in the GitHub repo as encrypted <code>.enc</code> files — every save is a git commit, giving you complete version history at <code>github.com/Phyto-Evolution/tcplants</code>.</p>
+      </div>
+
+      <h2 id="h-value">💰 Value Vault</h2>
+      <div class="help-section-card">
+        <p>Nav drawer → <strong>💰 Value</strong>. Estimates your current lab inventory value from bottles + greenhouse stock using configurable prices.</p>
+        <h3>Prices Tab</h3>
+        <p>Set base prices (₹) for 8 categories: bottles by stage (I, II, III, IV, Weaned, Rooting) and GH plants by size grade (Seedling, Small, Medium, Adult). Prices auto-save with an 800ms debounce after you stop typing.</p>
+        <h3>Vault Tab</h3>
+        <p>Live calculated total: <code>Σ(bottles by stage × stage price) + Σ(GH plants × grade price × quantity)</code>. Full breakdown by category with species-level detail.</p>
+        <table><tr><th>Setting</th><th>Where</th></tr>
+          <tr><td>Size grade (Seedling / Small / Medium / Adult)</td><td>GH plant editor → Size Grade field</td></tr>
+          <tr><td>Dashboard stat card</td><td>Shows compact total (₹12k / ₹1.2L format), navigates to Value page</td></tr>
+        </table>
+        <div class="help-tip">💡 Set the 8 base prices once in the Prices tab — the Vault auto-updates as you add or remove bottles and plants. Species-level overrides are planned for a future update.</div>
       </div>
 
       <h2 id="h-weather">🌡️ Weather Widget</h2>
@@ -4126,191 +4169,127 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
 
   <div class="section fullpage" id="sec-logicflows">
     <main style="flex:1;overflow-y:auto;padding:28px 32px;max-width:980px">
-      <h1 style="font-size:20px;font-weight:800;margin-bottom:4px">🔗 Logic Flows</h1>
-      <p style="color:var(--mu);font-size:13px;margin-bottom:28px">Complete dependency map of every system in TC Plants Lab Notes — what each function does, what it calls, what calls it, what state it reads/writes, and what UI it changes. Use as blueprint for testing and for future development sessions.</p>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+        <h1 style="font-size:20px;font-weight:800;margin:0">🔗 Logic Flows</h1>
+        <span style="background:linear-gradient(135deg,var(--ac),var(--pu));color:#0d1117;border-radius:12px;font-size:11px;font-weight:800;padding:2px 9px;letter-spacing:.04em">v3.11</span>
+      </div>
+      <p style="color:var(--mu);font-size:13px;margin-bottom:14px">Complete dependency map — state, CRUD flows, AI, navigation, and known gaps. Blueprint for testing and future development.</p>
+      <!-- Quick-nav chips -->
+      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:24px">
+        <a href="#lf-data" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid rgba(63,185,80,.4);color:var(--gn);text-decoration:none;background:rgba(63,185,80,.06)">📦 Data</a>
+        <a href="#lf-login" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid rgba(88,166,255,.4);color:var(--ac);text-decoration:none;background:rgba(88,166,255,.06)">🔑 Login</a>
+        <a href="#lf-nav" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid rgba(188,140,255,.4);color:var(--pu);text-decoration:none;background:rgba(188,140,255,.06)">🧭 Nav</a>
+        <a href="#lf-notes" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid var(--bd);color:var(--tx);text-decoration:none;background:var(--sf)">📋 Notes</a>
+        <a href="#lf-bottles" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid var(--bd);color:var(--tx);text-decoration:none;background:var(--sf)">🫙 Bottles</a>
+        <a href="#lf-gh" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid var(--bd);color:var(--tx);text-decoration:none;background:var(--sf)">🏡 GH</a>
+        <a href="#lf-dash" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid rgba(255,166,0,.4);color:var(--yw);text-decoration:none;background:rgba(255,166,0,.06)">🏠 Dashboard</a>
+        <a href="#lf-ai" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid rgba(188,140,255,.4);color:var(--pu);text-decoration:none;background:rgba(188,140,255,.06)">🤖 AI</a>
+        <a href="#lf-analytics" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid var(--bd);color:var(--tx);text-decoration:none;background:var(--sf)">📊 Analytics</a>
+        <a href="#lf-gbif" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid rgba(63,185,80,.4);color:var(--gn);text-decoration:none;background:rgba(63,185,80,.06)">🌍 GBIF</a>
+        <a href="#lf-value" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid rgba(255,180,0,.4);color:#e3a000;text-decoration:none;background:rgba(255,180,0,.06)">💰 Value</a>
+        <a href="#lf-export" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid var(--bd);color:var(--tx);text-decoration:none;background:var(--sf)">📥 Export</a>
+        <a href="#lf-gaps" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid rgba(248,81,73,.4);color:var(--rd);text-decoration:none;background:rgba(248,81,73,.06)">⚠️ Gaps</a>
+      </div>
 
       <!-- ═══ DATA ARCHITECTURE ═══ -->
-      <div class="help-section-card">
-        <h2 class="help-h2">Data Architecture</h2>
-        <h3 class="help-h3">State Object <code>S</code> — fields, owners, consumers</h3>
+      <div id="lf-data" class="help-section-card" style="border-left:3px solid var(--gn)">
+        <h2 class="help-h2" style="color:var(--gn)">📦 Data Architecture</h2>
+
+        <h3 class="help-h3">State Object <code>S</code> — all fields</h3>
         <table class="help-table">
-          <tr><th>Field</th><th>Populated by</th><th>Read by</th><th>Persisted to</th></tr>
-          <tr><td><code>S.notes[]</code></td><td>login → loadNotesIndex()</td><td>renderNoteList, openNote, LabAnalytics, _buildAIContext, Reminders, Dashboard, Search</td><td>notes/index.enc (index), notes/{id}.enc (body)</td></tr>
-          <tr><td><code>S.notesSha</code></td><td>loadNotesIndex, saveNotesIndex</td><td>saveNotesIndex (lock), writeNote</td><td>—</td></tr>
-          <tr><td><code>S.cur</code></td><td>openNote, saveNoteAction</td><td>openNote, saveNoteAction, renderNoteList (active highlight)</td><td>—</td></tr>
-          <tr><td><code>S.editing</code></td><td>editNote, startNewNote</td><td>saveNoteAction (branch: edit vs create)</td><td>—</td></tr>
-          <tr><td><code>S.accs[]</code></td><td>login → loadAccessions()</td><td>renderAccList, openAccession, openBottle (cross-link), Search</td><td>accessions/data.enc</td></tr>
-          <tr><td><code>S.recs[]</code></td><td>login → loadRecipes()</td><td>renderRecList, openRecipe, bottle form (recipe select), Search</td><td>recipes/data.enc</td></tr>
-          <tr><td><code>S.bottles[]</code></td><td>login → loadBottles()</td><td>renderBottleList, openBottle, Dashboard, Reminders, Analytics, Greenhouse (cross-ref), Species detail, Search</td><td>bottles/data.enc</td></tr>
-          <tr><td><code>S.sessions[]</code></td><td>login → loadBottles() (packed together)</td><td>openBottle (session info row), saveSessionAction</td><td>bottles/data.enc (same file)</td></tr>
-          <tr><td><code>S.bottlesSha</code></td><td>loadBottles, saveBottles</td><td>saveBottles, saveBottleAction, saveSessionAction, updateBottleStatus</td><td>—</td></tr>
-          <tr><td><code>S.bottleFilter</code></td><td>setBotFilter()</td><td>renderBottleList</td><td>—</td></tr>
-          <tr><td><code>S.bottleSearch</code></td><td>search input, navTo links, viewBatch</td><td>renderBottleList</td><td>—</td></tr>
-          <tr><td><code>S.botBatchFilter</code></td><td>viewBatch(batchId)</td><td>renderBottleList (overrides status filter)</td><td>—</td></tr>
-          <tr><td><code>S.curBot</code></td><td>openBottle, saveBottleAction</td><td>openBottle, renderBottleList (active highlight)</td><td>—</td></tr>
-          <tr><td><code>S.greenhouse[]</code></td><td>login → loadGreenhouse()</td><td>renderGHList, openGHPlant, Dashboard, Reminders, Search</td><td>greenhouse/data.enc</td></tr>
-          <tr><td><code>S.ghTransfers[]</code></td><td>login → loadGreenhouse() (packed together)</td><td>openGHPlant (transfer tab), saveGHExplant</td><td>greenhouse/data.enc (same file)</td></tr>
-          <tr><td><code>S.supplies[]</code></td><td>login → loadSupplies()</td><td>SupplyInventory.renderInventoryPage, calcPerformance, Dashboard (low-stock)</td><td>supplies/data.enc</td></tr>
-          <tr><td><code>S.journal[]</code></td><td>login → loadJournal()</td><td>renderJournalList, openJournalEntry, _scheduleOvernightJournalParse, _buildAIContext</td><td>journal/entries.enc</td></tr>
-          <tr><td><code>S_inv</code> (separate)</td><td>loadInv() — on Stock section visit</td><td>renderInv, saveInv</td><td>inventory/data.enc</td></tr>
-          <tr><td><code>S.taxSpecies[]</code></td><td>loadTaxonomy() post-login</td><td>_taxSuggest, species picker, _buildAIContext, Species section</td><td>taxonomy/*.json (read-only packs)</td></tr>
-          <tr><td><code>S.taxCustom</code></td><td>loadTaxonomy → ghGet(taxonomy/custom.enc)</td><td>Species section (custom tab), _taxSuggest, flairs</td><td>taxonomy/custom.enc</td></tr>
-          <tr><td><code>S.analytics</code></td><td>LabAnalytics.calculate() post-login</td><td>_buildAIContext (AI context only) — renderAnalytics() does NOT use it (recalculates inline)</td><td>—</td></tr>
-          <tr><td><code>S.weather</code></td><td>fetchWeather() post-login, every 60s</td><td>weather-chip display, _buildAIContext</td><td>—</td></tr>
-          <tr><td><code>S.section</code></td><td>switchSection()</td><td>navTo, switchSection, closeSidebarMobile checks</td><td>—</td></tr>
+          <tr><th>Field</th><th>Loaded by</th><th>Read by</th><th>GitHub file</th></tr>
+          <tr><td><code>S.notes[]</code></td><td>login → <code>loadNotesIndex()</code></td><td>renderNoteList, openNote, LabAnalytics, _buildAIContext, Reminders, Dashboard, Search</td><td>notes/index.enc + notes/{id}.enc</td></tr>
+          <tr><td><code>S.accs[]</code></td><td>login → <code>loadAccessions()</code></td><td>renderAccList, openAccession, openBottle, Search</td><td>accessions/data.enc</td></tr>
+          <tr><td><code>S.recs[]</code></td><td>login → <code>loadRecipes()</code></td><td>renderRecList, openRecipe, bottle form, Search</td><td>recipes/data.enc</td></tr>
+          <tr><td><code>S.bottles[]</code> + <code>S.sessions[]</code></td><td>login → <code>loadBottles()</code></td><td>renderBottleList, openBottle, Dashboard, Reminders, Analytics, Species, Search</td><td>bottles/data.enc</td></tr>
+          <tr><td><code>S.greenhouse[]</code> + <code>S.ghTransfers[]</code></td><td>login → <code>loadGreenhouse()</code></td><td>renderGHList, openGHPlant, Dashboard, Reminders, Search</td><td>greenhouse/data.enc</td></tr>
+          <tr><td><code>S.supplies[]</code></td><td>login → <code>loadSupplies()</code></td><td>SupplyInventory.renderInventoryPage, calcPerformance, Dashboard low-stock</td><td>supplies/data.enc</td></tr>
+          <tr><td><code>S.journal[]</code></td><td>login → <code>loadJournal()</code></td><td>renderJournalList, overnight parser, _buildAIContext</td><td>journal/entries.enc</td></tr>
+          <tr><td><code>S.value</code></td><td>login → <code>loadValue()</code> (8th load)</td><td>renderValueSection, vault calculation</td><td>value/data.enc</td></tr>
+          <tr><td><code>S.taxSpecies[]</code></td><td>post-login <code>loadTaxonomy()</code></td><td>_taxSuggest, species picker, _buildAIContext, Species section</td><td>taxonomy/*.json packs (read-only)</td></tr>
+          <tr><td><code>S.taxCustom</code></td><td><code>loadTaxonomy()</code> → ghGet</td><td>Species custom tab, _taxSuggest, flairs, GBIF imports</td><td>taxonomy/custom.enc</td></tr>
+          <tr><td><code>S.analytics</code></td><td><code>LabAnalytics.calculate()</code> at login + after saves</td><td>_buildAIContext only (renderAnalytics recalculates inline)</td><td>— (memory only)</td></tr>
+          <tr><td><code>S.weather</code></td><td><code>fetchWeather()</code> at login, every 60s</td><td>weather-chip display, _buildAIContext</td><td>— (Open-Meteo API)</td></tr>
+          <tr><td><code>S_inv</code> (separate object)</td><td><code>loadInv()</code> on Stock section visit (not at login)</td><td>renderInv, saveInv</td><td>inventory/data.enc</td></tr>
+          <tr><td><code>S.cur / S.editing / S.curBot / S.curGH</code></td><td>openNote, openBottle, openGHPlant</td><td>detail renderers, save actions (edit vs create branch)</td><td>— (UI state)</td></tr>
+          <tr><td><code>S.bottleFilter / S.bottleSearch / S.botBatchFilter</code></td><td>setBotFilter, viewBatch, search input</td><td>renderBottleList (priority: batchFilter → statusFilter → search)</td><td>— (UI state)</td></tr>
+          <tr><td><code>S.section</code></td><td>switchSection()</td><td>navTo, switchSection, mobile sidebar checks</td><td>— (UI state)</td></tr>
         </table>
 
-        <h3 class="help-h3" style="margin-top:20px">Encryption cycle (enc → GitHub → dec)</h3>
-        <pre class="help-pre">Write path:
-  data (JS object)
-  → JSON.stringify(data)
-  → enc(text): AES-256-GCM
-      deriveKey(S.pw, randomSalt, 600000 PBKDF2 iterations)
-      crypto.subtle.encrypt → ciphertext
-      return JSON.stringify({v:1, s:b64(salt), i:b64(iv), d:b64(ct)})
-  → ghPut(path, encryptedStr, sha, msg)
-      btoa(unescape(encodeURIComponent(encryptedStr)))   ← GitHub base64
-      PUT /repos/Phyto-Evolution/tcplants/contents/{path}
-      returns new sha → stored in S.*Sha
+        <h3 class="help-h3" style="margin-top:18px">Encryption cycle</h3>
+        <div class="help-flow">
+          <span class="flow-step">JS object</span><span class="flow-arrow">→</span>
+          <span class="flow-step">JSON.stringify</span><span class="flow-arrow">→</span>
+          <span class="flow-step">enc() AES-256-GCM + PBKDF2(600k)</span><span class="flow-arrow">→</span>
+          <span class="flow-step">ghPut() btoa → GitHub API PUT</span><span class="flow-arrow">→</span>
+          <span class="flow-step">new sha stored in S.*Sha</span>
+        </div>
+        <div class="help-flow">
+          <span class="flow-step">ghGet() GitHub API GET</span><span class="flow-arrow">→</span>
+          <span class="flow-step">ghDec() atob</span><span class="flow-arrow">→</span>
+          <span class="flow-step">dec() crypto.subtle.decrypt</span><span class="flow-arrow">→</span>
+          <span class="flow-step">JSON.parse → S.*</span>
+        </div>
 
-Read path:
-  ghGet(path)
-  → fetch GitHub API → r.json()
-  → f.content = GitHub base64 string
-  → ghDec(f.content): atob → decodeURIComponent/escape → encrypted JSON string
-  → dec(encryptedStr): JSON.parse → {s,i,d}
-      deriveKey(S.pw, b64d(s))
-      crypto.subtle.decrypt({name:'AES-GCM', iv:b64d(i)}, key, b64d(d))
-      → new TextDecoder().decode(plaintext)
-  → JSON.parse(plaintext) → JS object → assigned to S.*
-
-⚠️  loadInv() (Stock section) is missing the ghDec() step — latent bug if inventory/data.enc ever exists.</pre>
-
-        <h3 class="help-h3" style="margin-top:20px">Session cache (10-minute TTL)</h3>
-        <pre class="help-pre">_writeCache():
-  sessionStorage.setItem('_lc', JSON.stringify({
-    notes, notesSha, accs, accSha, recs, recSha,
-    bottles, bottlesSha, sessions,
-    greenhouse, ghTransfers, greenhouseSha,
-    taxCustom, taxCustomSha,
-    ts: Date.now()
-  }))
-
-_readCache():
-  sessionStorage.getItem('_lc') → parse
-  if(Date.now() - ts > 10*60*1000) return null  ← TTL expired
-  return cached object
-
-Login branch:
-  if(_readCache()) → restore from cache, skip 7 API calls
-  else → Promise.all 7 loads → _writeCache()
-
-⚠️  supplies and journal are NOT cached — re-fetched every login after cache miss.</pre>
+        <h3 class="help-h3" style="margin-top:18px">Session cache (10-min TTL)</h3>
+        <p style="font-size:12px;color:var(--mu);line-height:1.6;margin:0 0 8px"><code>_writeCache()</code> saves notes + accs + recs + bottles + greenhouse + taxCustom to <code>sessionStorage._lc</code>. Cache restored on next login if &lt;10 minutes old — skips 7 API calls. Supplies, journal, and value are NOT cached — re-fetched every session.</p>
       </div>
 
       <!-- ═══ LOGIN FLOW ═══ -->
-      <div class="help-section-card">
-        <h2 class="help-h2">Login / Unlock Flow</h2>
-        <pre class="help-pre">User action: fills GitHub access token → clicks Sign In (single field since token IS the passphrase)
-
-login():
-  1. Read ltok (GitHub token → S.tok). S.pw = S.tok (token is the encryption key)
-  2. If no token but DEVICE_KEY exists → restore from localStorage
-  3. Validate HTTPS (crypto.subtle requires it)
-  4. GET /repos/Phyto-Evolution/tcplants → verify token has repo access
-  5. S.pw = tok; S.tok = tok
-  6. sessionStorage.setItem('_lt', tok)  ← session backup
-  Migration: if dec() throws OperationError, show #lmigrate panel → _migrateEncryption(oldPw)
-    re-encrypts all .enc files from old passphrase → token passphrase
-  7a. Cache hit (_readCache()): restore 5 data stores, toast "⚡ Loaded from cache"
-  7b. Cache miss: Promise.all([
-        loadNotesIndex(),     → notes/index.enc    → S.notes, S.notesSha
-        loadAccessions(),     → accessions/data.enc → S.accs, S.accSha
-        loadRecipes(),        → recipes/data.enc    → S.recs, S.recSha
-        loadBottles(),        → bottles/data.enc    → S.bottles, S.sessions, S.bottlesSha
-        loadGreenhouse(),     → greenhouse/data.enc → S.greenhouse, S.ghTransfers, S.greenhouseSha
-        loadSupplies(),       → supplies/data.enc   → S.supplies, S.suppliesSha (or empty if file missing)
-        loadJournal()         → journal/entries.enc → S.journal, S.journalSha (or empty)
-      ]) → _writeCache()
-  8. Hide #login, show #app
-  9. renderNoteList(); renderAccList(); renderRecList(); renderBottleList(); renderGHList()
-  10. populateTagsDatalist(); updateReminderBadge(); switchSection('notes'); showNote('empty')
-  11. Show UI chrome: #ql-fab, #ai-btn, #lab-footer-bar, #actlog-tab
-  12. fetchActivityLog() — commits feed
-  13. If no DEVICE_KEY → show #trust-banner (save device offer)
-  14. loadTaxonomy() — taxonomy packs + custom species
-  15. loadEncryptedKeys() → _initAIKeyHint() + _initVoiceSettings()
-  16. setTimeout(_doWriteSummary, 5000) — commit lab-summary.json
-  17. LabAnalytics.calculate() → S.analytics
-  18. _scheduleOvernightJournalParse() — 8s delayed, then batch-parse unparsed journal entries
-  19. fetchWeather() + setInterval(fetchWeather, 60000)
-
-Device trust:
-  DEVICE_KEY = 'tcplants_device_v1'
-  Trust yes → enc(S.tok) → localStorage.setItem(DEVICE_KEY, ...)
-  Trust no → banner dismissed
-  Next login → token restored from localStorage directly (stored plaintext since token = key)
-  Forget device → localStorage.removeItem(DEVICE_KEY) → ltok field shown again
-
-Offline wrappers (Haiku addition):
-  loadNotesIndex and saveNotesIndex are wrapped to throw Error('offline') if !navigator.onLine
-  Other 5 load functions are NOT wrapped — inconsistent
-  _updateOfflineState() fires at startup → may briefly show offline toast</pre>
+      <div id="lf-login" class="help-section-card" style="border-left:3px solid var(--ac)">
+        <h2 class="help-h2" style="color:var(--ac)">🔑 Login / Unlock Flow</h2>
+        <p style="font-size:12px;color:var(--mu);margin:0 0 10px"><strong>Single-token login:</strong> the GitHub PAT is both the auth credential and the AES-256-GCM encryption key. No separate passphrase.</p>
+        <div class="help-flow" style="justify-content:flex-start;flex-direction:column;align-items:flex-start;gap:4px;padding:12px 14px">
+          <div style="font-size:12px;display:flex;align-items:center;gap:8px"><span class="flow-step" style="min-width:26px;text-align:center">1</span><span>Read GitHub token → <code>S.tok = S.pw = tok</code>. If DEVICE_KEY in localStorage → restore token.</span></div>
+          <div style="font-size:12px;display:flex;align-items:center;gap:8px"><span class="flow-step" style="min-width:26px;text-align:center">2</span><span>Validate HTTPS (required for crypto.subtle). GET <code>/repos/Phyto-Evolution/tcplants</code> → verify access.</span></div>
+          <div style="font-size:12px;display:flex;align-items:center;gap:8px"><span class="flow-step" style="min-width:26px;text-align:center">3</span><span>Migration check: if <code>dec()</code> throws OperationError → show #lmigrate panel → <code>_migrateEncryption(oldPw)</code> re-encrypts all .enc files.</span></div>
+          <div style="font-size:12px;display:flex;align-items:center;gap:8px"><span class="flow-step" style="min-width:26px;text-align:center">4</span><span>Cache hit → restore from sessionStorage (skip 8 API calls). Cache miss → <code>Promise.all</code> 8 loads:</span></div>
+          <div style="font-size:12px;padding-left:42px;font-family:var(--mono);color:var(--mu)">loadNotesIndex() · loadAccessions() · loadRecipes() · loadBottles() · loadGreenhouse() · loadSupplies() · loadJournal() · loadValue()</div>
+          <div style="font-size:12px;display:flex;align-items:center;gap:8px"><span class="flow-step" style="min-width:26px;text-align:center">5</span><span>Hide #login → show #app → render all lists → show UI chrome (FAB, AI btn, footer bar, actlog)</span></div>
+          <div style="font-size:12px;display:flex;align-items:center;gap:8px"><span class="flow-step" style="min-width:26px;text-align:center">6</span><span><code>loadTaxonomy()</code> · <code>loadEncryptedKeys()</code> · <code>fetchActivityLog()</code> · device trust banner check</span></div>
+          <div style="font-size:12px;display:flex;align-items:center;gap:8px"><span class="flow-step" style="min-width:26px;text-align:center">7</span><span><code>LabAnalytics.calculate()</code> → <code>S.analytics</code> · <code>_scheduleOvernightJournalParse()</code> (8s delay) · <code>fetchWeather()</code> + 60s interval</span></div>
+          <div style="font-size:12px;display:flex;align-items:center;gap:8px"><span class="flow-step" style="min-width:26px;text-align:center">8</span><span><code>setTimeout(_doWriteSummary, 5000)</code> → commits lab-summary.json</span></div>
+        </div>
+        <h3 class="help-h3" style="margin-top:14px">Device trust</h3>
+        <table class="help-table">
+          <tr><th>Action</th><th>Result</th></tr>
+          <tr><td>Trust Yes</td><td><code>enc(S.tok)</code> → <code>localStorage.DEVICE_KEY</code> — next visit restores token automatically</td></tr>
+          <tr><td>Trust No</td><td>Banner dismissed — token must be re-entered next visit</td></tr>
+          <tr><td>Forget device</td><td><code>localStorage.removeItem(DEVICE_KEY)</code> — token field shown on login again</td></tr>
+        </table>
       </div>
 
       <!-- ═══ NAVIGATION ═══ -->
-      <div class="help-section-card">
-        <h2 class="help-h2">Navigation System</h2>
-        <pre class="help-pre">navTo(sec):
-  → switchSection(sec)
-  → if listSecs.includes(sec):
-      openNavDrawer()                          ← drawer IS the sidebar for list sections
-      toggle nd-{sec} panel inside drawer
-      if sec!=='bottles': S.botBatchFilter=null ← clear batch context
-  → else (full-page sections):
-      hide all nd-list-area panels
-      closeNavDrawer()
-      render section: journal/schedule/insights/supply/search/logicflows
-
-switchSection(name):
-  → S.section = name
-  → remove .on from all .section divs, add .on to #sec-{name}
-  → sync ndtab .active state
-  → trigger section render:
-      reminders  → renderReminders()
-      contam     → renderContamDashboard()
-      analytics  → renderAnalytics()
-      sterilise  → loadCustomSterilProtocol() or renderSterilPage()
-      stock      → loadInv().then(renderInv)
-      species    → renderSpecies()
-      news       → _renderPersistedPins() + handleNewsToggle
-      calendar   → renderCalendar()
-      bottles    → renderBottleList() + showBotEmpty()
-      greenhouse → renderGHList() + showGHEmpty()
-
-List section panels (inside #nav-drawer → #nd-panel):
-  nd-notes     → note-list, note-search, type/stage filters
-  nd-registry  → acc-list, acc-search
-  nd-recipes   → rec-list, rec-search
-  nd-bottles   → bot-list, bot-search, status pills, new button
-  nd-greenhouse → gh-list, gh-search, filter pills
-
-Cross-section link pattern (canonical):
-  navTo('section'); openDetail('id')   ← navTo opens drawer, openDetail populates main area
-
-  ✓ Correct:  navTo('bottles');openBottle(id)
-  ✗ Broken:   openBottle(id)           ← section may not be active, drawer closed
-  ✗ Broken:   switchSection('notes');openNote(id) ← drawer never opened
-
-viewBatch(batchId) — special bottle navigation:
-  S.botBatchFilter = batchId
-  S.bottleFilter = 'all'; S.bottleSearch = ''
-  openNavDrawer(); renderBottleList()   ← list shows only batch members</pre>
+      <div id="lf-nav" class="help-section-card" style="border-left:3px solid var(--pu)">
+        <h2 class="help-h2" style="color:var(--pu)">🧭 Navigation System</h2>
+        <table class="help-table">
+          <tr><th>Section type</th><th>navTo() behaviour</th><th>Examples</th></tr>
+          <tr><td><strong>List sections</strong></td><td>Opens nav drawer + switches to nd-{sec} panel. Drawer stays open as sidebar.</td><td>notes, registry, recipes, bottles, greenhouse</td></tr>
+          <tr><td><strong>Full-page sections</strong></td><td>Closes drawer, hides all nd panels, triggers section render function.</td><td>reminders, contam, analytics, species, schedule, journal, supply, value, search, logicflows</td></tr>
+          <tr><td><strong>stock</strong></td><td>Redirected → <code>navTo('supply')</code> (Stock deprecated in v3.11)</td><td>—</td></tr>
+        </table>
+        <h3 class="help-h3" style="margin-top:14px">Section render triggers (via switchSection)</h3>
+        <table class="help-table">
+          <tr><th>Section</th><th>Render call</th></tr>
+          <tr><td>reminders</td><td><code>renderReminders()</code></td></tr>
+          <tr><td>contam</td><td><code>renderContamDashboard()</code></td></tr>
+          <tr><td>analytics</td><td><code>renderAnalytics()</code></td></tr>
+          <tr><td>species</td><td><code>renderSpecies()</code></td></tr>
+          <tr><td>calendar</td><td><code>renderCalendar()</code></td></tr>
+          <tr><td>news</td><td><code>_renderPersistedPins()</code> + <code>handleNewsToggle()</code></td></tr>
+          <tr><td>sterilise</td><td><code>loadCustomSterilProtocol()</code> or <code>renderSterilPage()</code></td></tr>
+          <tr><td>value</td><td><code>renderValueSection()</code></td></tr>
+          <tr><td>bottles, greenhouse</td><td><code>renderBottleList()</code> + <code>showBotEmpty()</code> / <code>renderGHList()</code></td></tr>
+        </table>
+        <div class="help-tip">✓ Canonical cross-section pattern: <code>navTo('bottles'); openBottle(id)</code> — <code>navTo</code> opens the drawer first, then the detail function populates the main area. Calling <code>openBottle(id)</code> alone without <code>navTo</code> breaks because the section may not be active.</div>
+        <h3 class="help-h3" style="margin-top:14px">Special navigation</h3>
+        <p style="font-size:12px;color:var(--mu)"><code>viewBatch(batchId)</code>: sets <code>S.botBatchFilter = batchId</code>, clears other filters → <code>openNavDrawer(); renderBottleList()</code> — list shows only that batch.</p>
+        <p style="font-size:12px;color:var(--mu)"><code>_handleNavQRResult()</code>: scans URL params on load — <code>?bottle=id</code> → open bottle · <code>?note=id</code> → open note · <code>?gh=id</code> → open GH plant (v3.11)</p>
       </div>
 
       <!-- ═══ NOTES FLOW ═══ -->
-      <div class="help-section-card">
-        <h2 class="help-h2">Notes — Full CRUD Flow</h2>
+      <div id="lf-notes" class="help-section-card" style="border-left:3px solid var(--bd)">
+        <h2 class="help-h2">📋 Notes — Full CRUD Flow</h2>
         <pre class="help-pre">CREATE:
   startNewNote('generic'|'tc')
   → clear form fields, set S.editing=null
@@ -4385,8 +4364,8 @@ CAMERA/BARCODE in notes:
       </div>
 
       <!-- ═══ BOTTLES FLOW ═══ -->
-      <div class="help-section-card">
-        <h2 class="help-h2">Bottles — Full CRUD & Lifecycle</h2>
+      <div id="lf-bottles" class="help-section-card" style="border-left:3px solid var(--ac)">
+        <h2 class="help-h2" style="color:var(--ac)">🫙 Bottles — Full CRUD & Lifecycle</h2>
         <pre class="help-pre">THREE CREATION MODES — toggled by setBotMode():
 
 SINGLE (qty=1):
@@ -4492,11 +4471,19 @@ CROSS-SECTION LINKS from bot-detail:
 _botNextSeq():
   → max of all FSL-YYYY-NNNN codes parsed as integers → +1
   → if no existing bottles → returns 1</pre>
+
+        <h3 class="help-h3" style="margin-top:14px">Passage Tracking (v3.11)</h3>
+        <table class="help-table">
+          <tr><th>Where</th><th>What</th></tr>
+          <tr><td>Bottle editor</td><td>"Source bottle (passage)" text input → <code>bot-parent-code</code>. Live lookup hint shows species/status (green=found, red=not found).</td></tr>
+          <tr><td>saveBottleAction()</td><td>Resolves parent code → <code>parent_id</code> stored on new bottle.</td></tr>
+          <tr><td>openBottle()</td><td>Shows "Passaged from" row (link to parent) + "Passaged bottles" section (children with ↓ arrow chips).</td></tr>
+        </table>
       </div>
 
       <!-- ═══ RAVANA AI FLOW ═══ -->
-      <div class="help-section-card">
-        <h2 class="help-h2">Ravana AI — Context, Routing, Tool-Use</h2>
+      <div id="lf-ai" class="help-section-card" style="border-left:3px solid var(--pu)">
+        <h2 class="help-h2" style="color:var(--pu)">🤖 Ravana AI — Context, Routing, Tool-Use</h2>
         <pre class="help-pre">CONTEXT BUILDING — _buildAIContext():
   assembles a structured prompt snapshot:
   → lab identity (name from settings)
@@ -4573,11 +4560,29 @@ QUOTA CHECK — _isAtQuota() (Task #8):
   checks localStorage token usage counters
   compares against AI_LIMITS for selected provider
   if at quota → toast warning, skip API call</pre>
+
+        <h3 class="help-h3" style="margin-top:14px">Voice Commands — full list (v3.11)</h3>
+        <table class="help-table">
+          <tr><th>Pattern</th><th>Action</th><th>AI call?</th></tr>
+          <tr><td>"home" / "dashboard"</td><td>navTo('notes')</td><td>No</td></tr>
+          <tr><td>"notes" / "bottles" / "greenhouse" / "recipes" / "registry" / "reminders" / "analytics"</td><td>Navigate to that section</td><td>No</td></tr>
+          <tr><td>"settings" / "open scanner" / "sidebar" / "close"</td><td>Open panel / close AI</td><td>No</td></tr>
+          <tr><td>"read protocol N" / "read recipe N"</td><td>TTS reads numbered recipe aloud</td><td>No</td></tr>
+          <tr><td>"what's overdue" / "how many bottles" / "latest note"</td><td>TTS reads data summary</td><td>No</td></tr>
+          <tr><td>"switch to deep" / "switch to Claude" / "switch to quick"</td><td>Change AI model</td><td>No</td></tr>
+          <tr><td>"whisper mode" / "native mode"</td><td>Switch STT mode</td><td>No</td></tr>
+          <tr><td>"stop reading" / "stop"</td><td>Stop TTS mid-sentence</td><td>No</td></tr>
+          <tr><td>"add N bottles of [species]" <span style="color:var(--gn)">(v3.11)</span></td><td>startNewBottle('batch'), prefills species + qty</td><td>No</td></tr>
+          <tr><td>"open bottle FSL-XXXX" <span style="color:var(--gn)">(v3.11)</span></td><td>Finds by code → navTo('bottles'); openBottle</td><td>No</td></tr>
+          <tr><td>"show species [name]" / "open species [name]" <span style="color:var(--gn)">(v3.11)</span></td><td>navTo('species'); openSpDetail(name)</td><td>No</td></tr>
+          <tr><td>"export report" / "download report" <span style="color:var(--gn)">(v3.11)</span></td><td>exportLabReport('csv')</td><td>No</td></tr>
+          <tr><td>Anything else</td><td>askAI(transcript)</td><td>Yes</td></tr>
+        </table>
       </div>
 
       <!-- ═══ GREENHOUSE FLOW ═══ -->
-      <div class="help-section-card">
-        <h2 class="help-h2">Greenhouse — Plant Tracking & Transfer Flows</h2>
+      <div id="lf-gh" class="help-section-card" style="border-left:3px solid var(--gn)">
+        <h2 class="help-h2" style="color:var(--gn)">🏡 Greenhouse — Plant Tracking & Transfer Flows</h2>
         <pre class="help-pre">GREENHOUSE PLANT CRUD:
   startNewGHPlant() → form: species, quantity, location, source, health, notes, next_inspection
   saveGHPlant() → push to S.greenhouse → saveGreenhouse(S.greenhouse, S.greenhouseSha, S.ghTransfers)
@@ -4615,85 +4620,73 @@ saveGreenhouse(plants, sha, transfers):
   → data = {plants, transfers}
   → ghPut(GH_F, enc(JSON.stringify(data)), sha)
   → loadGreenhouse reads back: raw.plants, raw.transfers</pre>
+
+        <h3 class="help-h3" style="margin-top:14px">QR on GH Plants (v3.11)</h3>
+        <table class="help-table">
+          <tr><th>Where</th><th>What</th></tr>
+          <tr><td>Plant detail → 📷 QR tab</td><td>QR code canvas (url: <code>?gh={id}</code>), plant name/location, Print + Copy buttons</td></tr>
+          <tr><td><code>ghTab('qr')</code></td><td>Calls <code>_renderGHQRCanvas(S.curGH)</code> → <code>QRCode.toCanvas()</code></td></tr>
+          <tr><td>QR scanner / URL param</td><td><code>?gh=id</code> → <code>navTo('greenhouse'); openGHPlant(id)</code></td></tr>
+        </table>
       </div>
 
       <!-- ═══ DASHBOARD FLOW ═══ -->
-      <div class="help-section-card">
-        <h2 class="help-h2">Dashboard — Render Pipeline</h2>
-        <pre class="help-pre">_renderDashboard() is called:
-  → at login (after all data loaded), via setTimeout
-  → NOT re-called on section switch to dashboard (uses cached render)
+      <div id="lf-dash" class="help-section-card" style="border-left:3px solid var(--yw)">
+        <h2 class="help-h2" style="color:var(--yw)">🏠 Dashboard — Render Pipeline</h2>
+        <p style="font-size:12px;color:var(--mu);margin:0 0 10px"><code>_renderDashboard()</code> is called at login and after saves. Static helper: <code>C(area, content, extra)</code> → <code>&lt;div class="dc" style="grid-area:area;extra"&gt;</code></p>
 
-Stat band (5 cards with onclick → navTo):
-  Notes count    → navTo('notes')
-  Bottles count  → navTo('bottles')
-  Accessions     → navTo('registry')
-  Greenhouse     → navTo('greenhouse')
-  Reminders      → navTo('reminders')
-  Each card: fn string injected as onclick="${s.fn}" via innerHTML
+        <h3 class="help-h3">10-Card Stat Band (v3.11)</h3>
+        <table class="help-table">
+          <tr><th>Card</th><th>Value</th><th>navTo</th></tr>
+          <tr><td>📋 Notes</td><td>S.notes.length</td><td>notes</td></tr>
+          <tr><td>🫙 Bottles</td><td>active count (inoculated + growing)</td><td>bottles</td></tr>
+          <tr><td>🌿 Accessions</td><td>S.accs.length</td><td>registry</td></tr>
+          <tr><td>🏡 Greenhouse</td><td>total plant count</td><td>greenhouse</td></tr>
+          <tr><td>⏰ Overdue</td><td>overdue notes + bottles + GH plants</td><td>reminders</td></tr>
+          <tr><td>🧪 Recipes</td><td>S.recs.length</td><td>recipes</td></tr>
+          <tr><td>📦 Supplies</td><td>low-stock count (yellow when &gt;0)</td><td>supply</td></tr>
+          <tr><td>☣️ Contam 30d</td><td>contam notes in last 30 days (red when &gt;0)</td><td>contam</td></tr>
+          <tr><td>💰 Vault</td><td>live ₹ value (bottles × stage prices + GH × grade)</td><td>value</td></tr>
+          <tr><td>📓 Journal 7d</td><td>journal entries in last 7 days</td><td>journal</td></tr>
+        </table>
 
-Alert strip — _computeAlerts():
-  contamination > 10% in 30d   → level:'crit' → navTo('contam')
-  overdue reviews               → level:'warn' → navTo('reminders')
-  transfers due (>28d growing)  → level:'warn' → navTo('bottles')  ← fixed: drawer now opens
-  GH plants sick                → level:'warn' → navTo('greenhouse') ← fixed
-  supply expiring (<14d)        → level:'info' → navTo('supply')
-  empty strip when no alerts
-
-Active bottles strip:
-  S.bottles.filter(status∈['inoculated','growing'])
-  → 5 most recent → card with code + species → onclick: navTo('bottles');openBottle(id)
-
-Recent notes:
-  S.notes sorted by date desc, top 5
-  → click → navTo('notes');openNote(id)
-
-Bottle status donut:
-  count by status → SVG arc segments → click segment → navTo('bottles');setBotFilter(status)
-  ← fixed: setBotFilter now opens drawer via navTo fix
-
-Analytics panels:
-  contamination heatmap (per species, last 30d)
-  activity heatmap (notes per day, last 60d)
-  active species list
-
-Pinned news card (if any pinned)
-Research summary (PubMed headlines)
-AI usage bar (token counts by provider)
-Voice transcript log</pre>
+        <h3 class="help-h3" style="margin-top:14px">Alert strip — <code>_computeAlerts()</code></h3>
+        <table class="help-table">
+          <tr><th>Condition</th><th>Level</th><th>navTo</th></tr>
+          <tr><td>Species with &gt;10% contam rate in 30d</td><td><span style="color:var(--rd)">crit</span></td><td>contam</td></tr>
+          <tr><td>Any overdue next_review (bottles or notes)</td><td><span style="color:var(--yw)">warn</span></td><td>reminders</td></tr>
+          <tr><td>≥5 active bottles past 28d inoculation</td><td><span style="color:var(--yw)">warn</span></td><td>bottles</td></tr>
+          <tr><td>GH plants with health ≠ healthy</td><td><span style="color:var(--yw)">warn</span></td><td>greenhouse</td></tr>
+          <tr><td>Supply batch expired or expiring &lt;14d</td><td><span style="color:var(--rd)">info</span></td><td>supply</td></tr>
+        </table>
       </div>
 
       <!-- ═══ ANALYTICS FLOW ═══ -->
-      <div class="help-section-card">
-        <h2 class="help-h2">Analytics Engine</h2>
-        <pre class="help-pre">TWO SEPARATE SYSTEMS (disconnected — known issue):
+      <div id="lf-analytics" class="help-section-card" style="border-left:3px solid var(--bd)">
+        <h2 class="help-h2">📊 Analytics Engine</h2>
 
-1. LabAnalytics.calculate() — runs at login:
-   → contamination.by_species: {species: contamRate%}
-   → success_rate.by_species + overall
-   → multiplication.by_species (avg cultures_out)
-   → culture_timeline.by_species (all notes chronologically)
-   → alerts: overdue reviews, high-contam species
-   → stored to S.analytics + S.analyticsLastCalc
-   → consumed by: _buildAIContext() AI context only
+        <h3 class="help-h3">Two systems — both kept in sync (v3.10)</h3>
+        <table class="help-table">
+          <tr><th>System</th><th>When it runs</th><th>Output</th><th>Consumed by</th></tr>
+          <tr><td><code>LabAnalytics.calculate()</code></td><td>Login + after saveNoteAction + after saveBottleAction (fixed v3.10)</td><td><code>S.analytics</code>: contam rates, success rates, multiplication, culture timeline, alerts</td><td><code>_buildAIContext()</code> — AI prompt context</td></tr>
+          <tr><td><code>renderAnalytics()</code></td><td>Analytics section visit</td><td>SVG charts inline-calculated from S.notes + S.bottles</td><td>Analytics page UI only</td></tr>
+        </table>
 
-2. renderAnalytics() — full-page analytics:
-   → RECALCULATES everything inline from S.notes + S.bottles
-   → does NOT use S.analytics (duplicate effort — known gap)
-   → outputs: 9 chart sections with SVG bars/donut
-
-Analytics recalculation triggers:
-  → login (LabAnalytics.calculate)
-  → analytics section visit (renderAnalytics — separate inline calc)
-  → saveNoteAction / deleteNote / updateBottleStatus (no auto-recalc — stale S.analytics)
-
-⚠️  S.analytics goes stale after data changes. Ravana AI may use stale context.
-    Fix: call LabAnalytics.calculate() after any save operation.</pre>
+        <h3 class="help-h3" style="margin-top:14px">Analytics page cards</h3>
+        <table class="help-table">
+          <tr><th>Card</th><th>Data source</th></tr>
+          <tr><td>Notes / Month, Stage Donut, Contam Trend, Recipe Usage, Tag Cloud</td><td>S.notes (inline calculation)</td></tr>
+          <tr><td>Species Success Rate, Stage Funnel, Avg Days Between Entries, Media Efficiency</td><td>S.notes + S.bottles</td></tr>
+          <tr><td>Culture Lifecycle Status</td><td>Active bottles vs expected duration (historical avg or subculture_interval_days)</td></tr>
+          <tr><td>Species Performance Ranking <span style="color:var(--gn)">(v3.11)</span></td><td><code>_buildSpeciesRankingCard()</code>: score/100, contam%, multiplication×, avg cycle days, active bottles — ranked table for all species ≥2 notes</td></tr>
+          <tr><td>Lab Cost Tracking <span style="color:var(--gn)">(v3.11)</span></td><td><code>_buildLabCostCard()</code>: S.supplies items with cost_total + date_prepared → 6-month bar chart + total spend + estimated ₹/bottle</td></tr>
+          <tr><td>Feature Usage</td><td>Section-visit counters in localStorage</td></tr>
+        </table>
       </div>
 
       <!-- ═══ JOURNAL FLOW ═══ -->
-      <div class="help-section-card">
-        <h2 class="help-h2">Lab Journal — Entry, Parse, Extract</h2>
+      <div class="help-section-card" style="border-left:3px solid var(--bd)">
+        <h2 class="help-h2">📓 Lab Journal — Entry, Parse, Extract</h2>
         <pre class="help-pre">CREATE:
   startNewJournalEntry() → clear form → show editor
   saveJournalEntry():
@@ -4733,8 +4726,8 @@ PARSE TOGGLE:
       </div>
 
       <!-- ═══ TAXONOMY FLOW ═══ -->
-      <div class="help-section-card">
-        <h2 class="help-h2">Taxonomy — Packs, Custom Species, Flairs</h2>
+      <div class="help-section-card" style="border-left:3px solid var(--gn)">
+        <h2 class="help-h2" style="color:var(--gn)">🌱 Taxonomy — Packs, Custom Species, Flairs</h2>
         <pre class="help-pre">PACK LOADING — loadTaxonomy():
   TAX_PACKS map: {nepenthaceae:'carnivorous', orchidaceae:'orchids', musaceae:'banana', ...}
   enabled packs: from localStorage('tcplants_tax_enabled') or all enabled
@@ -4772,8 +4765,8 @@ FLAIRS:
       </div>
 
       <!-- ═══ REMINDERS FLOW ═══ -->
-      <div class="help-section-card">
-        <h2 class="help-h2">Reminders — Badge, List, Navigation</h2>
+      <div class="help-section-card" style="border-left:3px solid var(--bd)">
+        <h2 class="help-h2">⏰ Reminders — Badge, List, Navigation</h2>
         <pre class="help-pre">DATA SOURCES (all in-memory, no dedicated file):
   Bottles with next_review: S.bottles.filter(next_review exists + status active)
   Notes with next_review:   S.notes.filter(next_review exists)
@@ -4806,8 +4799,8 @@ Badge triggers (cyclic dependency awareness):
       </div>
 
       <!-- ═══ SEARCH FLOW ═══ -->
-      <div class="help-section-card">
-        <h2 class="help-h2">Search System — Cross-Section</h2>
+      <div class="help-section-card" style="border-left:3px solid var(--bd)">
+        <h2 class="help-h2">🔍 Search System — Cross-Section</h2>
         <pre class="help-pre">SearchSystem.renderSearchPage():
   → #search-main page with input + saved filter chips
   → oninput → _doSearch(query)
@@ -4833,42 +4826,32 @@ Saved filters:
       </div>
 
       <!-- ═══ SUPPLY/STOCK INVENTORY ═══ -->
-      <div class="help-section-card">
-        <h2 class="help-h2">Inventory — TWO Separate Systems</h2>
-        <pre class="help-pre">⚠️  TWO COMPLETELY SEPARATE INVENTORY SYSTEMS — different files, different state, different UX
-
-SYSTEM 1: Stock (nav → 📦 Stock)
-  State: S_inv = {items:[]} — NOT part of S
-  File: inventory/data.enc
-  Load: loadInv() — called on section visit (NOT at login)
-        ⚠️  Missing ghDec() step — latent decode bug if file exists
-  Render: renderInv() → category tabs → items list → edit/delete
-  Low-stock: S_inv.items.filter(qty <= low_threshold) → dashboard alert (via S_inv?.items)
-  Categories: Media Salts, Growth Regulators, Gelling Agents, Sugars, Vitamins, etc.
-  Use case: tracking reagent stocks with low-stock thresholds
-
-SYSTEM 2: Supply Inventory (nav → 📦 Supplies)
-  State: S.supplies[] — part of main S
-  File: supplies/data.enc
-  Load: loadSupplies() at login — part of Promise.all 7 loads
-  Render: SupplyInventory.renderInventoryPage() → batch cards with performance
-  Performance: calcPerformance(item) — correlates supply batch window with bottle outcomes
-    → finds bottles prepared within date_prepared → next_batch window
-    → contamRate, successRate vs lab average → flag if >10% worse
-  Use case: tracking media prep batches + correlating with TC success rates
-
-Relationship to bottles:
-  Supply batch.date_prepared → bottle.date_prepared window → performance correlation
-  NOT automatically decremented when bottles are created (manual tracking)
-
-Login line 13277:
-  SupplyInventory.items = JSON.parse(localStorage('tcplants_supply') || '[]')
-  ⚠️  This is DEAD CODE — renderInventoryPage() uses S.supplies not SupplyInventory.items</pre>
+      <div class="help-section-card" style="border-left:3px solid var(--yw)">
+        <h2 class="help-h2" style="color:var(--yw)">📦 Inventory — Two Systems</h2>
+        <table class="help-table">
+          <tr><th>System</th><th>State</th><th>File</th><th>Load</th><th>Use case</th></tr>
+          <tr>
+            <td><strong>Stock</strong> (nav → 📦 Stock)<br><span style="color:var(--yw);font-size:11px">⚠️ Redirects to Supply since v3.11</span></td>
+            <td><code>S_inv = {items:[]}</code> — separate object</td>
+            <td>inventory/data.enc</td>
+            <td>On section visit (not at login)</td>
+            <td>Reagents with low-stock thresholds, category tabs</td>
+          </tr>
+          <tr>
+            <td><strong>Supply Inventory</strong> (nav → 📦 Supplies) — <span style="color:var(--gn)">primary</span></td>
+            <td><code>S.supplies[]</code> — part of main S</td>
+            <td>supplies/data.enc</td>
+            <td><code>loadSupplies()</code> at login (8th Promise.all)</td>
+            <td>Media prep batches + TC performance correlation</td>
+          </tr>
+        </table>
+        <div class="help-tip">📦 Stock section now redirects to Supply via <code>switchSection()</code> early return. Supply is the primary inventory system — batch cards with expiry, cost/unit, and contamination correlation.</div>
+        <p style="font-size:12px;color:var(--mu);margin:6px 0 0"><code>calcPerformance(item)</code>: finds bottles prepared within <code>date_prepared → next_batch</code> window → calculates contamRate + successRate vs lab average. Flags if &gt;10% worse.</p>
       </div>
 
       <!-- ═══ CALENDAR FLOW ═══ -->
-      <div class="help-section-card">
-        <h2 class="help-h2">Calendar — Month Grid & Day Panel</h2>
+      <div class="help-section-card" style="border-left:3px solid var(--bd)">
+        <h2 class="help-h2">📅 Calendar — Month Grid & Day Panel</h2>
         <pre class="help-pre">renderCalendar():
   → S.calYear, S.calMonth → build month grid
   → each day cell: count notes + bottles with dates in that day
@@ -4897,8 +4880,8 @@ Export: _exportCalRange(start, end) → format events as .ics / markdown</pre>
       </div>
 
       <!-- ═══ WEATHER FLOW ═══ -->
-      <div class="help-section-card">
-        <h2 class="help-h2">Weather, Activity Log, Service Worker</h2>
+      <div class="help-section-card" style="border-left:3px solid var(--bd)">
+        <h2 class="help-h2">🌡️ Weather, Activity Log, Service Worker</h2>
         <pre class="help-pre">WEATHER:
   fetchWeather():
   → navigator.geolocation.getCurrentPosition → lat/lon
@@ -4927,21 +4910,71 @@ SERVICE WORKER (sw.js):
   ⚠️  Only loadNotesIndex + saveNotesIndex wrapped with offline check (Haiku, inconsistent)</pre>
       </div>
 
+      <!-- ═══ GBIF FLOWS ═══ -->
+      <div id="lf-gbif" class="help-section-card" style="border-left:3px solid var(--gn)">
+        <h2 class="help-h2" style="color:var(--gn)">🌍 GBIF Integration — 6 Features (v3.10–v3.11)</h2>
+        <table class="help-table">
+          <tr><th>Feature</th><th>Where triggered</th><th>What it does</th><th>State written</th></tr>
+          <tr><td><strong>A — Synonym resolver</strong></td><td>Custom species form (<code>_taxGBIFLookup()</code>) + species detail panel (<code>_loadSpDetailGBIF()</code>)</td><td>If GBIF returns <code>synonym=true</code>, shows yellow banner with accepted name + "Use accepted name →" swap button</td><td>Auto-fills form</td></tr>
+          <tr><td><strong>B — Common names</strong></td><td><code>_gbifImportSpecies()</code></td><td>Fetches <code>vernacularNames</code> in parallel with IUCN. English name (or first available) auto-fills <code>common_name</code> field</td><td><code>sp.common_name</code></td></tr>
+          <tr><td><strong>C — Native distributions</strong></td><td><code>_loadSpDetailGBIF()</code></td><td>Fetches distributions, filters NATIVE/ENDEMIC status, shows compact country tag row in species detail panel</td><td>UI only</td></tr>
+          <tr><td><strong>D — Reference photo</strong></td><td><code>_loadSpDetailGBIF()</code></td><td>Fetches <code>media?type=StillImage&amp;limit=1</code>, injects photo div with rights credit below Summary block. onerror hides silently.</td><td>UI only</td></tr>
+          <tr><td><strong>E — Taxonomy hierarchy</strong></td><td><code>_gbifImportSpecies()</code> 3rd parallel fetch</td><td>Fetches <code>GET /v1/species/{key}</code> for order/class/kingdom. Saved on the sp object in taxCustom.</td><td><code>sp.gbif_order, gbif_class, gbif_kingdom</code></td></tr>
+          <tr><td><strong>F — Bulk CP genera import</strong></td><td>"🌿 Import CP Checklist" button in GBIF tab</td><td><code>_gbifBulkImportCP()</code>: fetches 5 family keys in parallel (Nepenthaceae, Droseraceae, Sarraceniaceae, Lentibulariaceae, Cephalotaceae). Deduplicates, skips already-imported, batch-inserts to taxCustom.</td><td><code>S.taxCustom.species[]</code></td></tr>
+        </table>
+        <p style="font-size:12px;color:var(--mu);margin:6px 0 0">All 6 features use <code>Promise.allSettled()</code> internally — network failures degrade gracefully without crashing the UI.</p>
+      </div>
+
+      <!-- ═══ VALUE INVENTORY ═══ -->
+      <div id="lf-value" class="help-section-card" style="border-left:3px solid #e3a000">
+        <h2 class="help-h2" style="color:#e3a000">💰 Value Inventory — Vault Calculation (v3.10)</h2>
+        <p style="font-size:12px;color:var(--mu);margin:0 0 10px">Nav drawer → 💰 Value. Estimates live inventory value from bottles + greenhouse stock using user-configured base prices.</p>
+        <table class="help-table">
+          <tr><th>Component</th><th>Detail</th></tr>
+          <tr><td>Prices tab</td><td>8 base prices: bottles by stage (I–IV, Weaned, Rooting) + GH plants by size_grade (Seedling/Small/Medium/Adult). Saved to <code>S.value.prices</code> with 800ms debounce auto-save.</td></tr>
+          <tr><td>Vault tab</td><td>Live calculated: <code>Σ(bottles by stage × stagePrice) + Σ(GH plants × gradePrice × quantity)</code>. Species-level breakdown with overrides (pending). Vault total shown in INR.</td></tr>
+          <tr><td>Dashboard stat card</td><td>Compact ₹ value — formatted with <code>fmtINR()</code> (Indian locale: ₹12k / ₹1.2L)</td></tr>
+          <tr><td>GH plant size_grade</td><td>New field on GH plant form: Seedling / Small / Medium / Adult. Used in vault calculation.</td></tr>
+          <tr><td>State</td><td><code>S.value = {prices:{}, overrides:{}}</code> · <code>S.valueSha</code> — 8th load in login Promise.all</td></tr>
+          <tr><td>File</td><td>value/data.enc</td></tr>
+        </table>
+      </div>
+
+      <!-- ═══ EXPORT FLOW ═══ -->
+      <div id="lf-export" class="help-section-card" style="border-left:3px solid var(--ac)">
+        <h2 class="help-h2" style="color:var(--ac)">📥 Export System (v3.11)</h2>
+        <table class="help-table">
+          <tr><th>Function</th><th>Mode</th><th>Output</th></tr>
+          <tr><td><code>exportLabReport('csv')</code></td><td>CSV</td><td>3 separate Blob downloads: <strong>bottles.csv</strong> (code/species/stage/status/dates/recipe/batch/parent/notes), <strong>notes.csv</strong> (date/title/type/stage/species/cultures_out/recipe/tags), <strong>greenhouse.csv</strong> (species/location/qty/health/size_grade). Uses <code>Blob + &lt;a download&gt;</code> pattern.</td></tr>
+          <tr><td><code>exportLabReport('print')</code></td><td>Print</td><td>Generates styled HTML with summary stat band + active bottles table + GH plants table. Opens in new window, auto-prints via <code>window.onload</code>.</td></tr>
+          <tr><td>Analytics export buttons</td><td>CSV + Print</td><td>"📥 Export CSV" + "🖨 Print Report" in analytics header.</td></tr>
+          <tr><td>Voice command</td><td>"export report" / "download report"</td><td>Calls <code>exportLabReport('csv')</code> directly.</td></tr>
+        </table>
+        <h3 class="help-h3" style="margin-top:14px">Legacy exports (always available)</h3>
+        <table class="help-table">
+          <tr><th>Button</th><th>Output</th></tr>
+          <tr><td>⬇ ZIP</td><td>All notes as decrypted Markdown + accessions + recipes as JSON</td></tr>
+          <tr><td>CSV (top bar)</td><td>Note metadata CSV + accessions CSV</td></tr>
+          <tr><td>📅 Calendar export</td><td>Print-ready HTML: this week / this month</td></tr>
+        </table>
+      </div>
+
       <!-- ═══ KNOWN ISSUES ═══ -->
-      <div class="help-section-card" style="border-color:rgba(248,81,73,.3)">
+      <div id="lf-gaps" class="help-section-card" style="border-left:3px solid var(--rd);border-color:rgba(248,81,73,.3)">
         <h2 class="help-h2" style="color:var(--rd)">Known Gaps &amp; Latent Bugs</h2>
         <table class="help-table">
           <tr><th>Issue</th><th>Location</th><th>Impact</th><th>Status</th></tr>
           <tr><td><s>loadInv() missing ghDec()</s></td><td>Fixed v3.9</td><td>Stock data unreadable if inventory/data.enc exists</td><td>✅ Fixed</td></tr>
-          <tr><td>S.analytics goes stale after saves</td><td>LabAnalytics.calculate only at login</td><td>Ravana AI gets outdated context after data changes</td><td>Gap</td></tr>
-          <tr><td>renderAnalytics() vs S.analytics disconnect</td><td>renderAnalytics()</td><td>Duplicate computation, S.analytics never shown on Analytics page</td><td>Gap</td></tr>
-          <tr><td><s>SupplyInventory.items dead assignment</s></td><td>Fixed v3.9</td><td>Dead code, localStorage-based value never read</td><td>✅ Fixed</td></tr>
-          <tr><td><s>validateBottleData wrong status list</s></td><td>Fixed v3.9</td><td>Would reject subcultured/rooting/hardening/weaned/prepared statuses</td><td>✅ Fixed</td></tr>
-          <tr><td><s>Batch checkbox invisible (CSS width:100% on all inputs)</s></td><td>Fixed v3.9</td><td>Checkboxes stretched full-width, invisible in bottle list</td><td>✅ Fixed</td></tr>
-          <tr><td>Offline check only on 2 of 7 load functions</td><td>Lines 13701-13711</td><td>Partial offline blocking — inconsistent behaviour</td><td>Haiku artifact</td></tr>
-          <tr><td><s>updateReminderBadge not called after bottle saves</s></td><td>Fixed v3.8</td><td>Badge count may be stale after bottle edits</td><td>✅ Fixed</td></tr>
-          <tr><td>Telegram integration frozen</td><td>Lines 13267-13271</td><td>Commented out — settings UI exists but no function</td><td>Frozen</td></tr>
-          <tr><td>Two inventory systems (Stock ≠ Supply)</td><td>Separate files + state</td><td>User confusion, low-stock alerts only from Stock</td><td>Design debt</td></tr>
+          <tr><td><s>S.analytics goes stale after saves</s></td><td>Fixed v3.10</td><td>Now: LabAnalytics.calculate() called after saveNoteAction + saveBottleAction</td><td>✅ Fixed</td></tr>
+          <tr><td>renderAnalytics() vs S.analytics disconnect</td><td>renderAnalytics()</td><td>renderAnalytics() recalculates inline — S.analytics used only by AI context. Not a bug, but duplicate computation.</td><td>Design debt</td></tr>
+          <tr><td><s>SupplyInventory.items dead assignment</s></td><td>Fixed v3.9</td><td>Dead code — renderInventoryPage() uses S.supplies directly</td><td>✅ Fixed</td></tr>
+          <tr><td><s>validateBottleData wrong status list</s></td><td>Fixed v3.9</td><td>Now includes all 10 statuses</td><td>✅ Fixed</td></tr>
+          <tr><td><s>Batch checkbox invisible</s></td><td>Fixed v3.9</td><td>CSS width:100% scoped to text inputs only</td><td>✅ Fixed</td></tr>
+          <tr><td><s>Offline check inconsistency</s></td><td>Fixed v3.10</td><td>Removed Haiku monkey-patches — all load functions fail naturally on network error</td><td>✅ Fixed</td></tr>
+          <tr><td><s>updateReminderBadge not called after bottle saves</s></td><td>Fixed v3.8</td><td>Badge now updates after all saves</td><td>✅ Fixed</td></tr>
+          <tr><td>Telegram integration frozen</td><td>Settings UI exists, function commented out</td><td>Alert settings visible but non-functional</td><td>Frozen</td></tr>
+          <tr><td>Two inventory systems (Stock ≠ Supply)</td><td>Stock now redirects to Supply (v3.11)</td><td>Stock UI still exists but unreachable. Low-stock alerts use S.supplies.</td><td>Partially resolved</td></tr>
+          <tr><td>Agentic Ravana tool-use</td><td>askAI() / _executeTool()</td><td>Write tools (create_note, create_bottle, log_contam) have confirm gate scaffolded but not fully implemented</td><td>Pending — priority queue</td></tr>
         </table>
       </div>
 
