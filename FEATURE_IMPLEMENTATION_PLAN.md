@@ -1,7 +1,9 @@
 # TC Plants Feature Implementation Plan
-**Date**: April 18, 2026  
+**Date**: April 18, 2026 — **STATUS: ARCHIVED. All features shipped v3.5–v3.11.**  
 **Scope**: 8 integrated lab features + Lab Blog integration  
 **Code Philosophy**: Seasoned, blended, production-maturity (DRY, error-handled, unified state)
+
+> **⚠️ ARCHIVED DOCUMENT.** This was the original planning doc from the first build session. All 8 features are implemented. The Lab Blog plan was adapted — the in-app Lab Journal (journal/entries.enc) replaced the proposed separate Eleventy blog repo. See ROADMAP.md for current status and next priorities.
 
 ---
 

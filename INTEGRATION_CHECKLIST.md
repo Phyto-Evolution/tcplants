@@ -1,40 +1,44 @@
 # 8 Features Integration Checklist
 
-## Status Update on Original 25 Tasks
+> **Note:** This file was written in April 2026 by an earlier session. The authoritative to-do list is ROADMAP.md. Items below are retained as a historical audit record only.
 
-### ✅ ACTUALLY COMPLETED
+## Status Update on Original 25 Tasks (updated 2026-04-22)
+
+### ✅ COMPLETED
 - Task #1: Remove dangerous header - DONE
 - Task #2: Secure key storage - DONE
 - Task #3: Error handling - DONE
 - Task #4: Web Speech config - DONE
 - Task #5: Voice validation - DONE
-- Task #6: Backend proxy - DONE
-- Task #7: Prompt injection - DONE
-- Task #8: Token tracking - DONE
+- Task #6: Backend proxy - DONE (Cloudflare Worker proxy at plantking.ape.workers.dev)
+- Task #7: Prompt injection - DONE (_sanitizeContextData)
+- Task #8: Token tracking - DONE (_isAtQuota)
+- Task #9: Silence detection - ✅ DONE (Whisper silence threshold configurable in Settings)
+- Task #10: Voice commands - ✅ DONE (full command set including v3.11 additions)
+- Task #13: Third-party errors - ✅ DONE (try/catch around all API calls, graceful fallbacks)
 - Task #16: marked.js sanitization - DONE
+- Task #17: Dynamic onclick fix - ✅ DONE (event delegation pattern)
 - Task #18: Input validation - DONE
 - Task #19: Mobile optimization - DONE
 - Task #20: Accessibility - DONE
 - Task #21: Offline mode - DONE
 - Task #23: marked.js SRI - DONE
+- Task #25: Data import validation - ✅ DONE (CSV import validation in GH plants + taxonomy)
 
-### ⏳ NOT YET DONE (Will Address Post-Features)
-- Task #9: Silence detection
-- Task #10: Voice commands
-- Task #11: Browser testing
-- Task #12: GitHub rate limits
-- Task #13: Third-party errors
-- Task #14: Event listener leaks
-- Task #15: setInterval cleanup
-- Task #17: Dynamic onclick fix
-- Task #24: CSP headers (server config)
-- Task #25: Data import validation
+### ⏳ STILL PENDING
+- Task #11: Browser testing — manual QA task (not a code change)
+- Task #12: GitHub rate limits — handled via error UI; full rate-limit tracker not built
+- Task #14: Event listener leaks — ongoing maintenance concern
+- Task #15: setInterval cleanup — weather interval cleared on lock; others may leak
+- Task #24: CSP headers — requires server/worker config, not done
 
 ---
 
-## 8 NEW FEATURES - INTEGRATION PLAN
+## 8 NEW FEATURES — ALL SHIPPED ✅
 
-### Feature 1: LabAnalytics (Core Foundation)
+> All 8 features below are fully implemented as of v3.7–v3.11. Implementation details differ from the original plan in some cases (e.g. LabBlog became the in-app Lab Journal, not a separate Eleventy blog). See ROADMAP.md for canonical shipped status.
+
+### Feature 1: LabAnalytics (Core Foundation) ✅ SHIPPED v3.5
 **Location**: Add after line 4350 (after existing utility functions)
 **Size**: ~500 lines
 **Dependencies**: None (uses S.notes, S.bottles)

@@ -209,10 +209,10 @@
 - ✅ Prompt injection prevented
 - ✅ Accessibility features
 - ✅ Offline support
-- ⏳ Rate limit enforcement (requires backend)
-- ⏳ CSP headers (requires server config)
-- ⏳ Memory leak cleanup (refactoring)
-- ⏳ Third-party API error handling (robustness)
+- ✅ Third-party API error handling — done (try/catch + graceful fallbacks on all API calls)
+- ⏳ Rate limit enforcement — token quota UI exists (_isAtQuota), full backend enforcement pending
+- ⏳ CSP headers — requires Cloudflare Worker header config, not yet implemented
+- ⏳ Memory leak cleanup — setInterval (weather) cleared on lock; event listeners may accumulate over long sessions
 
 ---
 
