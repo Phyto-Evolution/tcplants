@@ -19734,9 +19734,12 @@ async function _galSaveUpload(){
   const saveBtn=document.getElementById('gal-save-btn');
   saveBtn.disabled=true; saveBtn.textContent='Saving…';
   try{
-    // Encrypt & upload full image
+    // Encrypt & upload full image (chunked btoa avoids stack overflow on large images)
     const arrBuf=await _galUploadBlob.arrayBuffer();
-    const imgB64=btoa(String.fromCharCode(...new Uint8Array(arrBuf)));
+    const bytes=new Uint8Array(arrBuf);
+    let binary='';
+    for(let i=0;i<bytes.length;i+=8192) binary+=String.fromCharCode(...bytes.subarray(i,i+8192));
+    const imgB64=btoa(binary);
     const encImg=await enc(imgB64);
     await ghPut(`gallery/${id}.enc`,encImg,null,`gallery: add ${title}`);
     // Update meta
