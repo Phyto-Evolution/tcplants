@@ -4315,7 +4315,7 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
           <select id="gal-stage"><option value="">—</option><option>Stage 1</option><option>Stage 2</option><option>Stage 3</option><option>Ex vitro</option><option>N/A</option></select>
         </div>
         <div class="field"><label>Bottle code (if applicable)</label><input type="text" id="gal-bottle-id" placeholder="FSL-2026-0042"></div>
-        <div class="field"><label>GH Plant ID (if applicable)</label><input type="text" id="gal-gh-id" placeholder="gh_..."></div>
+        <div class="field"><label>GH Plant</label><select id="gal-gh-id"><option value="">— none —</option></select></div>
         <div class="field"><label>Passage #</label><input type="number" id="gal-passage" placeholder="e.g. 3" min="0" style="width:80px"></div>
         <div class="field"><label>Health</label>
           <select id="gal-health"><option value="">—</option><option>Excellent</option><option>Good</option><option>Fair</option><option>Poor</option><option>Contaminated</option></select>
@@ -19631,10 +19631,35 @@ function _galShowUploadModal(filename, canvas){
   // Contamination banner: only show in contamination camera context, not gallery upload
   const contamBanner=document.getElementById('gal-contam-banner');
   if(contamBanner) contamBanner.style.display='none';
-  // Populate category and species selects dynamically (static HTML can't evaluate template literals)
+  // Populate category, species and GH plant selects dynamically
   _galPopulateCatSelect('gal-category');
   _galPopulateSpecies();
+  _galPopulateGHSelect('gal-gh-id');
   m.style.display='flex';
+}
+
+function _galPopulateGHSelect(selectId, currentVal){
+  const sel=document.getElementById(selectId); if(!sel) return;
+  const plants=(S.greenhouse||[]).slice().sort((a,b)=>(a.species||'').localeCompare(b.species||''));
+  sel.innerHTML='<option value="">— none —</option>'+plants.map(p=>{
+    const hlth={healthy:'🟢',stressed:'🟡',dormant:'⚪',declined:'🔴'}[p.health||'healthy']||'';
+    const label=`${hlth} ${esc(p.species||'Unknown')}${p.location?' · '+esc(p.location):''}${p.quantity?' (×'+p.quantity+')':''}`;
+    return `<option value="${esc(p.id)}">${label}</option>`;
+  }).join('');
+  if(currentVal) sel.value=currentVal;
+  // When a GH plant is chosen, auto-populate species field
+  sel.onchange=()=>{
+    const plant=(S.greenhouse||[]).find(p=>p.id===sel.value);
+    if(!plant) return;
+    const spSel=document.getElementById('gal-species');
+    if(spSel&&plant.species){
+      // Try to match full_name in species select
+      const opt=[...spSel.options].find(o=>o.value===plant.species||o.text.includes(plant.species));
+      if(opt) spSel.value=opt.value;
+    }
+    const locInput=document.getElementById('gal-location');
+    if(locInput&&plant.location&&!locInput.value) locInput.value=plant.location;
+  };
 }
 
 function _galPopulateCatSelect(selectId, currentVal){
