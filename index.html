@@ -4324,6 +4324,7 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
         <div class="field" style="grid-column:1/-1"><label>Tags (comma separated)</label><input type="text" id="gal-tags" placeholder="e.g. multiplication, healthy, fungal contam"></div>
         <div class="field" style="grid-column:1/-1"><label>Notes</label><textarea id="gal-notes" style="height:60px" placeholder="Any observations, anomalies, or context…"></textarea></div>
       </div>
+      <div id="gal-contam-banner" style="display:none;border-radius:8px;padding:10px 14px;font-size:12px;font-weight:600;margin-bottom:0"></div>
       <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
         <button class="btn ghost" onclick="_galCloseModal()">Cancel</button>
         <button class="btn sm" id="gal-deepscan-btn" onclick="_galRunDeepScan()" style="background:linear-gradient(135deg,#4285f4,#8250df);color:#fff;border:none">🔬 Deep Scan</button>
@@ -12416,7 +12417,10 @@ async function _galGeminiDeepScan(canvas){
   if(!_aiProxyURL){toast('Proxy URL not set — configure in Settings → AI Proxy','fail');return null;}
   const blob=await new Promise(res=>canvas.toBlob(res,'image/webp',0.85));
   const ab=await blob.arrayBuffer();
-  const b64=btoa(String.fromCharCode(...new Uint8Array(ab)));
+  const bytes=new Uint8Array(ab);
+  let binary='';
+  for(let i=0;i<bytes.length;i+=8192) binary+=String.fromCharCode(...bytes.subarray(i,i+8192));
+  const b64=btoa(binary);
   const prompt=`This is a tissue culture vessel image from a plant lab. Background media may contain activated charcoal (black), food-safe dye, phenol red pH indicator (yellow/pink shift), or iron chelates (amber) — these uniform background colours are NORMAL, ignore them.\n\nLook ONLY for localised anomalies: (1) fuzzy or filamentous growth = fungal, (2) turbid/cloudy patches in liquid = bacterial, (3) unexpected discrete circular colonies, (4) irregular discolouration differing from surrounding media.\n\nReturn ONLY valid JSON, no markdown: {"contaminated":true or false or "uncertain","type":"fungal" or "bacterial" or "mixed" or "none","confidence":0-100,"note":"one sentence observation"}`;
   const r=await fetch(_aiProxyURL+'/api/ai/gemini-vision',{
     method:'POST',headers:{'Content-Type':'application/json'},
