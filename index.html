@@ -855,6 +855,45 @@ main > .dview, main > .editor{ margin:0 auto; }
 .lf-pill-yw{background:rgba(210,153,34,.1);border-color:rgba(210,153,34,.25);color:var(--yw)}
 .lf-pill-rd{background:rgba(248,81,73,.1);border-color:rgba(248,81,73,.25);color:var(--rd)}
 .lf-stat{display:inline-flex;align-items:center;gap:4px;font-size:10px;background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:2px 8px;color:var(--mu);flex-shrink:0}
+/* ── Flow diagram nodes ─────────────────────────────────────── */
+.lf-diagram{background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:18px 20px;margin:12px 0;overflow-x:auto}
+.lf-diagram-lbl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--mu);margin-bottom:12px}
+/* Horizontal flow row */
+.lf-hrow{display:flex;align-items:center;flex-wrap:wrap;gap:0;margin:6px 0}
+.lf-hrow+.lf-hrow{margin-top:4px}
+/* Vertical flow */
+.lf-vcol{display:flex;flex-direction:column;align-items:flex-start;gap:0}
+/* Node box types */
+.lf-n{display:inline-flex;flex-direction:column;align-items:center;gap:2px}
+.lf-b{background:var(--sf);border:1px solid var(--bd);border-radius:7px;padding:6px 12px;font-size:12px;font-weight:600;white-space:nowrap;line-height:1.3}
+.lf-b.fn{font-family:var(--mono);font-size:11px;background:rgba(88,166,255,.08);border-color:rgba(88,166,255,.3);color:var(--ac)}
+.lf-b.state{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.3);color:var(--gn);font-family:var(--mono);font-size:11px}
+.lf-b.file{background:rgba(188,140,255,.08);border-color:rgba(188,140,255,.3);color:var(--pu);font-family:var(--mono);font-size:10px}
+.lf-b.actor{background:rgba(88,166,255,.06);border-color:var(--ac);font-weight:700;border-width:2px}
+.lf-b.warn{background:rgba(248,81,73,.08);border-color:rgba(248,81,73,.3);color:var(--rd)}
+.lf-b.ok{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.3);color:var(--gn)}
+.lf-b.decision{clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);padding:14px 16px;background:rgba(210,153,34,.1);border-color:var(--yw);color:var(--yw);font-size:10px}
+.lf-sub{font-size:9px;color:var(--mu);text-align:center;max-width:90px;line-height:1.3}
+/* Arrows */
+.lf-arr{color:var(--ac);font-size:14px;font-weight:700;padding:0 5px;flex-shrink:0;align-self:center}
+.lf-arr.dn{display:block;text-align:center;padding:3px 0;color:var(--mu);font-size:12px}
+.lf-arr.gray{color:var(--mu)}
+/* Multi-branch split */
+.lf-branch{display:flex;gap:8px;align-items:flex-start;padding:8px 0}
+.lf-branch-arm{display:flex;flex-direction:column;align-items:center;gap:3px}
+/* Master flow grid */
+.lf-master{display:grid;gap:12px;margin:16px 0}
+.lf-master-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.lf-master-section{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;text-align:center}
+.lf-master-section:hover{border-color:var(--ac);background:var(--sf2)}
+.lf-master-layer{background:rgba(88,166,255,.04);border:1px dashed rgba(88,166,255,.2);border-radius:8px;padding:8px 14px;font-size:11px;color:var(--mu);font-style:italic}
+/* Logic flow search */
+.lf-search-wrap{background:linear-gradient(135deg,rgba(88,166,255,.06),rgba(188,140,255,.04));border:1px solid rgba(88,166,255,.2);border-radius:10px;padding:14px 16px;margin-bottom:18px}
+.lf-search-input{width:100%;padding:9px 14px;background:var(--sf);border:1px solid var(--bd);border-radius:7px;color:var(--tx);font-size:13px;outline:none;box-sizing:border-box;transition:border-color .15s}
+.lf-search-input:focus{border-color:var(--ac)}
+.lf-highlight-section>summary{border-color:var(--ac)!important;background:rgba(88,166,255,.06)!important}
+.lf-dim-section>summary{opacity:.35}
+.lf-search-hit{background:rgba(255,200,0,.2);border-radius:2px;padding:0 1px}
 /* ── Help page visual upgrades ──────────────────────────────── */
 .help-sc-hdr{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--bd)}
 .help-sc-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
@@ -3935,15 +3974,29 @@ input, textarea, select {
         <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">Ctrl+K · 8 sources · field prefixes · highlighting · recent</span>
       </h2>
       <div class="help-section-card">
-        <p>Press <kbd>Ctrl+K</kbd> from anywhere in the app, or go to nav drawer → <strong>Search</strong>. Searches all sections simultaneously as you type.</p>
-        <table><tr><th>Section searched</th><th>Fields matched</th></tr>
-          <tr><td>📋 Notes</td><td>Title, species, tags, body preview</td></tr>
-          <tr><td>🫙 Bottles</td><td>Code, species, notes field</td></tr>
-          <tr><td>🌿 Accessions</td><td>Species name, accession number, source</td></tr>
-          <tr><td>🧪 Recipes</td><td>Recipe name, base medium, target</td></tr>
-          <tr><td>🏡 Greenhouse</td><td>Species, source</td></tr>
+        <p>Press <kbd>Ctrl+K</kbd> from anywhere in the app, or go to nav drawer → <strong>Search</strong>. Type anything — the engine searches all 8 data sources simultaneously with relevance ranking and term highlighting.</p>
+        <h3>Sources and fields indexed</h3>
+        <table><tr><th>Source</th><th>Fields indexed</th><th>Notes</th></tr>
+          <tr><td>📋 Notes</td><td>Title, species, tags, body preview, <strong>keyword stems</strong></td><td>Body keyword index extracted at save time (250 words) — full content searchable without API calls</td></tr>
+          <tr><td>🫙 Bottles</td><td>Code (FSL-YYYY-NNNN), species, stage, status, notes, flair note</td><td>Status: growing/inoculated/contaminated etc.</td></tr>
+          <tr><td>🌿 Accessions</td><td>Species, accession number, source, origin, notes</td><td>—</td></tr>
+          <tr><td>🧪 Recipes</td><td>Name, base medium, target species, PGR text, prep notes</td><td>PGR concentrations searchable</td></tr>
+          <tr><td>🏡 Greenhouse</td><td>Species, source, location, health, notes</td><td>—</td></tr>
+          <tr><td>📓 Journal</td><td>Title, body, tags</td><td>New in v3.11</td></tr>
+          <tr><td>📦 Supplies</td><td>Name, unit, notes</td><td>New in v3.11</td></tr>
+          <tr><td>🌱 Species</td><td>Scientific name, common name, category, source</td><td>Custom taxonomy — new in v3.11</td></tr>
         </table>
-        <p>Results are grouped by section with counts. Tap any result to jump directly to that record. Requires at least 2 characters to start searching.</p>
+        <h3>How matching works</h3>
+        <table><tr><th>Feature</th><th>How to use</th></tr>
+          <tr><td><strong>Multi-word AND</strong></td><td>All words must appear somewhere — "rajah growing" finds Nepenthes rajah bottles with growing status</td></tr>
+          <tr><td><strong>Relevance ranking</strong></td><td>Title match = 3pts, species = 2pts, tags = 2pts, body = 1pt — best matches appear first in each section</td></tr>
+          <tr><td><strong>Term highlighting</strong></td><td>Matched words highlighted in yellow across all result rows</td></tr>
+          <tr><td><strong>Field prefixes</strong></td><td>Click the prefix chips or type them: <code>species:</code> <code>stage:</code> <code>status:</code> <code>code:</code> <code>tag:</code> <code>health:</code> <code>location:</code></td></tr>
+          <tr><td><strong>Recent searches</strong></td><td>Last 10 queries shown when the search box is empty</td></tr>
+          <tr><td><strong>Saved filters</strong></td><td>Click 💾 Save to name and pin a search — appears as a chip at the top. Up to 20 saved.</td></tr>
+        </table>
+        <div class="help-tip">💡 Example queries: <code>Nepenthes rajah growing</code> · <code>species:Drosera stage:II</code> · <code>status:contaminated FSL-2026</code> · <code>BAP 1 mg</code> (finds recipes with that PGR) · <code>tag:transfer location:bench3</code></div>
+        <p>Results are grouped by section with colour-coded headers. Tap any result to navigate directly to that record. Min 2 characters to trigger search.</p>
       </div>
 
       <h2 id="h-supply" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
@@ -4318,15 +4371,70 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
     </div>
   </div>
 
-  <div class="section fullpage" id="sec-logicflows">
-    <main style="flex:1;overflow-y:auto;padding:28px 32px;max-width:980px">
+  <div class="section fullpage" id="sec-logicflows" style="display:flex;flex-direction:column;align-items:center">
+    <main style="flex:1;overflow-y:auto;padding:28px 32px;max-width:980px;width:100%;box-sizing:border-box">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
         <h1 style="font-size:20px;font-weight:800;margin:0">🔗 Logic Flows</h1>
         <span style="background:linear-gradient(135deg,var(--ac),var(--pu));color:#0d1117;border-radius:12px;font-size:11px;font-weight:800;padding:2px 9px;letter-spacing:.04em">v3.11</span>
         <button onclick="_lfExpandAll()" class="btn xs ghost" style="margin-left:auto">Expand all</button>
         <button onclick="_lfCollapseAll()" class="btn xs ghost">Collapse all</button>
       </div>
-      <p style="color:var(--mu);font-size:13px;margin-bottom:12px">Expand a section to test it. Each summary shows key functions and scope at a glance.</p>
+      <p style="color:var(--mu);font-size:13px;margin-bottom:12px">System-wide dependency map. Search by function name, concept, or section. Expand any block to test it.</p>
+
+      <!-- ── SMART SEARCH ─────────────────────────────────────── -->
+      <div class="lf-search-wrap">
+        <div style="font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);margin-bottom:8px">🔍 Search Logic Flows — function names, concepts, sections</div>
+        <input class="lf-search-input" id="lf-search-q" placeholder="e.g.  saveNoteAction  or  bottle CRUD  or  encrypt  or  voice commands" oninput="_lfSearch(this.value)">
+        <div id="lf-search-status" style="font-size:11px;color:var(--mu);margin-top:6px;min-height:16px"></div>
+      </div>
+
+      <!-- ── MASTER SYSTEM FLOW ───────────────────────────────── -->
+      <div class="lf-diagram" style="margin-bottom:20px">
+        <div class="lf-diagram-lbl">🗺 Master System Flow — TC Plants Lab Architecture</div>
+
+        <!-- Layer 1: Entry -->
+        <div class="lf-hrow" style="justify-content:center;margin-bottom:6px">
+          <div class="lf-n"><div class="lf-b actor" style="background:rgba(63,185,80,.1);border-color:var(--gn)">👤 Shiva (user)</div></div>
+          <span class="lf-arr">→</span>
+          <div class="lf-n"><div class="lf-b" style="font-size:11px">GitHub PAT<br><span style="font-size:9px;color:var(--mu)">token = auth + key</span></div></div>
+          <span class="lf-arr">→</span>
+          <div class="lf-n"><div class="lf-b fn">login()</div><div class="lf-sub">validate · migrate · cache check</div></div>
+          <span class="lf-arr">→</span>
+          <div class="lf-n"><div class="lf-b fn">Promise.all(8 loads)</div><div class="lf-sub">notes · bottles · accs · recs · GH · supplies · journal · value</div></div>
+          <span class="lf-arr">→</span>
+          <div class="lf-n"><div class="lf-b state">S{state}</div><div class="lf-sub">global in-memory</div></div>
+        </div>
+
+        <div class="lf-arr dn">↓ decrypted data flows into all sections</div>
+
+        <!-- Layer 2: Data sections -->
+        <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin:8px 0">
+          ${['📋 Notes','🫙 Bottles','🌿 Registry','🧪 Recipes','🏡 Greenhouse','📓 Journal','📦 Supplies','💰 Value'].map(s=>`<div class="lf-master-section" onclick="_lfSearch('${s.split(' ').slice(1).join(' ')}')">${s}</div>`).join('')}
+        </div>
+
+        <div class="lf-arr dn">↓ cross-cutting systems read from S and write back via GitHub API</div>
+
+        <!-- Layer 3: Cross-cutting -->
+        <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin:8px 0 4px">
+          ${[
+            {label:'🤖 Ravana AI',color:'rgba(188,140,255,.15)',id:'lf-ai'},
+            {label:'🔍 Search',color:'rgba(88,166,255,.1)',id:'lf-search'},
+            {label:'📊 Analytics',color:'rgba(88,166,255,.1)',id:'lf-analytics'},
+            {label:'🏠 Dashboard',color:'rgba(210,153,34,.1)',id:'lf-dash'},
+            {label:'🌍 GBIF',color:'rgba(63,185,80,.1)',id:'lf-gbif'},
+            {label:'📥 Export',color:'rgba(88,166,255,.1)',id:'lf-export'},
+            {label:'📅 Calendar',color:'rgba(255,255,255,.04)',id:''},
+            {label:'⏰ Reminders',color:'rgba(255,255,255,.04)',id:''},
+          ].map(s=>`<div class="lf-master-section" style="background:${s.color}" onclick="${s.id?`document.getElementById('${s.id}').open=true;document.getElementById('${s.id}').scrollIntoView({behavior:'smooth'})`:`_lfSearch('${s.label.split(' ').slice(1).join(' ')}')`}">${s.label}</div>`).join('')}
+        </div>
+
+        <div class="lf-arr dn">↓ all writes encrypt via AES-256-GCM → ghPut() → GitHub commits</div>
+
+        <!-- Layer 4: Persistence -->
+        <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin:8px 0 0">
+          ${['notes/index.enc + {id}.enc','bottles/data.enc','accessions/data.enc','recipes/data.enc','greenhouse/data.enc','supplies/data.enc','journal/entries.enc','value/data.enc','taxonomy/custom.enc'].map(f=>`<div class="lf-b file" style="font-size:10px">${f}</div>`).join('')}
+        </div>
+      </div>
 
       <!-- Quick-nav chips -->
       <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:18px">
@@ -4426,7 +4534,47 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
       <div class="lf-body">
         <div class="help-section-card" style="border:none;padding:0;margin:0;background:transparent">
         <h2 class="help-h2" style="color:var(--ac)">🔑 Login / Unlock Flow</h2>
-        <p style="font-size:12px;color:var(--mu);margin:0 0 10px"><strong>Single-token login:</strong> the GitHub PAT is both the auth credential and the AES-256-GCM encryption key. No separate passphrase.</p>
+
+        <!-- Visual login flow -->
+        <div class="lf-diagram">
+          <div class="lf-diagram-lbl">Login sequence — single path, 8 stages</div>
+          <div class="lf-hrow" style="flex-wrap:wrap;gap:4px">
+            <div class="lf-n"><div class="lf-b actor">PAT token</div><div class="lf-sub">auth + encrypt key</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">validate()</div><div class="lf-sub">HTTPS check · repo access</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">_readCache()</div><div class="lf-sub">10-min TTL</div></div>
+          </div>
+          <div style="display:flex;gap:16px;margin:6px 0 6px 8px">
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <span style="font-size:10px;color:var(--gn);font-weight:700">HIT</span>
+              <span class="lf-arr dn" style="color:var(--gn)">↓</span>
+              <div class="lf-b ok" style="font-size:11px">restore 5 stores<br><span style="font-size:9px">⚡ instant</span></div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <span style="font-size:10px;color:var(--mu);font-weight:700">MISS</span>
+              <span class="lf-arr dn">↓</span>
+              <div class="lf-b fn" style="font-size:10px">Promise.all( loadNotesIndex · loadAccessions · loadRecipes · loadBottles · loadGreenhouse · loadSupplies · loadJournal · loadValue )</div>
+              <span class="lf-arr dn">↓</span>
+              <div class="lf-b state" style="font-size:11px">_writeCache()</div>
+            </div>
+          </div>
+          <div class="lf-arr dn">↓</div>
+          <div class="lf-hrow" style="flex-wrap:wrap;gap:4px">
+            <div class="lf-b">Hide #login → show #app</div>
+            <span class="lf-arr gray">→</span>
+            <div class="lf-b fn">renderAll()</div>
+            <span class="lf-arr gray">→</span>
+            <div class="lf-b fn">loadTaxonomy()</div>
+            <span class="lf-arr gray">→</span>
+            <div class="lf-b fn">LabAnalytics.calculate()</div>
+            <span class="lf-arr gray">→</span>
+            <div class="lf-b fn">fetchWeather()</div>
+            <span class="lf-arr gray">→</span>
+            <div class="lf-b fn">_doWriteSummary()</div>
+          </div>
+        </div>
+
         <div class="help-flow" style="justify-content:flex-start;flex-direction:column;align-items:flex-start;gap:4px;padding:12px 14px">
           <div style="font-size:12px;display:flex;align-items:center;gap:8px"><span class="flow-step" style="min-width:26px;text-align:center">1</span><span>Read GitHub token → <code>S.tok = S.pw = tok</code>. If DEVICE_KEY in localStorage → restore token.</span></div>
           <div style="font-size:12px;display:flex;align-items:center;gap:8px"><span class="flow-step" style="min-width:26px;text-align:center">2</span><span>Validate HTTPS (required for crypto.subtle). GET <code>/repos/Phyto-Evolution/tcplants</code> → verify access.</span></div>
@@ -4590,6 +4738,69 @@ CAMERA/BARCODE in notes:
       <div class="lf-body">
         <div style="background:transparent">
         <h2 class="help-h2" style="color:var(--ac)">🫙 Bottles — Full CRUD & Lifecycle</h2>
+
+        <!-- Visual: 3 creation modes + lifecycle -->
+        <div class="lf-diagram">
+          <div class="lf-diagram-lbl">Creation modes + lifecycle flow</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+            <div style="background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.2);border-radius:8px;padding:10px">
+              <div style="font-size:11px;font-weight:700;margin-bottom:6px;color:var(--ac)">＋ Single</div>
+              <div class="lf-hrow" style="flex-direction:column;align-items:flex-start;gap:3px">
+                <div class="lf-b fn" style="font-size:10px">startNewBottle('single')</div>
+                <span class="lf-arr dn">↓</span>
+                <div class="lf-b fn" style="font-size:10px">saveBottleAction()</div>
+                <span class="lf-arr dn">↓</span>
+                <div class="lf-b" style="font-size:10px">1 bottle · FSL-YYYY-NNNN</div>
+                <span class="lf-arr dn">↓</span>
+                <div class="lf-b fn" style="font-size:10px">openBottle() + QR inline</div>
+              </div>
+            </div>
+            <div style="background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2);border-radius:8px;padding:10px">
+              <div style="font-size:11px;font-weight:700;margin-bottom:6px;color:var(--gn)">⊞ Batch</div>
+              <div style="display:flex;flex-direction:column;align-items:flex-start;gap:3px">
+                <div class="lf-b fn" style="font-size:10px">setBotMode('batch')</div>
+                <span class="lf-arr dn">↓</span>
+                <div class="lf-b fn" style="font-size:10px">saveBottleAction()</div>
+                <span class="lf-arr dn">↓</span>
+                <div class="lf-b" style="font-size:10px">N bottles · shared batch_id</div>
+                <span class="lf-arr dn">↓</span>
+                <div class="lf-b fn" style="font-size:10px">_showSavedQRGrid()</div>
+              </div>
+            </div>
+            <div style="background:rgba(188,140,255,.06);border:1px solid rgba(188,140,255,.2);border-radius:8px;padding:10px">
+              <div style="font-size:11px;font-weight:700;margin-bottom:6px;color:var(--pu)">🔥 Session</div>
+              <div style="display:flex;flex-direction:column;align-items:flex-start;gap:3px">
+                <div class="lf-b fn" style="font-size:10px">setBotMode('session')</div>
+                <span class="lf-arr dn">↓</span>
+                <div class="lf-b fn" style="font-size:10px">saveSessionAction()</div>
+                <span class="lf-arr dn">↓</span>
+                <div class="lf-b" style="font-size:10px">all batches · shared session_id</div>
+                <span class="lf-arr dn">↓</span>
+                <div class="lf-b fn" style="font-size:10px">_showSavedQRGrid() grouped</div>
+              </div>
+            </div>
+          </div>
+          <!-- Lifecycle -->
+          <div class="lf-diagram-lbl" style="margin-bottom:8px">Bottle lifecycle</div>
+          <div class="lf-hrow" style="justify-content:center;flex-wrap:wrap;gap:4px">
+            <div class="lf-n"><div class="lf-b">🧫 Prepared</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b">💉 Inoculated</div><div class="lf-sub">date_inoculated set</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b">🌱 Growing</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b ok">✂️ Subcultured</div><div class="lf-sub">last_transfer set</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b ok">🏡 Send to GH</div><div class="lf-sub">sendToGreenhouse()</div></div>
+          </div>
+          <div class="lf-hrow" style="justify-content:center;margin-top:4px;flex-wrap:wrap;gap:4px">
+            <div style="font-size:10px;color:var(--mu)">or terminal:</div>
+            <div class="lf-b warn" style="font-size:11px">☣️ Contaminated</div>
+            <div style="font-size:10px;color:var(--mu);padding:0 4px">|</div>
+            <div class="lf-b warn" style="font-size:11px">🗑 Discarded</div>
+          </div>
+        </div>
+
         <pre class="help-pre">THREE CREATION MODES — toggled by setBotMode():
 
 SINGLE (qty=1):
@@ -4719,6 +4930,38 @@ _botNextSeq():
       <div class="lf-body">
         <div style="background:transparent">
         <h2 class="help-h2" style="color:var(--pu)">🤖 Ravana AI — Context, Routing, Tool-Use</h2>
+
+        <div class="lf-diagram">
+          <div class="lf-diagram-lbl">AI request routing</div>
+          <div class="lf-hrow" style="flex-wrap:wrap;gap:4px;justify-content:center">
+            <div class="lf-n"><div class="lf-b fn">askAI(prompt)</div><div class="lf-sub">user message</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">_buildAIContext()</div><div class="lf-sub">notes · bottles · species · analytics · weather · schedule</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">_selectAIProvider()</div><div class="lf-sub">groq / claude / gemini</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">_callAIProxyFull()</div><div class="lf-sub">→ plantking.ape.workers.dev</div></div>
+          </div>
+          <div class="lf-arr dn">↓ response</div>
+          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+              <span style="font-size:10px;color:var(--mu)">text reply</span>
+              <div class="lf-b fn" style="font-size:10px">renderAIReply()</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+              <span style="font-size:10px;color:var(--yw)">tool_call</span>
+              <div class="lf-b fn" style="font-size:10px">_handleToolCall() → _executeTool()</div>
+              <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:center">
+                <div class="lf-b" style="font-size:9px">get_lab_summary</div>
+                <div class="lf-b" style="font-size:9px">get_bottles</div>
+                <div class="lf-b" style="font-size:9px">get_species_analysis</div>
+                <div class="lf-b" style="font-size:9px">search_lab</div>
+                <div class="lf-b warn" style="font-size:9px">update_bottle_status ⚠️ confirm</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <pre class="help-pre">CONTEXT BUILDING — _buildAIContext():
   assembles a structured prompt snapshot:
   → lab identity (name from settings)
@@ -4829,6 +5072,41 @@ QUOTA CHECK — _isAtQuota() (Task #8):
       <div class="lf-body">
         <div style="background:transparent">
         <h2 class="help-h2" style="color:var(--gn)">🏡 Greenhouse — Plant Tracking & Transfer Flows</h2>
+
+        <div class="lf-diagram">
+          <div class="lf-diagram-lbl">Bidirectional GH ↔ Lab loop</div>
+          <div style="display:flex;align-items:center;gap:0;flex-wrap:wrap;justify-content:center">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+              <div class="lf-b actor" style="background:rgba(63,185,80,.1);border-color:var(--gn)">🏡 GH Stock plant</div>
+              <div style="font-size:9px;color:var(--mu)">S.greenhouse[] · quantity ledger</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <span style="font-size:10px;color:var(--gn);font-weight:700">Take explant</span>
+              <span class="lf-arr" style="font-size:20px">→</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+              <div class="lf-b fn">startNewBottle() / saveSessionAction()</div>
+              <div style="font-size:9px;color:var(--mu)">greenhouse_plant_id wired · 🏡 flair pre-selected</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <span style="font-size:10px;color:var(--ac);font-weight:700">TC growth</span>
+              <span class="lf-arr" style="font-size:20px">→</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+              <div class="lf-b fn">sendToGreenhouse()</div>
+              <div style="font-size:9px;color:var(--mu)">type:'lab_output_in' logged · quantity += N</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <span style="font-size:10px;color:var(--gn);font-weight:700">Back to stock</span>
+              <span class="lf-arr" style="font-size:20px">→</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+              <div class="lf-b ok">🏡 GH Stock grows</div>
+              <div style="font-size:9px;color:var(--mu)">saveGreenhouse() → greenhouse/data.enc</div>
+            </div>
+          </div>
+        </div>
+
         <pre class="help-pre">GREENHOUSE PLANT CRUD:
   startNewGHPlant() → form: species, quantity, location, source, health, notes, next_inspection
   saveGHPlant() → push to S.greenhouse → saveGreenhouse(S.greenhouse, S.greenhouseSha, S.ghTransfers)
@@ -11234,7 +11512,22 @@ Anything outside lab operations and immediately related workflow. One refusal. T
 
 DATA DISCIPLINE
 When lab data is provided in context: pull from it first. Distinguish clearly between "your records show X" and "general TC practice suggests X". Never fabricate data points. When data is thin, say so and say what would make the answer better.
-For PGR concentrations always give both mg/L and µM. For contamination queries always ask about: sterilisation method, media pH, vessel sealing, laminar flow. Never present extrapolation as published protocol — flag it.`;
+For PGR concentrations always give both mg/L and µM. For contamination queries always ask about: sterilisation method, media pH, vessel sealing, laminar flow. Never present extrapolation as published protocol — flag it.
+
+THE SYSTEM YOU LIVE IN — TC Plants Lab Notes
+You operate inside a single-file PWA (index.html) built by Shiva. When Shiva or Kumar asks about the system itself — how it works, what a function does, where data is stored, why something behaves a certain way — you can answer directly. You know the architecture.
+
+Core data flow: login() → Promise.all(8 encrypted file loads) → global S{state} object → all sections render from S → user edits → encrypted via AES-256-GCM → ghPut() → GitHub commit. Every save is a commit. Every piece of data lives in the repo as ciphertext.
+
+Key state: S.notes[] S.bottles[] S.sessions[] S.accs[] S.recs[] S.greenhouse[] S.ghTransfers[] S.supplies[] S.journal[] S.value S.taxCustom S.analytics S.weather.
+
+Key functions: saveNoteAction() · saveBottleAction() / saveSessionAction() · updateBottleStatus() · sendToGreenhouse() · saveGHPlant() · saveJournalEntry() · parseJournalWithRavana() · LabAnalytics.calculate() · SearchSystem._run() · exportLabReport() · navTo() · _buildAIContext() (your own context builder) · _parseVoiceAction() (18 instant voice commands before calling you) · _executeTool() (your tool-use dispatch).
+
+Sections: Notes (CRUD, draft, wiki-links, keyword stems for search) · Bottles (Single/Batch/Session modes, FSL-YYYY-NNNN codes, QR labels, passage tracking) · Greenhouse (bidirectional GH↔Lab, QR tab, condition log, bench view) · Registry · Recipes (scaler, flairs) · Journal (Ravana parse, overnight batch) · Supply (batch perf correlation) · Value (vault calculation from bottles × stage prices + GH × size grade) · Analytics (12 charts + species ranking + lab cost) · Search (8 sources, tokenized AND, field prefixes, highlighted) · Calendar · Reminders · Schedule · GBIF (A–F: synonym, common name, distributions, photo, hierarchy, bulk CP import).
+
+Voice command dispatch: _parseVoiceAction() intercepts 18 patterns before reaching you — navigation, bottle creation, species lookup, export report, model switch, etc. Only unmatched queries reach askAI().
+
+Proxy: all AI calls route through plantking.ape.workers.dev (Cloudflare Worker). Write tool operations require explicit confirmation gate before _executeWriteOp() fires.`;
 
 const AI_MODELS={
   groq8: {name:'Quick',        icon:'⚡', lsKey:'tcplants_groq_key',   getKey:()=>localStorage.getItem('tcplants_groq_key')||'',   getLink:'https://console.groq.com',                         groqModel:'llama-3.1-8b-instant',   label:'Groq 8B'},
@@ -11546,6 +11839,16 @@ async function _buildAIContext(){
   // Current user context
   const _cu=_getRavanaUser();
   ctx+=`\n\n### CURRENT USER\nSpeaking with: ${_cu.name}\nBackground: ${_cu.bg}\nTone guidance: ${_cu.tone}`;
+
+  // System architecture awareness (Ravana learns the app's own structure)
+  if(ctx.length<MAX_CONTEXT_SIZE){
+    ctx+=`\n\n### APP ARCHITECTURE (TC Plants Lab Notes — your operating environment)
+Single-file PWA (index.html). Global state object S. All data AES-256-GCM encrypted → GitHub.
+Key functions you can reference: saveNoteAction() notes CRUD · saveBottleAction() / saveSessionAction() bottle CRUD · navTo(sec) navigation · _buildAIContext() your own context · askAI() AI routing → Cloudflare proxy → Groq/Claude/Gemini · _parseVoiceAction() voice command dispatch · LabAnalytics.calculate() analytics engine · SearchSystem._run() search across 8 data stores · exportLabReport() 3-CSV export.
+Data flow: login() → Promise.all(8 loads) → S{state} → sections render → user edits → ghPut() → GitHub commits.
+Sections: Notes · Bottles (Single/Batch/Session modes) · Greenhouse (bidirectional lab↔GH) · Registry · Recipes · Journal (Ravana parse) · Supply · Value (vault) · Analytics · Search · Calendar · Reminders · Schedule · GBIF integration (A–F features).
+You (Ravana) operate via: AI_RULEBOOK system prompt + _buildAIContext() data snapshot + tool-use framework (_executeTool). Write ops require confirmation gate. Voice: _parseVoiceAction() handles 18 instant commands before calling askAI.`;
+  }
 
   return ctx;
 }
@@ -17957,6 +18260,106 @@ document.getElementById('theme-btn').addEventListener('click',function(){
 });
 function _lfExpandAll(){ document.querySelectorAll('#sec-logicflows details').forEach(d=>d.open=true); }
 function _lfCollapseAll(){ document.querySelectorAll('#sec-logicflows details').forEach(d=>d.open=false); }
+
+// ── Logic Flow smart search ────────────────────────────────────────────
+// Index: each section → {id, keywords, functions, concepts, text}
+const LF_SEARCH_INDEX=[
+  {id:'lf-data', label:'Data Architecture', keywords:['state','s.notes','s.bottles','s.accs','s.recs','s.greenhouse','s.supplies','s.journal','s.value','s.taxcustom','s.analytics','sha','encryption','aes','gcm','pbkdf2','cache','sessionStorage','writeCache','readCache','ghput','ghget','ghdec','ghDec','encrypt','decrypt','persist','field','store','load'],functions:['ghPut','ghGet','ghDec','_writeCache','_readCache','enc','dec']},
+  {id:'lf-login', label:'Login / Unlock Flow', keywords:['login','token','pat','passphrase','single-token','auth','authentication','cache','migrate','migration','trust','device','trusted','unlock','sign','signin','loadNotesIndex','loadAccessions','loadRecipes','loadBottles','loadGreenhouse','loadSupplies','loadJournal','loadValue','promise.all'],functions:['login','_readCache','_migrateEncryption','_writeCache','loadNotesIndex','loadAccessions','loadBottles','loadGreenhouse','loadSupplies','loadJournal','loadValue']},
+  {id:'lf-nav', label:'Navigation System', keywords:['nav','navto','navigation','drawer','switch','section','route','url','qr','bottle','note','gh','greenhouse','listsecs','switchsection','open','close','drawer','sidebar','panel'],functions:['navTo','switchSection','openNavDrawer','closeNavDrawer','viewBatch','_handleNavQRResult']},
+  {id:'lf-notes', label:'Notes CRUD', keywords:['note','notes','save','edit','delete','create','draft','wiki','wikilink','backlink','history','markdown','body','title','species','tag','stage','review','cultures','pinned','saveNoteAction','openNote','renderNoteList','keyword','keywords','extract','search'],functions:['saveNoteAction','openNote','renderNoteList','startNewNote','editNote','deleteNote','saveNotesIndex','writeNote','_extractKeywords','_wikiPreprocess','_wireDraftListeners']},
+  {id:'lf-bottles', label:'Bottles CRUD & Lifecycle', keywords:['bottle','bottles','single','batch','session','autoclave','qr','label','status','lifecycle','prepared','inoculated','growing','subcultured','contaminated','discarded','fsl','code','seq','passage','parent','passage tracking','filter','batch filter'],functions:['saveBottleAction','saveSessionAction','updateBottleStatus','openBottle','renderBottleList','startNewBottle','setBotMode','_showSavedQRGrid','_botNextSeq','sendToGreenhouse','viewBatch','setBotFilter']},
+  {id:'lf-ai', label:'Ravana AI', keywords:['ai','ravana','context','prompt','system','groq','claude','gemini','voice','whisper','stt','tts','wake','wake word','tool','tool call','tool-use','agentic','chat','panel','model','proxy','cloudflare','contex','rulebook','charmap'],functions:['askAI','_buildAIContext','_callAIProxyFull','_selectAIProvider','_handleToolCall','_executeTool','_parseVoiceAction','_startNativeSR','_startRecording','_transcribeWhisper','_ttsSpeak','_isAtQuota']},
+  {id:'lf-gh', label:'Greenhouse', keywords:['greenhouse','gh','plant','stock','transfer','explant','explant-out','lab-output','quantity','ledger','health','condition','inspection','bench','location','qr','source','sendtogreenhouse'],functions:['saveGHPlant','openGHPlant','renderGHList','saveGHExplant','saveGreenhouse','adjustQuantity','logCondition','ghTab','_renderGHQRCanvas']},
+  {id:'lf-dash', label:'Dashboard', keywords:['dashboard','dash','stat','card','band','10','alert','alerts','contamination','overdue','transfer','supplies','vault','journal','7d','30d','strip','donut','heatmap','activity','renderDashboard','computeAlerts'],functions:['_renderDashboard','_computeAlerts','C','H','Scroll']},
+  {id:'lf-analytics', label:'Analytics Engine', keywords:['analytics','chart','graph','contam','contamination','species','success','rate','multiplication','culture','lifecycle','ranking','performance','lab cost','cost','spend','efficiency','media','recipe','tag','cloud','funnel'],functions:['LabAnalytics.calculate','renderAnalytics','_buildSpeciesRankingCard','_buildLabCostCard','RavanaInsights._computeMetrics']},
+  {id:'lf-gbif', label:'GBIF Integration', keywords:['gbif','species','taxonomy','synonym','common name','distribution','native','photo','reference','hierarchy','order','class','kingdom','bulk','cp','carnivorous','nepenthes','droseraceae','sarraceniaceae','lentibulariaceae','cephalotaceae'],functions:['_taxGBIFLookup','_gbifImportSpecies','_loadSpDetailGBIF','_gbifBulkImportCP']},
+  {id:'lf-value', label:'Value Inventory', keywords:['value','vault','price','cost','inr','stage','grade','seedling','small','medium','adult','estimate','total','calculation','loadValue','renderValueSection'],functions:['loadValue','renderValueSection','_valTab','_valPriceSet','_renderValueVaultPanel','fmtINR']},
+  {id:'lf-export', label:'Export System', keywords:['export','csv','print','report','download','zip','calendar','blob','bottles.csv','notes.csv','greenhouse.csv'],functions:['exportLabReport','_downloadText','exportAll']},
+  {id:'lf-gaps', label:'Known Gaps', keywords:['bug','gap','issue','pending','broken','frozen','telegram','csp','memory','leak','setinterval','agentic','todo']},
+  {id:null, label:'Journal', keywords:['journal','entry','parse','overnight','ravana','dictate','voice','whisper','tags','auto-flair','parseEnabled','parsed'],functions:['saveJournalEntry','parseJournalWithRavana','_scheduleOvernightJournalParse','_setJournalParseEnabled','_journalMicTap']},
+  {id:null, label:'Taxonomy', keywords:['taxonomy','pack','packs','species','custom','flair','autocomplete','suggest','dropdown','modal','csv','import','gbif'],functions:['loadTaxonomy','_taxSuggest','_importCsvTaxonomy','saveCustomTaxonomy','openSpeciesPicker','_taxDropdownSelect']},
+  {id:null, label:'Reminders', keywords:['reminder','badge','overdue','due','next_review','inspection','gh','greenhouse','bottle','note','updateReminderBadge'],functions:['renderReminders','updateReminderBadge']},
+  {id:null, label:'Search', keywords:['search','find','query','token','fuzzy','highlight','prefix','species','stage','status','tag','recent','filter','saved'],functions:['SearchSystem._run','SearchSystem._hl','SearchSystem.renderSearchPage','_extractKeywords']},
+  {id:null, label:'Inventory', keywords:['supply','supplies','stock','inventory','batch','expiry','cost','performance','calcPerformance','low stock','alert'],functions:['SupplyInventory.renderInventoryPage','calcPerformance','loadSupplies','saveSupplies']},
+  {id:null, label:'Calendar', keywords:['calendar','month','day','panel','dots','navigate','export','ics','note','bottle','journal','date'],functions:['renderCalendar','_openCalPanel','_exportCalRange']},
+  {id:null, label:'Weather & SW', keywords:['weather','temperature','humidity','uv','rain','open-meteo','interval','activity','commits','service worker','sw','cache','offline'],functions:['fetchWeather','fetchActivityLog']},
+];
+
+// Simple edit-distance for fuzzy matching short tokens
+function _lfEditDist(a,b){
+  if(!a||!b) return Math.max((a||'').length,(b||'').length);
+  const m=a.length,n=b.length;
+  if(Math.abs(m-n)>2) return 99;
+  const dp=Array.from({length:m+1},(_,i)=>Array.from({length:n+1},(__,j)=>i===0?j:j===0?i:0));
+  for(let i=1;i<=m;i++) for(let j=1;j<=n;j++) dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+  return dp[m][n];
+}
+
+function _lfSearch(raw){
+  const statusEl=document.getElementById('lf-search-status');
+  const input=document.getElementById('lf-search-q');
+  if(input&&input.value!==raw) input.value=raw;
+
+  const allDetails=[...document.querySelectorAll('#sec-logicflows .lf-acc details')];
+
+  if(!raw||!raw.trim()){
+    allDetails.forEach(d=>{d.classList.remove('lf-highlight-section','lf-dim-section');});
+    if(statusEl) statusEl.textContent='';
+    return;
+  }
+
+  const tokens=raw.toLowerCase().trim().split(/\s+/).filter(t=>t.length>=2);
+
+  // Score each section
+  const scores=LF_SEARCH_INDEX.map(sec=>{
+    let score=0;
+    const allWords=[...sec.keywords,...(sec.functions||[])].map(w=>w.toLowerCase());
+    for(const tok of tokens){
+      // Exact match in keywords: +10
+      if(allWords.some(w=>w===tok)) score+=10;
+      // Function name exact: +15
+      else if((sec.functions||[]).some(f=>f.toLowerCase()===tok)) score+=15;
+      // Contains match: +5
+      else if(allWords.some(w=>w.includes(tok))) score+=5;
+      // Label contains: +8
+      else if(sec.label.toLowerCase().includes(tok)) score+=8;
+      // Fuzzy match (edit distance ≤ 2 for tokens ≥ 4 chars): +2
+      else if(tok.length>=4&&allWords.some(w=>_lfEditDist(tok,w.slice(0,tok.length+2))<=2)) score+=2;
+    }
+    return{sec,score};
+  }).sort((a,b)=>b.score-a.score);
+
+  const matches=scores.filter(s=>s.score>0);
+  const matchIds=new Set(matches.map(s=>s.sec.id).filter(Boolean));
+
+  // Apply CSS to actual detail elements
+  allDetails.forEach(d=>{
+    const id=d.id||'';
+    if(matchIds.has(id)||(!id&&matches.some(s=>!s.sec.id&&d.querySelector('summary')?.textContent.includes(s.sec.label)))){
+      d.classList.add('lf-highlight-section');
+      d.classList.remove('lf-dim-section');
+      if(matches[0]?.sec?.id===id) d.open=true;
+    } else if(matches.length>0){
+      d.classList.add('lf-dim-section');
+      d.classList.remove('lf-highlight-section');
+    } else {
+      d.classList.remove('lf-highlight-section','lf-dim-section');
+    }
+  });
+
+  // Auto-expand and scroll to best match
+  if(matches.length>0&&matches[0].sec.id){
+    const top=document.getElementById(matches[0].sec.id);
+    if(top&&!top.open){ top.open=true; }
+    setTimeout(()=>top?.scrollIntoView({behavior:'smooth',block:'start'}),100);
+  }
+
+  const hint=matches.length>0
+    ?`Found in: ${matches.slice(0,4).map(s=>`<strong>${s.sec.label}</strong>`).join(', ')}${matches.length>4?` +${matches.length-4} more`:''}`
+    :`<span style="color:var(--rd)">No sections match "${raw}" — try a function name or concept</span>`;
+  if(statusEl) statusEl.innerHTML=hint;
+}
 
 function _loginToggleTheme(){
   _applyTheme(_themeNext(document.documentElement.dataset.theme||'dark'));
