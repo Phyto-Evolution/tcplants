@@ -65,3 +65,27 @@ Notes · Registry · Recipes · Bottles · Greenhouse · Reminders · Contam · 
 - `api-proxy.js` — Cloudflare Worker proxy for AI APIs
 - `cloudflare-worker.js` — deployed worker
 - `conversations/` — full session dumps (read these)
+- `theme/skins.css` — theme overrides (dark/light/paper dot grids, login glow gradients)
+
+---
+
+## Playwright MCP — Visual Superpower
+
+A Playwright MCP server is wired in `.claude/settings.json`. Use it to:
+
+- **Screenshot the live site** (`https://notes.tcplants.in`) before and after visual changes
+- **Test all 3 themes** — dark (default), light, paper — by reading the URL with `?theme=light` param or via the theme toggle
+- **Verify login screen** — animated dots, glass card, skin toggle
+- **Check responsiveness** — screenshot at 375px (mobile) and 1280px (desktop)
+- **Visual regression** — screenshot before edit, make change, screenshot after, compare
+
+### Design language to preserve
+
+CSS variables (defined in `index.html` `:root`):
+- `--bg` background · `--sf/sf2/sf3` surfaces · `--bd` border · `--tx` text · `--mu` muted text
+- `--ac` accent blue · `--gn` green · `--rd` red · `--yw` yellow · `--pu` purple
+- `--glass / --glass-bd` — glassmorphism on login card, toasts, greeting
+
+Key component patterns: `.help-section-card` (info cards) · `.help-flow` (flow diagrams) · `.dc` (dashboard cards) · `.btn / .btn.sm / .btn.ghost` (buttons) · `.fpill` (filter pills)
+
+All theme overrides live in `theme/skins.css` — never hardcode colours that should adapt to theme.

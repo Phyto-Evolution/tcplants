@@ -840,6 +840,33 @@ main > .dview, main > .editor{ margin:0 auto; }
 .help-table th{text-align:left;padding:6px 10px;background:var(--sf2);border:1px solid var(--bd);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--mu)}
 .help-table td{padding:6px 10px;border:1px solid var(--bd);vertical-align:top;line-height:1.5}
 .help-table tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+/* ── Logic Flow accordion ───────────────────────────────────── */
+.lf-acc details{margin-bottom:10px}
+.lf-acc summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;padding:13px 16px;border-radius:8px;background:var(--sf);border:1px solid var(--bd);transition:border-color .15s,background .15s;user-select:none}
+.lf-acc summary::-webkit-details-marker{display:none}
+.lf-acc summary .lf-caret{margin-left:auto;font-size:14px;color:var(--mu);transition:transform .2s;flex-shrink:0}
+.lf-acc details[open]>summary .lf-caret{transform:rotate(90deg)}
+.lf-acc details[open]>summary{border-radius:8px 8px 0 0;border-bottom-color:transparent}
+.lf-acc summary:hover{background:var(--sf2);border-color:var(--ac)}
+.lf-acc .lf-body{background:var(--sf);border:1px solid var(--bd);border-top:none;border-radius:0 0 8px 8px;padding:18px 20px}
+.lf-pill{display:inline-block;font-family:var(--mono);font-size:10px;background:rgba(88,166,255,.1);border:1px solid rgba(88,166,255,.25);border-radius:4px;padding:1px 7px;color:var(--ac);margin:0 2px 3px}
+.lf-pill-gn{background:rgba(63,185,80,.1);border-color:rgba(63,185,80,.25);color:var(--gn)}
+.lf-pill-pu{background:rgba(188,140,255,.1);border-color:rgba(188,140,255,.25);color:var(--pu)}
+.lf-pill-yw{background:rgba(210,153,34,.1);border-color:rgba(210,153,34,.25);color:var(--yw)}
+.lf-pill-rd{background:rgba(248,81,73,.1);border-color:rgba(248,81,73,.25);color:var(--rd)}
+.lf-stat{display:inline-flex;align-items:center;gap:4px;font-size:10px;background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:2px 8px;color:var(--mu);flex-shrink:0}
+/* ── Help page visual upgrades ──────────────────────────────── */
+.help-sc-hdr{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--bd)}
+.help-sc-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.help-h2-big{font-size:22px;font-weight:800;margin:0;flex:1}
+.help-acc details{margin-bottom:6px}
+.help-acc summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:6px;background:var(--sf2);border:1px solid var(--bd);font-size:12px;font-weight:700;color:var(--mu);user-select:none}
+.help-acc summary::-webkit-details-marker{display:none}
+.help-acc summary::after{content:'›';margin-left:auto;transition:transform .2s}
+.help-acc details[open]>summary::after{transform:rotate(90deg)}
+.help-acc .ha-body{padding:10px 0 4px;border-top:none}
+.help-h2-icon{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:800;color:var(--tx);margin-bottom:12px}
+.help-h2-icon .hi{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
 
 /* ── GALLERY ── */
 .gal-cats{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
@@ -3001,7 +3028,11 @@ input, textarea, select {
         <a href="#h-security">Security</a>
       </div>
 
-      <h2 id="h-start">Getting Started</h2>
+      <h2 id="h-start" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+        <span style="width:32px;height:32px;border-radius:8px;background:rgba(88,166,255,.15);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">🚀</span>
+        <span style="flex:1">Getting Started</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">Sign in · navigation · Vanakkam greeting</span>
+      </h2>
       <div class="help-section-card">
         <h3>Signing In</h3>
         <p>Enter your <strong>GitHub Personal Access Token</strong> (with <code>repo</code> scope). The token is <em>both</em> your authentication credential and your AES-256-GCM encryption key — one field, one secret.</p>
@@ -3033,7 +3064,11 @@ input, textarea, select {
         <p>After successful login a centred glass-blur greeting appears for ~2.5 seconds, showing your lab name if configured in Settings. It fades automatically — no tap needed.</p>
       </div>
 
-      <h2 id="h-notes">Lab Notes</h2>
+      <h2 id="h-notes" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+        <span style="width:32px;height:32px;border-radius:8px;background:rgba(63,185,80,.15);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">📋</span>
+        <span style="flex:1">Lab Notes</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">Editor · shortcuts · wiki-links · draft · camera</span>
+      </h2>
       <div class="help-section-card">
         <h3>Entry Fields</h3>
         <table><tr><th>Field</th><th>Required</th><th>Purpose</th></tr>
@@ -3083,7 +3118,11 @@ input, textarea, select {
         </table>
       </div>
 
-      <h2 id="h-registry">Accession Registry</h2>
+      <h2 id="h-registry" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+        <span style="width:32px;height:32px;border-radius:8px;background:rgba(63,185,80,.15);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">🌿</span>
+        <span style="flex:1">Accession Registry</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">Track plant origins · timeline · species links</span>
+      </h2>
       <div class="help-section-card">
         <p>Track every plant accession — its origin, status, and full lab history. Any note whose Species field matches the accession species is automatically linked.</p>
         <h3>Fields</h3>
@@ -3109,7 +3148,11 @@ input, textarea, select {
         <p>On any accession detail, switch to the <strong>📅 Timeline</strong> tab to see all linked lab notes as a chronological vertical timeline with stage icons — click any title to open that note.</p>
       </div>
 
-      <h2 id="h-recipes">Media Recipe Book</h2>
+      <h2 id="h-recipes" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+        <span style="width:32px;height:32px;border-radius:8px;background:rgba(188,140,255,.15);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">🧪</span>
+        <span style="flex:1">Media Recipe Book</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">Formulations · scaler · flairs · autoclave params</span>
+      </h2>
       <div class="help-section-card">
         <p>Store complete, reusable media formulations. Each recipe records enough detail to reproduce the exact medium at any time.</p>
         <h3>Recipe Fields</h3>
@@ -3130,7 +3173,11 @@ input, textarea, select {
         <p>In the recipe detail view, click <strong>⚗️ Scale Media</strong>. Enter a target volume (e.g. 500 mL) and all ingredient quantities are recalculated proportionally. One-click copy for the bench.</p>
       </div>
 
-      <h2 id="h-bottles">🫙 Bottle Inventory</h2>
+      <h2 id="h-bottles" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+        <span style="width:32px;height:32px;border-radius:8px;background:rgba(88,166,255,.15);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">🫙</span>
+        <span style="flex:1">Bottle Inventory</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">Single · Batch · Session · lifecycle · QR · passage tracking</span>
+      </h2>
       <div class="help-section-card">
         <h3>Creation Modes</h3>
         <table><tr><th>Mode</th><th>When to use</th><th>Creates</th></tr>
@@ -3210,7 +3257,11 @@ input, textarea, select {
         </table>
       </div>
 
-      <h2 id="h-greenhouse">🏡 Greenhouse List</h2>
+      <h2 id="h-greenhouse" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+        <span style="width:32px;height:32px;border-radius:8px;background:rgba(63,185,80,.15);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">🏡</span>
+        <span style="flex:1">Greenhouse</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">Stock plants · bidirectional flow · QR · bench view · CSV import</span>
+      </h2>
       <div class="help-section-card">
         <p>Bidirectional stock plant management — tracks what's in the greenhouse, where it came from, and where it's going. The bridge between field collection and the TC lab.</p>
 
@@ -3339,7 +3390,11 @@ input, textarea, select {
         </table>
       </div>
 
-      <h2 id="h-dashboard">🏠 Home Dashboard</h2>
+      <h2 id="h-dashboard" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+        <span style="width:32px;height:32px;border-radius:8px;background:rgba(210,153,34,.15);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">🏠</span>
+        <span style="flex:1">Home Dashboard</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">10 stat cards · alerts · active strips · donut · heatmap</span>
+      </h2>
       <div class="help-section-card">
         <p>Always accessible via the <strong>🏠 Home</strong> button. The dashboard is a real-time lab overview rebuilt around biological workflows.</p>
         <h3>Quick Actions</h3>
@@ -3371,7 +3426,11 @@ input, textarea, select {
         <p>Side by side: last 5 saved recipes (click to open, + New shortcut) and healthy greenhouse stock plants (click to open, with "Lab → GH ready" alert when subcultured bottles exist).</p>
       </div>
 
-      <h2 id="h-species">🌱 Species in Culture</h2>
+      <h2 id="h-species" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+        <span style="width:32px;height:32px;border-radius:8px;background:rgba(63,185,80,.15);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">🌱</span>
+        <span style="flex:1">Species in Culture</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">Species table · detail panel · taxonomy packs · GBIF · flairs</span>
+      </h2>
       <div class="help-section-card">
         <h3>Species Table</h3>
         <p>Click <strong>🌱 Species</strong> in the nav drawer. A live table lists every species found in your notes, accessions, and bottles.</p>
@@ -3413,7 +3472,11 @@ input, textarea, select {
         <p>Define coloured labels in the <strong>Flairs</strong> tab — e.g. <em>Borneo clone</em>, <em>Highland form</em>, <em>SCV-01</em>. The <strong>🏡 GH</strong> flair is a system flair created automatically the first time you use a Greenhouse source. Flairs are now also assignable to <strong>media recipes</strong> and are required when adding custom species. They appear as pills in lists and as sub-rows in the species autocomplete dropdown.</p>
       </div>
 
-      <h2 id="h-reminders">⏰ Reminders</h2>
+      <h2 id="h-reminders" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+        <span style="width:32px;height:32px;border-radius:8px;background:rgba(255,200,0,.15);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">⏰</span>
+        <span style="flex:1">Reminders</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">Notes · bottles · GH plants · urgency groups · nav badge</span>
+      </h2>
       <div class="help-section-card">
         <p>Notes, active bottles, and greenhouse plants with a review / inspection date appear here, grouped by urgency. The nav badge shows combined overdue + this-week count across all three types.</p>
         <table><tr><th>Group</th><th>Condition</th><th>Colour</th></tr>
@@ -3429,13 +3492,21 @@ input, textarea, select {
         </table>
       </div>
 
-      <h2 id="h-contam">☣️ Contamination Dashboard</h2>
+      <h2 id="h-contam" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+        <span style="width:32px;height:32px;border-radius:8px;background:rgba(248,81,73,.15);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">☣️</span>
+        <span style="flex:1">Contamination</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">Event log · most affected species · trend chart</span>
+      </h2>
       <div class="help-section-card">
         <p>All notes of type <strong>Contamination Log</strong> are aggregated here. Shows a summary (total events, most affected species, most common stage) and a chronological list of every contamination event. Click any entry to open the full note.</p>
         <div class="help-tip">💡 Use the <strong>Contamination Trend</strong> chart in Analytics to spot monthly spikes. If contamination suddenly rises, check laminar flow maintenance, media pH, and explant surface sterilisation protocol.</div>
       </div>
 
-      <h2 id="h-analytics">📊 Lab Analytics</h2>
+      <h2 id="h-analytics" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+        <span style="width:32px;height:32px;border-radius:8px;background:rgba(88,166,255,.15);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">📊</span>
+        <span style="flex:1">Lab Analytics</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">12 charts · species ranking · lab cost · export CSV/print</span>
+      </h2>
       <div class="help-section-card">
         <p>All metrics are computed in-browser from your already-decrypted data. Nothing is sent anywhere. Click <strong>📥 Export CSV</strong> or <strong>🖨 Print Report</strong> in the Analytics header to export.</p>
         <table><tr><th>Chart / Card</th><th>What it shows</th></tr>
@@ -3456,7 +3527,11 @@ input, textarea, select {
         <div class="help-tip">💡 Always fill <strong>Cultures Out</strong> on Multiplication and Rooting notes to get meaningful data in Media Efficiency and Species Performance Ranking.</div>
       </div>
 
-      <h2 id="h-calendar">📅 Calendar</h2>
+      <h2 id="h-calendar" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+        <span style="width:32px;height:32px;border-radius:8px;background:rgba(255,200,0,.15);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">📅</span>
+        <span style="flex:1">Calendar</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">Month grid · day panel · create from date · export</span>
+      </h2>
       <div class="help-section-card">
         <p>Monthly view of all lab activity. Navigate with <strong>‹ ›</strong> or <strong>Today</strong>.</p>
         <h3>Calendar Dots</h3>
@@ -3473,7 +3548,11 @@ input, textarea, select {
         <p>Click <strong>⬇ Export → This week / This month</strong>. A print-ready window opens with all entries expanded — note bodies, badges, and contamination/review flags. Save as PDF via the browser print dialog.</p>
       </div>
 
-      <h2 id="h-tools">⏱ Lab Tools</h2>
+      <h2 id="h-tools" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+        <span style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.1);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">⏱</span>
+        <span style="flex:1">Lab Tools</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">Timers · stopwatches · media scaler · biochem calculator · tray</span>
+      </h2>
       <div class="help-section-card">
         <table><tr><th>Tool</th><th>How to use</th></tr>
           <tr><td>Countdown Timers</td><td>＋ Add Timer → enter h/m/s + name → ▶ Start. Up to 5 simultaneous. Beeps on zero. ↺ Reset.</td></tr>
@@ -3494,7 +3573,11 @@ input, textarea, select {
         <p>The Stepper card in Tools is now a shortcut button only — the full stepper UI lives in <strong>🧫 Sterilise</strong> but minimises to the same tray.</p>
       </div>
 
-      <h2 id="h-sterilise">🧫 Sterilisation Lab</h2>
+      <h2 id="h-sterilise" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+        <span style="width:32px;height:32px;border-radius:8px;background:rgba(63,185,80,.15);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">🧫</span>
+        <span style="flex:1">Sterilisation Lab</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">10 protocol presets · stepper timer · custom builder · minimise to tray</span>
+      </h2>
       <div class="help-section-card">
         <p>A dedicated page for surface sterilisation work — accessible via <strong>🧫 Sterilise</strong> in the nav drawer or the shortcut in Lab Tools. The stepper timer can be minimised to the footer bar and run in parallel with any other section.</p>
         <h3>Protocol Library (left panel)</h3>
@@ -3529,7 +3612,11 @@ input, textarea, select {
         </table>
       </div>
 
-      <h2 id="h-qr">📷 QR Scan</h2>
+      <h2 id="h-qr" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+        <span style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.1);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">📷</span>
+        <span style="flex:1">QR Scan</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">Route mode · bottle/note/GH routing · scan enhancement</span>
+      </h2>
       <div class="help-section-card">
         <p>Tap <strong>📷</strong> in the top nav bar from any screen — opens the scanner in <em>route mode</em>.</p>
         <table><tr><th>Scanned content</th><th>Result</th></tr>
@@ -3542,7 +3629,11 @@ input, textarea, select {
         <p>Enable <strong>Scan Enhancement</strong> in ⚙️ Settings. When active, contrast and brightness sliders appear during scanning — drag to boost image clarity. Enable <strong>Try Harder Mode</strong> for a slower but more thorough decoder pass.</p>
       </div>
 
-      <h2 id="h-ai">⚡ AI &amp; Voice</h2>
+      <h2 id="h-ai" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+        <span style="width:32px;height:32px;border-radius:8px;background:rgba(188,140,255,.15);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">⚡</span>
+        <span style="flex:1">AI & Voice — Ravana</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">3 models · voice commands · wake word · journal parse · PubMed</span>
+      </h2>
       <div class="help-section-card">
         <h3>Lab Footer Bar</h3>
         <p>Fixed bottom-right bar visible after login — all AI and voice controls in one place:</p>
@@ -3601,7 +3692,11 @@ input, textarea, select {
         <p>Settings → Voice &amp; Lab Mode: STT mode selector, readback confirmation, voice commands, wake word toggle, TTS voice/speed/pitch, noise suppression, echo cancellation, auto-gain control, silence threshold for Whisper auto-stop.</p>
       </div>
 
-      <h2 id="h-news">📰 TC Research News</h2>
+      <h2 id="h-news" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+        <span style="width:32px;height:32px;border-radius:8px;background:rgba(88,166,255,.15);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">📰</span>
+        <span style="flex:1">TC Research News</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">18 topic chips · PubMed · PMC PDF links · pin articles · archive</span>
+      </h2>
       <div class="help-section-card">
         <p>Click <strong>📰 News</strong> in the nav drawer. Tap a topic chip, then toggle the switch to load up to 60 publications from <strong>PubMed</strong>. Changing the chip resets the toggle so you can reload with the new query.</p>
         <h3>Topic Chips (18 + Custom)</h3>
@@ -3634,7 +3729,11 @@ input, textarea, select {
         <p>Each load is automatically saved to your repo at <code>news/YYYY-MM-DD.json</code> — a permanent dated research archive. If a file for today already exists, it is not overwritten.</p>
       </div>
 
-      <h2 id="h-actlog">⚡ Activity Log</h2>
+      <h2 id="h-actlog" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+        <span style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.1);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">⚡</span>
+        <span style="flex:1">Activity Log</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">Last 30 GitHub commits · click to jump to note</span>
+      </h2>
       <div class="help-section-card">
         <p>The <strong>⚡ Activity</strong> tab (right edge) shows the last 30 GitHub commits on your lab repo — a real-time record of every save to the cloud.</p>
         <table><tr><th>Icon</th><th>Commit type</th></tr>
@@ -3651,7 +3750,11 @@ input, textarea, select {
         <p>Click any 🌱 or ✏️ commit to jump directly to that note. <strong>↻</strong> refreshes. Click <strong>✕</strong>, the Activity tab again, or anywhere outside the panel to close it.</p>
       </div>
 
-      <h2 id="h-stock">📦 Lab Stock &amp; Inventory</h2>
+      <h2 id="h-stock" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+        <span style="width:32px;height:32px;border-radius:8px;background:rgba(210,153,34,.15);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">📦</span>
+        <span style="flex:1">Lab Stock & Inventory</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">Reagents · low-stock alerts · expiry · category tabs</span>
+      </h2>
       <div class="help-section-card">
         <p>Click <strong>📦 Stock</strong> in the nav drawer. Track all lab reagents, glassware, and consumables with low-stock alerts and expiry date monitoring. Data is encrypted in your GitHub repo at <code>inventory/data.enc</code>.</p>
         <h3>Item Fields</h3>
@@ -3671,7 +3774,11 @@ input, textarea, select {
         <div class="help-tip">💡 Check stock before every media prep session. Link item names to your recipe notes so you know which reagents each formulation needs.</div>
       </div>
 
-      <h2 id="h-settings">⚙️ Settings</h2>
+      <h2 id="h-settings" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+        <span style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.1);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">⚙️</span>
+        <span style="flex:1">Settings</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">Theme · AI keys · voice · scan · cache · device trust</span>
+      </h2>
       <div class="help-section-card">
         <p>Click <strong>⚙️</strong> in the top bar. All changes persist in <code>localStorage</code>.</p>
         <table><tr><th>Setting</th><th>Effect</th></tr>
@@ -3698,7 +3805,11 @@ input, textarea, select {
         </ol>
       </div>
 
-      <h2 id="h-journal">📓 Lab Journal</h2>
+      <h2 id="h-journal" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+        <span style="width:32px;height:32px;border-radius:8px;background:rgba(188,140,255,.15);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">📓</span>
+        <span style="flex:1">Lab Journal</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">Free-form writing · voice dictation · Ravana parse · overnight batch</span>
+      </h2>
       <div class="help-section-card">
         <p>Nav drawer → <strong>Lab Journal</strong>. A freeform encrypted scratchpad — write in plain language, ideas, observations, protocol thoughts. No required fields. Ravana reads it and extracts structured data.</p>
         <h3>Writing</h3>
@@ -3727,7 +3838,11 @@ input, textarea, select {
         <p>Open the Ravana AI panel → tap <strong>📓 Journal Log</strong> tab. Shows all parsed entries with their summaries and extracted data. Each extract has a <strong>Use →</strong> button to pre-fill the relevant form, and a <strong>↺ Re-parse</strong> button to flag the entry for re-processing if Ravana made a mistake.</p>
       </div>
 
-      <h2 id="h-lifecycle">🔬 Culture Lifecycle Tracking</h2>
+      <h2 id="h-lifecycle" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+        <span style="width:32px;height:32px;border-radius:8px;background:rgba(88,166,255,.15);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">🔬</span>
+        <span style="flex:1">Culture Lifecycle Tracking</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">Progress bar per bottle · expected duration · status colours</span>
+      </h2>
       <div class="help-section-card">
         <p>Every active bottle now shows how far it is through its expected stage duration, and the Analytics section shows a lab-wide lifecycle health summary.</p>
         <h3>On each bottle detail</h3>
@@ -3755,7 +3870,11 @@ input, textarea, select {
         <p>Analytics section → <strong>Culture Lifecycle Status</strong> card. All active bottles grouped by status with counts and clickable rows that navigate directly to the bottle.</p>
       </div>
 
-      <h2 id="h-alerts">🚨 Dashboard Alerts</h2>
+      <h2 id="h-alerts" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+        <span style="width:32px;height:32px;border-radius:8px;background:rgba(248,81,73,.15);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">🚨</span>
+        <span style="flex:1">Dashboard Alerts</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">5 alert conditions · auto-dismiss · nav to fix</span>
+      </h2>
       <div class="help-section-card">
         <p>A strip of coloured pills appears above the stat band whenever the lab needs attention. It renders on every dashboard load and disappears automatically when the condition clears — no manual dismiss needed.</p>
         <table><tr><th>Alert</th><th>Condition</th><th>Goes to</th></tr>
@@ -3767,7 +3886,11 @@ input, textarea, select {
         </table>
       </div>
 
-      <h2 id="h-batch">☑ Batch Operations</h2>
+      <h2 id="h-batch" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+        <span style="width:32px;height:32px;border-radius:8px;background:rgba(88,166,255,.15);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">☑</span>
+        <span style="flex:1">Batch Operations</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">Checkbox select · bulk status update · one save</span>
+      </h2>
       <div class="help-section-card">
         <p>Select multiple bottles and update all of them in a single save — useful after an autoclave run or an end-of-day subculture pass.</p>
         <h3>How to select</h3>
@@ -3789,7 +3912,11 @@ input, textarea, select {
         <p>All changes are saved to GitHub in a single write after confirmation.</p>
       </div>
 
-      <h2 id="h-schedule">📅 Lab Schedule</h2>
+      <h2 id="h-schedule" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+        <span style="width:32px;height:32px;border-radius:8px;background:rgba(255,200,0,.15);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">📅</span>
+        <span style="flex:1">Lab Schedule</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">Overdue · this week · transfer due · GH attention</span>
+      </h2>
       <div class="help-section-card">
         <p>Nav drawer → <strong>Schedule</strong>. A single view showing everything that needs action, sorted by urgency.</p>
         <table><tr><th>Section</th><th>Shows</th></tr>
@@ -3802,7 +3929,11 @@ input, textarea, select {
         <p>Stat cards at the top give a count per category at a glance.</p>
       </div>
 
-      <h2 id="h-search">🔍 Advanced Search</h2>
+      <h2 id="h-search" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+        <span style="width:32px;height:32px;border-radius:8px;background:rgba(88,166,255,.15);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">🔍</span>
+        <span style="flex:1">Advanced Search</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">Ctrl+K · 8 sources · field prefixes · highlighting · recent</span>
+      </h2>
       <div class="help-section-card">
         <p>Press <kbd>Ctrl+K</kbd> from anywhere in the app, or go to nav drawer → <strong>Search</strong>. Searches all sections simultaneously as you type.</p>
         <table><tr><th>Section searched</th><th>Fields matched</th></tr>
@@ -3815,7 +3946,11 @@ input, textarea, select {
         <p>Results are grouped by section with counts. Tap any result to jump directly to that record. Requires at least 2 characters to start searching.</p>
       </div>
 
-      <h2 id="h-supply">📦 Supply Inventory</h2>
+      <h2 id="h-supply" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+        <span style="width:32px;height:32px;border-radius:8px;background:rgba(210,153,34,.15);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">📦</span>
+        <span style="flex:1">Supply Inventory</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">Media batches · expiry · cost/unit · TC perf correlation</span>
+      </h2>
       <div class="help-section-card">
         <p>Nav drawer → <strong>Supplies</strong>. Track media batches, reagents, gelling agents, hormones, and consumables. Data is stored encrypted in GitHub (<code>supplies/data.enc</code>) — synced across devices, version-controlled like all other lab data.</p>
         <h3>Adding a batch</h3>
@@ -3835,7 +3970,11 @@ input, textarea, select {
         <p>Expiry warnings also appear in the <strong>Dashboard Alert strip</strong> before they become critical.</p>
       </div>
 
-      <h2 id="h-export">Export &amp; Backup</h2>
+      <h2 id="h-export" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+        <span style="width:32px;height:32px;border-radius:8px;background:rgba(88,166,255,.15);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">📥</span>
+        <span style="flex:1">Export & Backup</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">Lab report CSV/print · ZIP · calendar export · GitHub history</span>
+      </h2>
       <div class="help-section-card">
         <h3>Lab Report Export (v3.11)</h3>
         <table><tr><th>Mode</th><th>Contents</th></tr>
@@ -3853,7 +3992,11 @@ input, textarea, select {
         <p>Your data is always in the GitHub repo as encrypted <code>.enc</code> files — every save is a git commit, giving you complete version history at <code>github.com/Phyto-Evolution/tcplants</code>.</p>
       </div>
 
-      <h2 id="h-value">💰 Value Vault</h2>
+      <h2 id="h-value" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+        <span style="width:32px;height:32px;border-radius:8px;background:rgba(227,160,0,.15);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">💰</span>
+        <span style="flex:1">Value Vault</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">Stage & size prices · live vault total · INR format</span>
+      </h2>
       <div class="help-section-card">
         <p>Nav drawer → <strong>💰 Value</strong>. Estimates your current lab inventory value from bottles + greenhouse stock using configurable prices.</p>
         <h3>Prices Tab</h3>
@@ -3867,7 +4010,11 @@ input, textarea, select {
         <div class="help-tip">💡 Set the 8 base prices once in the Prices tab — the Vault auto-updates as you add or remove bottles and plants. Species-level overrides are planned for a future update.</div>
       </div>
 
-      <h2 id="h-weather">🌡️ Weather Widget</h2>
+      <h2 id="h-weather" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+        <span style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.1);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">🌡️</span>
+        <span style="flex:1">Weather Widget</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">Open-Meteo · lab + greenhouse · 60s refresh · expandable popover</span>
+      </h2>
       <div class="help-section-card">
         <p>The weather chip in the nav bar shows current real-feel temperature at the lab. Data is fetched from Open-Meteo every 60 seconds — no API key needed.</p>
         <table><tr><th>Location</th><th>Metrics</th></tr>
@@ -3877,7 +4024,11 @@ input, textarea, select {
         <p>Click the chip to expand the two-location popover. Click anywhere outside to close.</p>
       </div>
 
-      <h2 id="h-security">🔒 Privacy &amp; Security</h2>
+      <h2 id="h-security" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+        <span style="width:32px;height:32px;border-radius:8px;background:rgba(248,81,73,.15);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">🔒</span>
+        <span style="flex:1">Privacy & Security</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">AES-256-GCM · PBKDF2 600k · GitHub ciphertext only</span>
+      </h2>
       <div class="help-section-card">
         <table><tr><th>What</th><th>How it works</th></tr>
           <tr><td>Encryption</td><td>AES-256-GCM. Key derived via PBKDF2 (SHA-256, 600,000 iterations). Unique salt per save.</td></tr>
@@ -4172,17 +4323,20 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
         <h1 style="font-size:20px;font-weight:800;margin:0">🔗 Logic Flows</h1>
         <span style="background:linear-gradient(135deg,var(--ac),var(--pu));color:#0d1117;border-radius:12px;font-size:11px;font-weight:800;padding:2px 9px;letter-spacing:.04em">v3.11</span>
+        <button onclick="_lfExpandAll()" class="btn xs ghost" style="margin-left:auto">Expand all</button>
+        <button onclick="_lfCollapseAll()" class="btn xs ghost">Collapse all</button>
       </div>
-      <p style="color:var(--mu);font-size:13px;margin-bottom:14px">Complete dependency map — state, CRUD flows, AI, navigation, and known gaps. Blueprint for testing and future development.</p>
+      <p style="color:var(--mu);font-size:13px;margin-bottom:12px">Expand a section to test it. Each summary shows key functions and scope at a glance.</p>
+
       <!-- Quick-nav chips -->
-      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:24px">
+      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:18px">
         <a href="#lf-data" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid rgba(63,185,80,.4);color:var(--gn);text-decoration:none;background:rgba(63,185,80,.06)">📦 Data</a>
         <a href="#lf-login" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid rgba(88,166,255,.4);color:var(--ac);text-decoration:none;background:rgba(88,166,255,.06)">🔑 Login</a>
         <a href="#lf-nav" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid rgba(188,140,255,.4);color:var(--pu);text-decoration:none;background:rgba(188,140,255,.06)">🧭 Nav</a>
         <a href="#lf-notes" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid var(--bd);color:var(--tx);text-decoration:none;background:var(--sf)">📋 Notes</a>
         <a href="#lf-bottles" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid var(--bd);color:var(--tx);text-decoration:none;background:var(--sf)">🫙 Bottles</a>
         <a href="#lf-gh" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid var(--bd);color:var(--tx);text-decoration:none;background:var(--sf)">🏡 GH</a>
-        <a href="#lf-dash" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid rgba(255,166,0,.4);color:var(--yw);text-decoration:none;background:rgba(255,166,0,.06)">🏠 Dashboard</a>
+        <a href="#lf-dash" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid rgba(255,166,0,.4);color:var(--yw);text-decoration:none;background:rgba(255,166,0,.06)">🏠 Dash</a>
         <a href="#lf-ai" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid rgba(188,140,255,.4);color:var(--pu);text-decoration:none;background:rgba(188,140,255,.06)">🤖 AI</a>
         <a href="#lf-analytics" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid var(--bd);color:var(--tx);text-decoration:none;background:var(--sf)">📊 Analytics</a>
         <a href="#lf-gbif" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid rgba(63,185,80,.4);color:var(--gn);text-decoration:none;background:rgba(63,185,80,.06)">🌍 GBIF</a>
@@ -4191,8 +4345,25 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
         <a href="#lf-gaps" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid rgba(248,81,73,.4);color:var(--rd);text-decoration:none;background:rgba(248,81,73,.06)">⚠️ Gaps</a>
       </div>
 
+      <div class="lf-acc">
       <!-- ═══ DATA ARCHITECTURE ═══ -->
-      <div id="lf-data" class="help-section-card" style="border-left:3px solid var(--gn)">
+      <details id="lf-data">
+      <summary>
+        <span style="width:28px;height:28px;border-radius:7px;background:rgba(63,185,80,.12);display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">📦</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">Data Architecture</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:2px">State object S · GitHub enc/dec cycle · session cache · 16 fields tracked</div>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center">
+          <span class="lf-pill lf-pill-gn">S.*</span>
+          <span class="lf-pill">ghGet/ghPut</span>
+          <span class="lf-pill">AES-256-GCM</span>
+          <span class="lf-stat">16 state fields</span>
+        </div>
+        <span class="lf-caret">›</span>
+      </summary>
+      <div class="lf-body">
+        <div class="help-section-card" style="border:none;padding:0;margin:0;background:transparent">
         <h2 class="help-h2" style="color:var(--gn)">📦 Data Architecture</h2>
 
         <h3 class="help-h3">State Object <code>S</code> — all fields</h3>
@@ -4233,10 +4404,27 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
 
         <h3 class="help-h3" style="margin-top:18px">Session cache (10-min TTL)</h3>
         <p style="font-size:12px;color:var(--mu);line-height:1.6;margin:0 0 8px"><code>_writeCache()</code> saves notes + accs + recs + bottles + greenhouse + taxCustom to <code>sessionStorage._lc</code>. Cache restored on next login if &lt;10 minutes old — skips 7 API calls. Supplies, journal, and value are NOT cached — re-fetched every session.</p>
-      </div>
+        </div>
+      </div></details>
 
       <!-- ═══ LOGIN FLOW ═══ -->
-      <div id="lf-login" class="help-section-card" style="border-left:3px solid var(--ac)">
+      <details id="lf-login">
+      <summary>
+        <span style="width:28px;height:28px;border-radius:7px;background:rgba(88,166,255,.12);display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🔑</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">Login / Unlock Flow</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:2px">Single-token auth · 8 parallel loads · device trust · migration tool</div>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center">
+          <span class="lf-pill">login()</span>
+          <span class="lf-pill">_readCache()</span>
+          <span class="lf-pill">_migrateEncryption()</span>
+          <span class="lf-stat">8 data loads</span>
+        </div>
+        <span class="lf-caret">›</span>
+      </summary>
+      <div class="lf-body">
+        <div class="help-section-card" style="border:none;padding:0;margin:0;background:transparent">
         <h2 class="help-h2" style="color:var(--ac)">🔑 Login / Unlock Flow</h2>
         <p style="font-size:12px;color:var(--mu);margin:0 0 10px"><strong>Single-token login:</strong> the GitHub PAT is both the auth credential and the AES-256-GCM encryption key. No separate passphrase.</p>
         <div class="help-flow" style="justify-content:flex-start;flex-direction:column;align-items:flex-start;gap:4px;padding:12px 14px">
@@ -4257,10 +4445,24 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
           <tr><td>Trust No</td><td>Banner dismissed — token must be re-entered next visit</td></tr>
           <tr><td>Forget device</td><td><code>localStorage.removeItem(DEVICE_KEY)</code> — token field shown on login again</td></tr>
         </table>
-      </div>
+        </div>
+      </div></details>
 
       <!-- ═══ NAVIGATION ═══ -->
-      <div id="lf-nav" class="help-section-card" style="border-left:3px solid var(--pu)">
+      <details id="lf-nav">
+      <summary>
+        <span style="width:28px;height:28px;border-radius:7px;background:rgba(188,140,255,.12);display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🧭</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">Navigation System</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:2px">navTo() · switchSection() · drawer vs full-page · URL routing</div>
+        </div>
+        <span class="lf-pill lf-pill-pu">navTo()</span>
+        <span class="lf-pill lf-pill-pu">switchSection()</span>
+        <span class="lf-pill">viewBatch()</span>
+        <span class="lf-caret">›</span>
+      </summary>
+      <div class="lf-body">
+        <div class="help-section-card" style="border:none;padding:0;margin:0;background:transparent">
         <h2 class="help-h2" style="color:var(--pu)">🧭 Navigation System</h2>
         <table class="help-table">
           <tr><th>Section type</th><th>navTo() behaviour</th><th>Examples</th></tr>
@@ -4285,10 +4487,21 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
         <h3 class="help-h3" style="margin-top:14px">Special navigation</h3>
         <p style="font-size:12px;color:var(--mu)"><code>viewBatch(batchId)</code>: sets <code>S.botBatchFilter = batchId</code>, clears other filters → <code>openNavDrawer(); renderBottleList()</code> — list shows only that batch.</p>
         <p style="font-size:12px;color:var(--mu)"><code>_handleNavQRResult()</code>: scans URL params on load — <code>?bottle=id</code> → open bottle · <code>?note=id</code> → open note · <code>?gh=id</code> → open GH plant (v3.11)</p>
-      </div>
+      </div></div></details>
 
       <!-- ═══ NOTES FLOW ═══ -->
-      <div id="lf-notes" class="help-section-card" style="border-left:3px solid var(--bd)">
+      <details id="lf-notes">
+      <summary>
+        <span style="width:28px;height:28px;border-radius:7px;background:rgba(255,255,255,.08);display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">📋</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">Notes — Full CRUD Flow</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:2px">4 ops · draft · wiki-links · history · keyword stems</div>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center"><span class="lf-pill lf-pill-gn">saveNoteAction()</span><span class="lf-pill">openNote()</span><span class="lf-pill">saveNotesIndex()</span></div>
+        <span class="lf-caret">›</span>
+      </summary>
+      <div class="lf-body">
+        <div style="background:transparent">
         <h2 class="help-h2">📋 Notes — Full CRUD Flow</h2>
         <pre class="help-pre">CREATE:
   startNewNote('generic'|'tc')
@@ -4361,10 +4574,21 @@ NOTE HISTORY:
 CAMERA/BARCODE in notes:
   openCamera() → getUserMedia → _startCam() → ZXing BrowserQRCodeReader
   → decode QR → insertBarcodeResult(text) → appended to ne-body textarea</pre>
-      </div>
+      </div></div></details>
 
       <!-- ═══ BOTTLES FLOW ═══ -->
-      <div id="lf-bottles" class="help-section-card" style="border-left:3px solid var(--ac)">
+      <details id="lf-bottles">
+      <summary>
+        <span style="width:28px;height:28px;border-radius:7px;background:rgba(88,166,255,.12);display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🫙</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">Bottles — Full CRUD & Lifecycle</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:2px">3 creation modes · passage tracking · QR labels · filters</div>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center"><span class="lf-pill">saveBottleAction()</span><span class="lf-pill">updateBottleStatus()</span><span class="lf-pill">_botNextSeq()</span></div>
+        <span class="lf-caret">›</span>
+      </summary>
+      <div class="lf-body">
+        <div style="background:transparent">
         <h2 class="help-h2" style="color:var(--ac)">🫙 Bottles — Full CRUD & Lifecycle</h2>
         <pre class="help-pre">THREE CREATION MODES — toggled by setBotMode():
 
@@ -4479,10 +4703,21 @@ _botNextSeq():
           <tr><td>saveBottleAction()</td><td>Resolves parent code → <code>parent_id</code> stored on new bottle.</td></tr>
           <tr><td>openBottle()</td><td>Shows "Passaged from" row (link to parent) + "Passaged bottles" section (children with ↓ arrow chips).</td></tr>
         </table>
-      </div>
+      </div></div></details>
 
       <!-- ═══ RAVANA AI FLOW ═══ -->
-      <div id="lf-ai" class="help-section-card" style="border-left:3px solid var(--pu)">
+      <details id="lf-ai">
+      <summary>
+        <span style="width:28px;height:28px;border-radius:7px;background:rgba(188,140,255,.12);display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🤖</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">Ravana AI — Context, Routing, Voice</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:2px">6 tools · 2 STT modes · 18 voice commands · wake word · tool-use gate</div>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center"><span class="lf-pill lf-pill-pu">askAI()</span><span class="lf-pill lf-pill-pu">_buildAIContext()</span><span class="lf-pill lf-pill-pu">_parseVoiceAction()</span></div>
+        <span class="lf-caret">›</span>
+      </summary>
+      <div class="lf-body">
+        <div style="background:transparent">
         <h2 class="help-h2" style="color:var(--pu)">🤖 Ravana AI — Context, Routing, Tool-Use</h2>
         <pre class="help-pre">CONTEXT BUILDING — _buildAIContext():
   assembles a structured prompt snapshot:
@@ -4578,10 +4813,21 @@ QUOTA CHECK — _isAtQuota() (Task #8):
           <tr><td>"export report" / "download report" <span style="color:var(--gn)">(v3.11)</span></td><td>exportLabReport('csv')</td><td>No</td></tr>
           <tr><td>Anything else</td><td>askAI(transcript)</td><td>Yes</td></tr>
         </table>
-      </div>
+      </div></div></details>
 
       <!-- ═══ GREENHOUSE FLOW ═══ -->
-      <div id="lf-gh" class="help-section-card" style="border-left:3px solid var(--gn)">
+      <details id="lf-gh">
+      <summary>
+        <span style="width:28px;height:28px;border-radius:7px;background:rgba(63,185,80,.12);display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🏡</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">Greenhouse — Plant Tracking & Transfers</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:2px">Bidirectional bottle↔GH · QR tab (?gh=) · condition log · ledger</div>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center"><span class="lf-pill lf-pill-gn">saveGHPlant()</span><span class="lf-pill lf-pill-gn">saveGHExplant()</span><span class="lf-pill">openGHPlant()</span></div>
+        <span class="lf-caret">›</span>
+      </summary>
+      <div class="lf-body">
+        <div style="background:transparent">
         <h2 class="help-h2" style="color:var(--gn)">🏡 Greenhouse — Plant Tracking & Transfer Flows</h2>
         <pre class="help-pre">GREENHOUSE PLANT CRUD:
   startNewGHPlant() → form: species, quantity, location, source, health, notes, next_inspection
@@ -4628,10 +4874,21 @@ saveGreenhouse(plants, sha, transfers):
           <tr><td><code>ghTab('qr')</code></td><td>Calls <code>_renderGHQRCanvas(S.curGH)</code> → <code>QRCode.toCanvas()</code></td></tr>
           <tr><td>QR scanner / URL param</td><td><code>?gh=id</code> → <code>navTo('greenhouse'); openGHPlant(id)</code></td></tr>
         </table>
-      </div>
+      </div></div></details>
 
       <!-- ═══ DASHBOARD FLOW ═══ -->
-      <div id="lf-dash" class="help-section-card" style="border-left:3px solid var(--yw)">
+      <details id="lf-dash">
+      <summary>
+        <span style="width:28px;height:28px;border-radius:7px;background:rgba(210,153,34,.12);display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🏠</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">Dashboard — Render Pipeline</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:2px">10 stat cards · 5 alert types · active strips · species grid</div>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center"><span class="lf-pill lf-pill-yw">_renderDashboard()</span><span class="lf-pill lf-pill-yw">_computeAlerts()</span></div>
+        <span class="lf-caret">›</span>
+      </summary>
+      <div class="lf-body">
+        <div style="background:transparent">
         <h2 class="help-h2" style="color:var(--yw)">🏠 Dashboard — Render Pipeline</h2>
         <p style="font-size:12px;color:var(--mu);margin:0 0 10px"><code>_renderDashboard()</code> is called at login and after saves. Static helper: <code>C(area, content, extra)</code> → <code>&lt;div class="dc" style="grid-area:area;extra"&gt;</code></p>
 
@@ -4659,10 +4916,21 @@ saveGreenhouse(plants, sha, transfers):
           <tr><td>GH plants with health ≠ healthy</td><td><span style="color:var(--yw)">warn</span></td><td>greenhouse</td></tr>
           <tr><td>Supply batch expired or expiring &lt;14d</td><td><span style="color:var(--rd)">info</span></td><td>supply</td></tr>
         </table>
-      </div>
+      </div></div></details>
 
       <!-- ═══ ANALYTICS FLOW ═══ -->
-      <div id="lf-analytics" class="help-section-card" style="border-left:3px solid var(--bd)">
+      <details id="lf-analytics">
+      <summary>
+        <span style="width:28px;height:28px;border-radius:7px;background:rgba(255,255,255,.08);display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">📊</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">Analytics Engine</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:2px">12 charts · species ranking · lab cost · lifecycle · freshness fixed</div>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center"><span class="lf-pill">LabAnalytics.calculate()</span><span class="lf-pill">renderAnalytics()</span><span class="lf-pill">_buildSpeciesRankingCard()</span></div>
+        <span class="lf-caret">›</span>
+      </summary>
+      <div class="lf-body">
+        <div style="background:transparent">
         <h2 class="help-h2">📊 Analytics Engine</h2>
 
         <h3 class="help-h3">Two systems — both kept in sync (v3.10)</h3>
@@ -4682,10 +4950,21 @@ saveGreenhouse(plants, sha, transfers):
           <tr><td>Lab Cost Tracking <span style="color:var(--gn)">(v3.11)</span></td><td><code>_buildLabCostCard()</code>: S.supplies items with cost_total + date_prepared → 6-month bar chart + total spend + estimated ₹/bottle</td></tr>
           <tr><td>Feature Usage</td><td>Section-visit counters in localStorage</td></tr>
         </table>
-      </div>
+      </div></div></details>
 
       <!-- ═══ JOURNAL FLOW ═══ -->
-      <div class="help-section-card" style="border-left:3px solid var(--bd)">
+      <details>
+      <summary>
+        <span style="width:28px;height:28px;border-radius:7px;background:rgba(188,140,255,.12);display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">📓</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">Lab Journal — Entry, Parse, Extract</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:2px">Voice dictation · overnight parser · extract cards · parse toggle</div>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center"><span class="lf-pill lf-pill-pu">parseJournalWithRavana()</span><span class="lf-pill">saveJournalEntry()</span><span class="lf-pill">_scheduleOvernightJournalParse()</span></div>
+        <span class="lf-caret">›</span>
+      </summary>
+      <div class="lf-body">
+        <div style="background:transparent">
         <h2 class="help-h2">📓 Lab Journal — Entry, Parse, Extract</h2>
         <pre class="help-pre">CREATE:
   startNewJournalEntry() → clear form → show editor
@@ -4723,10 +5002,21 @@ PARSE TOGGLE:
   _setJournalParseEnabled(id, bool):
   → entry.parseEnabled = bool → saveJournal → renderJournalList
   → paused entries show ⏸ badge, skipped by overnight parser</pre>
-      </div>
+      </div></div></details>
 
       <!-- ═══ TAXONOMY FLOW ═══ -->
-      <div class="help-section-card" style="border-left:3px solid var(--gn)">
+      <details>
+      <summary>
+        <span style="width:28px;height:28px;border-radius:7px;background:rgba(63,185,80,.12);display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🌱</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">Taxonomy — Packs, Custom Species, Flairs</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:2px">Pack loading · autocomplete · species picker · CSV import · flairs</div>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center"><span class="lf-pill lf-pill-gn">loadTaxonomy()</span><span class="lf-pill lf-pill-gn">_taxSuggest()</span><span class="lf-pill">_importCsvTaxonomy()</span></div>
+        <span class="lf-caret">›</span>
+      </summary>
+      <div class="lf-body">
+        <div style="background:transparent">
         <h2 class="help-h2" style="color:var(--gn)">🌱 Taxonomy — Packs, Custom Species, Flairs</h2>
         <pre class="help-pre">PACK LOADING — loadTaxonomy():
   TAX_PACKS map: {nepenthaceae:'carnivorous', orchidaceae:'orchids', musaceae:'banana', ...}
@@ -4762,11 +5052,21 @@ FLAIRS:
   S.taxFlairs + S.taxCustom.flairs → combined in _botFlairHtml(flair_ids)
   → colored pills in bottle detail + list
   → flair picker in bottle editor: click to toggle flair_ids[]</pre>
-      </div>
+      </div></div></details>
 
       <!-- ═══ REMINDERS FLOW ═══ -->
-      <div class="help-section-card" style="border-left:3px solid var(--bd)">
-        <h2 class="help-h2">⏰ Reminders — Badge, List, Navigation</h2>
+      <details>
+      <summary>
+        <span style="width:28px;height:28px;border-radius:7px;background:rgba(255,255,255,.08);display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">⏰</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">Reminders — Badge, List, Navigation</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:2px">3 sources (notes/bottles/GH) · urgency groups · nav badge count</div>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center"><span class="lf-pill">renderReminders()</span><span class="lf-pill">updateReminderBadge()</span></div>
+        <span class="lf-caret">›</span>
+      </summary>
+      <div class="lf-body">
+        <div style="background:transparent"> — Badge, List, Navigation</h2>
         <pre class="help-pre">DATA SOURCES (all in-memory, no dedicated file):
   Bottles with next_review: S.bottles.filter(next_review exists + status active)
   Notes with next_review:   S.notes.filter(next_review exists)
@@ -4796,11 +5096,21 @@ updateReminderBadge():
 Badge triggers (cyclic dependency awareness):
   saving a note → saveNoteAction → updateReminderBadge (in line with render)
   saving a bottle → no auto-badge update (gap — badge may be stale after bottle edits)</pre>
-      </div>
+      </div></div></details>
 
       <!-- ═══ SEARCH FLOW ═══ -->
-      <div class="help-section-card" style="border-left:3px solid var(--bd)">
-        <h2 class="help-h2">🔍 Search System — Cross-Section</h2>
+      <details>
+      <summary>
+        <span style="width:28px;height:28px;border-radius:7px;background:rgba(88,166,255,.12);display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🔍</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">Search System — Cross-Section</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:2px">8 sources · tokenized AND · field prefixes · highlighting · recent searches</div>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center"><span class="lf-pill">SearchSystem._run()</span><span class="lf-pill">SearchSystem._hl()</span><span class="lf-pill">_extractKeywords()</span></div>
+        <span class="lf-caret">›</span>
+      </summary>
+      <div class="lf-body">
+        <div style="background:transparent"> System — Cross-Section</h2>
         <pre class="help-pre">SearchSystem.renderSearchPage():
   → #search-main page with input + saved filter chips
   → oninput → _doSearch(query)
@@ -4823,10 +5133,21 @@ Result navigation:
 Saved filters:
   localStorage('tcplants_search_filters') → up to 20 saved filter strings
   chip click → fill input → trigger search</pre>
-      </div>
+      </div></div></details>
 
       <!-- ═══ SUPPLY/STOCK INVENTORY ═══ -->
-      <div class="help-section-card" style="border-left:3px solid var(--yw)">
+      <details>
+      <summary>
+        <span style="width:28px;height:28px;border-radius:7px;background:rgba(210,153,34,.12);display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">📦</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">Inventory — Two Systems</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:2px">Supply = primary · Stock redirects to Supply · batch perf correlation</div>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center"><span class="lf-pill lf-pill-yw">SupplyInventory.renderInventoryPage()</span><span class="lf-pill">calcPerformance()</span></div>
+        <span class="lf-caret">›</span>
+      </summary>
+      <div class="lf-body">
+        <div style="background:transparent">
         <h2 class="help-h2" style="color:var(--yw)">📦 Inventory — Two Systems</h2>
         <table class="help-table">
           <tr><th>System</th><th>State</th><th>File</th><th>Load</th><th>Use case</th></tr>
@@ -4847,11 +5168,21 @@ Saved filters:
         </table>
         <div class="help-tip">📦 Stock section now redirects to Supply via <code>switchSection()</code> early return. Supply is the primary inventory system — batch cards with expiry, cost/unit, and contamination correlation.</div>
         <p style="font-size:12px;color:var(--mu);margin:6px 0 0"><code>calcPerformance(item)</code>: finds bottles prepared within <code>date_prepared → next_batch</code> window → calculates contamRate + successRate vs lab average. Flags if &gt;10% worse.</p>
-      </div>
+      </div></div></details>
 
       <!-- ═══ CALENDAR FLOW ═══ -->
-      <div class="help-section-card" style="border-left:3px solid var(--bd)">
-        <h2 class="help-h2">📅 Calendar — Month Grid & Day Panel</h2>
+      <details>
+      <summary>
+        <span style="width:28px;height:28px;border-radius:7px;background:rgba(255,255,255,.08);display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">📅</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">Calendar — Month Grid & Day Panel</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:2px">Month grid · day panel · create from date · ICS export</div>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center"><span class="lf-pill">renderCalendar()</span><span class="lf-pill">_openCalPanel()</span></div>
+        <span class="lf-caret">›</span>
+      </summary>
+      <div class="lf-body">
+        <div style="background:transparent"> — Month Grid & Day Panel</h2>
         <pre class="help-pre">renderCalendar():
   → S.calYear, S.calMonth → build month grid
   → each day cell: count notes + bottles with dates in that day
@@ -4877,11 +5208,21 @@ New note from calendar:
 Month navigation: S.calMonth/calYear ±1 → re-renderCalendar
 
 Export: _exportCalRange(start, end) → format events as .ics / markdown</pre>
-      </div>
+      </div></div></details>
 
       <!-- ═══ WEATHER FLOW ═══ -->
-      <div class="help-section-card" style="border-left:3px solid var(--bd)">
-        <h2 class="help-h2">🌡️ Weather, Activity Log, Service Worker</h2>
+      <details>
+      <summary>
+        <span style="width:28px;height:28px;border-radius:7px;background:rgba(255,255,255,.08);display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🌡️</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">Weather, Activity Log, Service Worker</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:2px">Open-Meteo dual location · 60s interval · last 30 commits · SW cache</div>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center"><span class="lf-pill">fetchWeather()</span><span class="lf-pill">fetchActivityLog()</span></div>
+        <span class="lf-caret">›</span>
+      </summary>
+      <div class="lf-body">
+        <div style="background:transparent">, Activity Log, Service Worker</h2>
         <pre class="help-pre">WEATHER:
   fetchWeather():
   → navigator.geolocation.getCurrentPosition → lat/lon
@@ -4908,10 +5249,21 @@ SERVICE WORKER (sw.js):
   Offline: navigator.onLine → #offline-pill shown
   Write ops blocked when offline via _checkOnline()
   ⚠️  Only loadNotesIndex + saveNotesIndex wrapped with offline check (Haiku, inconsistent)</pre>
-      </div>
+      </div></div></details>
 
       <!-- ═══ GBIF FLOWS ═══ -->
-      <div id="lf-gbif" class="help-section-card" style="border-left:3px solid var(--gn)">
+      <details id="lf-gbif">
+      <summary>
+        <span style="width:28px;height:28px;border-radius:7px;background:rgba(63,185,80,.12);display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🌍</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">GBIF Integration — 6 Features (A–F)</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:2px">Synonym resolver · common names · distributions · photo · hierarchy · bulk CP</div>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center"><span class="lf-pill lf-pill-gn">_gbifImportSpecies()</span><span class="lf-pill lf-pill-gn">_loadSpDetailGBIF()</span><span class="lf-pill lf-pill-gn">_gbifBulkImportCP()</span></div>
+        <span class="lf-caret">›</span>
+      </summary>
+      <div class="lf-body">
+        <div style="background:transparent">
         <h2 class="help-h2" style="color:var(--gn)">🌍 GBIF Integration — 6 Features (v3.10–v3.11)</h2>
         <table class="help-table">
           <tr><th>Feature</th><th>Where triggered</th><th>What it does</th><th>State written</th></tr>
@@ -4923,10 +5275,21 @@ SERVICE WORKER (sw.js):
           <tr><td><strong>F — Bulk CP genera import</strong></td><td>"🌿 Import CP Checklist" button in GBIF tab</td><td><code>_gbifBulkImportCP()</code>: fetches 5 family keys in parallel (Nepenthaceae, Droseraceae, Sarraceniaceae, Lentibulariaceae, Cephalotaceae). Deduplicates, skips already-imported, batch-inserts to taxCustom.</td><td><code>S.taxCustom.species[]</code></td></tr>
         </table>
         <p style="font-size:12px;color:var(--mu);margin:6px 0 0">All 6 features use <code>Promise.allSettled()</code> internally — network failures degrade gracefully without crashing the UI.</p>
-      </div>
+      </div></div></details>
 
       <!-- ═══ VALUE INVENTORY ═══ -->
-      <div id="lf-value" class="help-section-card" style="border-left:3px solid #e3a000">
+      <details id="lf-value">
+      <summary>
+        <span style="width:28px;height:28px;border-radius:7px;background:rgba(227,160,0,.12);display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">💰</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">Value Inventory — Vault Calculation</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:2px">8 price tiers · live vault · GH size_grade · INR formatting</div>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center"><span class="lf-pill lf-pill-yw">renderValueSection()</span><span class="lf-pill lf-pill-yw">_valPriceSet()</span><span class="lf-pill">loadValue()</span></div>
+        <span class="lf-caret">›</span>
+      </summary>
+      <div class="lf-body">
+        <div style="background:transparent">
         <h2 class="help-h2" style="color:#e3a000">💰 Value Inventory — Vault Calculation (v3.10)</h2>
         <p style="font-size:12px;color:var(--mu);margin:0 0 10px">Nav drawer → 💰 Value. Estimates live inventory value from bottles + greenhouse stock using user-configured base prices.</p>
         <table class="help-table">
@@ -4938,10 +5301,21 @@ SERVICE WORKER (sw.js):
           <tr><td>State</td><td><code>S.value = {prices:{}, overrides:{}}</code> · <code>S.valueSha</code> — 8th load in login Promise.all</td></tr>
           <tr><td>File</td><td>value/data.enc</td></tr>
         </table>
-      </div>
+      </div></div></details>
 
       <!-- ═══ EXPORT FLOW ═══ -->
-      <div id="lf-export" class="help-section-card" style="border-left:3px solid var(--ac)">
+      <details id="lf-export">
+      <summary>
+        <span style="width:28px;height:28px;border-radius:7px;background:rgba(88,166,255,.12);display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">📥</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">Export System (v3.11)</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:2px">3-CSV download · print report · voice trigger · legacy ZIP/CSV</div>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center"><span class="lf-pill">exportLabReport()</span><span class="lf-pill">_downloadText()</span></div>
+        <span class="lf-caret">›</span>
+      </summary>
+      <div class="lf-body">
+        <div style="background:transparent">
         <h2 class="help-h2" style="color:var(--ac)">📥 Export System (v3.11)</h2>
         <table class="help-table">
           <tr><th>Function</th><th>Mode</th><th>Output</th></tr>
@@ -4957,10 +5331,23 @@ SERVICE WORKER (sw.js):
           <tr><td>CSV (top bar)</td><td>Note metadata CSV + accessions CSV</td></tr>
           <tr><td>📅 Calendar export</td><td>Print-ready HTML: this week / this month</td></tr>
         </table>
-      </div>
+      </div></div></details>
 
       <!-- ═══ KNOWN ISSUES ═══ -->
-      <div id="lf-gaps" class="help-section-card" style="border-left:3px solid var(--rd);border-color:rgba(248,81,73,.3)">
+      <details id="lf-gaps">
+      <summary style="border-color:rgba(248,81,73,.25)!important">
+        <span style="width:28px;height:28px;border-radius:7px;background:rgba(248,81,73,.12);display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">⚠️</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700;color:var(--rd)">Known Gaps &amp; Latent Bugs</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:2px">7 fixed · 4 open · 1 priority queue item</div>
+        </div>
+        <span class="lf-pill lf-pill-rd">Telegram frozen</span>
+        <span class="lf-pill lf-pill-rd">CSP pending</span>
+        <span class="lf-pill lf-pill-yw">Agentic Ravana</span>
+        <span class="lf-caret">›</span>
+      </summary>
+      <div class="lf-body" style="border-color:rgba(248,81,73,.2)">
+        <div style="background:transparent">
         <h2 class="help-h2" style="color:var(--rd)">Known Gaps &amp; Latent Bugs</h2>
         <table class="help-table">
           <tr><th>Issue</th><th>Location</th><th>Impact</th><th>Status</th></tr>
@@ -4976,8 +5363,10 @@ SERVICE WORKER (sw.js):
           <tr><td>Two inventory systems (Stock ≠ Supply)</td><td>Stock now redirects to Supply (v3.11)</td><td>Stock UI still exists but unreachable. Low-stock alerts use S.supplies.</td><td>Partially resolved</td></tr>
           <tr><td>Agentic Ravana tool-use</td><td>askAI() / _executeTool()</td><td>Write tools (create_note, create_bottle, log_contam) have confirm gate scaffolded but not fully implemented</td><td>Pending — priority queue</td></tr>
         </table>
-      </div>
+        </div>
+      </div></details>
 
+      </div><!-- /.lf-acc -->
     </main>
   </div>
 
@@ -7510,87 +7899,276 @@ const SupplyInventory={
 };
 
 // 7. SEARCH SYSTEM
+// ── Keyword extractor for body-search index (Group 2) ─────────────────
+function _extractKeywords(body){
+  if(!body) return [];
+  const STOP=new Set(['the','and','for','are','but','not','you','all','can','had','was','one','our','out','get','has','him','his','how','new','now','see','who','did','its','let','put','say','she','too','use','any','may','into','then','than','that','this','they','were','with','from','have','been','will','also','each','just','know','like','make','many','more','most','over','same','such','time','very','what','your','about','after','again','could','every','first','other','their','them','there','these','when','which','while','some','would','used','here','both','high','show','where','only','well','must','does','even','much','those','made','each','need','take','back','down','away','give','open','gave','left','life','grow','root','into','onto','upon','per','via','pre','post']);
+  return [...new Set(body.toLowerCase().replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(w=>w.length>=3&&!STOP.has(w)))].slice(0,250);
+}
+
 const SearchSystem={
-  _run(q){
-    if(!q||q.length<2) return null;
-    const lq=q.toLowerCase();
-    const match=(s)=>(s||'').toLowerCase().includes(lq);
-    const notes=(S.notes||[]).filter(n=>match(n.title)||match(n.species)||match(n.body_preview)||(n.tags||[]).some(t=>match(t)));
-    const bottles=(S.bottles||[]).filter(b=>match(b.code)||match(b.species)||match(b.notes));
-    const accs=(S.accs||[]).filter(a=>match(a.species)||match(a.num)||match(a.source));
-    const recs=(S.recs||[]).filter(r=>match(r.name)||match(r.base)||match(r.target));
-    const gh=(S.greenhouse||[]).filter(p=>match(p.species)||match(p.source));
-    return{notes,bottles,accs,recs,gh,total:notes.length+bottles.length+accs.length+recs.length+gh.length};
+  // ── Parse field prefixes from query ──────────────────────────────
+  _parseQuery(raw){
+    const prefixes={};
+    const clean=raw.replace(/(\w+):(\S+)/g,(_,k,v)=>{ prefixes[k.toLowerCase()]=v.toLowerCase(); return ''; }).trim();
+    const tokens=clean.toLowerCase().split(/\s+/).filter(t=>t.length>=2);
+    return{tokens,prefixes};
   },
+
+  // ── Highlight matching tokens in escaped text ─────────────────────
+  _hl(text,tokens){
+    if(!text||!tokens.length) return esc(text||'');
+    let s=esc(text);
+    for(const t of tokens){
+      const re=new RegExp(t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
+      s=s.replace(re,m=>`<mark style="background:rgba(255,200,0,.25);border-radius:2px;padding:0 1px;color:inherit">${m}</mark>`);
+    }
+    return s;
+  },
+
+  // ── Score a result — higher = more relevant ───────────────────────
+  _score(fields,tokens){
+    if(!tokens.length) return 1;
+    let s=0;
+    for(const t of tokens){
+      for(const[w,text]of fields){
+        if((text||'').toLowerCase().includes(t)){s+=w;break;}
+      }
+    }
+    return s;
+  },
+
+  // ── Check all tokens appear somewhere in fieldTexts ───────────────
+  _allMatch(tokens,fieldTexts){
+    if(!tokens.length) return true;
+    return tokens.every(t=>fieldTexts.some(f=>(f||'').toLowerCase().includes(t)));
+  },
+
+  // ── Prefix filter check ───────────────────────────────────────────
+  _matchPfx(item,type,pfx){
+    if(pfx.species&&!(item.species||'').toLowerCase().includes(pfx.species)) return false;
+    if(type==='note'){
+      if(pfx.stage&&!(item.stage||'').toLowerCase().includes(pfx.stage)) return false;
+      if(pfx.tag&&!(item.tags||[]).some(t=>t.toLowerCase().includes(pfx.tag))) return false;
+      if(pfx.type&&!(item.type||'').toLowerCase().includes(pfx.type)) return false;
+    }
+    if(type==='bottle'){
+      if(pfx.status&&!(item.status||'').toLowerCase().includes(pfx.status)) return false;
+      if(pfx.code&&!(item.code||'').toLowerCase().includes(pfx.code)) return false;
+      if(pfx.stage&&!(item.stage||'').toLowerCase().includes(pfx.stage)) return false;
+    }
+    if(type==='gh'){
+      if(pfx.health&&!(item.health||'').toLowerCase().includes(pfx.health)) return false;
+      if(pfx.location&&!(item.location||'').toLowerCase().includes(pfx.location)) return false;
+    }
+    return true;
+  },
+
+  // ── Main search engine ─────────────────────────────────────────────
+  _run(raw){
+    if(!raw||raw.trim().length<2) return null;
+    const{tokens,prefixes:pfx}=this._parseQuery(raw);
+    if(!tokens.length&&!Object.keys(pfx).length) return null;
+    const am=(texts)=>this._allMatch(tokens,texts);
+    const sc=(fields)=>this._score(fields,tokens);
+
+    // Notes — body_preview + keyword stems (Group 2)
+    const notes=(S.notes||[])
+      .filter(n=>this._matchPfx(n,'note',pfx)&&am([n.title,n.species,n.body_preview,...(n.tags||[]),...(n.keywords||[])]))
+      .map(n=>({...n,_s:sc([[3,n.title],[2,n.species],[2,(n.tags||[]).join(' ')],[1,n.body_preview],[1,(n.keywords||[]).join(' ')]])}))
+      .sort((a,b)=>b._s-a._s);
+
+    // Bottles
+    const bottles=(S.bottles||[])
+      .filter(b=>this._matchPfx(b,'bottle',pfx)&&am([b.code,b.species,b.notes,b.stage,b.status,b.flair_note]))
+      .map(b=>({...b,_s:sc([[3,b.code],[2,b.species],[2,b.stage],[1,b.notes],[1,b.status]])}))
+      .sort((a,b)=>b._s-a._s);
+
+    // Accessions
+    const accs=(S.accs||[])
+      .filter(a=>this._matchPfx(a,'acc',pfx)&&am([a.species,a.num,a.source,a.notes,a.origin]))
+      .map(a=>({...a,_s:sc([[3,a.species],[2,a.num],[1,a.source],[1,a.notes]])}))
+      .sort((a,b)=>b._s-a._s);
+
+    // Recipes — includes PGR text and prep notes
+    const recs=(S.recs||[])
+      .filter(r=>am([r.name,r.base,r.target,r.pgr,r.notes,r.autoclave]))
+      .map(r=>({...r,_s:sc([[3,r.name],[2,r.target],[2,r.pgr],[1,r.base],[1,r.notes]])}))
+      .sort((a,b)=>b._s-a._s);
+
+    // Greenhouse
+    const gh=(S.greenhouse||[])
+      .filter(p=>this._matchPfx(p,'gh',pfx)&&am([p.species,p.source,p.location,p.notes,p.health]))
+      .map(p=>({...p,_s:sc([[3,p.species],[2,p.location],[1,p.source],[1,p.notes]])}))
+      .sort((a,b)=>b._s-a._s);
+
+    // Journal entries (new)
+    const journal=(S.journal||[])
+      .filter(j=>am([j.title,j.body,...(j.tags||[])]))
+      .map(j=>({...j,_s:sc([[3,j.title],[2,(j.tags||[]).join(' ')],[1,j.body]])}))
+      .sort((a,b)=>b._s-a._s);
+
+    // Supplies (new)
+    const supplies=(S.supplies||[])
+      .filter(s=>am([s.name,s.notes,s.unit]))
+      .map(s=>({...s,_s:sc([[3,s.name],[1,s.notes]])}))
+      .sort((a,b)=>b._s-a._s);
+
+    // Custom taxonomy species (new)
+    const species=((S.taxCustom||{}).species||[])
+      .filter(sp=>am([sp.name,sp.common_name,sp.category,sp.source]))
+      .map(sp=>({...sp,_s:sc([[3,sp.name],[2,sp.common_name],[1,sp.category]])}))
+      .sort((a,b)=>b._s-a._s);
+
+    const total=notes.length+bottles.length+accs.length+recs.length+gh.length+journal.length+supplies.length+species.length;
+    return{notes,bottles,accs,recs,gh,journal,supplies,species,total,tokens,pfx};
+  },
+
+  // ── Render results ─────────────────────────────────────────────────
   _renderResults(res,q){
-    if(!res) return '<div style="color:var(--mu);font-size:13px;padding:12px 0">Type at least 2 characters to search.</div>';
-    if(!res.total) return `<div style="color:var(--mu);font-size:13px;padding:12px 0">No results for "${esc(q)}"</div>`;
-    const sec=(icon,label,items,rows)=>items.length?`
-      <div style="margin-bottom:16px">
-        <div style="font-size:10px;font-weight:800;letter-spacing:.1em;color:var(--mu);text-transform:uppercase;margin-bottom:6px">${icon} ${label} <span style="font-weight:400">(${items.length})</span></div>
-        ${rows}
+    if(!res){
+      // Show recent searches when idle
+      const recent=this._loadRecent();
+      const hint=recent.length?`<div style="margin-top:16px"><div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--mu);text-transform:uppercase;margin-bottom:8px">Recent searches</div>${recent.map(r=>`<span onclick="SearchSystem._applyFilter('${esc(r)}')" style="display:inline-block;cursor:pointer;background:var(--sf2);border:1px solid var(--bd);border-radius:14px;padding:3px 10px;font-size:12px;margin:3px 3px 3px 0;color:var(--tx)">${esc(r)}</span>`).join('')}</div>`:'';
+      return `<div style="color:var(--mu);font-size:13px;padding:6px 0">Type to search — use <code style="font-size:11px">species:Nepenthes</code> <code style="font-size:11px">stage:II</code> <code style="font-size:11px">status:growing</code> <code style="font-size:11px">tag:contam</code> for field-specific search. Multi-word AND logic: all terms must match.</div>${hint}`;
+    }
+    if(!res.total) return `<div style="color:var(--mu);font-size:13px;padding:12px 0">No results for <strong>"${esc(q)}"</strong> across all sections. Try fewer words or a field prefix like <code>species:</code></div>`;
+
+    const H=this._hl.bind(this);
+    const T=res.tokens;
+
+    const sec=(icon,label,col,items,rows)=>items.length?`
+      <div style="margin-bottom:20px">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:7px">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:${col}22;font-size:12px">${icon}</span>
+          <span style="font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--mu);text-transform:uppercase">${label}</span>
+          <span style="font-size:10px;background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:1px 7px;color:var(--mu)">${items.length}</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:3px">${rows}</div>
       </div>`:'';
-    const pill=(txt,col='var(--mu)')=>`<span style="font-size:10px;background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:1px 7px;color:${col}">${txt}</span>`;
-    const row=(icon,title,sub,action)=>`<div onclick="${action}" style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--sf);border:1px solid var(--bd);border-radius:6px;cursor:pointer;margin-bottom:4px;transition:background .12s" onmouseover="this.style.background='var(--sf2)'" onmouseout="this.style.background='var(--sf)'">
-      <span style="font-size:15px;flex-shrink:0">${icon}</span>
+
+    const row=(icon,title,sub,badges,action)=>`<div onclick="${action}" style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--sf);border:1px solid var(--bd);border-radius:7px;cursor:pointer;transition:background .1s,border-color .1s" onmouseover="this.style.background='var(--sf2)';this.style.borderColor='var(--ac)'" onmouseout="this.style.background='var(--sf)';this.style.borderColor='var(--bd)'">
+      <span style="font-size:15px;flex-shrink:0;opacity:.85">${icon}</span>
       <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${title}</div>
-        ${sub?`<div style="font-size:11px;color:var(--mu)">${sub}</div>`:''}
-      </div></div>`;
-    return sec('📋','Notes',res.notes,res.notes.map(n=>row('📋',esc(n.title),[fmtDateShort(n.date),n.species?esc(n.species):'',n.stage||''].filter(Boolean).join(' · '),`navTo('notes');openNote('${n.id}')`)).join(''))
-      +sec('🫙','Bottles',res.bottles,res.bottles.map(b=>row('🫙',esc(b.code),[esc(b.species||''),b.status||''].filter(Boolean).join(' · '),`navTo('bottles');openBottle('${b.id}')`)).join(''))
-      +sec('🌿','Accessions',res.accs,res.accs.map(a=>row('🌿',esc(a.species||a.num||''),esc(a.source||''),`navTo('registry');openAccession('${a.id}')`)).join(''))
-      +sec('🧪','Recipes',res.recs,res.recs.map(r=>row('🧪',esc(r.name),esc(r.base||''),`navTo('recipes');openRecipe('${r.id}')`)).join(''))
-      +sec('🏡','Greenhouse',res.gh,res.gh.map(p=>row('🏡',esc(p.species||'Plant'),`Health: ${esc(p.health||'?')}`,`navTo('greenhouse');openGHPlant('${p.id}')`)).join(''));
+        <div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${title}</div>
+        ${sub?`<div style="font-size:11px;color:var(--mu);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${sub}</div>`:''}
+      </div>
+      ${badges?`<div style="display:flex;gap:4px;flex-shrink:0">${badges}</div>`:''}
+    </div>`;
+
+    const badge=(txt,col='var(--mu)')=>`<span style="font-size:10px;background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:1px 7px;color:${col};white-space:nowrap">${txt}</span>`;
+
+    const statusCol={inoculated:'var(--ac)',growing:'var(--gn)',contaminated:'var(--rd)',subcultured:'var(--pu)',prepared:'var(--mu)',discarded:'var(--mu)'};
+
+    return [
+      sec('📋','Lab Notes','#3fb950',res.notes,res.notes.slice(0,15).map(n=>
+        row('📋',H(n.title,T),[fmtDateShort(n.date),n.species?H(n.species,T):'',n.stage||''].filter(Boolean).join(' · '),
+          [n.stage?badge(n.stage):'',n.type?badge(n.type):''].filter(Boolean).join(''),
+          `navTo('notes');openNote('${n.id}')`)
+      ).join('')),
+      sec('🫙','Bottles','#58a6ff',res.bottles,res.bottles.slice(0,15).map(b=>
+        row('🫙',H(b.code,T),[H(b.species||'',T),fmtDateShort(b.date_prepared)].filter(Boolean).join(' · '),
+          [b.status?badge(b.status,statusCol[b.status]||'var(--mu)'):'',b.stage?badge(b.stage):''].filter(Boolean).join(''),
+          `navTo('bottles');openBottle('${b.id}')`)
+      ).join('')),
+      sec('🌿','Accessions','#3fb950',res.accs,res.accs.slice(0,10).map(a=>
+        row('🌿',H(a.species||a.num||'',T),H(a.source||'',T),
+          a.num?badge(a.num):'',`navTo('registry');openAccession('${a.id}')`)
+      ).join('')),
+      sec('🧪','Recipes','#bc8cff',res.recs,res.recs.slice(0,10).map(r=>
+        row('🧪',H(r.name,T),[r.base?H(r.base,T):'',r.pgr?H(r.pgr,T):''].filter(Boolean).join(' · '),
+          r.target?badge(r.target):'',`navTo('recipes');openRecipe('${r.id}')`)
+      ).join('')),
+      sec('🏡','Greenhouse','#3fb950',res.gh,res.gh.slice(0,10).map(p=>
+        row('🏡',H(p.species||'Plant',T),p.location?H(p.location,T):'',
+          [p.health?badge(p.health,{healthy:'var(--gn)',stressed:'var(--yw)',declined:'var(--rd)'}[p.health]||'var(--mu)'):''].filter(Boolean).join(''),
+          `navTo('greenhouse');openGHPlant('${p.id}')`)
+      ).join('')),
+      sec('📓','Journal','#bc8cff',res.journal,res.journal.slice(0,8).map(j=>
+        row('📓',H(j.title||'Untitled entry',T),[fmtDateShort(j.date),j.parsed?'✦ parsed':''].filter(Boolean).join(' · '),
+          (j.tags||[]).slice(0,2).map(t=>badge(t)).join(''),
+          `navTo('journal');openJournalEntry&&openJournalEntry('${j.id}')`)
+      ).join('')),
+      sec('📦','Supplies','#e3a000',res.supplies,res.supplies.slice(0,8).map(s=>
+        row('📦',H(s.name,T),[s.unit,s.date_prepared?fmtDateShort(s.date_prepared):''].filter(Boolean).join(' · '),
+          s.quantity!==undefined?badge(`${s.quantity}${s.unit?' '+s.unit:''}`):'',
+          `navTo('supply')`)
+      ).join('')),
+      sec('🌱','Species','#3fb950',res.species,res.species.slice(0,8).map(sp=>
+        row('🌱',H(sp.name,T),sp.common_name?H(sp.common_name,T):'',
+          [sp.conservation_status?badge(sp.conservation_status):'',sp.category?badge(sp.category):''].filter(Boolean).join(''),
+          `navTo('species')`)
+      ).join('')),
+    ].join('');
   },
+
+  // ── Page render ────────────────────────────────────────────────────
   renderSearchPage(){
     const c=document.getElementById('search-main'); if(!c) return;
     const filters=SearchSystem._loadFilters();
     const filterChips=filters.length?`
-      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">
+      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px">
         ${filters.map(f=>`
-          <span style="display:inline-flex;align-items:center;gap:4px;background:var(--sf2);border:1px solid var(--bd);border-radius:16px;padding:3px 10px 3px 12px;font-size:12px;cursor:pointer" onclick="SearchSystem._applyFilter('${esc(f.query)}')">
-            ${esc(f.name)}
-            <button onclick="event.stopPropagation();SearchSystem._deleteFilter('${esc(f.name)}');SearchSystem.renderSearchPage()" style="background:none;border:none;color:var(--mu);cursor:pointer;font-size:11px;padding:0 0 0 4px;line-height:1">✕</button>
+          <span style="display:inline-flex;align-items:center;gap:3px;background:var(--sf2);border:1px solid var(--bd);border-radius:14px;padding:3px 8px 3px 11px;font-size:11px;cursor:pointer" onclick="SearchSystem._applyFilter('${esc(f.query)}')">
+            💾 ${esc(f.name)}
+            <button onclick="event.stopPropagation();SearchSystem._deleteFilter('${esc(f.name)}');SearchSystem.renderSearchPage()" style="background:none;border:none;color:var(--mu);cursor:pointer;font-size:11px;padding:0 0 0 3px;line-height:1">✕</button>
           </span>`).join('')}
       </div>`:'';
-    c.innerHTML=`<div style="padding:20px;max-width:900px">
-      <h2 style="margin-bottom:12px;font-size:18px">🔍 Search</h2>
+    c.innerHTML=`<div style="padding:24px;max-width:880px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <h2 style="font-size:18px;margin:0;font-weight:800">🔍 Search</h2>
+        <span style="font-size:11px;color:var(--mu)">notes · bottles · accessions · recipes · greenhouse · journal · supplies · species</span>
+      </div>
       ${filterChips}
-      <div style="display:flex;gap:8px;margin-bottom:16px">
-        <input type="text" id="search-q" placeholder="Search notes, bottles, accessions, recipes, greenhouse…"
-          style="flex:1;padding:10px 14px;background:var(--sf);border:1px solid var(--bd);border-radius:8px;color:var(--tx);font-size:14px"
-          oninput="SearchSystem._onInput(this.value)" autofocus>
-        <button class="btn sm ghost" onclick="SearchSystem._promptSaveFilter()" id="search-save-btn" style="white-space:nowrap;display:none">💾 Save filter</button>
+      <div style="display:flex;gap:8px;margin-bottom:6px">
+        <input type="text" id="search-q" placeholder="e.g. Nepenthes rajah  or  species:Drosera stage:II  or  growing contam"
+          style="flex:1;padding:11px 14px;background:var(--sf);border:1px solid var(--bd);border-radius:8px;color:var(--tx);font-size:14px;outline:none;transition:border-color .15s"
+          oninput="SearchSystem._onInput(this.value)"
+          onfocus="this.style.borderColor='var(--ac)'" onblur="this.style.borderColor='var(--bd)'"
+          autofocus>
+        <button class="btn sm ghost" onclick="SearchSystem._promptSaveFilter()" id="search-save-btn" style="white-space:nowrap;display:none">💾 Save</button>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px" id="search-prefix-hints">
+        ${['species:','stage:','status:','tag:','code:','health:','location:'].map(p=>`<span onclick="SearchSystem._insertPrefix('${p}')" style="cursor:pointer;font-size:11px;font-family:var(--mono);background:var(--sf2);border:1px solid var(--bd);border-radius:5px;padding:2px 7px;color:var(--mu)" title="Click to add prefix">${p}</span>`).join('')}
       </div>
       <div id="search-results"></div>
     </div>`;
     setTimeout(()=>{ const el=document.getElementById('search-q'); if(el) el.focus(); },50);
   },
+
   _onInput(q){
     const res=this._run(q);
     const el=document.getElementById('search-results'); if(!el) return;
     el.innerHTML=this._renderResults(res,q);
     const btn=document.getElementById('search-save-btn');
-    if(btn) btn.style.display=q.length>=2?'':'none';
+    if(btn) btn.style.display=q.trim().length>=2?'':'none';
+    if(q.trim().length>=2) this._addRecent(q.trim());
   },
+
   _applyFilter(q){
     SearchSystem.renderSearchPage();
     setTimeout(()=>{
       const el=document.getElementById('search-q'); if(!el) return;
       el.value=q; el.focus(); SearchSystem._onInput(q);
-      const btn=document.getElementById('search-save-btn'); if(btn) btn.style.display='';
     },50);
   },
+
+  _insertPrefix(pfx){
+    const el=document.getElementById('search-q'); if(!el) return;
+    el.value=(el.value.trim()+' '+pfx).trim()+' ';
+    el.focus(); SearchSystem._onInput(el.value);
+  },
+
   _promptSaveFilter(){
     const q=document.getElementById('search-q')?.value.trim(); if(!q) return;
-    const name=prompt(`Save this search as:\n"${q}"\n\nFilter name:`,q);
-    if(!name) return;
+    const name=prompt(`Name this saved search:\n"${q}"`,q);
+    if(!name||!name.trim()) return;
     SearchSystem._saveFilter(name.trim(),q);
     SearchSystem.renderSearchPage();
     setTimeout(()=>SearchSystem._applyFilter(q),50);
-    toast('Filter saved: '+name);
+    toast('Search saved: '+name.trim());
   },
+
   _loadFilters(){ try{ return JSON.parse(localStorage.getItem('tcplants_search_filters')||'[]'); }catch{ return []; } },
   _saveFilter(name,query){
     const filters=this._loadFilters().filter(f=>f.name!==name);
@@ -7600,7 +8178,13 @@ const SearchSystem={
   _deleteFilter(name){
     const filters=this._loadFilters().filter(f=>f.name!==name);
     localStorage.setItem('tcplants_search_filters',JSON.stringify(filters));
-    toast('Filter removed');
+    toast('Search removed');
+  },
+  _loadRecent(){ try{ return JSON.parse(localStorage.getItem('tcplants_search_recent')||'[]'); }catch{ return []; } },
+  _addRecent(q){
+    const r=this._loadRecent().filter(x=>x!==q);
+    r.unshift(q);
+    localStorage.setItem('tcplants_search_recent',JSON.stringify(r.slice(0,10)));
   }
 };
 
@@ -12489,13 +13073,14 @@ async function saveNoteAction(){
   document.getElementById('save-note-btn').disabled=true;
   load('Encrypting & saving…');
   try{
+    const keywords=_extractKeywords(body); // Group 2: body keyword stems for search
     if(S.editing){
       const ef=await ghGet(`${DIR}/${S.editing}.enc`);
       await writeNote(S.editing,body,ef.sha,`lab: update "${title}"`);
       const editingId=S.editing;
       const {sha,notes}=await saveNotesIndex(ns=>{
         const idx=ns.findIndex(n=>n.id===editingId);
-        if(idx!==-1) ns[idx]={...ns[idx],title,type,stage,species,tags,next_review:review,recipe_id,cultures_out,note_type,pinned};
+        if(idx!==-1) ns[idx]={...ns[idx],title,type,stage,species,tags,next_review:review,recipe_id,cultures_out,note_type,pinned,keywords};
         return ns;
       });
       S.notes=notes; S.notesSha=sha; S.cur=editingId;
@@ -12504,7 +13089,7 @@ async function saveNoteAction(){
       S.calDate=null;
       await writeNote(id,body,null,`lab: add "${title}"`);
       const {sha,notes}=await saveNotesIndex(ns=>{
-        ns.push({id,title,date,type,stage,species,tags,next_review:review,recipe_id,cultures_out,note_type,pinned});
+        ns.push({id,title,date,type,stage,species,tags,next_review:review,recipe_id,cultures_out,note_type,pinned,keywords});
         return ns;
       });
       S.notes=notes; S.notesSha=sha; S.cur=id;
@@ -17370,6 +17955,9 @@ function _applyTheme(t){
 document.getElementById('theme-btn').addEventListener('click',function(){
   _applyTheme(_themeNext(document.documentElement.dataset.theme||'dark'));
 });
+function _lfExpandAll(){ document.querySelectorAll('#sec-logicflows details').forEach(d=>d.open=true); }
+function _lfCollapseAll(){ document.querySelectorAll('#sec-logicflows details').forEach(d=>d.open=false); }
+
 function _loginToggleTheme(){
   _applyTheme(_themeNext(document.documentElement.dataset.theme||'dark'));
 }
