@@ -4326,7 +4326,8 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
       </div>
       <div id="gal-contam-banner" style="display:none;border-radius:8px;padding:10px 14px;font-size:12px;font-weight:600;margin-bottom:0"></div>
       <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
-        <button class="btn ghost" onclick="_galCloseModal()">Cancel</button>
+        <button class="btn ghost" id="gal-cancel-btn" onclick="_galAbortUpload()">Cancel</button>
+        <button class="btn sm ghost" id="gal-skip-btn" onclick="_galCloseModal()" style="display:none">⏭ Skip</button>
         <button class="btn sm" id="gal-deepscan-btn" onclick="_galRunDeepScan()" style="background:linear-gradient(135deg,#4285f4,#8250df);color:#fff;border:none">🔬 Deep Scan</button>
         <button class="btn green" id="gal-save-btn" onclick="_galSaveUpload()">Save Photo</button>
       </div>
@@ -4446,7 +4447,7 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
         <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin:8px 0 4px">
           <div class="lf-master-section" style="background:rgba(188,140,255,.15)" onclick="document.getElementById('lf-ai').open=true;document.getElementById('lf-ai').scrollIntoView({behavior:'smooth'})">🤖 Ravana AI</div>
           <div class="lf-master-section" style="background:rgba(88,166,255,.1)" onclick="navTo('search')">🔍 Search</div>
-          <div class="lf-master-section" style="background:rgba(88,166,255,.1)" onclick="navTo('analytics');document.getElementById('lf-analytics').open=true">📊 Analytics</div>
+          <div class="lf-master-section" style="background:rgba(88,166,255,.1)" onclick="document.getElementById('lf-analytics').open=true;document.getElementById('lf-analytics').scrollIntoView({behavior:'smooth'})">📊 Analytics</div>
           <div class="lf-master-section" style="background:rgba(210,153,34,.1)" onclick="document.getElementById('lf-dash').open=true;document.getElementById('lf-dash').scrollIntoView({behavior:'smooth'})">🏠 Dashboard</div>
           <div class="lf-master-section" style="background:rgba(63,185,80,.1)" onclick="document.getElementById('lf-gbif').open=true;document.getElementById('lf-gbif').scrollIntoView({behavior:'smooth'})">🌍 GBIF</div>
           <div class="lf-master-section" style="background:rgba(88,166,255,.1)" onclick="document.getElementById('lf-export').open=true;document.getElementById('lf-export').scrollIntoView({behavior:'smooth'})">📥 Export</div>
@@ -6297,6 +6298,13 @@ SERVICE WORKER (sw.js):
             <div class="set-row-sub">Remove saved encrypted token</div>
           </div>
           <button class="btn xs danger" onclick="forgetDevice()">Forget</button>
+        </div>
+        <div class="set-row">
+          <div class="set-row-info">
+            <div class="set-row-label">Re-index notes for search</div>
+            <div class="set-row-sub">Extract keyword stems from existing notes (enables body search on older entries)</div>
+          </div>
+          <button class="btn xs ghost" onclick="_bulkReindexKeywords(this)">Re-index</button>
         </div>
         <div class="set-row">
           <div class="set-row-info">
@@ -11860,6 +11868,11 @@ async function _buildAIContext(){
   // Current user context
   const _cu=_getRavanaUser();
   ctx+=`\n\n### CURRENT USER\nSpeaking with: ${_cu.name}\nBackground: ${_cu.bg}\nTone guidance: ${_cu.tone}`;
+
+  // Minimal app architecture — injected only for 70B/Claude (higher TPM limits); skipped for 8B
+  if(_aiModel!=='groq8'&&ctx.length<MAX_CONTEXT_SIZE){
+    ctx+=`\n\n### APP\nSingle-file PWA. State: S.notes/bottles/greenhouse/accs/recs/supplies/journal/value. AES-256-GCM encrypted → GitHub. navTo(sec) navigates. saveNoteAction/saveBottleAction/saveGHPlant write data. _parseVoiceAction() handles 18 instant commands. All AI calls via Cloudflare proxy.`;
+  }
 
   return ctx;
 }
@@ -17911,6 +17924,21 @@ function _clearCache(){
   localStorage.removeItem('tcplants_cache');
   toast('Cache cleared — will reload from GitHub on next login');
 }
+async function _bulkReindexKeywords(btn){
+  if(!S.notes?.length){toast('No notes to index','fail');return;}
+  if(btn){btn.disabled=true;btn.textContent='Indexing…';}
+  try{
+    const count=S.notes.filter(n=>!n.keywords).length;
+    await saveNotesIndex(ns=>{
+      ns.forEach(n=>{ if(!n.keywords) n.keywords=_extractKeywords(n.body_preview||''); });
+      return ns;
+    });
+    _writeCache();
+    toast(`Re-indexed ${count} notes for body search ✓`);
+  }catch(e){toast('Re-index failed: '+e.message,'fail');}
+  if(btn){btn.disabled=false;btn.textContent='Re-index';}
+}
+
 function _resetUsageStats(){
   localStorage.removeItem('tcplants_usage');
   toast('Usage stats reset');
@@ -19332,7 +19360,7 @@ function renderGalleryGrid(){
         `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--mu);font-size:24px">${(GALLERY_CATS.find(c=>c.id===item.category)||GALLERY_CATS[0]).icon}</div>`}
       <div class="gal-thumb-overlay">
         <div class="gal-thumb-title">${esc(item.title||item.category)}</div>
-        <div class="gal-thumb-cat">${item.species_id?esc(item.species_id)+' · ':''} ${item.date||''}</div>
+        <div class="gal-thumb-cat">${item.species_id?esc(_galResolveSpecies(item.species_id))+' · ':''} ${item.date||''}</div>
       </div>
     </div>`).join('');
 }
@@ -19616,7 +19644,29 @@ function _galShowUploadModal(filename, canvas){
   _galPopulateCatSelect('gal-category');
   _galPopulateSpecies();
   _galPopulateGHSelect('gal-gh-id');
+  // Show Skip button during multi-upload; hide it for single-upload
+  const qTotal=(_galUploadQueue||[]).length;
+  const skipBtn=document.getElementById('gal-skip-btn');
+  const cancelBtn=document.getElementById('gal-cancel-btn');
+  if(skipBtn&&cancelBtn){
+    if(qTotal>1){
+      skipBtn.style.display='';
+      cancelBtn.textContent='✕ Cancel All';
+    } else {
+      skipBtn.style.display='none';
+      cancelBtn.textContent='Cancel';
+    }
+  }
   m.style.display='flex';
+}
+
+function _galResolveSpecies(species_id){
+  if(!species_id) return '';
+  // If it already looks like a species name (contains space = genus + epithet), use as-is
+  if(species_id.includes(' ')) return species_id;
+  // Otherwise it's a legacy ID — try to find the matching species in taxonomy
+  const sp=(S.taxSpecies||[]).find(s=>s.id===species_id);
+  return sp?(sp.full_name||sp.name||species_id):species_id;
 }
 
 function _galPopulateGHSelect(selectId, currentVal){
@@ -19766,10 +19816,17 @@ async function _galRunDeepScan(){
   btn.disabled=false; btn.textContent='🔬 Deep Scan';
 }
 
-function _galCloseModal(){
+function _galAbortUpload(){
+  // Cancel All — clears the entire queue and closes
+  _galUploadQueue=[]; _galUploadQueueIdx=0;
   document.getElementById('gal-modal').style.display='none';
   _galUploadCanvas=null; _galUploadBlob=null; _galUploadThumb=null; _galBarcodeInfo=null;
-  // Advance queue if multi-upload
+}
+
+function _galCloseModal(){
+  // Skip (or single-upload close) — advances queue to next item
+  document.getElementById('gal-modal').style.display='none';
+  _galUploadCanvas=null; _galUploadBlob=null; _galUploadThumb=null; _galBarcodeInfo=null;
   _galUploadQueueIdx++;
   if(_galUploadQueueIdx<(_galUploadQueue||[]).length){
     setTimeout(()=>_galLoadQueueItem(_galUploadQueueIdx),150);
