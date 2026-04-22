@@ -19330,7 +19330,7 @@ async function loadGallery(){
   init.innerHTML='<div style="color:var(--mu);font-size:13px;padding:40px 20px">Loading gallery…</div>';
   try{
     const f=await ghGet('gallery/meta.enc');
-    if(f){_galItems=JSON.parse(await dec(f.content));_galSha=f.sha;}
+    if(f){_galItems=JSON.parse(await dec(ghDec(f.content)));_galSha=f.sha;}
     else{_galItems=[];_galSha=null;}
   }catch(e){_galItems=[];_galSha=null;}
   _galLoaded=true;
@@ -19645,7 +19645,6 @@ function _galShowUploadModal(filename, canvas){
   _galPopulateSpecies();
   _galPopulateGHSelect('gal-gh-id');
   // Show Skip button during multi-upload; hide it for single-upload
-  const qTotal=(_galUploadQueue||[]).length;
   const skipBtn=document.getElementById('gal-skip-btn');
   const cancelBtn=document.getElementById('gal-cancel-btn');
   if(skipBtn&&cancelBtn){
@@ -19849,7 +19848,7 @@ async function _galOpenLightbox(id){
   try{
     const f=await ghGet(`gallery/${id}.enc`);
     if(f){
-      const imgB64=await dec(f.content);
+      const imgB64=await dec(ghDec(f.content));
       const byteArr=Uint8Array.from(atob(imgB64),c=>c.charCodeAt(0));
       const blob=new Blob([byteArr],{type:'image/webp'});
       imgEl.src=URL.createObjectURL(blob);
@@ -19976,7 +19975,7 @@ async function loadSterilRuns(){
   if(!S.tok) return;
   try{
     const f=await ghGet('sterilise/runs.enc');
-    if(f){S.sterilRuns=JSON.parse(await dec(f.content));_sterilRunsSha=f.sha;}
+    if(f){S.sterilRuns=JSON.parse(await dec(ghDec(f.content)));_sterilRunsSha=f.sha;}
     else{S.sterilRuns=[];_sterilRunsSha=null;}
   }catch(e){S.sterilRuns=[];}
   renderSterilRunLog();
