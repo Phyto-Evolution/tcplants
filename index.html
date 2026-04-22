@@ -11548,20 +11548,7 @@ DATA DISCIPLINE
 When lab data is provided in context: pull from it first. Distinguish clearly between "your records show X" and "general TC practice suggests X". Never fabricate data points. When data is thin, say so and say what would make the answer better.
 For PGR concentrations always give both mg/L and µM. For contamination queries always ask about: sterilisation method, media pH, vessel sealing, laminar flow. Never present extrapolation as published protocol — flag it.
 
-THE SYSTEM YOU LIVE IN — TC Plants Lab Notes
-You operate inside a single-file PWA (index.html) built by Shiva. When Shiva or Kumar asks about the system itself — how it works, what a function does, where data is stored, why something behaves a certain way — you can answer directly. You know the architecture.
-
-Core data flow: login() → Promise.all(8 encrypted file loads) → global S{state} object → all sections render from S → user edits → encrypted via AES-256-GCM → ghPut() → GitHub commit. Every save is a commit. Every piece of data lives in the repo as ciphertext.
-
-Key state: S.notes[] S.bottles[] S.sessions[] S.accs[] S.recs[] S.greenhouse[] S.ghTransfers[] S.supplies[] S.journal[] S.value S.taxCustom S.analytics S.weather.
-
-Key functions: saveNoteAction() · saveBottleAction() / saveSessionAction() · updateBottleStatus() · sendToGreenhouse() · saveGHPlant() · saveJournalEntry() · parseJournalWithRavana() · LabAnalytics.calculate() · SearchSystem._run() · exportLabReport() · navTo() · _buildAIContext() (your own context builder) · _parseVoiceAction() (18 instant voice commands before calling you) · _executeTool() (your tool-use dispatch).
-
-Sections: Notes (CRUD, draft, wiki-links, keyword stems for search) · Bottles (Single/Batch/Session modes, FSL-YYYY-NNNN codes, QR labels, passage tracking) · Greenhouse (bidirectional GH↔Lab, QR tab, condition log, bench view) · Registry · Recipes (scaler, flairs) · Journal (Ravana parse, overnight batch) · Supply (batch perf correlation) · Value (vault calculation from bottles × stage prices + GH × size grade) · Analytics (12 charts + species ranking + lab cost) · Search (8 sources, tokenized AND, field prefixes, highlighted) · Calendar · Reminders · Schedule · GBIF (A–F: synonym, common name, distributions, photo, hierarchy, bulk CP import).
-
-Voice command dispatch: _parseVoiceAction() intercepts 18 patterns before reaching you — navigation, bottle creation, species lookup, export report, model switch, etc. Only unmatched queries reach askAI().
-
-Proxy: all AI calls route through plantking.ape.workers.dev (Cloudflare Worker). Write tool operations require explicit confirmation gate before _executeWriteOp() fires.`;
+`;
 
 const AI_MODELS={
   groq8: {name:'Quick',        icon:'⚡', lsKey:'tcplants_groq_key',   getKey:()=>localStorage.getItem('tcplants_groq_key')||'',   getLink:'https://console.groq.com',                         groqModel:'llama-3.1-8b-instant',   label:'Groq 8B'},
@@ -11873,16 +11860,6 @@ async function _buildAIContext(){
   // Current user context
   const _cu=_getRavanaUser();
   ctx+=`\n\n### CURRENT USER\nSpeaking with: ${_cu.name}\nBackground: ${_cu.bg}\nTone guidance: ${_cu.tone}`;
-
-  // System architecture awareness (Ravana learns the app's own structure)
-  if(ctx.length<MAX_CONTEXT_SIZE){
-    ctx+=`\n\n### APP ARCHITECTURE (TC Plants Lab Notes — your operating environment)
-Single-file PWA (index.html). Global state object S. All data AES-256-GCM encrypted → GitHub.
-Key functions you can reference: saveNoteAction() notes CRUD · saveBottleAction() / saveSessionAction() bottle CRUD · navTo(sec) navigation · _buildAIContext() your own context · askAI() AI routing → Cloudflare proxy → Groq/Claude/Gemini · _parseVoiceAction() voice command dispatch · LabAnalytics.calculate() analytics engine · SearchSystem._run() search across 8 data stores · exportLabReport() 3-CSV export.
-Data flow: login() → Promise.all(8 loads) → S{state} → sections render → user edits → ghPut() → GitHub commits.
-Sections: Notes · Bottles (Single/Batch/Session modes) · Greenhouse (bidirectional lab↔GH) · Registry · Recipes · Journal (Ravana parse) · Supply · Value (vault) · Analytics · Search · Calendar · Reminders · Schedule · GBIF integration (A–F features).
-You (Ravana) operate via: AI_RULEBOOK system prompt + _buildAIContext() data snapshot + tool-use framework (_executeTool). Write ops require confirmation gate. Voice: _parseVoiceAction() handles 18 instant commands before calling askAI.`;
-  }
 
   return ctx;
 }
