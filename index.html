@@ -885,7 +885,9 @@ main > .dview, main > .editor{ margin:0 auto; }
 .lf-master{display:grid;gap:12px;margin:16px 0}
 .lf-master-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .lf-master-section{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;text-align:center}
-.lf-master-section:hover{border-color:var(--ac);background:var(--sf2)}
+.lf-master-section:hover{border-color:var(--ac);background:var(--sf2);transform:translateY(-1px)}
+.lf-b[onclick]{cursor:pointer}
+.lf-b[onclick]:hover{border-color:var(--ac)!important;filter:brightness(1.08)}
 .lf-master-layer{background:rgba(88,166,255,.04);border:1px dashed rgba(88,166,255,.2);border-radius:8px;padding:8px 14px;font-size:11px;color:var(--mu);font-style:italic}
 /* Logic flow search */
 .lf-search-wrap{background:linear-gradient(135deg,rgba(88,166,255,.06),rgba(188,140,255,.04));border:1px solid rgba(88,166,255,.2);border-radius:10px;padding:14px 16px;margin-bottom:18px}
@@ -4253,8 +4255,8 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
       <div id="gal-outer" style="display:none">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
           <h2 style="font-size:20px;font-weight:700;margin:0">📸 Photo Gallery</h2>
-          <button class="btn sm green" onclick="_galStartUpload()">＋ Upload</button>
           <button class="btn sm" onclick="_galStartCamera()" style="background:var(--sf2);border:1px solid var(--bd)">📷 Camera</button>
+          <button class="btn sm green" onclick="_galStartUpload()" title="Select one or more images">＋ Upload</button>
           <span id="gal-count" style="color:var(--mu);font-size:12px;margin-left:auto"></span>
         </div>
         <div id="gal-cats" class="gal-cats"></div>
@@ -4267,7 +4269,7 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
   <div id="gal-modal" style="display:none;position:fixed;inset:0;z-index:1900;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center">
     <div id="gal-modal-inner" style="background:var(--bg);border:1px solid var(--bd);border-radius:14px;width:min(700px,96vw);max-height:92vh;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:14px">
       <div style="display:flex;align-items:center;gap:10px">
-        <h3 style="font-size:16px;font-weight:700;margin:0;flex:1">📸 New Photo</h3>
+        <h3 style="font-size:16px;font-weight:700;margin:0;flex:1" id="gal-modal-title">📸 New Photo</h3>
         <button class="btn xs ghost" onclick="_galCloseModal()">✕</button>
       </div>
       <!-- Preview canvas with crop overlay -->
@@ -4296,10 +4298,16 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
         <div class="field"><label>Title *</label><input type="text" id="gal-title" placeholder="e.g. Nepenthes Stage 2 multiplication"></div>
         <div class="field"><label>Date</label><input type="date" id="gal-date"></div>
         <div class="field"><label>Category</label>
-          <select id="gal-category">${GALLERY_CATS.filter(c=>c.id!=='all').map(c=>`<option value="${c.id}">${c.icon} ${c.label}</option>`).join('')}</select>
+          <select id="gal-category"><option value="general">📷 General</option></select>
         </div>
         <div class="field"><label>Location</label>
-          <select id="gal-location"><option>Lab</option><option>Greenhouse</option><option>Hardening Chamber</option><option>Field</option><option>Other</option></select>
+          <div style="display:flex;gap:4px;align-items:center">
+            <input type="text" id="gal-location" list="gal-location-list2" placeholder="Lab / Greenhouse / GPS…" style="flex:1">
+            <datalist id="gal-location-list2">
+              <option value="Lab"><option value="Greenhouse"><option value="Hardening Chamber"><option value="Shade House"><option value="Field"><option value="Nursery">
+            </datalist>
+            <button type="button" class="btn xs ghost" onclick="_galGPSLocation('gal-location')" style="padding:4px 8px;white-space:nowrap">📍</button>
+          </div>
         </div>
         <div class="field"><label>Species</label><select id="gal-species"><option value="">— none —</option></select></div>
         <div class="field"><label>Stage</label>
@@ -4346,7 +4354,7 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
       <div style="font-size:14px;font-weight:700">Photo Details</div>
       <div class="gal-meta-row"><label>Title</label><input type="text" id="gal-lb-title"></div>
       <div class="gal-meta-row"><label>Category</label>
-        <select id="gal-lb-cat">${GALLERY_CATS.filter(c=>c.id!=='all').map(c=>`<option value="${c.id}">${c.icon} ${c.label}</option>`).join('')}</select>
+        <select id="gal-lb-cat"><option value="general">📷 General</option></select>
       </div>
       <div class="gal-meta-row"><label>Date</label><input type="date" id="gal-lb-date"></div>
       <div class="gal-meta-row"><label>Species</label><input type="text" id="gal-lb-species" placeholder="species name or ID"></div>
@@ -4356,7 +4364,18 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
         <select id="gal-lb-stage"><option value="">—</option><option>Stage 1</option><option>Stage 2</option><option>Stage 3</option><option>Ex vitro</option><option>N/A</option></select>
       </div>
       <div class="gal-meta-row"><label>Location</label>
-        <select id="gal-lb-location"><option>Lab</option><option>Greenhouse</option><option>Hardening Chamber</option><option>Field</option><option>Other</option></select>
+        <div style="display:flex;gap:4px;align-items:center">
+          <input type="text" id="gal-lb-location" list="gal-location-list" placeholder="Lab / Greenhouse / GPS…" style="flex:1">
+          <datalist id="gal-location-list">
+            <option value="Lab">
+            <option value="Greenhouse">
+            <option value="Hardening Chamber">
+            <option value="Shade House">
+            <option value="Field">
+            <option value="Nursery">
+          </datalist>
+          <button class="btn xs ghost" title="Use GPS coordinates" onclick="_galGPSLocation('gal-lb-location')" style="padding:4px 8px;white-space:nowrap">📍 GPS</button>
+        </div>
       </div>
       <div class="gal-meta-row"><label>Health</label>
         <select id="gal-lb-health"><option value="">—</option><option>Excellent</option><option>Good</option><option>Fair</option><option>Poor</option><option>Contaminated</option></select>
@@ -4407,32 +4426,45 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
 
         <div class="lf-arr dn">↓ decrypted data flows into all sections</div>
 
-        <!-- Layer 2: Data sections -->
+        <!-- Layer 2: Data sections — click to navigate -->
         <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin:8px 0">
-          ${['📋 Notes','🫙 Bottles','🌿 Registry','🧪 Recipes','🏡 Greenhouse','📓 Journal','📦 Supplies','💰 Value'].map(s=>`<div class="lf-master-section" onclick="_lfSearch('${s.split(' ').slice(1).join(' ')}')">${s}</div>`).join('')}
+          <div class="lf-master-section" onclick="navTo('notes')">📋 Notes</div>
+          <div class="lf-master-section" onclick="navTo('bottles')">🫙 Bottles</div>
+          <div class="lf-master-section" onclick="navTo('registry')">🌿 Registry</div>
+          <div class="lf-master-section" onclick="navTo('recipes')">🧪 Recipes</div>
+          <div class="lf-master-section" onclick="navTo('greenhouse')">🏡 Greenhouse</div>
+          <div class="lf-master-section" onclick="navTo('journal')">📓 Journal</div>
+          <div class="lf-master-section" onclick="navTo('supply')">📦 Supplies</div>
+          <div class="lf-master-section" onclick="navTo('value')">💰 Value</div>
         </div>
 
         <div class="lf-arr dn">↓ cross-cutting systems read from S and write back via GitHub API</div>
 
-        <!-- Layer 3: Cross-cutting -->
+        <!-- Layer 3: Cross-cutting — click to navigate or expand section -->
         <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin:8px 0 4px">
-          ${[
-            {label:'🤖 Ravana AI',color:'rgba(188,140,255,.15)',id:'lf-ai'},
-            {label:'🔍 Search',color:'rgba(88,166,255,.1)',id:'lf-search'},
-            {label:'📊 Analytics',color:'rgba(88,166,255,.1)',id:'lf-analytics'},
-            {label:'🏠 Dashboard',color:'rgba(210,153,34,.1)',id:'lf-dash'},
-            {label:'🌍 GBIF',color:'rgba(63,185,80,.1)',id:'lf-gbif'},
-            {label:'📥 Export',color:'rgba(88,166,255,.1)',id:'lf-export'},
-            {label:'📅 Calendar',color:'rgba(255,255,255,.04)',id:''},
-            {label:'⏰ Reminders',color:'rgba(255,255,255,.04)',id:''},
-          ].map(s=>`<div class="lf-master-section" style="background:${s.color}" onclick="${s.id?`document.getElementById('${s.id}').open=true;document.getElementById('${s.id}').scrollIntoView({behavior:'smooth'})`:`_lfSearch('${s.label.split(' ').slice(1).join(' ')}')`}">${s.label}</div>`).join('')}
+          <div class="lf-master-section" style="background:rgba(188,140,255,.15)" onclick="document.getElementById('lf-ai').open=true;document.getElementById('lf-ai').scrollIntoView({behavior:'smooth'})">🤖 Ravana AI</div>
+          <div class="lf-master-section" style="background:rgba(88,166,255,.1)" onclick="navTo('search')">🔍 Search</div>
+          <div class="lf-master-section" style="background:rgba(88,166,255,.1)" onclick="navTo('analytics');document.getElementById('lf-analytics').open=true">📊 Analytics</div>
+          <div class="lf-master-section" style="background:rgba(210,153,34,.1)" onclick="document.getElementById('lf-dash').open=true;document.getElementById('lf-dash').scrollIntoView({behavior:'smooth'})">🏠 Dashboard</div>
+          <div class="lf-master-section" style="background:rgba(63,185,80,.1)" onclick="document.getElementById('lf-gbif').open=true;document.getElementById('lf-gbif').scrollIntoView({behavior:'smooth'})">🌍 GBIF</div>
+          <div class="lf-master-section" style="background:rgba(88,166,255,.1)" onclick="document.getElementById('lf-export').open=true;document.getElementById('lf-export').scrollIntoView({behavior:'smooth'})">📥 Export</div>
+          <div class="lf-master-section" onclick="navTo('calendar')">📅 Calendar</div>
+          <div class="lf-master-section" onclick="navTo('reminders')">⏰ Reminders</div>
         </div>
 
         <div class="lf-arr dn">↓ all writes encrypt via AES-256-GCM → ghPut() → GitHub commits</div>
 
         <!-- Layer 4: Persistence -->
         <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin:8px 0 0">
-          ${['notes/index.enc + {id}.enc','bottles/data.enc','accessions/data.enc','recipes/data.enc','greenhouse/data.enc','supplies/data.enc','journal/entries.enc','value/data.enc','taxonomy/custom.enc'].map(f=>`<div class="lf-b file" style="font-size:10px">${f}</div>`).join('')}
+          <div class="lf-b file" style="font-size:10px">notes/index.enc + {id}.enc</div>
+          <div class="lf-b file" style="font-size:10px">bottles/data.enc</div>
+          <div class="lf-b file" style="font-size:10px">accessions/data.enc</div>
+          <div class="lf-b file" style="font-size:10px">recipes/data.enc</div>
+          <div class="lf-b file" style="font-size:10px">greenhouse/data.enc</div>
+          <div class="lf-b file" style="font-size:10px">supplies/data.enc</div>
+          <div class="lf-b file" style="font-size:10px">journal/entries.enc</div>
+          <div class="lf-b file" style="font-size:10px">value/data.enc</div>
+          <div class="lf-b file" style="font-size:10px">taxonomy/custom.enc</div>
         </div>
       </div>
 
@@ -4746,7 +4778,7 @@ CAMERA/BARCODE in notes:
             <div style="background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.2);border-radius:8px;padding:10px">
               <div style="font-size:11px;font-weight:700;margin-bottom:6px;color:var(--ac)">＋ Single</div>
               <div class="lf-hrow" style="flex-direction:column;align-items:flex-start;gap:3px">
-                <div class="lf-b fn" style="font-size:10px">startNewBottle('single')</div>
+                <div class="lf-b fn" style="font-size:10px" onclick="navTo('bottles');startNewBottle('single')" title="Click to open Single bottle form">startNewBottle('single')</div>
                 <span class="lf-arr dn">↓</span>
                 <div class="lf-b fn" style="font-size:10px">saveBottleAction()</div>
                 <span class="lf-arr dn">↓</span>
@@ -4758,7 +4790,7 @@ CAMERA/BARCODE in notes:
             <div style="background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2);border-radius:8px;padding:10px">
               <div style="font-size:11px;font-weight:700;margin-bottom:6px;color:var(--gn)">⊞ Batch</div>
               <div style="display:flex;flex-direction:column;align-items:flex-start;gap:3px">
-                <div class="lf-b fn" style="font-size:10px">setBotMode('batch')</div>
+                <div class="lf-b fn" style="font-size:10px" onclick="navTo('bottles');startNewBottle('batch')" title="Click to open Batch mode">setBotMode('batch')</div>
                 <span class="lf-arr dn">↓</span>
                 <div class="lf-b fn" style="font-size:10px">saveBottleAction()</div>
                 <span class="lf-arr dn">↓</span>
@@ -4770,7 +4802,7 @@ CAMERA/BARCODE in notes:
             <div style="background:rgba(188,140,255,.06);border:1px solid rgba(188,140,255,.2);border-radius:8px;padding:10px">
               <div style="font-size:11px;font-weight:700;margin-bottom:6px;color:var(--pu)">🔥 Session</div>
               <div style="display:flex;flex-direction:column;align-items:flex-start;gap:3px">
-                <div class="lf-b fn" style="font-size:10px">setBotMode('session')</div>
+                <div class="lf-b fn" style="font-size:10px" onclick="navTo('bottles');startNewBottle('session')" title="Click to open Session mode">setBotMode('session')</div>
                 <span class="lf-arr dn">↓</span>
                 <div class="lf-b fn" style="font-size:10px">saveSessionAction()</div>
                 <span class="lf-arr dn">↓</span>
@@ -5077,7 +5109,7 @@ QUOTA CHECK — _isAtQuota() (Task #8):
           <div class="lf-diagram-lbl">Bidirectional GH ↔ Lab loop</div>
           <div style="display:flex;align-items:center;gap:0;flex-wrap:wrap;justify-content:center">
             <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
-              <div class="lf-b actor" style="background:rgba(63,185,80,.1);border-color:var(--gn)">🏡 GH Stock plant</div>
+              <div class="lf-b actor" style="background:rgba(63,185,80,.1);border-color:var(--gn)" onclick="navTo('greenhouse')" title="Go to Greenhouse">🏡 GH Stock plant</div>
               <div style="font-size:9px;color:var(--mu)">S.greenhouse[] · quantity ledger</div>
             </div>
             <div style="display:flex;flex-direction:column;align-items:center">
@@ -5085,7 +5117,7 @@ QUOTA CHECK — _isAtQuota() (Task #8):
               <span class="lf-arr" style="font-size:20px">→</span>
             </div>
             <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
-              <div class="lf-b fn">startNewBottle() / saveSessionAction()</div>
+              <div class="lf-b fn" onclick="navTo('bottles');startNewBottle('single')" title="Click to create bottle from GH">startNewBottle() / saveSessionAction()</div>
               <div style="font-size:9px;color:var(--mu)">greenhouse_plant_id wired · 🏡 flair pre-selected</div>
             </div>
             <div style="display:flex;flex-direction:column;align-items:center">
@@ -19309,7 +19341,7 @@ function renderGalleryGrid(){
   const grid=document.getElementById('gal-grid');
   if(!grid) return;
   if(!visible.length){
-    grid.innerHTML=`<div class="gal-empty">No photos in this category yet.<br><button class="btn sm" style="margin-top:12px" onclick="_galStartUpload()">＋ Upload first photo</button></div>`;
+    grid.innerHTML=`<div class="gal-empty">No photos in this category yet.<br><span style="font-size:12px;color:var(--mu)">Use <strong>＋ Upload</strong> or <strong>📷 Camera</strong> above.</span></div>`;
     return;
   }
   grid.innerHTML=visible.map(item=>`
@@ -19329,25 +19361,33 @@ function _galSetCat(cat){_galCat=cat;renderGalleryGrid();}
 let _galUploadCanvas=null, _galUploadBlob=null, _galUploadThumb=null, _galBarcodeInfo=null;
 let _galCropActive=false, _galCropStart=null;
 
+let _galUploadQueue=[], _galUploadQueueIdx=0;
+
 function _galStartUpload(){
   const inp=document.createElement('input');
-  inp.type='file'; inp.accept='image/*';
+  inp.type='file'; inp.accept='image/*'; inp.multiple=true;
   inp.onchange=async()=>{
-    const file=inp.files[0]; if(!file) return;
-    const img=new Image();
-    const url=URL.createObjectURL(file);
-    img.onload=async()=>{
-      URL.revokeObjectURL(url);
-      const {blob,canvas}=await _galCompress(img);
-      _galUploadCanvas=canvas; _galUploadBlob=blob;
-      _galUploadThumb=await _galThumb(canvas);
-      _galBarcodeInfo=await _galDetectBarcode(canvas);
-      _galContamResult=_galAnalyzeContam(canvas);
-      _galShowUploadModal(file.name, canvas);
-    };
-    img.src=url;
+    const files=[...inp.files]; if(!files.length) return;
+    _galUploadQueue=files; _galUploadQueueIdx=0;
+    _galLoadQueueItem(0);
   };
   inp.click();
+}
+
+async function _galLoadQueueItem(idx){
+  const file=_galUploadQueue[idx]; if(!file) return;
+  const img=new Image();
+  const url=URL.createObjectURL(file);
+  img.onload=async()=>{
+    URL.revokeObjectURL(url);
+    const {blob,canvas}=await _galCompress(img);
+    _galUploadCanvas=canvas; _galUploadBlob=blob;
+    _galUploadThumb=await _galThumb(canvas);
+    _galBarcodeInfo=await _galDetectBarcode(canvas);
+    _galContamResult=_galAnalyzeContam(canvas);
+    _galShowUploadModal(file.name, canvas);
+  };
+  img.src=url;
 }
 
 async function _galCompress(img, targetKB=300){
@@ -19557,8 +19597,10 @@ function _galStopCamera(){
 
 function _galShowUploadModal(filename, canvas){
   const m=document.getElementById('gal-modal');
-  const pWrap=document.getElementById('gal-preview-wrap');
-  const preview=document.getElementById('gal-modal-preview');
+  // Queue progress in title
+  const titleEl=document.getElementById('gal-modal-title');
+  const qTotal=(_galUploadQueue||[]).length;
+  if(titleEl) titleEl.textContent=qTotal>1?`📸 New Photo (${_galUploadQueueIdx+1}/${qTotal})`:'📸 New Photo';
   // Copy watermarked canvas to preview
   const pc=document.getElementById('gal-preview-canvas');
   pc.width=canvas.width; pc.height=canvas.height;
@@ -19582,37 +19624,57 @@ function _galShowUploadModal(filename, canvas){
   document.getElementById('gal-filesize').textContent=`${Math.round(_galUploadBlob.size/1024)}KB · ${canvas.width}×${canvas.height}`;
   // Default date
   document.getElementById('gal-date').value=new Date().toISOString().slice(0,10);
-  // Contamination analysis result
-  const cr=_galContamResult;
-  let contamBanner=document.getElementById('gal-contam-banner');
-  if(!contamBanner){
-    contamBanner=document.createElement('div');
-    contamBanner.id='gal-contam-banner';
-    contamBanner.style.cssText='border-radius:8px;padding:10px 14px;font-size:12px;font-weight:600;margin-bottom:0';
-    document.getElementById('gal-bc-row').parentNode.insertBefore(contamBanner, document.getElementById('gal-bc-row'));
-  }
-  if(cr&&cr.score>0.18){
-    const lvl=cr.score>0.45?'High':'Possible';
-    const col=cr.score>0.45?'var(--rd)':'var(--yw)';
-    const txCol=cr.score>0.45?'#fff':'#000';
-    contamBanner.style.cssText=`border-radius:8px;padding:10px 14px;font-size:12px;font-weight:600;background:${col};color:${txCol};margin-bottom:0`;
-    contamBanner.innerHTML=`☣️ ${lvl} contamination risk — ${(cr.score*100).toFixed(0)}% anomaly · ${cr.anomaly_pct.toFixed(1)}% pixels deviate · dominant anomaly: ${cr.anomaly_color}`;
-    contamBanner.style.display='block';
-    document.getElementById('gal-health').value='Contaminated';
-  } else {
-    contamBanner.style.display='none';
-    if(cr) document.getElementById('gal-health').value='Good';
-  }
-  // Populate species select
+  // Auto-set title to filename (without extension)
+  const titleInput=document.getElementById('gal-title');
+  if(titleInput&&!titleInput.value) titleInput.value=filename.replace(/\.[^.]+$/,'').replace(/[-_]/g,' ');
+  // Contamination banner: only show in contamination camera context, not gallery upload
+  const contamBanner=document.getElementById('gal-contam-banner');
+  if(contamBanner) contamBanner.style.display='none';
+  // Populate category and species selects dynamically (static HTML can't evaluate template literals)
+  _galPopulateCatSelect('gal-category');
   _galPopulateSpecies();
   m.style.display='flex';
 }
 
+function _galPopulateCatSelect(selectId, currentVal){
+  const sel=document.getElementById(selectId); if(!sel) return;
+  sel.innerHTML=GALLERY_CATS.filter(c=>c.id!=='all').map(c=>`<option value="${esc(c.id)}">${c.icon} ${esc(c.label)}</option>`).join('');
+  if(currentVal) sel.value=currentVal;
+}
+
+function _galGPSLocation(inputId){
+  if(!navigator.geolocation){toast('Geolocation not supported','fail');return;}
+  const inp=document.getElementById(inputId); if(!inp) return;
+  inp.value='📍 Getting GPS…'; inp.disabled=true;
+  navigator.geolocation.getCurrentPosition(
+    pos=>{
+      const lat=pos.coords.latitude.toFixed(5);
+      const lng=pos.coords.longitude.toFixed(5);
+      const acc=Math.round(pos.coords.accuracy);
+      inp.value=`${lat},${lng} (~${acc}m)`;
+      inp.disabled=false;
+    },
+    err=>{
+      inp.value='';inp.disabled=false;
+      toast('GPS failed: '+err.message,'fail');
+    },
+    {enableHighAccuracy:true,timeout:10000}
+  );
+}
+
 function _galPopulateSpecies(){
   const sel=document.getElementById('gal-species');
-  const items=(S.taxCustom?.species||[]).concat(S.taxSpecies||[]);
-  const uniq=[...new Map(items.map(s=>[s.id||s.name,s])).values()];
-  sel.innerHTML='<option value="">— none —</option>'+uniq.slice(0,200).map(s=>`<option value="${esc(s.id||s.name)}">${esc(s.name||s.id)}</option>`).join('');
+  if(!sel) return;
+  // Taxonomy items use full_name (not name). Merge custom + pack species, deduplicate by full_name.
+  const allSp=(S.taxSpecies||[]);
+  const uniq=[...new Map(allSp.map(s=>[s.full_name||s.name||s.id,s])).values()]
+    .filter(s=>s.full_name||s.name)
+    .sort((a,b)=>(a.full_name||a.name||'').localeCompare(b.full_name||b.name||''));
+  sel.innerHTML='<option value="">— none —</option>'+uniq.slice(0,300).map(s=>{
+    const label=esc(s.full_name||s.name||'');
+    const val=esc(s.full_name||s.name||'');
+    return `<option value="${val}">${label}</option>`;
+  }).join('');
 }
 
 async function _galSaveUpload(){
@@ -19697,6 +19759,13 @@ async function _galRunDeepScan(){
 function _galCloseModal(){
   document.getElementById('gal-modal').style.display='none';
   _galUploadCanvas=null; _galUploadBlob=null; _galUploadThumb=null; _galBarcodeInfo=null;
+  // Advance queue if multi-upload
+  _galUploadQueueIdx++;
+  if(_galUploadQueueIdx<(_galUploadQueue||[]).length){
+    setTimeout(()=>_galLoadQueueItem(_galUploadQueueIdx),150);
+  } else {
+    _galUploadQueue=[];
+  }
 }
 
 // ── Lightbox ──
@@ -19705,6 +19774,7 @@ async function _galOpenLightbox(id){
   const item=_galItems.find(i=>i.id===id); if(!item) return;
   const lb=document.getElementById('gal-lightbox');
   lb.style.display='flex';
+  _galPopulateCatSelect('gal-lb-cat', item.category||'general');
   _galFillLbMeta(item);
   // Load full image
   const imgEl=document.getElementById('gal-lb-img');
@@ -19729,7 +19799,7 @@ function _galFillLbMeta(item){
   document.getElementById('gal-lb-ghplant').value=item.gh_plant_id||'';
   document.getElementById('gal-lb-stage').value=item.stage||'';
   document.getElementById('gal-lb-date').value=item.date||'';
-  document.getElementById('gal-lb-location').value=item.location||'Lab';
+  document.getElementById('gal-lb-location').value=item.location||'';
   document.getElementById('gal-lb-health').value=item.health||'';
   document.getElementById('gal-lb-barcode').textContent=item.barcode_value?(item.barcode_value+(item.barcode_type?` [${item.barcode_type}]`:'')):'—';
   document.getElementById('gal-lb-info').textContent=`${item.dimensions||''}  ${item.file_size_kb||'?'}KB  ${item.upload_date?new Date(item.upload_date).toLocaleDateString('en-IN'):''}`;
