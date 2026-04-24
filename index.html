@@ -4756,77 +4756,79 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
       <div class="lf-body">
         <div style="background:transparent">
         <h2 class="help-h2">📋 Notes — Full CRUD Flow</h2>
-        <pre class="help-pre">CREATE:
-  startNewNote('generic'|'tc')
-  → clear form fields, set S.editing=null
-  → show #note-editor, hide #note-view
-  → _wireDraftListeners() already active: oninput → sessionStorage draft save
+        <div class="lf-diagram">
+          <div class="lf-diagram-lbl">CREATE — new note</div>
+          <div class="lf-hrow" style="flex-wrap:wrap">
+            <div class="lf-n"><div class="lf-b fn">startNewNote()</div><div class="lf-sub">generic · tc</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b state">S.editing = null</div><div class="lf-sub">editor shown · draft listener active</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">saveNoteAction()</div><div class="lf-sub">read form · validate · disable btn</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">writeNote(id, body)</div><div class="lf-sub">ghPut notes/{id}.enc</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">saveNotesIndex(ns.push(…))</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b ok">✓ Saved</div><div class="lf-sub">_writeCache · renderNoteList · toast</div></div>
+          </div>
+        </div>
 
-  saveNoteAction():
-  → read all form fields: title, body, type, stage, species, tags, review, recipe_id, cultures_out
-  → if isGeneric: cultures_out=null, pinned from checkbox
-  → validateNoteData({id:'dummy',title,body,...}) ← Haiku addition, throws on invalid
-  → disable save button
-  → if S.editing:
-      ghGet(DIR/{S.editing}.enc)               ← read current body + sha
-      writeNote(S.editing, body, sha, msg)      ← ghPut body file
-      saveNotesIndex(patchFn)                   ← update index (read-fresh, patch, write)
-  → else (new note):
-      id = uid(), date = now (or S.calDate if set from calendar)
-      S.calDate = null
-      writeNote(id, body, null, msg)            ← ghPut body file (sha=null → create)
-      saveNotesIndex(ns => ns.push({id,title,date,...}))
-  → _writeCache(); populateTagsDatalist(); _clearDraft()
-  → renderNoteList(); openNote(S.cur); closeNavDrawer()
-  → toast 'Saved ✓'
+        <div class="lf-diagram" style="margin-top:10px">
+          <div class="lf-diagram-lbl">EDIT / UPDATE — existing note</div>
+          <div class="lf-hrow" style="flex-wrap:wrap">
+            <div class="lf-n"><div class="lf-b fn">editNote()</div><div class="lf-sub">S.editing = S.cur · populate form</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">saveNoteAction()</div><div class="lf-sub">S.editing set</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">ghGet(DIR/{id}.enc)</div><div class="lf-sub">read current sha</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">writeNote(id, body, sha)</div><div class="lf-sub">ghPut with existing sha</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">saveNotesIndex(patchFn)</div><div class="lf-sub">update index entry</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b ok">✓ Updated</div></div>
+          </div>
+        </div>
 
-  saveNotesIndex(patchFn) — LOCK mechanism:
-  → returns _notesSaveLock = _notesSaveLock.then(async()=>{...})
-  → ALWAYS reads fresh SHA first (ghGet(IDX)) to avoid conflicts
-  → applies patchFn to fresh notes array
-  → ghPut(IDX, enc(JSON.stringify(updated)), freshSha)
-  → returns {sha, notes}
+        <div class="lf-diagram" style="margin-top:10px">
+          <div class="lf-diagram-lbl">saveNotesIndex() — serialised write lock</div>
+          <div class="lf-hrow" style="flex-wrap:wrap">
+            <div class="lf-n"><div class="lf-b warn">🔒 _notesSaveLock</div><div class="lf-sub">promise chain · prevents racing saves</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">ghGet(IDX)</div><div class="lf-sub">always reads fresh SHA</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">patchFn(notes[])</div><div class="lf-sub">caller transforms the array</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">ghPut(IDX, enc, sha)</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b ok">returns {sha, notes}</div></div>
+          </div>
+        </div>
 
-READ:
-  openNote(id):
-  → S.cur = id; S.editing = null
-  → find note in S.notes (index metadata)
-  → ghGet(DIR/{id}.enc) → body loaded (cached in S.bodyCache)
-  → sanitizeMarkdown(_wikiPreprocess(body)) → #nv-body.innerHTML
-  → render badges: species link, stage, type, tags, linked bottles count, linked recipe
-  → renderBacklinks(id) — notes containing [[id]]
+        <div class="lf-diagram" style="margin-top:10px">
+          <div class="lf-diagram-lbl">READ — open + render list</div>
+          <div class="lf-hrow" style="flex-wrap:wrap">
+            <div class="lf-n"><div class="lf-b fn">openNote(id)</div><div class="lf-sub">S.cur = id</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">ghGet(DIR/{id}.enc)</div><div class="lf-sub">cached in S.bodyCache</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">sanitizeMarkdown(_wikiPreprocess())</div><div class="lf-sub">→ #nv-body.innerHTML</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b state">badges rendered</div><div class="lf-sub">species · stage · tags · bottles · recipe · backlinks</div></div>
+          </div>
+        </div>
 
-  renderNoteList():
-  → reads S.notes with filters: typeFilter, stageFilter, searchQ
-  → overdue filter: next_review < today
-  → sorted by pinned first, then date desc
-  → emits .n-item divs with data-id attrs → tap handler → openNote
-
-UPDATE:
-  editNote() → S.editing = S.cur → populate form fields → show editor
-  saveNoteAction() same as create but patches existing index entry + overwrites body file
-
-DELETE:
-  deleteNote() → confirm → ghDel(DIR/{id}.enc) → saveNotesIndex(remove by id) → renderNoteList → showNote('empty')
-
-DRAFT SYSTEM:
-  _wireDraftListeners() → oninput on note fields → debounced sessionStorage save
-  On startNewNote: check sessionStorage for draft → if found: show restore banner
-  _clearDraft() → sessionStorage.removeItem
-
-WIKI-LINKS:
-  _wikiPreprocess(body): finds [[title]] patterns → replaces with <span class="wikilink" data-note-id=...>
-  Click wikilink → openNote(data-note-id)
-  openWikiModal() → search S.notes by title → select → insert [[title]] into editor
-  renderBacklinks(id) → S.notes.filter(n=>n.body contains [[id]]) → backlinks panel
-
-NOTE HISTORY:
-  fetchNoteHistory(id) → GitHub commits API /repos/.../commits?path=notes/{id}.enc
-  → list with sha, date, author → click → ghGet(sha ref) → dec → show in modal → restore option
-
-CAMERA/BARCODE in notes:
-  openCamera() → getUserMedia → _startCam() → ZXing BrowserQRCodeReader
-  → decode QR → insertBarcodeResult(text) → appended to ne-body textarea</pre>
+        <div class="lf-diagram" style="margin-top:10px">
+          <div class="lf-diagram-lbl">DELETE · Draft · Wiki-links · History · Camera</div>
+          <table class="help-table" style="margin:0">
+            <tr><th>Op</th><th>Flow</th></tr>
+            <tr><td>Delete</td><td><code>deleteNote()</code> → confirm → ghDel({id}.enc) → saveNotesIndex(remove) → renderNoteList</td></tr>
+            <tr><td>Draft</td><td><code>_wireDraftListeners()</code> oninput → debounced sessionStorage · restore banner on next startNewNote · <code>_clearDraft()</code> on save</td></tr>
+            <tr><td>Wiki-links</td><td><code>_wikiPreprocess()</code> finds <code>[[title]]</code> → <code>&lt;span class="wikilink"&gt;</code> · click → openNote · <code>renderBacklinks(id)</code> shows reverse links</td></tr>
+            <tr><td>History</td><td><code>fetchNoteHistory(id)</code> → GitHub commits API → list with sha/date → click → ghGet(sha) → dec → show modal → restore</td></tr>
+            <tr><td>Camera / QR</td><td><code>openCamera()</code> → getUserMedia → ZXing BrowserQRCodeReader → decode → insertBarcodeResult → appended to ne-body</td></tr>
+          </table>
+        </div>
       </div></div></details>
 
       <!-- ═══ BOTTLES FLOW ═══ -->
@@ -4906,111 +4908,59 @@ CAMERA/BARCODE in notes:
           </div>
         </div>
 
-        <pre class="help-pre">THREE CREATION MODES — toggled by setBotMode():
+        <div class="lf-diagram">
+          <div class="lf-diagram-lbl">SINGLE bottle save</div>
+          <div class="lf-hrow" style="flex-wrap:wrap">
+            <div class="lf-n"><div class="lf-b fn">startNewBottle('single')</div><div class="lf-sub">setBotMode('single') · show form</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">saveBottleAction()</div><div class="lf-sub">read form · build base obj · code = FSL-{yr}-{seq}</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">saveBottles(S.bottles, sha)</div><div class="lf-sub">ghPut bottles/data.enc</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b ok">openBottle()</div><div class="lf-sub">QR canvas · detail panel</div></div>
+          </div>
+        </div>
 
-SINGLE (qty=1):
-  startNewBottle('single') → setBotMode('single') → show form, hide session builder
-  saveBottleAction():
-  → read form: species, stage, status, recipe_id, accession_id, note_id, media_volume,
-               explants, next_review, flair_note, notes, flair_ids, date_prepared,
-               date_inoculated, greenhouse_plant_id
-  → build base = {recipe_id, species, accession_id, stage, status, ...}
-  → code = FSL-{year}-{_botNextSeq()} (max existing seq + 1, zero-padded to 4 digits)
-  → id = uid(); push to S.bottles
-  → S.bottlesSha = await saveBottles(S.bottles, S.bottlesSha)  ← ghPut bottles/data.enc
-  → renderBottleList(); closeNavDrawer()
-  → openBottle(S.curBot)   ← populates bot-detail + generates QR canvas
+        <div class="lf-diagram" style="margin-top:10px">
+          <div class="lf-diagram-lbl">BATCH save (qty &gt; 1)</div>
+          <div class="lf-hrow" style="flex-wrap:wrap">
+            <div class="lf-n"><div class="lf-b fn">setBotMode('batch')</div><div class="lf-sub">shows qty field</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">saveBottleAction()</div><div class="lf-sub">loop qty: uid + FSL-{yr}-{seq+i} + shared batch_id</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">saveBottles()</div><div class="lf-sub">one ghPut for all</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b ok">_showSavedQRGrid()</div><div class="lf-sub">QR label grid · click → openBottle</div></div>
+          </div>
+        </div>
 
-BATCH (qty > 1):
-  setBotMode('batch') → shows qty field
-  saveBottleAction():
-  → loop qty times: each gets id=uid(), code=FSL-{year}-{seq+i}, shared batch_id=uid()
-  → push all to S.bottles, save in one ghPut
-  → renderBottleList(); closeNavDrawer()
-  → _showSavedQRGrid(newBottles, label)  ← renders all labels using LABEL_CONFIGS[0]
-  → clicking a QR card → openBottle(id)
+        <div class="lf-diagram" style="margin-top:10px">
+          <div class="lf-diagram-lbl">SESSION save (autoclave run)</div>
+          <div class="lf-hrow" style="flex-wrap:wrap">
+            <div class="lf-n"><div class="lf-b fn">setBotMode('session')</div><div class="lf-sub">session builder div shown</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">addSessionBatch()</div><div class="lf-sub">push {species,stage,recipe,qty} · capacity bar</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">saveSessionAction()</div><div class="lf-sub">collect batches · generate bottles + session record</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">saveBottles(S.bottles, sha, S.sessions)</div><div class="lf-sub">single ghPut</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b ok">_showSavedQRGrid()</div><div class="lf-sub">grouped by batch</div></div>
+          </div>
+        </div>
 
-SESSION (autoclave run with multiple batches):
-  setBotMode('session') → hides form fields, shows session builder div
-  addSessionBatch() → push {species,stage,recipe,qty} to UI batch rows
-  Capacity bar: total qty vs autoclave capacity → yellow >90%, red >100%
-  saveSessionAction():
-  → collect all batch rows from DOM
-  → for each batch: loop qty, generate bottles with shared batch_id + session_id
-  → create session record: {id, date, batches[], autoclave params}
-  → S.sessions.push(session); all bottles pushed to S.bottles
-  → saveBottles(S.bottles, S.bottlesSha, S.sessions)  ← single ghPut
-  → renderBottleList(); closeNavDrawer()
-  → _showSavedQRGrid(allNewBottles, label) grouped by batch
-
-EDIT:
-  startEditBottle(id) → populate form from S.bottles[id] → S.editingBot = id
-  saveBottleAction() edit branch:
-  → S.bottles[idx] = {...existing, ...base}
-  → saveBottles → renderBottleList; openBottle(S.curBot); closeNavDrawer()
-
-DELETE:
-  deleteBottle(id) → confirm → S.bottles.filter(remove) → saveBottles → renderBottleList → showBotEmpty
-
-STATUS UPDATE (lifecycle stepper):
-  updateBottleStatus(id, newStatus):
-  → S.bottles[idx].status = newStatus
-  → if newStatus==='inoculated': set date_inoculated
-  → if newStatus==='subcultured': set last_transfer
-  → saveBottles → renderBottleList; openBottle(S.curBot); closeNavDrawer()
-
-  Stepper buttons in bot-detail (generated by openBottle):
-  → BOT_STATUS_NEXT: prepared→inoculated, inoculated→growing, growing→subcultured
-  → terminal buttons: subcultured, contaminated, discarded
-  → ghBtn: 🏡 Send to GH → sendToGreenhouse(id)
-
-FILTER SYSTEM:
-  setBotFilter(f):
-    S.bottleFilter = f
-    S.botBatchFilter = null   ← clears batch context
-    renderBottleList()
-
-  viewBatch(batchId):             ← NEW: fixes broken "View all in batch" link
-    S.botBatchFilter = batchId
-    S.bottleFilter = 'all'; S.bottleSearch = ''
-    openNavDrawer(); renderBottleList()
-
-  renderBottleList() filter priority:
-    1. S.botBatchFilter → filter by batch_id (overrides everything)
-    2. S.bottleFilter → filter by status (if not 'all')
-    3. S.bottleSearch → text search (code, species, notes)
-    4. Sort by date_prepared desc
-
-QR & LABEL SYSTEM:
-  6 LABEL_CONFIGS: 58mm-full, 58mm-compact, 62mm-full, A4-4up, A4-2up, A4-QR-only
-  Each config: {id, name, w, h, qr (px), fields[], css}
-
-  openBottle() inline QR:
-  → canvas id=bot-qr-{id} inside bot-detail HTML
-  → QRCode.toCanvas(canvas, 'https://notes.tcplants.in?bottle={id}', {width:130})
-  → Size selector buttons: 58mm/62mm/a4 → _setLabelSize()
-
-  _toggleLabelPanel(id):
-  → _renderLabelPanel(id) → scope selector (this bottle / all in batch)
-  → scope==='batch' → S.bottles.filter(x=>x.batch_id===b.batch_id)
-  → _botLabelHtmlConfig(b, cfg) → HTML label with QR canvas + fields
-  → printBottleLabel(id) / printBatchLabels(batchId) → print window
-
-  _showSavedQRGrid(bottles, label):
-  → bot-detail.innerHTML = grid of _botLabelHtmlConfig(b, LABEL_CONFIGS[0])
-  → requestAnimationFrame → QRCode.toCanvas for each bot-label-qr-{id}
-  → Print all button → _printSavedQRs(ids)
-
-CROSS-SECTION LINKS from bot-detail:
-  Accession  → navTo('registry');openAccession(acc.id)
-  Recipe     → navTo('recipes');openRecipe(rec.id)
-  Linked note → navTo('notes');openNote(note.id)
-  Source GH plant → navTo('greenhouse');openGHPlant(srcPlant.id)
-  Batch link → viewBatch(b.batch_id)   ← opens drawer + filters to batch members
-
-_botNextSeq():
-  → max of all FSL-YYYY-NNNN codes parsed as integers → +1
-  → if no existing bottles → returns 1</pre>
+        <div class="lf-diagram" style="margin-top:10px">
+          <div class="lf-diagram-lbl">EDIT · DELETE · Status stepper · Filters · QR labels · Cross-links</div>
+          <table class="help-table" style="margin:0">
+            <tr><th>Op</th><th>Flow</th></tr>
+            <tr><td>Edit</td><td><code>startEditBottle(id)</code> → populate form → S.editingBot → saveBottleAction edit branch → saveBottles → renderBottleList; openBottle</td></tr>
+            <tr><td>Delete</td><td><code>deleteBottle(id)</code> → confirm → S.bottles.filter(remove) → saveBottles → renderBottleList → showBotEmpty</td></tr>
+            <tr><td>Status stepper</td><td><code>updateBottleStatus(id, newStatus)</code> → set status + timestamps (date_inoculated, last_transfer) → saveBottles. Buttons: prepared → inoculated → growing → subcultured · terminal: contaminated · discarded · 🏡 sendToGreenhouse</td></tr>
+            <tr><td>Filter priority</td><td>1. S.botBatchFilter (batch view) → 2. S.bottleFilter (status) → 3. S.bottleSearch (text) → 4. date desc sort</td></tr>
+            <tr><td>QR labels</td><td>6 LABEL_CONFIGS (58mm-full/compact, 62mm, A4-4up/2up/QR-only). <code>_toggleLabelPanel()</code> → scope selector (single/batch) → <code>_botLabelHtmlConfig(b, cfg)</code> → print window</td></tr>
+            <tr><td>Cross-links</td><td>Accession → registry · Recipe → recipes · Linked note → notes · Source GH plant → greenhouse · Batch link → <code>viewBatch()</code></td></tr>
+          </table>
+        </div>
 
         <h3 class="help-h3" style="margin-top:14px">Passage Tracking (v3.11)</h3>
         <table class="help-table">
@@ -5067,82 +5017,81 @@ _botNextSeq():
           </div>
         </div>
 
-        <pre class="help-pre">CONTEXT BUILDING — _buildAIContext():
-  assembles a structured prompt snapshot:
-  → lab identity (name from settings)
-  → notes (10 most recent): title, type, stage, species, date, preview
-  → bottles (10 most recent active): code, species, stage, status, recipe, next_review
-  → species summary: S.taxSpecies + S.taxCustom.species → grouped by category
-  → analytics snapshot: S.analytics (contamination rates, success rates)
-  → schedule: overdue bottles + notes + due-this-week
-  → journal (3 recent): title, date, parsed flag
-  → recipes (5): name, base media
-  → greenhouse (5 plants): species, quantity, health, location
-  → weather: S.weather lab + greenhouse readings
-  → supplies: low-stock items
+        <div class="lf-diagram">
+          <div class="lf-diagram-lbl">_buildAIContext() — what Ravana sees every call</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:6px 0">
+            <div class="lf-b actor" style="font-size:10px">🏷 Lab identity</div>
+            <div class="lf-b file" style="font-size:10px">📋 10 recent notes</div>
+            <div class="lf-b file" style="font-size:10px">🫙 10 active bottles</div>
+            <div class="lf-b file" style="font-size:10px">🌱 Species summary</div>
+            <div class="lf-b file" style="font-size:10px">📊 Analytics snapshot</div>
+            <div class="lf-b file" style="font-size:10px">⏰ Schedule + overdue</div>
+            <div class="lf-b file" style="font-size:10px">📔 3 journal entries</div>
+            <div class="lf-b file" style="font-size:10px">🧪 5 recipes</div>
+            <div class="lf-b file" style="font-size:10px">🏡 5 GH plants</div>
+            <div class="lf-b file" style="font-size:10px">🌡 Weather readings</div>
+            <div class="lf-b warn" style="font-size:10px">📦 Low-stock supplies</div>
+          </div>
+          <div class="lf-arr dn">↓ _sanitizeContextData() — strip special chars</div>
+          <div style="text-align:center"><div class="lf-b fn" style="font-size:11px;display:inline-block">AI prompt assembled</div></div>
+        </div>
 
-  Context is sanitized via _sanitizeContextData() to strip special chars (Haiku addition, prevents prompt injection)
+        <div class="lf-diagram" style="margin-top:10px">
+          <div class="lf-diagram-lbl">Provider selection + routing</div>
+          <div class="lf-hrow" style="flex-wrap:wrap">
+            <div class="lf-n"><div class="lf-b fn">askAI(prompt)</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b state">_aiModel ?</div><div class="lf-sub">groq8 · groq70 · claude · gemini</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">_callAIProxyFull()</div><div class="lf-sub">POST plantking.ape.workers.dev · {provider, model, messages, tools}</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b state">response</div><div class="lf-sub">text reply OR tool_call</div></div>
+          </div>
+          <div class="lf-arr dn">↓ if tool_call</div>
+          <div class="lf-hrow" style="flex-wrap:wrap">
+            <div class="lf-n"><div class="lf-b fn">_executeTool(name, params)</div></div>
+            <span class="lf-arr">→</span>
+            <div style="display:flex;flex-wrap:wrap;gap:4px">
+              <div class="lf-b" style="font-size:9px">get_lab_summary</div>
+              <div class="lf-b" style="font-size:9px">get_bottles</div>
+              <div class="lf-b" style="font-size:9px">get_species_analysis</div>
+              <div class="lf-b" style="font-size:9px">search_lab</div>
+              <div class="lf-b" style="font-size:9px">get_schedule</div>
+              <div class="lf-b warn" style="font-size:9px">update_bottle_status ⚠️ confirm gate</div>
+            </div>
+          </div>
+        </div>
 
-PROVIDER SELECTION — _selectAIProvider():
-  reads S.aiModel ('groq'|'claude'|'gemini') from settings
-  → groq: llama-3.3-70b-versatile (default)
-  → claude: claude-opus-4-5
-  → gemini: via Gemini API (legacy, less used now)
-
-ROUTING — askAI(prompt):
-  if _aiProxyURL set:
-    → _callAIProxyFull(provider, model, messages, clientKey)
-    → POST {_aiProxyURL}/api/ai/chat  ← Cloudflare Worker at plantking.ape.workers.dev
-    → body: {provider, model, messages, max_tokens, system, tools}
-    → if tool_call in response → _handleToolCall(tool_call) → _executeTool
-  else:
-    → _callAIDirect(provider, model, prompt, key)
-    → direct browser API call (fallback, key exposed)
-
-  Default proxy: localStorage('tcplants_ai_proxy_url') || 'https://plantking.ape.workers.dev'
-
-TOOL DISPATCH — _executeTool(name, params):
-  get_lab_summary   → returns formatted S.notes + S.bottles + analytics snapshot
-  get_bottles       → S.bottles filtered by species/status params
-  get_species_analysis → LabAnalytics + bottle history for species
-  fetch_taxonomy_updates → ghGet taxonomy pack file → species list
-  search_lab        → cross-section text search
-  get_schedule      → overdue + due-this-week from all sections
-
-  WRITE OPS (require confirmation gate):
-  update_bottle_status(bottle_id, status):
-    → _pendingToolConfirm = {name, params}
-    → show confirmation banner in AI panel
-    → user clicks Confirm → _executeWriteOp
-    → find bottle → update status → saveBottles → renderBottleList; openBottle
-
-  create_note, create_bottle, log_contam → similar confirmation gate (pending implementation)
-
-VOICE INTEGRATION:
-  _voiceCfg():
-    returns {mode:'nat'|'wsp', confirm:bool, tts:bool, wakeWord:bool, labMode:bool}
-    Lab mode forces: mode='wsp', confirm=false, tts=true, wakeWord=true
-
-  Native STT path:
-    _startNativeSR() → SpeechRecognition({continuous, interimResults, lang:en-IN})
-    → onresult: interim words shown in AI textarea live
-    → onfinal: transcript → if !confirm: askAI(); if confirm: _showVoiceConfirm
-
-  Whisper path:
-    _startRecording() → MediaRecorder(getUserMedia) → collect blobs
-    3.5s silence grace → _stopRecording() → Blob → _transcribeWhisper()
-    → POST {proxy}/api/ai/whisper with FormData(audio_file, model='whisper-large-v3')
-    → transcript → if confirm: show #ai-voice-confirm; if !confirm: askAI()
-
-  Wake word:
-    if wakeWord enabled → SpeechRecognition always-on → listen for 'hey lab'/'hey ravana'
-    → arm → full voice input cycle → 'bye lab'/'bye ravana' → disarm
-    #wake-armed-dot indicator shows when armed
-
-QUOTA CHECK — _isAtQuota() (Task #8):
-  checks localStorage token usage counters
-  compares against AI_LIMITS for selected provider
-  if at quota → toast warning, skip API call</pre>
+        <div class="lf-diagram" style="margin-top:10px">
+          <div class="lf-diagram-lbl">Voice STT paths + wake word</div>
+          <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;min-width:180px">
+              <div class="lf-b fn" style="font-size:10px">Native STT</div>
+              <div class="lf-arr dn">↓</div>
+              <div class="lf-b state" style="font-size:10px">SpeechRecognition (en-IN)</div>
+              <div class="lf-arr dn">↓ onfinal</div>
+              <div class="lf-b state" style="font-size:10px">confirm? → _showVoiceConfirm<br>else → askAI(transcript)</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;min-width:180px">
+              <div class="lf-b fn" style="font-size:10px">Whisper STT (Groq)</div>
+              <div class="lf-arr dn">↓</div>
+              <div class="lf-b state" style="font-size:10px">MediaRecorder → blobs</div>
+              <div class="lf-arr dn">↓ 3.5s silence</div>
+              <div class="lf-b fn" style="font-size:10px">_transcribeWhisper() → proxy/whisper</div>
+              <div class="lf-arr dn">↓</div>
+              <div class="lf-b ok" style="font-size:10px">transcript → askAI()</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;min-width:160px">
+              <div class="lf-b actor" style="font-size:10px">Wake word</div>
+              <div class="lf-arr dn">↓</div>
+              <div class="lf-b state" style="font-size:10px">SR always-on → "Hey Ravana"</div>
+              <div class="lf-arr dn">↓ arm</div>
+              <div class="lf-b fn" style="font-size:10px">full voice input cycle</div>
+              <div class="lf-arr dn">↓ "bye Ravana"</div>
+              <div class="lf-b state" style="font-size:10px">disarm · #wake-armed-dot off</div>
+            </div>
+          </div>
+        </div>
 
         <h3 class="help-h3" style="margin-top:14px">Voice Commands — full list (v3.11)</h3>
         <table class="help-table">
@@ -5212,43 +5161,28 @@ QUOTA CHECK — _isAtQuota() (Task #8):
           </div>
         </div>
 
-        <pre class="help-pre">GREENHOUSE PLANT CRUD:
-  startNewGHPlant() → form: species, quantity, location, source, health, notes, next_inspection
-  saveGHPlant() → push to S.greenhouse → saveGreenhouse(S.greenhouse, S.greenhouseSha, S.ghTransfers)
-  openGHPlant(id) → detail tabs: overview, transfers, condition log, output plan, inspections
-  editGHPlant(id) → populate form → save → renderGHList; openGHPlant
+        <div class="lf-diagram">
+          <div class="lf-diagram-lbl">CRUD — create / edit / read</div>
+          <div class="lf-hrow" style="flex-wrap:wrap">
+            <div class="lf-n"><div class="lf-b fn">startNewGHPlant()</div><div class="lf-sub">form: species · qty · location · source · health · next_inspection</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">saveGHPlant()</div><div class="lf-sub">push S.greenhouse · saveGreenhouse(plants, sha, transfers)</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">openGHPlant(id)</div><div class="lf-sub">tabs: overview · transfers · condition log · output plan</div></div>
+          </div>
+        </div>
 
-BOTTLE → GH TRANSFER (explant-out from bottle to greenhouse):
-  sendToGreenhouse(bottleId):
-  → find bottle → show transfer form (species, qty, destination)
-  → saveGHExplant(bottleId, formData):
-      transfer = {id, type:'explant_out', plant_id, bottle_id, date, quantity, notes}
-      S.ghTransfers.push(transfer)
-      saveGreenhouse(S.greenhouse, S.greenhouseSha, S.ghTransfers)
-      → openGHPlant shows the transfer in transfer tab
-
-GH → BOTTLE (bottle created FROM greenhouse plant):
-  In bottle form: greenhouse_plant_id field → dropdown of GH plants by species
-  On save: bottle.greenhouse_plant_id = plantId
-  In openBottle(): 'Source plant' row links back to the GH plant
-
-QUANTITY LEDGER:
-  adjustQuantity(plantId, delta, reason):
-  → p.quantity += delta
-  → transfer = {type:'quantity_adjust', delta, reason, date}
-  → S.ghTransfers.push(transfer)
-  → saveGreenhouse → openGHPlant (ledger tab shows history)
-
-CONDITION LOG:
-  logCondition(plantId, health, notes):
-  → p.health = health; p.last_inspection = today
-  → transfer = {type:'health_log', health, notes, date}
-  → saveGreenhouse → openGHPlant
-
-saveGreenhouse(plants, sha, transfers):
-  → data = {plants, transfers}
-  → ghPut(GH_F, enc(JSON.stringify(data)), sha)
-  → loadGreenhouse reads back: raw.plants, raw.transfers</pre>
+        <div class="lf-diagram" style="margin-top:10px">
+          <div class="lf-diagram-lbl">Transfers · Ledger · Condition · Save</div>
+          <table class="help-table" style="margin:0">
+            <tr><th>Op</th><th>Flow</th></tr>
+            <tr><td>Bottle → GH</td><td><code>sendToGreenhouse(bottleId)</code> → transfer form → <code>saveGHExplant()</code> → push {type:'explant_out', plant_id, bottle_id, qty} to S.ghTransfers → saveGreenhouse</td></tr>
+            <tr><td>GH → Bottle</td><td>Bottle form has greenhouse_plant_id dropdown. On save: <code>bottle.greenhouse_plant_id = plantId</code>. openBottle shows "Source plant" link back.</td></tr>
+            <tr><td>Qty ledger</td><td><code>adjustQuantity(plantId, delta, reason)</code> → p.quantity += delta → push {type:'quantity_adjust', delta} to ghTransfers → saveGreenhouse</td></tr>
+            <tr><td>Condition log</td><td><code>logCondition(plantId, health)</code> → p.health + last_inspection → push {type:'health_log'} → saveGreenhouse</td></tr>
+            <tr><td>saveGreenhouse()</td><td>data = {plants, transfers} → <code>ghPut(GH_F, enc(JSON), sha)</code>. loadGreenhouse reads back raw.plants + raw.transfers</td></tr>
+          </table>
+        </div>
 
         <h3 class="help-h3" style="margin-top:14px">QR on GH Plants (v3.11)</h3>
         <table class="help-table">
@@ -5349,42 +5283,61 @@ saveGreenhouse(plants, sha, transfers):
       <div class="lf-body">
         <div style="background:transparent">
         <h2 class="help-h2">📓 Lab Journal — Entry, Parse, Extract</h2>
-        <pre class="help-pre">CREATE:
-  startNewJournalEntry() → clear form → show editor
-  saveJournalEntry():
-  → if editing: update entry.body, mark bodyChanged=true → reset parsed=false
-  → else: new {id, title, body, date, tags, parseEnabled:true, parsed:false}
-  → S.journal.unshift(entry) → saveJournal(S.journal, S.journalSha) → renderJournalList
+        <div class="lf-diagram">
+          <div class="lf-diagram-lbl">CREATE + EDIT journal entry</div>
+          <div class="lf-hrow" style="flex-wrap:wrap">
+            <div class="lf-n"><div class="lf-b fn">startNewJournalEntry()</div><div class="lf-sub">clear form · show editor</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">saveJournalEntry()</div><div class="lf-sub">new: {id,title,body,date,parseEnabled:true,parsed:false}<br>edit: update body · reset parsed=false</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">saveJournal(S.journal, sha)</div><div class="lf-sub">ghPut journal/data.enc</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b ok">renderJournalList()</div></div>
+          </div>
+        </div>
 
-VOICE DICTATION in journal:
-  _journalMicTap():
-  → if voiceCfg.mode === 'wsp': record → Whisper → transcript → append to je-body
-  → else: SpeechRecognition → interim results live in je-body → final text appended
+        <div class="lf-diagram" style="margin-top:10px">
+          <div class="lf-diagram-lbl">Voice dictation in journal</div>
+          <div class="lf-hrow" style="flex-wrap:wrap">
+            <div class="lf-n"><div class="lf-b fn">_journalMicTap()</div></div>
+            <span class="lf-arr">→</span>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+                <div class="lf-b state" style="font-size:10px">Whisper mode</div>
+                <div class="lf-arr dn">↓</div>
+                <div class="lf-b fn" style="font-size:10px">record → _transcribeWhisper()</div>
+                <div class="lf-arr dn">↓</div>
+                <div class="lf-b ok" style="font-size:10px">append to je-body</div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+                <div class="lf-b state" style="font-size:10px">Native SR mode</div>
+                <div class="lf-arr dn">↓</div>
+                <div class="lf-b fn" style="font-size:10px">SpeechRecognition live</div>
+                <div class="lf-arr dn">↓</div>
+                <div class="lf-b ok" style="font-size:10px">final text appended</div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-RAVANA PARSE:
-  parseJournalWithRavana():
-  → prompt: "Parse this lab journal entry and extract structured data as JSON"
-  → JSON schema: {recipes:[{name,base,pgr,ph,notes}], species:[{name,category}], notes:[{title,type,stage,species,body}]}
-  → askAI(prompt) → _renderJournalExtracts(data)
-  → extract cards shown: "Create recipe", "Add species", "Create note"
-  → _journalCreateRecipe(idx) → navTo('recipes'); populate recipe form
-  → _journalCreateNote(idx)   → navTo('notes'); populate note form
-  → _journalAddSpecies(idx)   → navTo('species'); trigger add form
-  → _journalCreateAll()       → batch create all extracted items
-
-OVERNIGHT BATCH PARSE:
-  _scheduleOvernightJournalParse():
-  → fires 8s after login
-  → checks: unparsed entries with body.length > 30 AND parseEnabled !== false
-  → if hasUnparsed AND (firstVisitToday OR forceFlag):
-      show progress in journal parse banner
-      for each unparsed: askAI(parse prompt) → mark parsed=true → saveJournal
-  → re-renders journal list (parsed entries get ✦ badge)
-
-PARSE TOGGLE:
-  _setJournalParseEnabled(id, bool):
-  → entry.parseEnabled = bool → saveJournal → renderJournalList
-  → paused entries show ⏸ badge, skipped by overnight parser</pre>
+        <div class="lf-diagram" style="margin-top:10px">
+          <div class="lf-diagram-lbl">Ravana parse + overnight batch</div>
+          <div class="lf-hrow" style="flex-wrap:wrap">
+            <div class="lf-n"><div class="lf-b fn">parseJournalWithRavana()</div><div class="lf-sub">or overnight: 8s after login</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">askAI(parse prompt)</div><div class="lf-sub">JSON schema: recipes · species · notes</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">_renderJournalExtracts(data)</div><div class="lf-sub">extract cards shown</div></div>
+            <span class="lf-arr">→</span>
+            <div style="display:flex;flex-wrap:wrap;gap:4px">
+              <div class="lf-b ok" style="font-size:10px">_journalCreateRecipe() → recipes form</div>
+              <div class="lf-b ok" style="font-size:10px">_journalCreateNote() → notes form</div>
+              <div class="lf-b ok" style="font-size:10px">_journalAddSpecies() → species form</div>
+              <div class="lf-b fn" style="font-size:10px">_journalCreateAll() → batch create</div>
+            </div>
+          </div>
+          <div style="margin-top:6px;font-size:11px;color:var(--mu);padding:4px 8px;background:var(--sf2);border-radius:6px">Parse toggle: <code>_setJournalParseEnabled(id, bool)</code> — paused entries show ⏸ badge, skipped by overnight parser</div>
+        </div>
       </div></div></details>
 
       <!-- ═══ TAXONOMY FLOW ═══ -->
@@ -5401,40 +5354,29 @@ PARSE TOGGLE:
       <div class="lf-body">
         <div style="background:transparent">
         <h2 class="help-h2" style="color:var(--gn)">🌱 Taxonomy — Packs, Custom Species, Flairs</h2>
-        <pre class="help-pre">PACK LOADING — loadTaxonomy():
-  TAX_PACKS map: {nepenthaceae:'carnivorous', orchidaceae:'orchids', musaceae:'banana', ...}
-  enabled packs: from localStorage('tcplants_tax_enabled') or all enabled
-  → for each enabled pack: fetch taxonomy/{category}/{pack}.json
-  → merge into S.taxSpecies[] (canonical names)
-  → S.taxFlairs[] from JSON flair definitions
-  → also: ghGet(TAX_CUSTOM_FILE) → S.taxCustom.species + S.taxCustom.flairs
+        <div class="lf-diagram">
+          <div class="lf-diagram-lbl">loadTaxonomy() — pack loading</div>
+          <div class="lf-hrow" style="flex-wrap:wrap">
+            <div class="lf-n"><div class="lf-b file">TAX_PACKS map</div><div class="lf-sub">nepenthaceae · orchidaceae · musaceae · …</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">fetch taxonomy/{cat}/{pack}.json</div><div class="lf-sub">enabled packs from localStorage</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b state">S.taxSpecies[]</div><div class="lf-sub">canonical names · S.taxFlairs[]</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">ghGet(TAX_CUSTOM_FILE)</div><div class="lf-sub">S.taxCustom.species + flairs</div></div>
+          </div>
+        </div>
 
-AUTOCOMPLETE — _taxSuggest(inputEl):
-  triggered by: oninput on bot-species, ne-species, re-target fields
-  → query = inputEl.value
-  → filter S.taxSpecies + S.taxCustom.species by includes(query)
-  → show #tax-dropdown div positioned under input
-  → keyboard nav: _taxDropdownKeyNav → up/down arrow, Enter to select
-  → _taxDropdownSelect(name) → fill input, hide dropdown, trigger related fields
-    (e.g., species → populate accession dropdown, GH plant dropdown)
-
-SPECIES PICKER MODAL:
-  openSpeciesPicker(targetFieldId):
-  → shows #species-picker-modal
-  → browse by category or search
-  → select → fill targetFieldId input
-
-CSV IMPORT:
-  _importCsvTaxonomy(csvText):
-  → parse CSV: columns Name,Category,CommonName,Source
-  → validate each row → push to S.taxCustom.species
-  → saveCustomTaxonomy() → ghPut(TAX_CUSTOM_FILE, enc(JSON.stringify(S.taxCustom)), sha)
-  → _writeCache(); renderSpecies()
-
-FLAIRS:
-  S.taxFlairs + S.taxCustom.flairs → combined in _botFlairHtml(flair_ids)
-  → colored pills in bottle detail + list
-  → flair picker in bottle editor: click to toggle flair_ids[]</pre>
+        <div class="lf-diagram" style="margin-top:10px">
+          <div class="lf-diagram-lbl">Autocomplete · Picker · CSV import · Flairs</div>
+          <table class="help-table" style="margin:0">
+            <tr><th>Feature</th><th>Flow</th></tr>
+            <tr><td>Autocomplete</td><td><code>_taxSuggest(inputEl)</code> oninput → filter S.taxSpecies + taxCustom → #tax-dropdown → keyboard nav (↑↓ Enter) → <code>_taxDropdownSelect(name)</code> → fill + trigger related dropdowns</td></tr>
+            <tr><td>Species picker</td><td><code>openSpeciesPicker(targetFieldId)</code> → #species-picker-modal → browse by category or search → select → fill targetFieldId input</td></tr>
+            <tr><td>CSV import</td><td><code>_importCsvTaxonomy(csvText)</code> → parse cols Name,Category,CommonName,Source → validate → push to S.taxCustom.species → <code>saveCustomTaxonomy()</code> → ghPut TAX_CUSTOM_FILE</td></tr>
+            <tr><td>Flairs</td><td>S.taxFlairs + S.taxCustom.flairs → <code>_botFlairHtml(flair_ids)</code> → colored pills in bottle detail + list. Flair picker in bottle editor: click to toggle flair_ids[]</td></tr>
+          </table>
+        </div>
       </div></div></details>
 
       <!-- ═══ REMINDERS FLOW ═══ -->
@@ -5450,35 +5392,31 @@ FLAIRS:
       </summary>
       <div class="lf-body">
         <div style="background:transparent"> — Badge, List, Navigation</h2>
-        <pre class="help-pre">DATA SOURCES (all in-memory, no dedicated file):
-  Bottles with next_review: S.bottles.filter(next_review exists + status active)
-  Notes with next_review:   S.notes.filter(next_review exists)
-  GH plants with next_inspection: S.greenhouse.filter(next_inspection exists)
-
-renderReminders():
-  → overdueBot: next_review < today + status∈['inoculated','growing']
-     act: navTo('bottles');openBottle(id)
-  → overdueNote: next_review < today
-     act: navTo('notes');openNote(id)          ← fixed (was missing navTo)
-  → overdueGH: next_inspection < today
-     act: navTo('greenhouse');openGHPlant(id)
-  → dueBot/dueNote: within next 7 days (same pattern)
-  → ghXferDue: inoculated bottles > 28 days ago (based on date_inoculated)
-  → sort all by days remaining
-  → render .rem-card divs with data-id, data-isBottle, data-isGh attrs
-
-Tap handler (_setupTap):
-  .rem-card → isGh=1: navTo('greenhouse');openGHPlant
-           → isBottle=1: navTo('bottles');openBottle   ← fixed
-           → else: navTo('notes');openNote              ← fixed
-
-updateReminderBadge():
-  → count total overdue items → #nd-rbadge.textContent + show/hide
-  → called after: login, saveNoteAction, saveBottleAction, saveGHPlant, deleteNote
-
-Badge triggers (cyclic dependency awareness):
-  saving a note → saveNoteAction → updateReminderBadge (in line with render)
-  saving a bottle → no auto-badge update (gap — badge may be stale after bottle edits)</pre>
+        <div class="lf-diagram">
+          <div class="lf-diagram-lbl">Data sources → renderReminders()</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:4px 0">
+            <div class="lf-b file" style="font-size:10px">🫙 Bottles (next_review + active status)</div>
+            <div class="lf-b file" style="font-size:10px">📋 Notes (next_review set)</div>
+            <div class="lf-b file" style="font-size:10px">🏡 GH plants (next_inspection set)</div>
+          </div>
+          <div class="lf-arr dn">↓ renderReminders()</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:4px 0">
+            <div class="lf-b warn" style="font-size:10px">overdueBot — next_review &lt; today</div>
+            <div class="lf-b warn" style="font-size:10px">overdueNote — next_review &lt; today</div>
+            <div class="lf-b warn" style="font-size:10px">overdueGH — next_inspection &lt; today</div>
+            <div class="lf-b state" style="font-size:10px">dueBot / dueNote — within 7 days</div>
+            <div class="lf-b state" style="font-size:10px">ghXferDue — inoculated &gt; 28 days</div>
+          </div>
+          <div class="lf-arr dn">↓ sort by days remaining → .rem-card divs</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:4px 0">
+            <div class="lf-b fn" style="font-size:10px">isGh=1 → navTo('greenhouse');openGHPlant</div>
+            <div class="lf-b fn" style="font-size:10px">isBottle=1 → navTo('bottles');openBottle</div>
+            <div class="lf-b fn" style="font-size:10px">else → navTo('notes');openNote</div>
+          </div>
+        </div>
+        <div style="margin-top:8px;padding:8px 12px;background:var(--sf2);border-radius:6px;font-size:11px;color:var(--mu)">
+          <strong style="color:var(--tx)">updateReminderBadge()</strong> — count overdue → #nd-rbadge. Called after: login · saveNoteAction · saveBottleAction · saveGHPlant · deleteNote. <span style="color:var(--yw)">⚠️ bottle edits do not auto-update badge</span>
+        </div>
       </div></div></details>
 
       <!-- ═══ SEARCH FLOW ═══ -->
@@ -5494,28 +5432,31 @@ Badge triggers (cyclic dependency awareness):
       </summary>
       <div class="lf-body">
         <div style="background:transparent"> System — Cross-Section</h2>
-        <pre class="help-pre">SearchSystem.renderSearchPage():
-  → #search-main page with input + saved filter chips
-  → oninput → _doSearch(query)
-
-_doSearch(query):
-  → notes: title/body_preview/species/tags includes query
-  → bottles: code/species/notes includes query
-  → accs: species/accession_id/source includes query
-  → recs: name/base/notes includes query
-  → gh: species/location/notes includes query
-  → render grouped results with sec() + row() helpers
-
-Result navigation:
-  Notes   → navTo('notes');openNote(id)            ← fixed (was openNote only)
-  Bottles → navTo('bottles');openBottle(id)
-  Accs    → navTo('registry');openAccession(id)
-  Recipes → navTo('recipes');openRecipe(id)
-  GH      → navTo('greenhouse');openGHPlant(id)
-
-Saved filters:
-  localStorage('tcplants_search_filters') → up to 20 saved filter strings
-  chip click → fill input → trigger search</pre>
+        <div class="lf-diagram">
+          <div class="lf-diagram-lbl">SearchSystem — cross-section query flow</div>
+          <div class="lf-hrow" style="flex-wrap:wrap">
+            <div class="lf-n"><div class="lf-b fn">renderSearchPage()</div><div class="lf-sub">input + saved filter chips</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">_doSearch(query)</div><div class="lf-sub">oninput</div></div>
+            <span class="lf-arr">→</span>
+            <div style="display:flex;flex-wrap:wrap;gap:4px">
+              <div class="lf-b file" style="font-size:10px">📋 notes: title/body/species/tags</div>
+              <div class="lf-b file" style="font-size:10px">🫙 bottles: code/species/notes</div>
+              <div class="lf-b file" style="font-size:10px">🌿 accs: species/id/source</div>
+              <div class="lf-b file" style="font-size:10px">🧪 recs: name/base/notes</div>
+              <div class="lf-b file" style="font-size:10px">🏡 GH: species/location/notes</div>
+            </div>
+          </div>
+          <div class="lf-arr dn">↓ grouped results</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;justify-content:center;padding:4px 0">
+            <div class="lf-b fn" style="font-size:10px">Notes → navTo('notes');openNote(id)</div>
+            <div class="lf-b fn" style="font-size:10px">Bottles → navTo('bottles');openBottle(id)</div>
+            <div class="lf-b fn" style="font-size:10px">Accs → navTo('registry');openAccession(id)</div>
+            <div class="lf-b fn" style="font-size:10px">Recipes → navTo('recipes');openRecipe(id)</div>
+            <div class="lf-b fn" style="font-size:10px">GH → navTo('greenhouse');openGHPlant(id)</div>
+          </div>
+          <div style="margin-top:6px;font-size:11px;color:var(--mu)">Saved filters — localStorage('tcplants_search_filters') → up to 20 filter chips · click chip → fill input → trigger search</div>
+        </div>
       </div></div></details>
 
       <!-- ═══ SUPPLY/STOCK INVENTORY ═══ -->
@@ -5566,31 +5507,30 @@ Saved filters:
       </summary>
       <div class="lf-body">
         <div style="background:transparent"> — Month Grid & Day Panel</h2>
-        <pre class="help-pre">renderCalendar():
-  → S.calYear, S.calMonth → build month grid
-  → each day cell: count notes + bottles with dates in that day
-  → click day → _openCalPanel(date) → #cdp-list
-
-_openCalPanel(date):
-  S.calSelDate = date
-  → filter S.notes: date slice = date
-  → filter S.bottles: date_prepared/date_inoculated slice = date
-  → filter S.journal: date slice = date
-  → filter S.greenhouse: next_inspection = date
-  → render .cdp-card divs with data-id, data-isBottle attrs
-
-Tap handler (cdp-list):
-  isBottle=1 → navTo('bottles');openBottle(id)   ← fixed
-  else       → navTo('notes');openNote(id)         ← fixed
-
-New note from calendar:
-  click day → 'New entry for this date' button
-  S.calDate = date → navTo('notes') → startNewNote()
-  in saveNoteAction: date = new Date(S.calDate).toISOString(); S.calDate=null
-
-Month navigation: S.calMonth/calYear ±1 → re-renderCalendar
-
-Export: _exportCalRange(start, end) → format events as .ics / markdown</pre>
+        <div class="lf-diagram">
+          <div class="lf-diagram-lbl">Calendar render + day panel</div>
+          <div class="lf-hrow" style="flex-wrap:wrap">
+            <div class="lf-n"><div class="lf-b fn">renderCalendar()</div><div class="lf-sub">S.calYear + S.calMonth → month grid · day cells show note+bottle counts</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">click day → _openCalPanel(date)</div><div class="lf-sub">S.calSelDate = date</div></div>
+            <span class="lf-arr">→</span>
+            <div style="display:flex;flex-wrap:wrap;gap:4px">
+              <div class="lf-b file" style="font-size:10px">S.notes by date</div>
+              <div class="lf-b file" style="font-size:10px">S.bottles by date_prepared/inoculated</div>
+              <div class="lf-b file" style="font-size:10px">S.journal by date</div>
+              <div class="lf-b file" style="font-size:10px">S.greenhouse by next_inspection</div>
+            </div>
+          </div>
+          <div class="lf-arr dn">↓ .cdp-card divs</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;justify-content:center;padding:4px 0">
+            <div class="lf-b fn" style="font-size:10px">isBottle=1 → navTo('bottles');openBottle</div>
+            <div class="lf-b fn" style="font-size:10px">else → navTo('notes');openNote</div>
+          </div>
+          <div style="margin-top:6px;font-size:11px;color:var(--mu)">
+            <strong style="color:var(--tx)">New note from calendar:</strong> click day → "New entry for this date" → S.calDate = date → navTo('notes') → saveNoteAction uses date from S.calDate → S.calDate=null<br>
+            <strong style="color:var(--tx)">Month nav:</strong> S.calMonth/calYear ±1 → re-renderCalendar · <strong style="color:var(--tx)">Export:</strong> _exportCalRange(start, end) → .ics / markdown
+          </div>
+        </div>
       </div></div></details>
 
       <!-- ═══ WEATHER FLOW ═══ -->
@@ -5606,32 +5546,28 @@ Export: _exportCalRange(start, end) → format events as .ics / markdown</pre>
       </summary>
       <div class="lf-body">
         <div style="background:transparent">, Activity Log, Service Worker</h2>
-        <pre class="help-pre">WEATHER:
-  fetchWeather():
-  → navigator.geolocation.getCurrentPosition → lat/lon
-    OR stored coords from settings
-  → fetch OpenMeteo API: current temp, real-feel, humidity, UV, rain
-  → S.weather = {lab:{...}, gh:{...}, updatedAt: now}
-  → update #weather-chip button text
-  → called at login + every 60s via window._wxInterval
+        <div class="lf-diagram">
+          <div class="lf-diagram-lbl">Weather — dual location, 60s polling</div>
+          <div class="lf-hrow" style="flex-wrap:wrap">
+            <div class="lf-n"><div class="lf-b fn">fetchWeather()</div><div class="lf-sub">login + every 60s via window._wxInterval</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b state">geolocation or stored coords</div><div class="lf-sub">lab coords + GH coords (separate settings)</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b fn">fetch OpenMeteo API</div><div class="lf-sub">temp · real-feel · humidity · UV · rain</div></div>
+            <span class="lf-arr">→</span>
+            <div class="lf-n"><div class="lf-b ok">S.weather = {lab, gh, updatedAt}</div><div class="lf-sub">→ #weather-chip button text</div></div>
+          </div>
+        </div>
 
-  Dual location: lab coords + greenhouse coords (separate settings)
-  If geolocation denied: uses stored coords or shows error
-
-ACTIVITY LOG:
-  fetchActivityLog():
-  → GET /repos/Phyto-Evolution/tcplants/commits?per_page=30
-  → render .al-clickable items (commits that contain note titles)
-  → click → find note by title → closeActLog(); navTo('notes'); openNote(id)   ← fixed
-  → auto-refresh every session on login
-
-SERVICE WORKER (sw.js):
-  Cache strategy: network-first for index.html, cache-first for CDN assets
-  Cache name bumped manually (SW_CACHE version) to force refresh
-  Registration: navigator.serviceWorker.register('/sw.js')
-  Offline: navigator.onLine → #offline-pill shown
-  Write ops blocked when offline via _checkOnline()
-  ⚠️  Only loadNotesIndex + saveNotesIndex wrapped with offline check (Haiku, inconsistent)</pre>
+        <div class="lf-diagram" style="margin-top:10px">
+          <div class="lf-diagram-lbl">Activity log + Service Worker</div>
+          <table class="help-table" style="margin:0">
+            <tr><th>System</th><th>Flow</th></tr>
+            <tr><td>Activity log</td><td><code>fetchActivityLog()</code> → GET GitHub commits API ?per_page=30 → render .al-clickable items → click → find note by title → closeActLog(); navTo('notes'); openNote. Auto-refreshes on login.</td></tr>
+            <tr><td>Service Worker</td><td><code>navigator.serviceWorker.register('/sw.js')</code>. Cache: network-first for index.html, cache-first for CDN assets. Bump SW_CACHE version to force refresh.</td></tr>
+            <tr><td>Offline mode</td><td><code>navigator.onLine</code> → #offline-pill shown. Write ops blocked via <code>_checkOnline()</code>. <span style="color:var(--yw)">⚠️ offline check inconsistently applied — only notes index is guarded</span></td></tr>
+          </table>
+        </div>
       </div></div></details>
 
       <!-- ═══ GBIF FLOWS ═══ -->
