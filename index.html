@@ -5815,7 +5815,6 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
       <button class="ndtab" data-sec="journal" onclick="navTo('journal')"><span class="nd-icon">📔</span>Lab Journal</button>
       <button class="ndtab" data-sec="schedule" onclick="navTo('schedule')"><span class="nd-icon">📅</span>Schedule</button>
       <button class="ndtab" data-sec="insights" onclick="navTo('insights')"><span class="nd-icon">✨</span>Insights</button>
-      <button class="ndtab" data-sec="supply" onclick="navTo('supply')"><span class="nd-icon">📦</span>Supplies</button>
       <button class="ndtab" data-sec="value" onclick="navTo('value')"><span class="nd-icon">💰</span>Value</button>
       <button class="ndtab" data-sec="sales" onclick="navTo('sales')"><span class="nd-icon">📋</span>Sales</button>
       <button class="ndtab" data-sec="search" onclick="navTo('search')"><span class="nd-icon">🔍</span>Search</button>
@@ -18062,7 +18061,7 @@ function switchSection(name){
   const sec=document.getElementById(`sec-${name}`);
   if(sec) sec.classList.add('on');
   // Sync drawer active state — highlight both stock and supply tabs when on supply
-  document.querySelectorAll('.ndtab').forEach(t=>t.classList.toggle('active',t.dataset.sec===name||(name==='supply'&&t.dataset.sec==='stock')));
+  document.querySelectorAll('.ndtab').forEach(t=>t.classList.toggle('active',t.dataset.sec===name));
   if(name==='reminders') renderReminders();
   if(name==='contam') renderContamDashboard();
   if(name==='analytics') renderAnalytics();
