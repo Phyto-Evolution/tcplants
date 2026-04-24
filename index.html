@@ -1838,6 +1838,45 @@ input, textarea, select {
 /* Logic Flows scrollbar fix */
 #sec-logicflows main { scrollbar-width: none; -ms-overflow-style: none; }
 #sec-logicflows main::-webkit-scrollbar { display: none; }
+
+/* ── Sales Section ──────────────────────────────────────────── */
+#sec-sales main { padding:20px; max-width:960px; margin:0 auto; }
+.sale-tabs { display:flex; gap:0; border-bottom:1px solid var(--bd); margin-bottom:22px; flex-wrap:wrap; }
+.sale-tab-btn { padding:9px 20px; font-size:13px; font-weight:600; border:none; background:none; cursor:pointer; border-bottom:2px solid transparent; color:var(--mu); transition:color .15s; }
+.sale-tab-btn.active { border-bottom-color:var(--ac); color:var(--ac); }
+.sale-tab-pane { display:none; }
+.sale-tab-pane.on { display:block; }
+.sale-line-table { width:100%; border-collapse:collapse; margin-bottom:16px; }
+.sale-line-table th { padding:7px 8px; font-size:11px; color:var(--mu); font-weight:600; text-align:left; border-bottom:1px solid var(--bd); }
+.sale-line-table td { padding:7px 8px; font-size:13px; border-bottom:1px solid var(--bd); vertical-align:middle; }
+.sale-line-table td input, .sale-line-table td select { background:var(--sf2); border:1px solid var(--bd); border-radius:5px; padding:4px 7px; font-size:12px; color:var(--tx); width:100%; }
+.sale-order-card { background:var(--sf); border:1px solid var(--bd); border-radius:10px; padding:14px 16px; margin-bottom:10px; }
+.sale-order-card:hover { border-color:var(--ac); }
+.sale-order-head { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:6px; }
+.sale-inv-no { font-size:13px; font-weight:700; color:var(--ac); }
+.sale-status-pill { font-size:10px; font-weight:700; padding:2px 8px; border-radius:12px; }
+.sale-status-pill.draft { background:rgba(139,148,158,.2); color:var(--mu); }
+.sale-status-pill.confirmed { background:rgba(88,166,255,.2); color:var(--ac); }
+.sale-status-pill.dispatched { background:rgba(63,185,80,.2); color:var(--gn); }
+.sale-customer { font-size:12px; color:var(--mu); }
+.sale-total-big { font-size:14px; font-weight:700; color:var(--gn); }
+.sale-items-preview { font-size:11px; color:var(--mu); margin-top:4px; }
+.sale-actions { display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
+
+/* ── AI Master Control — new persona + tool styles ──────────── */
+.ai-persona-card { background:var(--sf); border:1px solid var(--bd); border-radius:10px; padding:14px 16px; margin-bottom:14px; }
+.ai-persona-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--ac); margin-bottom:4px; }
+.ai-persona-desc { font-size:11px; color:var(--mu); margin-bottom:8px; }
+.ai-persona-ta { width:100%; min-height:90px; background:var(--sf2); border:1px solid var(--bd); border-radius:6px; padding:8px 10px; font-size:12px; color:var(--tx); line-height:1.55; resize:vertical; font-family:inherit; box-sizing:border-box; }
+.ai-persona-ta:focus { outline:none; border-color:var(--ac); }
+.ai-persona-actions { display:flex; gap:6px; margin-top:8px; }
+.ai-tool-row { display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px solid var(--bd); }
+.ai-tool-name { font-size:12px; font-weight:600; color:var(--tx); flex:1; }
+.ai-tool-desc { font-size:11px; color:var(--mu); margin-top:2px; }
+.ai-tool-confirm-badge { font-size:10px; padding:2px 6px; border-radius:10px; background:rgba(255,166,0,.2); color:var(--yw); font-weight:600; flex-shrink:0; }
+.ai-func-model-sel { padding:3px 7px; font-size:11px; background:var(--sf2); border:1px solid var(--bd); border-radius:5px; color:var(--tx); }
+.ai-custom-task-card { background:var(--sf); border:1px solid var(--bd); border-radius:8px; padding:12px 14px; margin-bottom:10px; }
+.ai-ctx-preview { font-size:10px; color:var(--tx); background:var(--sf2); border:1px solid var(--bd); border-radius:6px; padding:10px 12px; white-space:pre-wrap; word-break:break-word; max-height:280px; overflow-y:auto; margin-top:10px; line-height:1.5; }
 </style>
 <link rel="stylesheet" href="theme/skins.css">
 <script>(function(){
@@ -5695,27 +5734,45 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
       <div class="page-head-inner">
         <span class="page-head-icon">🤖</span>
         <div>
-          <div class="page-head-title">AI Control Centre</div>
-          <div class="page-head-sub">Models · Voice · Functions · Context · Activity · System</div>
+          <div class="page-head-title">AI Master Control</div>
+          <div class="page-head-sub">Persona · Models · Voice · Functions · Tools · Context · Activity · System</div>
         </div>
       </div>
     </header>
     <main>
       <div class="ai-page-tabs" id="ai-ctrl-tabs">
-        <button class="ai-tab-btn active" onclick="_aiCtrlTab('models',this)">⚡ Models</button>
+        <button class="ai-tab-btn active" onclick="_aiCtrlTab('persona',this)">🏛 Persona</button>
+        <button class="ai-tab-btn" onclick="_aiCtrlTab('models',this)">⚡ Models</button>
         <button class="ai-tab-btn" onclick="_aiCtrlTab('voice',this)">🎙 Voice</button>
         <button class="ai-tab-btn" onclick="_aiCtrlTab('functions',this)">🔧 Functions</button>
+        <button class="ai-tab-btn" onclick="_aiCtrlTab('tools',this)">🛠 Tools</button>
         <button class="ai-tab-btn" onclick="_aiCtrlTab('context',this)">🧠 Context</button>
         <button class="ai-tab-btn" onclick="_aiCtrlTab('activity',this)">📊 Activity</button>
         <button class="ai-tab-btn" onclick="_aiCtrlTab('system',this)">⚙️ System</button>
       </div>
-      <div id="ai-ctrl-pane-models"    class="ai-tab-pane on"></div>
+      <div id="ai-ctrl-pane-persona"   class="ai-tab-pane on"></div>
+      <div id="ai-ctrl-pane-models"    class="ai-tab-pane"></div>
       <div id="ai-ctrl-pane-voice"     class="ai-tab-pane"></div>
       <div id="ai-ctrl-pane-functions" class="ai-tab-pane"></div>
+      <div id="ai-ctrl-pane-tools"     class="ai-tab-pane"></div>
       <div id="ai-ctrl-pane-context"   class="ai-tab-pane"></div>
       <div id="ai-ctrl-pane-activity"  class="ai-tab-pane"></div>
       <div id="ai-ctrl-pane-system"    class="ai-tab-pane"></div>
     </main>
+  </div>
+
+  <!-- ── SALES SECTION ── -->
+  <div class="section fullpage" id="sec-sales">
+    <header class="page-head">
+      <div class="page-head-inner">
+        <span class="page-head-icon">📋</span>
+        <div>
+          <div class="page-head-title">Sales & Invoicing</div>
+          <div class="page-head-sub">New Sale · Orders · Invoice</div>
+        </div>
+      </div>
+    </header>
+    <main id="sales-main"></main>
   </div>
 
   <!-- ── BATCH ACTION BAR ── -->
@@ -5751,6 +5808,7 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
       <button class="ndtab" data-sec="insights" onclick="navTo('insights')"><span class="nd-icon">✨</span>Insights</button>
       <button class="ndtab" data-sec="supply" onclick="navTo('supply')"><span class="nd-icon">📦</span>Supplies</button>
       <button class="ndtab" data-sec="value" onclick="navTo('value')"><span class="nd-icon">💰</span>Value</button>
+      <button class="ndtab" data-sec="sales" onclick="navTo('sales')"><span class="nd-icon">📋</span>Sales</button>
       <button class="ndtab" data-sec="search" onclick="navTo('search')"><span class="nd-icon">🔍</span>Search</button>
       <button class="ndtab" data-sec="gallery" onclick="navTo('gallery')"><span class="nd-icon">📸</span>Gallery</button>
       <button class="ndtab" data-sec="ai" onclick="navTo('ai')"><span class="nd-icon">🤖</span>AI Control</button>
@@ -6401,6 +6459,7 @@ const GH_F     = 'greenhouse/data.enc';
 const SUPPLY_F  = 'supplies/data.enc';
 const JOURNAL_F = 'journal/entries.enc';
 const VALUE_F   = 'value/data.enc';
+const SALES_F   = 'sales/data.enc';
 const KEYS_F = 'settings/keys.enc';
 const API    = 'https://api.github.com';
 
@@ -6440,6 +6499,8 @@ const S = {
   journal: [], journalSha: null, curJournal: null, editingJournal: null,
   // value inventory
   value: null, valueSha: null,
+  // sales
+  sales: [], salesSha: null,
   // ui state
   analytics: null,
   blogPosts: [],
@@ -6708,6 +6769,16 @@ async function loadValue(){
 }
 async function saveValue(data, sha){
   const res=await ghPut(VALUE_F, await enc(JSON.stringify(data)), sha, `lab: value inventory prices`);
+  return res.content.sha;
+}
+async function loadSales(){
+  const f=await ghGet(SALES_F);
+  if(!f) return {data:[],sha:null};
+  const raw=JSON.parse(await dec(ghDec(f.content)));
+  return {data:Array.isArray(raw)?raw:(raw.sales||[]), sha:f.sha};
+}
+async function saveSales(data, sha){
+  const res=await ghPut(SALES_F, await enc(JSON.stringify(data)), sha, `lab: sales update`);
   return res.content.sha;
 }
 
@@ -11803,24 +11874,150 @@ function _syncAISettingsPanel(){
 }
 
 // ════════════════════════════════════════════════════════════
-// AI CONTROL CENTRE
+// AI MASTER CONTROL
 // ════════════════════════════════════════════════════════════
+
+// ── Persona system — editable char map that overrides AI_RULEBOOK sections ──
+const _PERSONA_KEY='tcplants_ai_persona';
+const _PERSONA_SECTIONS={
+  IDENTITY:     {label:'Identity',      icon:'👑', desc:'Who Ravana is — name, origin, the scholar-king lineage, how to respond about his history.'},
+  CREATOR:      {label:'Creator & Lab', icon:'🌿', desc:'Who built this, who Shiva is, Forest Studio Labs, Phyto Evolution, the Shiva–Ravana devotion thread.'},
+  TONE:         {label:'Tone & Style',  icon:'🎙', desc:'How Ravana speaks — directness, no filler, ∿ glyph, when to lead with data, when to acknowledge effort.'},
+  DOMAIN_IN:    {label:'Domain (In)',   icon:'🔬', desc:'What Ravana works within — TC protocols, PGR, contamination, species, lab economics, supply management.'},
+  PEOPLE:       {label:'People',        icon:'👥', desc:'WHO YOU ARE SPEAKING WITH — Shiva profile and Kumar profile. Tone, knowledge level, how to frame things for each.'},
+  PROACTIVE:    {label:'Proactive',     icon:'⚡', desc:'How and when to volunteer observations — "Worth noting:", one proactive point, lean not padded.'},
+  DOMAIN_OUT:   {label:'Domain (Out)',  icon:'🚫', desc:'What Ravana refuses — outside lab workflow, one refusal with authority, then done.'},
+  DATA:         {label:'Data Rules',    icon:'📐', desc:'Data discipline — pull from lab data first, PGR units, contamination queries, never fabricate.'},
+};
+
+// Parse AI_RULEBOOK into sections
+function _parseRulebookSections(){
+  const text=AI_RULEBOOK;
+  const sections={};
+  const keys=Object.keys(_PERSONA_SECTIONS);
+  // Map section keys to their header text as it appears in AI_RULEBOOK
+  const headerMap={
+    IDENTITY:'IDENTITY',
+    CREATOR:'CREATOR AND LAB OWNER',
+    TONE:'TONE AND RESPONSE STYLE',
+    DOMAIN_IN:'DOMAIN — what you work within',
+    PEOPLE:'WHO YOU ARE SPEAKING WITH',
+    PROACTIVE:'PROACTIVE ENGAGEMENT',
+    DOMAIN_OUT:'DOMAIN — what you do not do',
+    DATA:'DATA DISCIPLINE',
+  };
+  keys.forEach((k,i)=>{
+    const header=headerMap[k];
+    const nextHeader=i<keys.length-1?headerMap[keys[i+1]]:null;
+    const start=text.indexOf('\n'+header+'\n');
+    if(start===-1){ sections[k]=''; return; }
+    const contentStart=start+header.length+2;
+    const end=nextHeader?text.indexOf('\n'+nextHeader+'\n',contentStart):text.length;
+    sections[k]=text.slice(contentStart, end>-1?end:text.length).trim();
+  });
+  return sections;
+}
+
+function _getPersonaCfg(){
+  try{ return JSON.parse(localStorage.getItem(_PERSONA_KEY)||'{}'); }catch{ return {}; }
+}
+function _savePersonaSection(key, val){
+  const c=_getPersonaCfg();
+  if(val.trim()) c[key]=val.trim(); else delete c[key];
+  localStorage.setItem(_PERSONA_KEY,JSON.stringify(c));
+  toast('Section saved ✓');
+}
+function _resetPersonaSection(key){
+  const c=_getPersonaCfg();
+  delete c[key];
+  localStorage.setItem(_PERSONA_KEY,JSON.stringify(c));
+  toast('Section reset to default');
+  _aiPagePersona();
+}
+function _getEffectiveRulebook(){
+  const overrides=_getPersonaCfg();
+  if(!Object.keys(overrides).length) return AI_RULEBOOK;
+  const defaults=_parseRulebookSections();
+  const headerMap={
+    IDENTITY:'IDENTITY',
+    CREATOR:'CREATOR AND LAB OWNER',
+    TONE:'TONE AND RESPONSE STYLE',
+    DOMAIN_IN:'DOMAIN — what you work within',
+    PEOPLE:'WHO YOU ARE SPEAKING WITH',
+    PROACTIVE:'PROACTIVE ENGAGEMENT',
+    DOMAIN_OUT:'DOMAIN — what you do not do',
+    DATA:'DATA DISCIPLINE',
+  };
+  // Reconstruct: opening line + all sections
+  const openLine=AI_RULEBOOK.slice(0,AI_RULEBOOK.indexOf('\n\nIDENTITY\n'));
+  let out=openLine+'\n\n';
+  Object.keys(_PERSONA_SECTIONS).forEach(k=>{
+    const header=headerMap[k];
+    const body=overrides[k]!==undefined?overrides[k]:defaults[k];
+    out+=header+'\n'+body+'\n\n';
+  });
+  return out.trimEnd()+'\n\n';
+}
+
 function renderAIPage(){
-  _aiCtrlTab('models');
-  // mark first tab button active
+  _aiCtrlTab('persona');
   document.querySelectorAll('#ai-ctrl-tabs .ai-tab-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
 }
 function _aiCtrlTab(name, btn){
-  document.querySelectorAll('#ai-ctrl-tabs + div, #ai-ctrl-tabs ~ div').forEach(p=>{
-    if(p.id&&p.id.startsWith('ai-ctrl-pane-')) p.classList.remove('on');
-  });
+  document.querySelectorAll('#sec-ai main > div[id^="ai-ctrl-pane-"]').forEach(p=>p.classList.remove('on'));
   if(btn){ document.querySelectorAll('#ai-ctrl-tabs .ai-tab-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
   const pane=document.getElementById('ai-ctrl-pane-'+name);
   if(!pane) return;
   pane.classList.add('on');
-  const fns={models:_aiPageModels,voice:_aiPageVoice,functions:_aiPageFunctions,context:_aiPageContext,activity:_aiPageActivity,system:_aiPageSystem};
+  const fns={persona:_aiPagePersona,models:_aiPageModels,voice:_aiPageVoice,functions:_aiPageFunctions,tools:_aiPageTools,context:_aiPageContext,activity:_aiPageActivity,system:_aiPageSystem};
   try{ if(fns[name]) fns[name](); }
-  catch(e){ pane.innerHTML='<div style="padding:20px;color:var(--rd);font-size:13px">Render error: '+e.message+'</div>'; }
+  catch(e){ pane.innerHTML='<div style="padding:20px;color:var(--rd);font-size:13px">⚠️ Render error: '+e.message+'</div>'; console.error(e); }
+}
+
+// ── Persona tab ───────────────────────────────────────────────
+function _aiPagePersona(){
+  const overrides=_getPersonaCfg();
+  const defaults=_parseRulebookSections();
+  const pane=document.getElementById('ai-ctrl-pane-persona'); if(!pane) return;
+
+  const overrideCount=Object.keys(overrides).length;
+  const headerHtml=`<div style="margin-bottom:18px">
+    <div style="font-size:15px;font-weight:800;margin-bottom:4px">🏛 Ravana Character Map</div>
+    <div style="font-size:12px;color:var(--mu);line-height:1.6">Every section of the system prompt is editable here. Changes are stored locally and override the defaults on every AI call. The original source (<code>AI_RULEBOOK</code>) is never modified — you can always reset any section.</div>
+    ${overrideCount?`<div style="margin-top:8px;font-size:12px;font-weight:600;color:var(--yw)">⚡ ${overrideCount} section${overrideCount!==1?'s':''} overridden</div>`:'<div style="margin-top:8px;font-size:12px;color:var(--mu)">No overrides active — using defaults.</div>'}
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <button class="btn sm ghost" onclick="_aiPreviewFullRulebook()">👁 Preview Effective Prompt</button>
+      <button class="btn sm ghost" style="color:var(--rd)" onclick="if(confirm('Reset ALL persona overrides to defaults?')){localStorage.removeItem(_PERSONA_KEY);toast('All sections reset');_aiPagePersona()}">↺ Reset All</button>
+    </div>
+  </div>`;
+
+  const sectionCards=Object.keys(_PERSONA_SECTIONS).map(k=>{
+    const info=_PERSONA_SECTIONS[k];
+    const isOverridden=overrides[k]!==undefined;
+    const currentVal=isOverridden?overrides[k]:(defaults[k]||'');
+    const taId=`ai-persona-ta-${k}`;
+    return `<div class="ai-persona-card" id="ai-persona-card-${k}">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+        <span style="font-size:14px">${info.icon}</span>
+        <div class="ai-persona-title">${info.label}</div>
+        ${isOverridden?'<span style="font-size:10px;padding:2px 7px;border-radius:10px;background:rgba(255,166,0,.2);color:var(--yw);font-weight:700">OVERRIDDEN</span>':'<span style="font-size:10px;padding:2px 7px;border-radius:10px;background:rgba(63,185,80,.1);color:var(--gn);font-weight:700">DEFAULT</span>'}
+      </div>
+      <div class="ai-persona-desc">${info.desc}</div>
+      <textarea class="ai-persona-ta" id="${taId}" rows="5">${esc(currentVal)}</textarea>
+      <div class="ai-persona-actions">
+        <button class="btn sm" onclick="_savePersonaSection('${k}',document.getElementById('${taId}').value);_aiPagePersona()">💾 Save Section</button>
+        ${isOverridden?`<button class="btn sm ghost" onclick="_resetPersonaSection('${k}')">↺ Reset to Default</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+
+  pane.innerHTML=headerHtml+sectionCards;
+}
+
+function _aiPreviewFullRulebook(){
+  const rb=_getEffectiveRulebook();
+  const w=window.open('','_blank','width=700,height=600');
+  if(w){ w.document.write(`<pre style="font-family:monospace;font-size:12px;padding:20px;white-space:pre-wrap;word-break:break-word;background:#0d1117;color:#c9d1d9">${rb.replace(/</g,'&lt;')}</pre>`); w.document.close(); }
 }
 
 // ── Models tab ────────────────────────────────────────────────
@@ -11983,45 +12180,172 @@ function _aiPageVoice(){
 
 // ── Functions tab ─────────────────────────────────────────────
 const _AI_FUNC_KEY='tcplants_ai_funcs';
+const _AI_FUNC_MODEL_KEY='tcplants_ai_func_models';
 function _aiFuncCfg(){
   try{ return JSON.parse(localStorage.getItem(_AI_FUNC_KEY)||'{}'); }catch{ return {}; }
+}
+function _aiFuncModelCfg(){
+  try{ return JSON.parse(localStorage.getItem(_AI_FUNC_MODEL_KEY)||'{}'); }catch{ return {}; }
 }
 function _aiFuncToggle(fn, el){
   const c=_aiFuncCfg();
   c[fn]=el.checked;
   localStorage.setItem(_AI_FUNC_KEY,JSON.stringify(c));
 }
+function _aiFuncModelSet(fn, model){
+  const c=_aiFuncModelCfg();
+  if(model==='default') delete c[fn]; else c[fn]=model;
+  localStorage.setItem(_AI_FUNC_MODEL_KEY,JSON.stringify(c));
+  toast('Model override saved');
+}
 function _aiPageFunctions(){
   const c=_aiFuncCfg();
-  const on=(k)=>c[k]!==false; // default true
-  const off=(k)=>!!c[k];      // default false
+  const cm=_aiFuncModelCfg();
+  const on=(k)=>c[k]!==false;
+  const off=(k)=>!!c[k];
+  const modelSel=(key)=>{
+    const cur=cm[key]||'default';
+    return `<select class="ai-func-model-sel" onchange="_aiFuncModelSet('${key}',this.value)">
+      <option value="default"${cur==='default'?' selected':''}>Default</option>
+      ${AI_MODEL_ORDER.map(k2=>`<option value="${k2}"${cur===k2?' selected':''}>${AI_MODELS[k2].label}</option>`).join('')}
+    </select>`;
+  };
 
-  const row=(key,label,desc,defaultOn)=>{
+  const row=(key,label,desc,defaultOn,showModel=true)=>{
     const chk=defaultOn?on(key):off(key);
-    return `<div class="ai-func-row">
-      <div class="ai-func-text"><div class="ai-func-label">${label}</div><div class="ai-func-desc">${desc}</div></div>
+    return `<div class="ai-func-row" style="gap:8px">
+      <div class="ai-func-text" style="flex:1"><div class="ai-func-label">${label}</div><div class="ai-func-desc">${desc}</div></div>
+      ${showModel?modelSel(key):''}
       <label class="toggle-wrap"><input type="checkbox" ${chk?'checked':''} onchange="_aiFuncToggle('${key}',this)"><span class="toggle-slider"></span></label>
     </div>`;
   };
 
+  // Custom task slots
+  let customTasks=[];
+  try{ customTasks=JSON.parse(localStorage.getItem('tcplants_ai_custom_tasks')||'[]'); }catch{}
+  while(customTasks.length<3) customTasks.push({label:'',prompt:''});
+
+  const customHtml=customTasks.slice(0,3).map((t,i)=>`
+    <div class="ai-custom-task-card">
+      <div style="display:flex;gap:8px;margin-bottom:6px;align-items:center">
+        <input type="text" placeholder="Button label…" value="${esc(t.label)}" id="ai-ctask-label-${i}"
+          style="flex:1;background:var(--sf2);border:1px solid var(--bd);border-radius:5px;padding:5px 8px;font-size:12px;color:var(--tx)">
+        <button class="btn sm ghost" onclick="_runCustomTask(${i})">▶ Run</button>
+        <button class="btn sm ghost" onclick="_saveCustomTask(${i})">💾</button>
+      </div>
+      <textarea id="ai-ctask-prompt-${i}" placeholder="Prompt template… Use {{species}}, {{bottle_code}} as placeholders."
+        rows="3" style="width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:5px;padding:6px 8px;font-size:11px;color:var(--tx);resize:vertical;font-family:inherit">${esc(t.prompt)}</textarea>
+    </div>`).join('');
+
   document.getElementById('ai-ctrl-pane-functions').innerHTML=`
     <div class="ai-section-head">Chat &amp; Analysis</div>
-    ${row('chat','Ravana Chat','Main conversational AI — responds to lab questions, protocols, species advice',true)}
-    ${row('contamAnalysis','Contamination Analysis','AI-assisted contamination identification when logging a contam event',true)}
-    ${row('recipeSuggest','Recipe Check','AI reviews media recipes and flags potential issues or improvements',true)}
-    ${row('speciesSuggest','Species Suggestions','Auto-suggest genus/species when adding new accessions or bottles',true)}
+    <div style="font-size:11px;color:var(--mu);padding:4px 0 8px">Toggle features on/off. Set per-feature model override (or leave Default to follow the global active model).</div>
+    ${row('chat','Ravana Chat','Main conversational AI — lab questions, protocols, multi-species analysis',true)}
+    ${row('contamAnalysis','Contamination Analysis','AI identification when logging a contamination event',true)}
+    ${row('recipeSuggest','Recipe Check','AI reviews media recipes, flags PGR issues or improvements',true)}
+    ${row('speciesSuggest','Species Auto-suggest','Suggest genus/species when adding accessions or bottles',true)}
     <div class="ai-section-head">Voice &amp; Commands</div>
-    ${row('voiceCommands','Voice Commands','Parse spoken lab commands — "add 3 bottles of Nepenthes rajah"',true)}
-    ${row('ttsResponses','TTS Responses','Read Ravana chat responses aloud via speech synthesis',true)}
-    ${row('wakeWord','Wake Word Detection','Listen for "Hey Ravana" in background to trigger voice input',false)}
+    ${row('voiceCommands','Voice Commands','Parse spoken commands — "add 3 bottles of Nepenthes rajah"',true,false)}
+    ${row('ttsResponses','TTS Responses','Read Ravana responses aloud via speech synthesis',true,false)}
+    ${row('wakeWord','Wake Word — "Hey Ravana"','Background listening for hands-free voice trigger (Lab Mode)',false,false)}
     <div class="ai-section-head">Insights &amp; Background</div>
-    ${row('insightsPage','Ravana Insights Page','Generate weekly lab health digest on the Insights page',true)}
-    ${row('dashboardAlerts','Dashboard AI Alerts','Include AI-generated alerts in the dashboard alert strip',true)}
-    ${row('speciesPanel','Species Detail Panel','Load GBIF data + AI notes when opening a species record',true)}
-    <div class="ai-section-head">Model Assignments</div>
-    <div style="font-size:12px;color:var(--mu);padding:10px 0 6px">Which model handles each task class:</div>
-    ${['Quick queries → groq8 (8B)', 'Deep analysis → groq70 (70B)', 'Vision / contamination scan → gemini', 'Complex multi-step → claude'].map(t=>`<div style="font-size:12px;color:var(--tx);padding:5px 0;border-bottom:1px solid var(--bd)">${t}</div>`).join('')}
-    <div style="margin-top:10px;font-size:11px;color:var(--mu)">To override model assignments, use the Models tab to set the active model for this session.</div>`;
+    ${row('insightsPage','Ravana Insights','Weekly lab health digest on the Insights page',true)}
+    ${row('dashboardAlerts','Dashboard Alerts','AI-generated alerts in the dashboard strip',true)}
+    ${row('speciesPanel','Species Panel','GBIF data + AI notes when opening a species record',true)}
+    <div class="ai-section-head">Custom Tasks</div>
+    <div style="font-size:11px;color:var(--mu);margin-bottom:10px">Define up to 3 one-shot tasks. Write a prompt, give it a label, run it from here or via voice command "run task [label]".</div>
+    ${customHtml}`;
+}
+function _saveCustomTask(i){
+  let tasks=[];
+  try{ tasks=JSON.parse(localStorage.getItem('tcplants_ai_custom_tasks')||'[]'); }catch{}
+  while(tasks.length<3) tasks.push({label:'',prompt:''});
+  tasks[i]={
+    label:(document.getElementById('ai-ctask-label-'+i)?.value||'').trim(),
+    prompt:(document.getElementById('ai-ctask-prompt-'+i)?.value||'').trim(),
+  };
+  localStorage.setItem('tcplants_ai_custom_tasks',JSON.stringify(tasks));
+  toast('Task '+(i+1)+' saved');
+}
+function _runCustomTask(i){
+  let tasks=[];
+  try{ tasks=JSON.parse(localStorage.getItem('tcplants_ai_custom_tasks')||'[]'); }catch{}
+  const t=tasks[i]||{};
+  if(!t.prompt){ toast('No prompt set for task '+(i+1),'fail'); return; }
+  let prompt=t.prompt;
+  // Fill placeholders
+  const curBot=S.curBot?(S.bottles||[]).find(b=>b.id===S.curBot):null;
+  prompt=prompt.replace(/\{\{species\}\}/gi,(curBot?.species||S.accs?.[0]?.species||'current species'));
+  prompt=prompt.replace(/\{\{bottle_code\}\}/gi,(curBot?.code||'current bottle'));
+  navTo('notes'); // go to chat section
+  setTimeout(()=>{ const el=document.getElementById('ai-input'); if(el){ el.value=prompt; askAI(); } },200);
+}
+
+// ── Tools tab ─────────────────────────────────────────────────
+const _AI_TOOL_DISABLE_KEY='tcplants_ai_tool_disabled';
+function _aiToolDisabledSet(){
+  try{ return new Set(JSON.parse(localStorage.getItem(_AI_TOOL_DISABLE_KEY)||'[]')); }catch{ return new Set(); }
+}
+function _aiToolToggle(name, el){
+  const disabled=_aiToolDisabledSet();
+  el.checked ? disabled.delete(name) : disabled.add(name);
+  localStorage.setItem(_AI_TOOL_DISABLE_KEY,JSON.stringify([...disabled]));
+}
+function _aiPageTools(){
+  const disabled=_aiToolDisabledSet();
+  const pane=document.getElementById('ai-ctrl-pane-tools'); if(!pane) return;
+
+  const toolMeta={
+    get_lab_summary:       {label:'Get Lab Summary',          desc:'Overall stats: bottle counts, active cultures, overdue, contaminated, species count, note count.'},
+    get_bottles:           {label:'Get Bottles',              desc:'Query bottles by species and/or status. Up to 20 results.'},
+    update_bottle_status:  {label:'Update Bottle Status',     desc:'Change a bottle\'s status (e.g. inoculated → subcultured). ⚠️ Requires user confirmation.'},
+    get_species_analysis:  {label:'Species Analysis',         desc:'Metrics for a species: success rate, contamination rate, multiplication factor, active bottles.'},
+    fetch_taxonomy_updates:{label:'GBIF Taxonomy Updates',    desc:'Fetch accepted species for a genus from GBIF. Returns new species not yet in lab.'},
+    search_lab:            {label:'Search Lab',               desc:'Full-text search across notes, bottles, accessions, recipes, greenhouse.'},
+    get_schedule:          {label:'Get Schedule',             desc:'Overdue reviews, due-this-week transfers, and upcoming actions.'},
+    create_note:           {label:'Create Note',              desc:'Create a new lab note. ⚠️ Requires user confirmation before writing.'},
+    set_review_date:       {label:'Set Review Date',          desc:'Set next review date on a bottle by number of days from today. ⚠️ Requires confirmation.'},
+    log_contamination:     {label:'Log Contamination',        desc:'Mark a bottle contaminated and create a contamination note. ⚠️ Requires confirmation.'},
+    get_recipe_performance:{label:'Recipe Performance',       desc:'Compare recipes by cultures out per use, multiplication factor, contamination rate.'},
+    get_dormant_species:   {label:'Dormant Species',          desc:'List species with no notes or bottle activity in the last N days.'},
+    cost_summary:          {label:'Cost Summary',             desc:'Supply spend, cost per bottle estimate, monthly trend breakdown.'},
+    get_passage_tree:      {label:'Passage Lineage Tree',     desc:'Full passage tree for a bottle: parent chain and all descendant bottles.'},
+  };
+
+  const confirmSet=new Set(['update_bottle_status','create_note','set_review_date','log_contamination']);
+  const activeCount=AI_TOOLS.length-disabled.size;
+
+  const toolRows=AI_TOOLS.map(t=>{
+    const name=t.function.name;
+    const meta=toolMeta[name]||{label:name,desc:''};
+    const isConfirm=confirmSet.has(name);
+    const enabled=!disabled.has(name);
+    return `<div class="ai-tool-row">
+      <div style="flex:1">
+        <div class="ai-tool-name">${meta.label} <code style="font-size:10px;color:var(--mu);font-weight:400">${name}</code>${isConfirm?'<span class="ai-tool-confirm-badge" title="Writes data — requires confirmation">CONFIRM</span>':''}</div>
+        <div class="ai-tool-desc">${meta.desc}</div>
+      </div>
+      <label class="toggle-wrap"><input type="checkbox" ${enabled?'checked':''} onchange="_aiToolToggle('${name}',this)"><span class="toggle-slider"></span></label>
+    </div>`;
+  }).join('');
+
+  pane.innerHTML=`
+    <div style="margin-bottom:16px">
+      <div style="font-size:15px;font-weight:800;margin-bottom:4px">🛠 AI Tools (Agent Loop)</div>
+      <div style="font-size:12px;color:var(--mu);line-height:1.6">Ravana uses these tools in the agent loop when answering questions that need live data. Toggle any tool off to prevent Ravana from calling it — useful if you want to restrict writes or limit API calls.</div>
+      <div style="margin-top:8px;font-size:12px"><strong style="color:var(--ac)">${activeCount} / ${AI_TOOLS.length}</strong> tools active · <span style="color:var(--yw)">${[...confirmSet].filter(n=>!disabled.has(n)).length} confirm-required</span></div>
+    </div>
+    <div class="ai-section-head" style="display:flex;justify-content:space-between;align-items:center">
+      Tools
+      <div style="display:flex;gap:6px">
+        <button class="btn sm ghost" style="font-size:11px" onclick="localStorage.setItem(_AI_TOOL_DISABLE_KEY,'[]');toast('All tools enabled');_aiPageTools()">Enable All</button>
+        <button class="btn sm ghost" style="font-size:11px;color:var(--rd)" onclick="localStorage.setItem(_AI_TOOL_DISABLE_KEY,JSON.stringify(AI_TOOLS.map(t=>t.function.name)));toast('All tools disabled');_aiPageTools()">Disable All</button>
+      </div>
+    </div>
+    ${toolRows}
+    <div style="margin-top:14px;padding:10px 14px;background:var(--sf2);border-radius:8px;font-size:11px;color:var(--mu)">
+      <strong style="color:var(--yw)">⚠️ CONFIRM tools:</strong> update_bottle_status, create_note, set_review_date, log_contamination — these modify lab data and require your tap to confirm before executing. This cannot be disabled for safety.
+    </div>`;
 }
 
 // ── Context tab ───────────────────────────────────────────────
@@ -12033,10 +12357,16 @@ function _aiCtxSave(){
   const c={
     notes:   parseInt(document.getElementById('aictx-notes')?.value||5),
     bottles: document.getElementById('aictx-bottles')?.checked!==false,
+    bottleCount:parseInt(document.getElementById('aictx-bottle-count')?.value||30),
     species: document.getElementById('aictx-species')?.checked!==false,
     recipes: document.getElementById('aictx-recipes')?.checked!==false,
     contam:  document.getElementById('aictx-contam')?.checked!==false,
     supplies:document.getElementById('aictx-supplies')?.checked!==false,
+    greenhouse:document.getElementById('aictx-greenhouse')?.checked!==false,
+    journal: document.getElementById('aictx-journal')?.checked!==false,
+    analytics:document.getElementById('aictx-analytics')?.checked!==false,
+    sales:   document.getElementById('aictx-sales')?.checked!==false,
+    user:    (document.getElementById('aictx-user')?.value||'shiva').trim()||'shiva',
     maxChars:parseInt(document.getElementById('aictx-maxchars')?.value||3000),
   };
   localStorage.setItem(_AI_CTX_KEY,JSON.stringify(c));
@@ -12050,34 +12380,71 @@ function _aiPageContext(){
     <label class="toggle-wrap"><input type="checkbox" id="aictx-${id}" ${on(id,def)?'checked':''} onchange="_aiCtxSave()"><span class="toggle-slider"></span></label>
   </div>`;
 
-  // Live estimate of context size
   const notesCount=Math.min((S.notes||[]).length, c.notes||5);
-  const estChars=(notesCount*120)+((S.bottles||[]).filter(b=>b.status!=='trashed').length*40)+((S.accs||[]).length*30)+200;
+  const botCount=Math.min((S.bottles||[]).filter(b=>!['discarded','contaminated'].includes(b.status)).length, c.bottleCount||30);
+  const estChars=(notesCount*120)+(botCount*40)+((S.accs||[]).length*30)+400;
 
   document.getElementById('ai-ctrl-pane-context').innerHTML=`
-    <div class="ai-section-head">What to include in every AI call</div>
+    <div style="font-size:15px;font-weight:800;margin-bottom:4px">🧠 Context Builder</div>
+    <div style="font-size:12px;color:var(--mu);margin-bottom:16px;line-height:1.6">Controls exactly what data is included in every Ravana call. More context = better answers; more tokens = faster quota use. Tune this to your workflow.</div>
+
+    <div class="ai-section-head">Active User</div>
     <div class="ai-ctx-row">
-      <div class="ai-func-text"><div class="ai-func-label">Recent notes count</div><div class="ai-func-desc">How many of your most recent notes Ravana sees as context</div></div>
+      <div class="ai-func-text"><div class="ai-func-label">Current user</div><div class="ai-func-desc">Ravana adjusts tone and framing based on who is logged in (Shiva vs Kumar).</div></div>
+      <select id="aictx-user" onchange="_setRavanaUser(this.value);_aiCtxSave()" style="padding:5px 8px;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-size:12px">
+        <option value="shiva"${(localStorage.getItem('tcplants_ravana_user')||'shiva')==='shiva'?' selected':''}>Shiva (lab owner)</option>
+        <option value="kumar"${(localStorage.getItem('tcplants_ravana_user')||'')==='kumar'?' selected':''}>Kumar (collaborator)</option>
+      </select>
+    </div>
+
+    <div class="ai-section-head">Data Sources</div>
+    <div class="ai-ctx-row">
+      <div class="ai-func-text"><div class="ai-func-label">Recent notes (count)</div><div class="ai-func-desc">How many recent notes Ravana sees per call</div></div>
       <div class="ai-range-row">
-        <input type="range" id="aictx-notes" min="0" max="20" value="${c.notes||5}" oninput="this.nextElementSibling.textContent=this.value+' notes';_aiCtxSave()">
+        <input type="range" id="aictx-notes" min="0" max="20" value="${c.notes||5}" oninput="this.nextElementSibling.textContent=this.value;_aiCtxSave()">
         <span class="ai-range-val">${c.notes||5}</span>
       </div>
     </div>
-    ${ctxRow('bottles','Bottle summary','Active bottle counts by species and stage')}
-    ${ctxRow('species','Species list','All registered species/accessions')}
-    ${ctxRow('recipes','Recipes','Media recipes and sterilisation protocols')}
-    ${ctxRow('contam','Contam events','Recent contamination incidents (last 30 days)')}
-    ${ctxRow('supplies','Supply levels','Current supply stock levels and low-stock flags')}
     <div class="ai-ctx-row">
-      <div class="ai-func-text"><div class="ai-func-label">Max context chars</div><div class="ai-func-desc">Hard cap on total characters sent per call. Lower = faster + fewer tokens used.</div></div>
+      <div class="ai-func-text"><div class="ai-func-label">Bottles (max count)</div><div class="ai-func-desc">Max active bottles included in context summary</div></div>
       <div class="ai-range-row">
-        <input type="range" id="aictx-maxchars" min="1000" max="8000" step="500" value="${c.maxChars||3000}" oninput="this.nextElementSibling.textContent=parseInt(this.value).toLocaleString();_aiCtxSave()">
+        <input type="range" id="aictx-bottle-count" min="5" max="100" step="5" value="${c.bottleCount||30}" oninput="this.nextElementSibling.textContent=this.value;_aiCtxSave()">
+        <span class="ai-range-val">${c.bottleCount||30}</span>
+      </div>
+    </div>
+    ${ctxRow('bottles','Bottle summary','Active bottle counts grouped by species and stage')}
+    ${ctxRow('species','Species / Accessions','All registered species and accession records')}
+    ${ctxRow('recipes','Recipes','Media recipes and sterilisation protocols')}
+    ${ctxRow('contam','Contamination events','Last 30 days contamination incidents')}
+    ${ctxRow('supplies','Supply levels','Current stock and low-stock alerts')}
+    ${ctxRow('greenhouse','Greenhouse plants','GH plant counts, health, size grades')}
+    ${ctxRow('journal','Lab journal entries','Recent lab journal entries (last 5)')}
+    ${ctxRow('analytics','Analytics summary','Contam rates, success rates, multiplication averages')}
+    ${ctxRow('sales','Sales data','Recent orders and revenue summary',false)}
+
+    <div class="ai-section-head">Limits</div>
+    <div class="ai-ctx-row">
+      <div class="ai-func-text"><div class="ai-func-label">Max context chars</div><div class="ai-func-desc">Hard cap per call. Lower = faster + fewer tokens.</div></div>
+      <div class="ai-range-row">
+        <input type="range" id="aictx-maxchars" min="1000" max="12000" step="500" value="${c.maxChars||3000}" oninput="this.nextElementSibling.textContent=parseInt(this.value).toLocaleString();_aiCtxSave()">
         <span class="ai-range-val">${(c.maxChars||3000).toLocaleString()}</span>
       </div>
     </div>
-    <div style="margin-top:14px;padding:10px 14px;background:var(--sf2);border-radius:8px;font-size:12px;color:var(--mu)">
-      📐 Estimated context per call: ~<strong style="color:var(--tx)">${estChars.toLocaleString()}</strong> chars (~<strong style="color:var(--tx)">${Math.round(estChars/4).toLocaleString()}</strong> tokens). Groq free tier limit: 6,000 TPM.
-    </div>`;
+
+    <div style="margin-top:14px;padding:10px 14px;background:var(--sf2);border-radius:8px;font-size:12px;color:var(--mu);line-height:1.8">
+      📐 Est. context: ~<strong style="color:var(--tx)">${estChars.toLocaleString()}</strong> chars · ~<strong style="color:var(--tx)">${Math.round(estChars/4).toLocaleString()}</strong> tokens
+    </div>
+    <div style="margin-top:10px">
+      <button class="btn sm ghost" onclick="_aiPreviewContext()">👁 Preview Context</button>
+    </div>
+    <div id="ai-ctx-preview-box" style="display:none"></div>`;
+}
+function _aiPreviewContext(){
+  const box=document.getElementById('ai-ctx-preview-box'); if(!box) return;
+  if(box.style.display!=='none'){ box.style.display='none'; return; }
+  const ctx=typeof _buildAIContext==='function'?_buildAIContext():'(context builder not available)';
+  box.innerHTML=`<div class="ai-ctx-preview">${esc(ctx)}</div>`;
+  box.style.display='block';
 }
 
 // ── Activity tab ──────────────────────────────────────────────
@@ -12154,46 +12521,89 @@ function _aiPageSystem(){
   const logSize=Math.round((localStorage.getItem(_AI_LOG_KEY)||'').length/1024);
   const allKeys=Object.keys(localStorage).filter(k=>k.startsWith('tcplants_'));
   const totalSize=allKeys.reduce((s,k)=>s+(localStorage.getItem(k)||'').length,0);
+  const personaOverrides=Object.keys(_getPersonaCfg()).length;
+  const toolDisabled=_aiToolDisabledSet().size;
+  const customTasks=(()=>{try{return JSON.parse(localStorage.getItem('tcplants_ai_custom_tasks')||'[]').filter(t=>t.label).length;}catch{return 0;}})();
+
+  const rb=_getEffectiveRulebook();
 
   document.getElementById('ai-ctrl-pane-system').innerHTML=`
+    <div style="font-size:15px;font-weight:800;margin-bottom:14px">⚙️ System</div>
+
     <div class="ai-section-head">Proxy &amp; Connectivity</div>
     <div class="ai-func-row">
       <div class="ai-func-text">
         <div class="ai-func-label">Cloudflare Worker URL</div>
-        <div class="ai-func-desc">Routes Gemini + proxied Claude calls. Leave blank to use keys directly.</div>
-        <input class="ai-key-field" id="ai-sys-proxy" type="url" placeholder="https://yourworker.workers.dev" value="${proxyUrl}" autocomplete="off">
+        <div class="ai-func-desc">Routes Gemini + proxied Claude calls. Default: plantking.ape.workers.dev</div>
+        <input class="ai-key-field" id="ai-sys-proxy" type="url" placeholder="https://yourworker.workers.dev" value="${esc(proxyUrl)}" autocomplete="off">
       </div>
       <button class="btn sm" style="margin-left:10px;flex-shrink:0" onclick="const v=document.getElementById('ai-sys-proxy').value.trim();localStorage.setItem('tcplants_proxy_url',v);if(typeof _aiProxyURL!=='undefined')_aiProxyURL=v;toast(v?'Proxy saved':'Proxy cleared')">Save</button>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
       <button class="ai-sys-btn" onclick="_aiTestProxy()">🔌 Test Proxy</button>
       <button class="ai-sys-btn" onclick="_aiTestGroq()">⚡ Test Groq</button>
+      <button class="ai-sys-btn" onclick="_aiSystemTestPrompt()">💬 Test Ravana</button>
     </div>
-    <div id="ai-sys-test-result" style="margin-top:8px;font-size:12px;color:var(--mu)"></div>
+    <div id="ai-sys-test-result" style="margin-top:8px;font-size:12px;color:var(--mu);min-height:18px"></div>
+    <div id="ai-sys-test-prompt-box" style="display:none;margin-top:10px">
+      <input type="text" id="ai-sys-test-input" placeholder="Ask Ravana anything…" style="width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:7px 10px;font-size:12px;color:var(--tx)">
+      <button class="btn sm" style="margin-top:6px" onclick="_aiSystemRunTest()">Send</button>
+      <div id="ai-sys-test-response" style="margin-top:8px;font-size:12px;color:var(--tx);background:var(--sf2);border-radius:6px;padding:10px;display:none;line-height:1.6"></div>
+    </div>
 
-    <div class="ai-section-head">Storage</div>
-    <div style="font-size:12px;color:var(--tx);line-height:2">
-      Cache size: <strong>${cachedSize}</strong><br>
-      AI log size: <strong>${logSize}KB</strong> (${_aiGetLog().length} entries)<br>
-      Total tcplants localStorage: <strong>${Math.round(totalSize/1024)}KB</strong>
+    <div class="ai-section-head">Storage &amp; State</div>
+    <div style="font-size:12px;color:var(--tx);line-height:2.1">
+      App cache: <strong>${cachedSize}</strong><br>
+      AI activity log: <strong>${logSize}KB</strong> (${_aiGetLog().length} entries)<br>
+      Total localStorage: <strong>${Math.round(totalSize/1024)}KB</strong> (${allKeys.length} keys)<br>
+      Persona overrides: <strong style="color:${personaOverrides?'var(--yw)':'var(--gn)'}">${personaOverrides} section${personaOverrides!==1?'s':''}</strong><br>
+      Disabled tools: <strong style="color:${toolDisabled?'var(--yw)':'var(--gn)'}">${toolDisabled} / ${AI_TOOLS.length}</strong><br>
+      Custom tasks defined: <strong>${customTasks}</strong>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
-      <button class="ai-sys-btn danger" onclick="if(confirm('Clear app cache? App will reload data from GitHub.'))localStorage.removeItem('tcplants_cache');toast('Cache cleared')">🗑 Clear Cache</button>
-      <button class="ai-sys-btn danger" onclick="_aiClearLog();_aiPageSystem()">🗑 Clear AI Log</button>
-      <button class="ai-sys-btn danger" onclick="if(confirm('Reset ALL AI settings to defaults?')){['tcplants_ai_model','tcplants_ai_funcs','tcplants_ai_context',_AI_LOG_KEY,VOICE_KEY].forEach(k=>localStorage.removeItem(k));_aiModel='groq8';_updateAIModelUI();toast('AI settings reset');_aiPageSystem()}">↺ Reset AI Settings</button>
+      <button class="ai-sys-btn danger" onclick="if(confirm('Clear app cache? Will reload from GitHub on next login.'))localStorage.removeItem('tcplants_cache');toast('Cache cleared')">🗑 Cache</button>
+      <button class="ai-sys-btn danger" onclick="_aiClearLog();_aiPageSystem()">🗑 AI Log</button>
+      <button class="ai-sys-btn danger" onclick="if(confirm('Reset ALL AI settings? (model, funcs, context, log, voice, persona, tools)'))['tcplants_ai_model','tcplants_ai_funcs','tcplants_ai_context',_AI_LOG_KEY,VOICE_KEY,_PERSONA_KEY,_AI_FUNC_MODEL_KEY,_AI_TOOL_DISABLE_KEY,'tcplants_ai_custom_tasks'].forEach(k=>localStorage.removeItem(k));_aiModel='groq8';_updateAIModelUI();toast('All AI settings reset');_aiPageSystem()">↺ Full Reset</button>
     </div>
 
-    <div class="ai-section-head">System Prompt Preview</div>
-    <div style="font-size:11px;color:var(--mu);margin-bottom:6px">First 600 chars of AI_RULEBOOK:</div>
-    <pre style="font-size:10px;color:var(--tx);background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:10px 12px;overflow-x:auto;white-space:pre-wrap;word-break:break-word;max-height:180px;overflow-y:auto">${(typeof AI_RULEBOOK!=='undefined'?AI_RULEBOOK.substring(0,600):'—')+'…'}</pre>
+    <div class="ai-section-head">Effective System Prompt</div>
+    <div style="font-size:11px;color:var(--mu);margin-bottom:6px">${personaOverrides?`<span style="color:var(--yw)">⚡ ${personaOverrides} section${personaOverrides!==1?'s':''} overridden from default</span>`:'Using default AI_RULEBOOK — no overrides active.'} · ${rb.length.toLocaleString()} chars total.</div>
+    <pre style="font-size:10px;color:var(--tx);background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:10px 12px;white-space:pre-wrap;word-break:break-word;max-height:220px;overflow-y:auto">${esc(rb)}</pre>
+    <div style="margin-top:8px;display:flex;gap:8px">
+      <button class="btn sm ghost" onclick="_aiPreviewFullRulebook()">⬚ Full Preview</button>
+      ${personaOverrides?`<button class="btn sm ghost" style="color:var(--rd)" onclick="if(confirm('Reset all persona overrides?')){localStorage.removeItem(_PERSONA_KEY);toast('Persona reset');_aiPageSystem()}">↺ Reset Persona</button>`:''}
+    </div>
 
-    <div class="ai-section-head">Version &amp; Build</div>
-    <div style="font-size:12px;color:var(--mu);line-height:1.8">
-      AI framework: <strong style="color:var(--tx)">Ravana v3.11+</strong><br>
-      Models available: <strong style="color:var(--tx)">${AI_MODEL_ORDER.length}</strong> (${AI_MODEL_ORDER.map(k=>AI_MODELS[k].label).join(', ')})<br>
-      Voice system: <strong style="color:var(--tx)">Whisper + Web Speech API</strong><br>
-      Tool use: <strong style="color:var(--tx)">Agent loop, max 3 rounds</strong>
+    <div class="ai-section-head">Build Info</div>
+    <div style="font-size:12px;color:var(--mu);line-height:2">
+      AI framework: <strong style="color:var(--tx)">Ravana v3.12 — Master Control</strong><br>
+      Models: <strong style="color:var(--tx)">${AI_MODEL_ORDER.map(k=>AI_MODELS[k].label).join(' · ')}</strong><br>
+      Tools: <strong style="color:var(--tx)">${AI_TOOLS.length} registered · ${AI_TOOLS.length-_aiToolDisabledSet().size} active</strong><br>
+      Voice: <strong style="color:var(--tx)">Whisper (Groq) + Web Speech API + TTS</strong><br>
+      Agent loop: <strong style="color:var(--tx)">max 3 rounds, 14 tools, ${[...AI_TOOLS_CONFIRM].length} confirm-required</strong>
     </div>`;
+}
+function _aiSystemTestPrompt(){
+  const box=document.getElementById('ai-sys-test-prompt-box');
+  if(box) box.style.display=box.style.display==='none'?'block':'none';
+}
+async function _aiSystemRunTest(){
+  const input=document.getElementById('ai-sys-test-input');
+  const resp=document.getElementById('ai-sys-test-response');
+  if(!input||!resp) return;
+  const q=input.value.trim(); if(!q) return;
+  resp.style.display='block'; resp.textContent='Thinking…';
+  try{
+    const text=await _callAISimple(q);
+    resp.textContent=text||'(no response)';
+  }catch(e){ resp.innerHTML=`<span style="color:var(--rd)">Error: ${esc(e.message)}</span>`; }
+}
+async function _callAISimple(prompt){
+  const ctx=typeof _buildAIContext==='function'?_buildAIContext():'';
+  const fullPrompt=_getEffectiveRulebook()+'\n\n---\n'+ctx+'\n\n---\nUser: '+prompt;
+  const provider=_selectAIProvider();
+  const result=await _callAIProvider(provider,fullPrompt,'',1024);
+  return result?.text||result||'';
 }
 async function _aiTestProxy(){
   const res=document.getElementById('ai-sys-test-result');
@@ -12686,7 +13096,7 @@ async function askAI(prompt){
 
   // Sanitize prompt to prevent injection
   const sanitizedPrompt=prompt.replace(/[^\w\s\.\,\!\?\'\"\-\(\)]/g,'').substring(0,2000);
-  const fullPrompt=AI_RULEBOOK+'\n\n---\n## Lab Data Context'+context+'\n\n---\nUser question: '+sanitizedPrompt;
+  const fullPrompt=_getEffectiveRulebook()+'\n\n---\n## Lab Data Context'+context+'\n\n---\nUser question: '+sanitizedPrompt;
 
   try{
     let text='';
@@ -12749,7 +13159,7 @@ async function askAI(prompt){
 async function _callAIProxyFull(provider, model, messages, clientKey, _retry=0){
   const splitIdx=messages[0]?.content?.indexOf('\n\n---\n## Lab Data Context')??-1;
   const firstMsg=messages[0]?.content||'';
-  const system=splitIdx>-1?firstMsg.slice(0,splitIdx):AI_RULEBOOK;
+  const system=splitIdx>-1?firstMsg.slice(0,splitIdx):_getEffectiveRulebook();
   // All messages after the first become the conversation
   const convMessages=messages.length>1?messages:messages.map((m,i)=>
     i===0?{role:'user',content:splitIdx>-1?firstMsg.slice(splitIdx):firstMsg}:m
@@ -12789,7 +13199,7 @@ async function _callAIProxyFull(provider, model, messages, clientKey, _retry=0){
 async function _callAIProxy(provider, model, fullPrompt, clientKey){
   // Split system prompt (AI_RULEBOOK section before '---') from user turn
   const splitIdx = fullPrompt.indexOf('\n\n---\n## Lab Data Context');
-  const system = splitIdx > -1 ? fullPrompt.slice(0, splitIdx) : AI_RULEBOOK;
+  const system = splitIdx > -1 ? fullPrompt.slice(0, splitIdx) : _getEffectiveRulebook();
   const userContent = splitIdx > -1 ? fullPrompt.slice(splitIdx) : fullPrompt;
 
   const headers = {'Content-Type':'application/json'};
@@ -16885,6 +17295,305 @@ async function _valPriceSet(key, val){
   },800);
 }
 
+// ════════════════════════════════════════════════════════════
+// SALES & INVOICING
+// ════════════════════════════════════════════════════════════
+const _SALE_STATUSES=['draft','confirmed','dispatched'];
+const _SALE_STATUS_LABEL={draft:'Draft',confirmed:'Confirmed',dispatched:'Dispatched'};
+
+function _salesNextInvoiceNo(){
+  const existing=(S.sales||[]).map(s=>parseInt((s.invoice_no||'').replace(/\D/g,''))||0);
+  const max=existing.length?Math.max(...existing):0;
+  const yr=new Date().getFullYear().toString().slice(2);
+  return `FSL-INV-${yr}-${String(max+1).padStart(4,'0')}`;
+}
+
+function renderSalesPage(tab){
+  const main=document.getElementById('sales-main'); if(!main) return;
+  const t=tab||'new';
+  const tabs=[
+    {k:'new',  label:'📝 New Sale'},
+    {k:'orders',label:'📦 Orders'},
+  ];
+  const tabHtml=`<div class="sale-tabs">${tabs.map(x=>`<button class="sale-tab-btn${t===x.k?' active':''}" onclick="renderSalesPage('${x.k}')">${x.label}</button>`).join('')}</div>`;
+  let body='';
+  if(t==='new') body=_salesNewHtml();
+  else if(t==='orders') body=_salesOrdersHtml();
+  main.innerHTML=tabHtml+`<div class="sale-tab-pane on" id="sale-pane-${t}">${body}</div>`;
+}
+
+function _salesNewHtml(){
+  const prices=(S.value||{}).prices||{};
+  const VALUE_STAGES=['prepared','inoculated','growing','subcultured','rooting','hardening','weaned'];
+  const VALUE_GH_GRADES=['seedling','small','medium','adult'];
+  const stageOpts=VALUE_STAGES.map(s=>`<option value="bottle_${s}">🫙 Bottle — ${s.charAt(0).toUpperCase()+s.slice(1)} (₹${parseFloat(prices['stage_'+s])||0}/bottle)</option>`).join('');
+  const gradeOpts=VALUE_GH_GRADES.map(g=>`<option value="gh_${g}">🌱 GH Plant — ${g.charAt(0).toUpperCase()+g.slice(1)} (₹${parseFloat(prices['gh_'+g])||0}/plant)</option>`).join('');
+
+  // Unique species from bottles + GH
+  const spSet=new Set([...(S.bottles||[]).map(b=>b.species), ...(S.greenhouse||[]).map(p=>p.species)].filter(Boolean));
+  const spOpts=[...spSet].sort().map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join('');
+
+  return `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px" id="sale-form-grid">
+      <div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--tx)">Customer Details</div>
+        <div class="field"><label>Customer / Organisation *</label><input type="text" id="sale-cust-name" placeholder="Name or org" style="width:100%;background:var(--sf);border:1px solid var(--bd);border-radius:7px;padding:7px 10px;font-size:13px;color:var(--tx)"></div>
+        <div class="field"><label>Contact (phone / email)</label><input type="text" id="sale-cust-contact" placeholder="Phone or email" style="width:100%;background:var(--sf);border:1px solid var(--bd);border-radius:7px;padding:7px 10px;font-size:13px;color:var(--tx)"></div>
+        <div class="field"><label>Address</label><textarea id="sale-cust-addr" rows="2" placeholder="Delivery address" style="width:100%;background:var(--sf);border:1px solid var(--bd);border-radius:7px;padding:7px 10px;font-size:13px;color:var(--tx);resize:vertical"></textarea></div>
+        <div class="field"><label>Sale Date</label><input type="date" id="sale-date" value="${new Date().toISOString().slice(0,10)}" style="background:var(--sf);border:1px solid var(--bd);border-radius:7px;padding:7px 10px;font-size:13px;color:var(--tx)"></div>
+        <div class="field"><label>Status</label>
+          <select id="sale-status" style="width:100%;background:var(--sf);border:1px solid var(--bd);border-radius:7px;padding:7px 10px;font-size:13px;color:var(--tx)">
+            <option value="draft">Draft</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="dispatched">Dispatched</option>
+          </select>
+        </div>
+        <div class="field"><label>Notes</label><textarea id="sale-notes" rows="2" placeholder="Any notes on this order…" style="width:100%;background:var(--sf);border:1px solid var(--bd);border-radius:7px;padding:7px 10px;font-size:13px;color:var(--tx);resize:vertical"></textarea></div>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--tx)">Line Items</div>
+        <table class="sale-line-table" id="sale-lines-table">
+          <thead><tr>
+            <th>Species</th><th>Type</th><th style="width:60px">Qty</th><th style="width:80px">Unit ₹</th><th style="width:80px">Total</th><th style="width:30px"></th>
+          </tr></thead>
+          <tbody id="sale-lines-body"></tbody>
+        </table>
+        <button class="btn sm ghost" style="margin-bottom:16px" onclick="_saleAddLine()">+ Add Line</button>
+        <div style="text-align:right;font-size:15px;font-weight:700;color:var(--gn)">Total: <span id="sale-grand-total">₹0</span></div>
+        <datalist id="sale-sp-list">${spOpts}</datalist>
+        <datalist id="sale-type-opts">${stageOpts}${gradeOpts}</datalist>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn green" onclick="_saveSaleAction()">💾 Save Order</button>
+      <button class="btn ghost" onclick="_saleAddLine()">+ Line Item</button>
+    </div>
+    <div id="sale-form-status" style="font-size:12px;color:var(--mu);margin-top:8px;min-height:18px"></div>
+    <script>_saleAddLine();_saleAddLine();<\/script>`;
+}
+
+function _saleAddLine(){
+  const prices=(S.value||{}).prices||{};
+  const tbody=document.getElementById('sale-lines-body'); if(!tbody) return;
+  const idx=tbody.rows.length;
+  const tr=document.createElement('tr');
+  tr.dataset.idx=idx;
+  tr.innerHTML=`
+    <td><input type="text" list="sale-sp-list" placeholder="Species…" oninput="_saleLineCalc()" style="min-width:120px"></td>
+    <td><select onchange="_saleLineAutoPrice(this,${idx})" style="min-width:130px">
+      <option value="">— type —</option>
+      ${['prepared','inoculated','growing','subcultured','rooting','hardening','weaned'].map(s=>`<option value="bottle_${s}">🫙 ${s.charAt(0).toUpperCase()+s.slice(1)}</option>`).join('')}
+      ${['seedling','small','medium','adult'].map(g=>`<option value="gh_${g}">🌱 GH ${g.charAt(0).toUpperCase()+g.slice(1)}</option>`).join('')}
+    </select></td>
+    <td><input type="number" min="1" value="1" oninput="_saleLineCalc()" style="width:55px"></td>
+    <td><input type="number" min="0" value="0" id="sale-unit-${idx}" oninput="_saleLineCalc()" style="width:75px"></td>
+    <td style="font-weight:600;color:var(--ac)" id="sale-subtotal-${idx}">₹0</td>
+    <td><button style="background:none;border:none;cursor:pointer;color:var(--rd);font-size:14px" onclick="this.closest('tr').remove();_saleLineCalc()">✕</button></td>`;
+  tbody.appendChild(tr);
+}
+
+function _saleLineAutoPrice(sel, idx){
+  const prices=(S.value||{}).prices||{};
+  const v=sel.value;
+  let price=0;
+  if(v.startsWith('bottle_')) price=parseFloat(prices['stage_'+v.slice(7)])||0;
+  else if(v.startsWith('gh_')) price=parseFloat(prices['gh_'+v.slice(3)])||0;
+  const unitEl=document.getElementById('sale-unit-'+idx);
+  if(unitEl) unitEl.value=price;
+  _saleLineCalc();
+}
+
+function _saleLineCalc(){
+  const tbody=document.getElementById('sale-lines-body'); if(!tbody) return;
+  let grand=0;
+  Array.from(tbody.rows).forEach((tr,i)=>{
+    const cells=tr.querySelectorAll('input,select');
+    const qty=parseFloat(cells[2]?.value||1)||0;
+    const unit=parseFloat(cells[3]?.value||0)||0;
+    const sub=qty*unit;
+    grand+=sub;
+    const subEl=tr.querySelector('[id^="sale-subtotal-"]');
+    if(subEl) subEl.textContent='₹'+sub.toLocaleString('en-IN',{maximumFractionDigits:0});
+  });
+  const tot=document.getElementById('sale-grand-total');
+  if(tot) tot.textContent=fmtINR(grand);
+}
+
+async function _saveSaleAction(){
+  const name=(document.getElementById('sale-cust-name')?.value||'').trim();
+  if(!name){ toast('Customer name is required','fail'); return; }
+  const tbody=document.getElementById('sale-lines-body');
+  const lines=Array.from(tbody?.rows||[]).map(tr=>{
+    const cells=tr.querySelectorAll('input,select');
+    const species=(cells[0]?.value||'').trim();
+    const type=cells[1]?.value||'';
+    const qty=parseInt(cells[2]?.value||1)||1;
+    const unit_price=parseFloat(cells[3]?.value||0)||0;
+    return {species,type,qty,unit_price,subtotal:qty*unit_price};
+  }).filter(l=>l.species||l.type);
+  if(!lines.length){ toast('Add at least one line item','fail'); return; }
+  const total=lines.reduce((s,l)=>s+l.subtotal,0);
+  const sale={
+    id:uid(),
+    invoice_no:_salesNextInvoiceNo(),
+    date:document.getElementById('sale-date')?.value||new Date().toISOString().slice(0,10),
+    customer_name:name,
+    customer_contact:(document.getElementById('sale-cust-contact')?.value||'').trim()||null,
+    customer_address:(document.getElementById('sale-cust-addr')?.value||'').trim()||null,
+    items:lines,
+    total,
+    status:document.getElementById('sale-status')?.value||'draft',
+    notes:(document.getElementById('sale-notes')?.value||'').trim()||null,
+    created_at:new Date().toISOString(),
+  };
+  const statusEl=document.getElementById('sale-form-status');
+  if(statusEl) statusEl.textContent='Saving…';
+  try{
+    S.sales=[sale,...(S.sales||[])];
+    S.salesSha=await saveSales(S.sales,S.salesSha);
+    toast(`📋 ${sale.invoice_no} saved`,'ok');
+    renderSalesPage('orders');
+  }catch(e){
+    S.sales=(S.sales||[]).filter(s=>s.id!==sale.id);
+    toast('Save failed: '+e.message,'fail');
+    if(statusEl) statusEl.textContent='Save failed: '+e.message;
+  }
+}
+
+function _salesOrdersHtml(){
+  const sales=S.sales||[];
+  if(!sales.length) return `<div style="padding:40px;text-align:center;color:var(--mu)"><div style="font-size:32px;margin-bottom:10px">📋</div><div>No orders yet — create one in New Sale.</div></div>`;
+
+  const total=sales.reduce((s,o)=>s+o.total,0);
+  const dispatched=sales.filter(o=>o.status==='dispatched').reduce((s,o)=>s+o.total,0);
+  const pending=sales.filter(o=>o.status!=='dispatched').reduce((s,o)=>s+o.total,0);
+
+  const summaryHtml=`<div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+    <div style="flex:1;min-width:140px;background:var(--sf);border:1px solid var(--bd);border-radius:9px;padding:12px 16px">
+      <div style="font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.06em">All orders</div>
+      <div style="font-size:22px;font-weight:800;color:var(--ac)">${fmtINR(total)}</div>
+      <div style="font-size:11px;color:var(--mu)">${sales.length} order${sales.length!==1?'s':''}</div>
+    </div>
+    <div style="flex:1;min-width:140px;background:var(--sf);border:1px solid var(--bd);border-radius:9px;padding:12px 16px">
+      <div style="font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.06em">Dispatched</div>
+      <div style="font-size:22px;font-weight:800;color:var(--gn)">${fmtINR(dispatched)}</div>
+    </div>
+    <div style="flex:1;min-width:140px;background:var(--sf);border:1px solid var(--bd);border-radius:9px;padding:12px 16px">
+      <div style="font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.06em">Pending</div>
+      <div style="font-size:22px;font-weight:800;color:var(--yw)">${fmtINR(pending)}</div>
+    </div>
+  </div>`;
+
+  const cardsHtml=sales.map(o=>{
+    const itemsPreview=o.items.slice(0,3).map(i=>`${i.species||i.type} ×${i.qty}`).join(' · ')+(o.items.length>3?` +${o.items.length-3} more`:'');
+    return `<div class="sale-order-card">
+      <div class="sale-order-head">
+        <span class="sale-inv-no">${esc(o.invoice_no)}</span>
+        <span class="sale-status-pill ${o.status}">${_SALE_STATUS_LABEL[o.status]||o.status}</span>
+        <span class="sale-total-big">${fmtINR(o.total)}</span>
+      </div>
+      <div class="sale-customer">${esc(o.customer_name)}${o.customer_contact?' · '+esc(o.customer_contact):''} · ${o.date}</div>
+      <div class="sale-items-preview">${esc(itemsPreview)}</div>
+      <div class="sale-actions">
+        <button class="btn sm ghost" onclick="_printInvoice('${o.id}')">🖨 Invoice</button>
+        <button class="btn sm ghost" onclick="_openSaleStatusEdit('${o.id}')">✏️ Status</button>
+        <button class="btn sm ghost" style="color:var(--rd)" onclick="_deleteSale('${o.id}')">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  return summaryHtml+cardsHtml;
+}
+
+function _openSaleStatusEdit(id){
+  const sale=(S.sales||[]).find(s=>s.id===id); if(!sale) return;
+  const newStatus=prompt(`Change status of ${sale.invoice_no}:\n\ndraft / confirmed / dispatched\n\nCurrent: ${sale.status}`,(sale.status));
+  if(!newStatus||!_SALE_STATUSES.includes(newStatus.trim())) return;
+  sale.status=newStatus.trim();
+  saveSales(S.sales,S.salesSha).then(sha=>{ S.salesSha=sha; toast('Status updated'); renderSalesPage('orders'); }).catch(e=>toast('Save failed: '+e.message,'fail'));
+}
+
+async function _deleteSale(id){
+  const sale=(S.sales||[]).find(s=>s.id===id); if(!sale) return;
+  if(!confirm(`Delete invoice ${sale.invoice_no}?\nThis cannot be undone.`)) return;
+  S.sales=(S.sales||[]).filter(s=>s.id!==id);
+  try{ S.salesSha=await saveSales(S.sales,S.salesSha); toast('Order deleted'); renderSalesPage('orders'); }
+  catch(e){ S.sales.push(sale); toast('Delete failed: '+e.message,'fail'); }
+}
+
+function _printInvoice(id){
+  const sale=(S.sales||[]).find(s=>s.id===id); if(!sale) return;
+  const itemRows=sale.items.map(i=>`
+    <tr>
+      <td>${esc(i.species||'—')}</td>
+      <td>${esc(i.type||'—')}</td>
+      <td style="text-align:center">${i.qty}</td>
+      <td style="text-align:right">₹${(i.unit_price||0).toLocaleString('en-IN')}</td>
+      <td style="text-align:right;font-weight:600">₹${(i.subtotal||0).toLocaleString('en-IN')}</td>
+    </tr>`).join('');
+
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Invoice ${esc(sale.invoice_no)}</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}body{font-family:'Segoe UI',sans-serif;font-size:13px;color:#111;padding:40px;max-width:800px;margin:0 auto}
+    .inv-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;padding-bottom:20px;border-bottom:2px solid #111}
+    .brand{font-size:22px;font-weight:800;color:#1a472a}.brand-sub{font-size:11px;color:#555;margin-top:3px}
+    .inv-meta{text-align:right}.inv-no{font-size:18px;font-weight:700;color:#1a472a}.inv-date{font-size:12px;color:#555}
+    .bill-to{margin-bottom:28px}.section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#888;margin-bottom:6px}
+    .customer-name{font-size:15px;font-weight:700}
+    table{width:100%;border-collapse:collapse;margin-bottom:20px}
+    thead tr{background:#1a472a;color:#fff}
+    thead th{padding:9px 10px;text-align:left;font-size:12px;font-weight:600}
+    tbody tr:nth-child(even){background:#f9f9f9}
+    tbody td{padding:8px 10px;border-bottom:1px solid #e5e5e5}
+    .total-row{margin-top:12px;text-align:right}
+    .total-label{font-size:12px;color:#555;margin-right:12px}
+    .total-val{font-size:22px;font-weight:800;color:#1a472a}
+    .footer{margin-top:40px;padding-top:16px;border-top:1px solid #ddd;font-size:11px;color:#888;text-align:center}
+    .status-chip{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;background:#e8f5e9;color:#1a472a;margin-left:8px}
+    .notes-box{margin-top:20px;padding:12px 14px;background:#f9f9f9;border-radius:6px;font-size:12px;color:#444}
+    @media print{body{padding:20px}button{display:none}}
+  </style>
+  </head><body>
+  <div class="inv-head">
+    <div>
+      <div class="brand">🌿 Forest Studio Labs</div>
+      <div class="brand-sub">Phyto Evolution Private Limited<br>Kelambakkam, Chennai, Tamil Nadu</div>
+    </div>
+    <div class="inv-meta">
+      <div class="inv-no">TAX INVOICE<span class="status-chip">${_SALE_STATUS_LABEL[sale.status]||sale.status}</span></div>
+      <div class="inv-date" style="font-size:15px;font-weight:700;margin-top:4px">${esc(sale.invoice_no)}</div>
+      <div class="inv-date">Date: ${sale.date}</div>
+    </div>
+  </div>
+  <div class="bill-to">
+    <div class="section-label">Bill To</div>
+    <div class="customer-name">${esc(sale.customer_name)}</div>
+    ${sale.customer_contact?`<div style="color:#555;margin-top:3px">${esc(sale.customer_contact)}</div>`:''}
+    ${sale.customer_address?`<div style="color:#555;margin-top:3px;white-space:pre-line">${esc(sale.customer_address)}</div>`:''}
+  </div>
+  <table>
+    <thead><tr>
+      <th>Species / Item</th><th>Type</th><th style="text-align:center">Qty</th>
+      <th style="text-align:right">Unit Price</th><th style="text-align:right">Amount</th>
+    </tr></thead>
+    <tbody>${itemRows}</tbody>
+  </table>
+  <div class="total-row">
+    <span class="total-label">Total Amount</span>
+    <span class="total-val">₹${(sale.total||0).toLocaleString('en-IN')}</span>
+  </div>
+  ${sale.notes?`<div class="notes-box"><strong>Notes:</strong> ${esc(sale.notes)}</div>`:''}
+  <div class="footer">
+    Forest Studio Labs · Kelambakkam, Chennai · Phyto Evolution Private Limited<br>
+    This invoice was generated by TC Plants Lab Notes. Thank you for your order.
+  </div>
+  <div style="margin-top:24px;text-align:center"><button onclick="window.print()" style="padding:8px 20px;background:#1a472a;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;font-weight:600">🖨 Print</button></div>
+  </body></html>`;
+
+  const w=window.open('','_blank');
+  if(w){ w.document.write(html); w.document.close(); }
+}
+
 // REMINDERS
 // ════════════════════════════════════════════════════════════
 function renderReminders(){
@@ -17220,6 +17929,7 @@ function navTo(sec){
     else if(sec==='supply'||sec==='stock') SupplyInventory.renderInventoryPage();
     else if(sec==='search') SearchSystem.renderSearchPage();
     else if(sec==='value') renderValueSection();
+    else if(sec==='sales') renderSalesPage();
     else if(sec==='changelog') renderChangelog();
     else if(sec==='gallery'){}  // lazy — user clicks Load Gallery
     else if(sec==='logicflows'){} // static page — no render needed
@@ -17286,7 +17996,7 @@ async function login(){
     }else{
       load('Loading all data…');
       const _safe=fn=>fn.catch(()=>null);
-      const [_nR,_aR,_rR,_bR,_gR,_sR,_jR,_vR]=await Promise.all([_safe(loadNotesIndex()),_safe(loadAccessions()),_safe(loadRecipes()),_safe(loadBottles()),_safe(loadGreenhouse()),_safe(loadSupplies()),_safe(loadJournal()),_safe(loadValue())]);
+      const [_nR,_aR,_rR,_bR,_gR,_sR,_jR,_vR,_slR]=await Promise.all([_safe(loadNotesIndex()),_safe(loadAccessions()),_safe(loadRecipes()),_safe(loadBottles()),_safe(loadGreenhouse()),_safe(loadSupplies()),_safe(loadJournal()),_safe(loadValue()),_safe(loadSales())]);
       const {notes=[],sha:nSha=null}=_nR||{};
       const {accs=[],sha:aSha=null}=_aR||{};
       const {recs=[],sha:rSha=null}=_rR||{};
@@ -17295,6 +18005,7 @@ async function login(){
       const {items:supItems=[],sha:supSha=null}=_sR||{};
       const {entries:jEntries=[],sha:jSha=null}=_jR||{};
       const {data:valData=null,sha:valSha=null}=_vR||{};
+      const {data:salesData=[],sha:slSha=null}=_slR||{};
       // warn if any load failed
       if([_nR,_aR,_rR,_bR,_gR,_sR,_jR,_vR].some(r=>r===null)) toast('⚠️ Some data files failed to load — partial data shown','warn');
       S.notes=notes; S.notesSha=nSha;
@@ -17305,6 +18016,7 @@ async function login(){
       S.supplies=supItems||[]; S.suppliesSha=supSha;
       S.journal=jEntries||[]; S.journalSha=jSha;
       S.value=valData||{prices:{},overrides:{}}; S.valueSha=valSha;
+      S.sales=salesData||[]; S.salesSha=slSha;
       _writeCache();
     }
     document.getElementById('login').style.display='none';
