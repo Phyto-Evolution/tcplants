@@ -11806,16 +11806,21 @@ function _syncAISettingsPanel(){
 // AI CONTROL CENTRE
 // ════════════════════════════════════════════════════════════
 function renderAIPage(){
-  _aiCtrlTab('models', document.querySelector('#ai-ctrl-tabs .ai-tab-btn'));
+  _aiCtrlTab('models');
+  // mark first tab button active
+  document.querySelectorAll('#ai-ctrl-tabs .ai-tab-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
 }
 function _aiCtrlTab(name, btn){
-  document.querySelectorAll('.ai-tab-pane').forEach(p=>p.classList.remove('on'));
-  document.querySelectorAll('#ai-ctrl-tabs .ai-tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#ai-ctrl-tabs + div, #ai-ctrl-tabs ~ div').forEach(p=>{
+    if(p.id&&p.id.startsWith('ai-ctrl-pane-')) p.classList.remove('on');
+  });
+  if(btn){ document.querySelectorAll('#ai-ctrl-tabs .ai-tab-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
   const pane=document.getElementById('ai-ctrl-pane-'+name);
-  if(pane) pane.classList.add('on');
-  if(btn) btn.classList.add('active');
-  const render={models:_aiPageModels,voice:_aiPageVoice,functions:_aiPageFunctions,context:_aiPageContext,activity:_aiPageActivity,system:_aiPageSystem};
-  if(render[name]) render[name]();
+  if(!pane) return;
+  pane.classList.add('on');
+  const fns={models:_aiPageModels,voice:_aiPageVoice,functions:_aiPageFunctions,context:_aiPageContext,activity:_aiPageActivity,system:_aiPageSystem};
+  try{ if(fns[name]) fns[name](); }
+  catch(e){ pane.innerHTML='<div style="padding:20px;color:var(--rd);font-size:13px">Render error: '+e.message+'</div>'; }
 }
 
 // ── Models tab ────────────────────────────────────────────────
@@ -17212,7 +17217,7 @@ function navTo(sec){
     if(sec==='journal'){ renderJournalList(); showJournalEmpty(); }
     else if(sec==='schedule') LabCalendar.renderCalendarView();
     else if(sec==='insights') RavanaInsights.renderInsightsPage();
-    else if(sec==='supply') SupplyInventory.renderInventoryPage();
+    else if(sec==='supply'||sec==='stock') SupplyInventory.renderInventoryPage();
     else if(sec==='search') SearchSystem.renderSearchPage();
     else if(sec==='value') renderValueSection();
     else if(sec==='changelog') renderChangelog();
