@@ -14,7 +14,7 @@ Before this conversation terminates — before you say goodbye, before you write
 
 This is non-negotiable. It does not matter how short or long the session was. The next Claude session MUST be able to read prior conversations and pick up context from them.
 
-**Why:** Previous Claude sessions (Haiku, Sonnet) have repeatedly failed to carry over what was discussed and built. Features were asked for and never built. The QR-on-save flow is one example. The conversation logs are the only reliable source of truth about what was agreed, what was attempted, and what was missed.
+**Why:** Previous Claude sessions (Haiku, Sonnet) have repeatedly failed to carry over what was discussed and built. Features were asked for and never built. The conversation logs are the only reliable source of truth about what was agreed, what was attempted, and what was missed.
 
 ---
 
@@ -37,12 +37,6 @@ Files like `COMPLETION_STATUS.md`, `SESSION_LOG.md`, `IMPLEMENTATION_SUMMARY.md`
 ### RULE 4: No superficial work
 
 Do not stub, scaffold, or partially implement. If you build something, build it completely — working logic, real data, real UI. Do not add a function that returns a placeholder, a section that renders "Coming soon", or a handler that logs to console instead of doing the thing. If a feature cannot be completed in this session, say so and do nothing rather than landing dead code. The next Claude reading this repo will mistake stubs for real implementations.
-
----
-
-### RULE 5: QR codes on bottle save
-
-When a bottle (single, batch, or session) is saved successfully, QR codes must be generated **inline on the same page** in the right-side panel — not behind a separate label button, not in a new tab. This was requested and never built. It is still pending.
 
 ---
 
