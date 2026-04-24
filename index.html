@@ -4324,8 +4324,17 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
   </div>
 
   <!-- ── SUPPLY INVENTORY ── -->
-  <div class="section" id="sec-supply">
-    <main id="supply-main" style="flex:1;overflow-y:auto"></main>
+  <div class="section fullpage" id="sec-supply">
+    <header class="page-head">
+      <div class="page-head-inner">
+        <span class="page-head-icon">📦</span>
+        <div>
+          <div class="page-head-title">Supply Inventory</div>
+          <div class="page-head-sub">Batches · Stock Levels · Performance · Cost</div>
+        </div>
+      </div>
+    </header>
+    <main id="supply-main" style="flex:1;overflow-y:auto;padding:20px;max-width:1100px;margin:0 auto"></main>
   </div>
 
   <!-- ── VALUE INVENTORY ── -->
@@ -8168,20 +8177,24 @@ const SupplyInventory={
     };
   },
 
-  renderInventoryPage(){
+  renderInventoryPage(filterCat){
     const c=document.getElementById('supply-main'); if(!c) return;
     const items=S.supplies||[];
     const today=new Date().toISOString().slice(0,10);
+    const _fCat=filterCat||SupplyInventory._activeCat||'all';
+    SupplyInventory._activeCat=_fCat;
 
     const statusOf=(item)=>{
-      if(item.expiry&&item.expiry<=today) return{label:'Expired',col:'var(--rd)'};
+      if(item.expiry&&item.expiry<=today) return{label:'Expired',col:'var(--rd)',key:'expired'};
       if(item.expiry){
         const d=Math.ceil((new Date(item.expiry)-new Date())/86400000);
-        if(d<=14) return{label:`Expires in ${d}d`,col:'var(--yw)'};
+        if(d<=14) return{label:`Expires in ${d}d`,col:'var(--yw)',key:'expiring'};
       }
-      const rem=item.quantity-(item.used||0);
-      if(rem<=0) return{label:'Depleted',col:'var(--mu)'};
-      return{label:`${rem} ${item.unit||'units'} left`,col:'var(--gn)'};
+      const rem=(item.quantity||0)-(item.used||0);
+      const minStock=item.min_stock||0;
+      if(rem<=0) return{label:'Depleted',col:'var(--mu)',key:'depleted'};
+      if(minStock>0&&rem<=minStock) return{label:`⚠️ Low — ${rem} ${item.unit||'units'} left`,col:'var(--yw)',key:'low'};
+      return{label:`${rem} ${item.unit||'units'} left`,col:'var(--gn)',key:'ok'};
     };
 
     const card=(item)=>{
@@ -8210,18 +8223,30 @@ const SupplyInventory={
         </div>`:
         perf?`<div style="margin-top:8px;font-size:11px;color:var(--mu)">No bottles prepared during this batch's window yet</div>`:'';
 
-      return `<div style="background:var(--sf);border:1px solid ${perf?.flag?'rgba(248,81,73,.4)':'var(--bd)'};border-radius:10px;padding:16px">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
-          <div style="font-weight:700;font-size:14px">${esc(item.name)}</div>
-          <button class="btn xs ghost" onclick="SupplyInventory.deleteItem('${item.id}')" style="padding:2px 6px;font-size:11px">✕</button>
+      const rem=(item.quantity||0)-(item.used||0);
+      const catBadge=item.category?`<span style="font-size:10px;padding:2px 7px;border-radius:10px;background:var(--sf2);color:var(--mu);font-weight:600">${esc(item.category)}</span>`:'';
+      const supplierBadge=item.supplier?`<span style="font-size:10px;color:var(--mu)">🏭 ${esc(item.supplier)}</span>`:'';
+      const lotBadge=item.lot_number?`<span style="font-size:10px;color:var(--mu)">Lot: ${esc(item.lot_number)}</span>`:'';
+
+      const _searchText=[item.name,item.category,item.supplier,item.lot_number].filter(Boolean).join(' ').toLowerCase();
+      return `<div data-item-id="${item.id}" data-search-text="${esc(_searchText)}" style="background:var(--sf);border:1px solid ${perf?.flag?'rgba(248,81,73,.4)':st.key==='low'?'rgba(210,153,34,.5)':'var(--bd)'};border-radius:10px;padding:14px 16px">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px">
+          <div>
+            <div style="font-weight:700;font-size:14px">${esc(item.name)}</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;align-items:center">${catBadge}${supplierBadge}${lotBadge}</div>
+          </div>
+          <div style="display:flex;gap:4px;flex-shrink:0">
+            <button class="btn xs ghost" onclick="SupplyInventory.openEditForm('${item.id}')" style="font-size:11px">✏️</button>
+            <button class="btn xs ghost" onclick="SupplyInventory.deleteItem('${item.id}')" style="padding:2px 6px;font-size:11px;color:var(--rd)">✕</button>
+          </div>
         </div>
-        <div style="height:4px;background:var(--sf3);border-radius:2px;margin-bottom:10px">
-          <div style="height:4px;border-radius:2px;background:${pct>50?'var(--gn)':pct>20?'var(--yw)':'var(--rd)'};width:${pct}%;transition:width .4s"></div>
+        <div style="height:5px;background:var(--sf3);border-radius:3px;margin-bottom:8px">
+          <div style="height:5px;border-radius:3px;background:${pct>50?'var(--gn)':pct>20?'var(--yw)':'var(--rd)'};width:${pct}%;transition:width .4s"></div>
         </div>
         <div style="font-size:12px;color:${st.col};margin-bottom:6px;font-weight:600">${st.label}</div>
         <div style="font-size:11px;color:var(--mu);display:flex;flex-direction:column;gap:2px">
-          <span>Qty: ${item.used||0} / ${item.quantity} ${item.unit||'units'} used</span>
-          ${item.cost_total?`<span>Cost: ₹${item.cost_total}${item.quantity?` (₹${(item.cost_total/item.quantity).toFixed(2)}/${item.unit||'unit'})`:''}</span>`:''}
+          <span>${item.used||0} used / ${item.quantity} ${item.unit||'units'} total${item.min_stock?' · Reorder at '+item.min_stock:''}</span>
+          ${item.cost_total?`<span>₹${item.cost_total} total${item.quantity?` (₹${(item.cost_total/item.quantity).toFixed(2)}/${item.unit||'unit'})`:''}${perf?.costPerBottle?` · ₹${perf.costPerBottle}/bottle`:''}</span>`:''}
           ${item.date_prepared?`<span>Prepared: ${fmtDateShort(item.date_prepared)}</span>`:''}
           ${item.expiry?`<span>Expires: ${fmtDateShort(item.expiry)}</span>`:''}
         </div>
@@ -8229,57 +8254,151 @@ const SupplyInventory={
         <div id="supply-price-history-${item.id}" style="margin-top:8px"></div>
         <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
           <button class="btn xs" onclick="SupplyInventory.markUsed('${item.id}')" style="flex:1;font-size:11px">+ Use 1</button>
-          <button class="btn xs ghost" onclick="SupplyInventory.editUse('${item.id}')" style="flex:1;font-size:11px">Edit use</button>
-          <button class="btn xs ghost" onclick="_addPriceSnapshot('${item.id}')" title="Log a new price snapshot" style="font-size:11px">₹ Price</button>
-          <button class="btn xs ghost" onclick="document.getElementById('supply-price-history-${item.id}').innerHTML='';renderPriceHistory('${item.id}')" style="font-size:11px">📈 History</button>
+          <button class="btn xs ghost" onclick="SupplyInventory.editUse('${item.id}')" style="flex:1;font-size:11px">Edit qty</button>
+          <button class="btn xs ghost" onclick="_addPriceSnapshot('${item.id}')" title="Log price" style="font-size:11px">₹</button>
+          <button class="btn xs ghost" onclick="document.getElementById('supply-price-history-${item.id}').innerHTML='';renderPriceHistory('${item.id}')" style="font-size:11px">📈</button>
         </div>
       </div>`;
     };
 
-    // Best/worst batch summary across items that have performance data
+    // Stats
     const ranked=items.map(i=>({i,p:this.calcPerformance(i)})).filter(x=>x.p&&x.p.bottles>=3).sort((a,b)=>a.p.contamRate-b.p.contamRate);
-    const summaryHtml=ranked.length>=2?`
-      <div style="background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:14px;margin-bottom:16px;display:flex;gap:20px;flex-wrap:wrap">
-        <div>
+    const allStatuses=items.map(statusOf);
+    const lowCount=allStatuses.filter(s=>['low','depleted'].includes(s.key)).length;
+    const expiringCount=allStatuses.filter(s=>['expired','expiring'].includes(s.key)).length;
+    const totalSpend=items.reduce((s,i)=>s+(i.cost_total||0),0);
+    const totalItems=items.length;
+
+    // Category filter pills
+    const cats=['All',...[...new Set(items.map(i=>i.category).filter(Boolean))].sort()];
+    const catPills=cats.map(cat=>{
+      const k=cat.toLowerCase()==='all'?'all':cat;
+      const count=cat==='All'?items.length:items.filter(i=>i.category===cat).length;
+      return `<button onclick="SupplyInventory.renderInventoryPage('${esc(k)}')" style="padding:5px 12px;border-radius:20px;font-size:12px;font-weight:${_fCat===k?'700':'400'};border:1px solid ${_fCat===k?'var(--ac)':'var(--bd)'};background:${_fCat===k?'rgba(88,166,255,.12)':'var(--sf)'};color:${_fCat===k?'var(--ac)':'var(--mu)'};cursor:pointer">${esc(cat)} <span style="font-size:10px;opacity:.7">${count}</span></button>`;
+    }).join('');
+
+    // Filter items
+    const filteredItems=_fCat==='all'?items:items.filter(i=>i.category===_fCat);
+
+    // Best/worst batch
+    const perfBand=ranked.length>=2?`
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+        <div style="flex:1;min-width:180px;background:var(--sf2);border:1px solid rgba(63,185,80,.3);border-radius:9px;padding:10px 14px">
           <div style="font-size:10px;font-weight:800;letter-spacing:.06em;color:var(--gn);text-transform:uppercase;margin-bottom:4px">🏆 Best batch</div>
           <div style="font-size:13px;font-weight:700">${esc(ranked[0].i.name)}</div>
-          <div style="font-size:12px;color:var(--mu)">${ranked[0].p.contamRate}% contam · ${ranked[0].p.successRate}% success${ranked[0].p.costPerBottle?' · ₹'+ranked[0].p.costPerBottle+'/bottle':''}</div>
+          <div style="font-size:11px;color:var(--mu)">${ranked[0].p.contamRate}% contam · ${ranked[0].p.successRate}% success${ranked[0].p.costPerBottle?' · ₹'+ranked[0].p.costPerBottle+'/bottle':''}</div>
         </div>
-        <div>
+        <div style="flex:1;min-width:180px;background:var(--sf2);border:1px solid rgba(248,81,73,.3);border-radius:9px;padding:10px 14px">
           <div style="font-size:10px;font-weight:800;letter-spacing:.06em;color:var(--rd);text-transform:uppercase;margin-bottom:4px">⚠️ Worst batch</div>
           <div style="font-size:13px;font-weight:700">${esc(ranked[ranked.length-1].i.name)}</div>
-          <div style="font-size:12px;color:var(--mu)">${ranked[ranked.length-1].p.contamRate}% contam · ${ranked[ranked.length-1].p.successRate}% success${ranked[ranked.length-1].p.costPerBottle?' · ₹'+ranked[ranked.length-1].p.costPerBottle+'/bottle':''}</div>
+          <div style="font-size:11px;color:var(--mu)">${ranked[ranked.length-1].p.contamRate}% contam · ${ranked[ranked.length-1].p.successRate}% success${ranked[ranked.length-1].p.costPerBottle?' · ₹'+ranked[ranked.length-1].p.costPerBottle+'/bottle':''}</div>
         </div>
       </div>`:'';
 
-    c.innerHTML=`<div style="padding:20px;max-width:900px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-        <h2 style="font-size:18px">📦 Supplies</h2>
-        <button class="btn sm green" onclick="SupplyInventory.openAddForm()">+ Add batch</button>
-      </div>
-      ${summaryHtml}
-      <div id="supply-form" style="display:none;background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:16px;margin-bottom:16px">
-        <div style="font-weight:700;margin-bottom:12px">New Supply Batch</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-          <div><label style="font-size:11px;color:var(--mu)">Name</label><input id="sup-name" type="text" placeholder="e.g. MS Medium" style="width:100%;padding:7px;background:var(--sf);border:1px solid var(--bd);border-radius:6px;color:var(--tx)"></div>
-          <div><label style="font-size:11px;color:var(--mu)">Unit</label><input id="sup-unit" type="text" placeholder="bottles / L / g" style="width:100%;padding:7px;background:var(--sf);border:1px solid var(--bd);border-radius:6px;color:var(--tx)"></div>
-          <div><label style="font-size:11px;color:var(--mu)">Quantity</label><input id="sup-qty" type="number" min="1" placeholder="50" style="width:100%;padding:7px;background:var(--sf);border:1px solid var(--bd);border-radius:6px;color:var(--tx)"></div>
-          <div><label style="font-size:11px;color:var(--mu)">Total cost (₹)</label><input id="sup-cost" type="number" min="0" placeholder="500" style="width:100%;padding:7px;background:var(--sf);border:1px solid var(--bd);border-radius:6px;color:var(--tx)"></div>
-          <div><label style="font-size:11px;color:var(--mu)">Prepared date</label><input id="sup-date" type="date" style="width:100%;padding:7px;background:var(--sf);border:1px solid var(--bd);border-radius:6px;color:var(--tx)" value="${today}"></div>
-          <div><label style="font-size:11px;color:var(--mu)">Expiry date</label><input id="sup-exp" type="date" style="width:100%;padding:7px;background:var(--sf);border:1px solid var(--bd);border-radius:6px;color:var(--tx)"></div>
+    // Form field helper
+    const fi=(id,label,type='text',extra='')=>`<div><label style="font-size:11px;font-weight:600;color:var(--mu);display:block;margin-bottom:3px">${label}</label><input id="${id}" type="${type}" ${extra} style="width:100%;padding:7px 9px;background:var(--bg);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-size:13px"></div>`;
+    const fs=(id,label,opts)=>`<div><label style="font-size:11px;font-weight:600;color:var(--mu);display:block;margin-bottom:3px">${label}</label><select id="${id}" style="width:100%;padding:7px 9px;background:var(--bg);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-size:13px"><option value="">—</option>${opts.map(o=>`<option>${esc(o)}</option>`).join('')}</select></div>`;
+
+    const SUPPLY_CATS=['Media Salts','Growth Regulators','Gelling Agents','Sugars & Carbon Sources','Vitamins & Amino Acids','pH Adjustment','Antibiotics & Antifungals','Sterilisation Supplies','Sealing & Closure','Laminar Flow & Safety','Culture Vessels','Glassware','Instruments & Tools','Labeling & Storage','Plant Material','Cold Storage Items','Other'];
+
+    c.innerHTML=`
+      <!-- Stats strip -->
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px">
+        <div style="flex:1;min-width:110px;background:var(--sf);border:1px solid var(--bd);border-radius:9px;padding:10px 14px">
+          <div style="font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.06em">Total items</div>
+          <div style="font-size:24px;font-weight:800;color:var(--ac)">${totalItems}</div>
         </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn sm green" onclick="SupplyInventory.saveNew()" style="flex:1">Save</button>
+        <div style="flex:1;min-width:110px;background:var(--sf);border:1px solid ${lowCount?'rgba(210,153,34,.4)':'var(--bd)'};border-radius:9px;padding:10px 14px">
+          <div style="font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.06em">Low / depleted</div>
+          <div style="font-size:24px;font-weight:800;color:${lowCount?'var(--yw)':'var(--gn)'}">${lowCount}</div>
+        </div>
+        <div style="flex:1;min-width:110px;background:var(--sf);border:1px solid ${expiringCount?'rgba(248,81,73,.4)':'var(--bd)'};border-radius:9px;padding:10px 14px">
+          <div style="font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.06em">Expiring ≤14d</div>
+          <div style="font-size:24px;font-weight:800;color:${expiringCount?'var(--rd)':'var(--gn)'}">${expiringCount}</div>
+        </div>
+        <div style="flex:1;min-width:110px;background:var(--sf);border:1px solid var(--bd);border-radius:9px;padding:10px 14px">
+          <div style="font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.06em">Total invested</div>
+          <div style="font-size:24px;font-weight:800;color:var(--yw)">${fmtINR(totalSpend)}</div>
+        </div>
+      </div>
+
+      <!-- Category filter -->
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">${catPills}</div>
+
+      ${perfBand}
+
+      <!-- Add form -->
+      <div id="supply-form" style="display:none;background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:16px;margin-bottom:18px">
+        <div style="font-size:14px;font-weight:700;margin-bottom:14px" id="supply-form-title">New Supply Batch</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
+          ${fi('sup-name','Item name *','text','placeholder="e.g. MS Medium, Gelrite, BAP"')}
+          ${fs('sup-cat','Category',SUPPLY_CATS)}
+          ${fi('sup-supplier','Supplier / Vendor','text','placeholder="e.g. HiMedia, Sigma"')}
+          ${fi('sup-lot','Lot / Batch number','text','placeholder="e.g. LOT-2024-07"')}
+          ${fi('sup-unit','Unit','text','placeholder="bottles / L / g / pcs"')}
+          ${fi('sup-qty','Quantity *','number','min="1" placeholder="50"')}
+          ${fi('sup-cost','Total cost (₹)','number','min="0" placeholder="500"')}
+          ${fi('sup-minstock','Reorder level','number','min="0" placeholder="5 (alert when remaining ≤ this)"')}
+          ${fi('sup-date','Prepared / Received date','date','value="'+today+'"')}
+          ${fi('sup-exp','Expiry date','date','')}
+        </div>
+        <div style="grid-column:1/-1"><label style="font-size:11px;font-weight:600;color:var(--mu);display:block;margin-bottom:3px">Notes</label><textarea id="sup-notes" rows="2" placeholder="Any notes on this batch, quality, observations…" style="width:100%;padding:7px 9px;background:var(--bg);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-size:13px;resize:vertical"></textarea></div>
+        <input type="hidden" id="sup-edit-id">
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="btn sm green" onclick="SupplyInventory.saveNew()" style="flex:1">💾 Save</button>
           <button class="btn sm ghost" onclick="SupplyInventory.closeForm()" style="flex:1">Cancel</button>
         </div>
       </div>
-      ${items.length
-        ?`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px">${items.map(card).join('')}</div>`
-        :`<div style="padding:32px;text-align:center;color:var(--mu)"><div style="font-size:32px;margin-bottom:8px">📦</div><p>No supply batches yet. Add your first batch.</p></div>`}
-    </div>`;
+
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <button class="btn sm green" onclick="SupplyInventory.openAddForm()">+ Add batch</button>
+        <input type="text" id="supply-search" placeholder="Search items…" oninput="SupplyInventory._search(this.value)"
+          style="flex:1;min-width:160px;max-width:280px;padding:6px 10px;background:var(--sf);border:1px solid var(--bd);border-radius:20px;font-size:13px;color:var(--tx)">
+        <button class="btn sm ghost" onclick="_stockRavanaInsight()" style="background:linear-gradient(135deg,var(--ac),var(--pu));color:#fff;border:none">✦ Analyse</button>
+      </div>
+
+      ${filteredItems.length
+        ?`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px" id="supply-grid">${filteredItems.map(card).join('')}</div>`
+        :`<div style="padding:40px;text-align:center;color:var(--mu)"><div style="font-size:36px;margin-bottom:10px">📦</div><p>${_fCat!=='all'?'No items in this category.':'No supply batches yet — add your first batch.'}</p></div>`}
+
+      <!-- Ravana analysis panel -->
+      <div id="stock-ravana-panel" style="display:none;margin-top:24px;background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:18px">
+        <div id="stock-ravana-body" style="font-size:13px;line-height:1.8;color:var(--tx)"></div>
+      </div>
+    `;
   },
-  openAddForm(){ const f=document.getElementById('supply-form'); if(f) f.style.display='block'; },
+  _activeCat:'all',
+  openAddForm(){
+    const f=document.getElementById('supply-form'); if(!f) return;
+    document.getElementById('sup-edit-id').value='';
+    document.getElementById('supply-form-title').textContent='New Supply Batch';
+    ['sup-name','sup-unit','sup-qty','sup-cost','sup-lot','sup-supplier','sup-minstock','sup-notes'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+    document.getElementById('sup-date').value=new Date().toISOString().slice(0,10);
+    document.getElementById('sup-exp').value='';
+    document.getElementById('sup-cat').value='';
+    f.style.display='block'; f.scrollIntoView({behavior:'smooth',block:'nearest'});
+  },
+  openEditForm(id){
+    const item=S.supplies.find(x=>x.id===id); if(!item) return;
+    const f=document.getElementById('supply-form'); if(!f) return;
+    document.getElementById('sup-edit-id').value=id;
+    document.getElementById('supply-form-title').textContent='Edit: '+item.name;
+    const set=(eid,val)=>{ const el=document.getElementById(eid); if(el) el.value=val||''; };
+    set('sup-name',item.name); set('sup-cat',item.category||''); set('sup-unit',item.unit);
+    set('sup-qty',item.quantity); set('sup-cost',item.cost_total);
+    set('sup-lot',item.lot_number); set('sup-supplier',item.supplier);
+    set('sup-minstock',item.min_stock); set('sup-date',item.date_prepared);
+    set('sup-exp',item.expiry); set('sup-notes',item.notes);
+    f.style.display='block'; f.scrollIntoView({behavior:'smooth',block:'nearest'});
+  },
   closeForm(){ const f=document.getElementById('supply-form'); if(f) f.style.display='none'; },
+  _search(q){
+    const grid=document.getElementById('supply-grid'); if(!grid) return;
+    const lo=q.toLowerCase();
+    grid.querySelectorAll('[data-item-id]').forEach(el=>{
+      el.style.display=!lo||el.dataset.searchText?.includes(lo)?'':'none';
+    });
+  },
   async saveNew(){
     const name=document.getElementById('sup-name')?.value.trim();
     const unit=document.getElementById('sup-unit')?.value.trim()||'units';
@@ -8287,11 +8406,26 @@ const SupplyInventory={
     const cost=parseFloat(document.getElementById('sup-cost')?.value)||0;
     const date=document.getElementById('sup-date')?.value||new Date().toISOString().slice(0,10);
     const exp=document.getElementById('sup-exp')?.value||'';
+    const category=document.getElementById('sup-cat')?.value.trim()||null;
+    const supplier=document.getElementById('sup-supplier')?.value.trim()||null;
+    const lot_number=document.getElementById('sup-lot')?.value.trim()||null;
+    const min_stock=parseInt(document.getElementById('sup-minstock')?.value)||0;
+    const notes=document.getElementById('sup-notes')?.value.trim()||null;
+    const editId=document.getElementById('sup-edit-id')?.value||'';
     if(!name||!qty){ toast('Name and quantity required','fail'); return; }
-    const item={id:uid(),name,unit,quantity:qty,used:0,cost_total:cost,date_prepared:date,expiry:exp||null};
-    S.supplies=[...S.supplies,item];
     load('Saving…');
-    try{ S.suppliesSha=await saveSupplies(S.supplies,S.suppliesSha); toast('📦 Batch added: '+name); }
+    try{
+      if(editId){
+        const idx=S.supplies.findIndex(x=>x.id===editId);
+        if(idx>-1) S.supplies[idx]={...S.supplies[idx],name,unit,quantity:qty,cost_total:cost,date_prepared:date,expiry:exp||null,category,supplier,lot_number,min_stock:min_stock||null,notes};
+        toast('📦 Updated: '+name);
+      } else {
+        const item={id:uid(),name,unit,quantity:qty,used:0,cost_total:cost,date_prepared:date,expiry:exp||null,category,supplier,lot_number,min_stock:min_stock||null,notes};
+        S.supplies=[...S.supplies,item];
+        toast('📦 Batch added: '+name);
+      }
+      S.suppliesSha=await saveSupplies(S.supplies,S.suppliesSha);
+    }
     catch(e){ toast('Save failed: '+e.message,'fail'); }
     unload(); this.renderInventoryPage();
   },
@@ -12245,9 +12379,31 @@ function _aiPageFunctions(){
     ${row('recipeSuggest','Recipe Check','AI reviews media recipes, flags PGR issues or improvements',true)}
     ${row('speciesSuggest','Species Auto-suggest','Suggest genus/species when adding accessions or bottles',true)}
     <div class="ai-section-head">Voice &amp; Commands</div>
-    ${row('voiceCommands','Voice Commands','Parse spoken commands — "add 3 bottles of Nepenthes rajah"',true,false)}
-    ${row('ttsResponses','TTS Responses','Read Ravana responses aloud via speech synthesis',true,false)}
-    ${row('wakeWord','Wake Word — "Hey Ravana"','Background listening for hands-free voice trigger (Lab Mode)',false,false)}
+    ${row('voiceCommands','Voice Commands','Enable command parsing. When OFF — all voice goes directly to Ravana chat (no commands triggered).',true,false)}
+    ${row('ttsResponses','TTS — Ravana speaks','Ravana reads responses aloud. When OFF — Ravana is always silent regardless of voice settings.',true,false)}
+    ${row('wakeWord','Wake Word — "Hey Ravana"','Background microphone listening for hands-free activation. Lab Mode only.',false,false)}
+    <div style="margin:10px 0 8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <span style="font-size:12px;font-weight:600">Voice feedback:</span>
+      ${['full','brief','off'].map(lv=>{const cur=localStorage.getItem('tcplants_voice_feedback')||'full';return `<button onclick="localStorage.setItem('tcplants_voice_feedback','${lv}');_aiPageFunctions();toast('Voice feedback: ${lv}')" style="padding:4px 12px;border-radius:14px;font-size:11px;font-weight:600;border:1px solid ${cur===lv?'var(--ac)':'var(--bd)'};background:${cur===lv?'rgba(88,166,255,.12)':'none'};color:${cur===lv?'var(--ac)':'var(--mu)'};cursor:pointer">${lv.charAt(0).toUpperCase()+lv.slice(1)}</button>`;}).join('')}
+    </div>
+    <div style="font-size:11px;color:var(--mu);margin-bottom:10px">Full = Ravana reads all responses · Brief = confirmations only ("Saved", "Done") · Off = no TTS ever</div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+      <span style="font-size:12px;font-weight:600">Lab Mode:</span>
+      <span style="font-size:12px;color:${_voiceCfg().labMode?'var(--gn)':'var(--mu)'}">${_voiceCfg().labMode?'🟢 Active':'⚫ Off'}</span>
+      <button class="btn sm ghost" style="font-size:11px" onclick="_toggleLabMode(!_voiceCfg().labMode);_aiPageFunctions()">Toggle</button>
+      <button class="ai-sys-btn" style="font-size:11px" onclick="_ttsSpeak('Ravana ready. Forest Studio Labs.')">🔊 Test TTS</button>
+    </div>
+    <details style="margin-bottom:10px"><summary style="font-size:12px;font-weight:700;cursor:pointer;color:var(--ac);padding:4px 0">📖 Command Reference (${18} commands)</summary>
+    <div style="margin-top:8px">
+    ${[
+      ['🧭 Navigate',['go to bottles','go to notes','go to greenhouse','go to reminders','go to analytics','go to species [name]']],
+      ['🫙 Bottles',['add [N] bottles of [species]','open bottle FSL-2026-XXXX']],
+      ['📝 Notes & Contam',['log contamination [species]','contamination on [species]','new note','new observation [species]']],
+      ['⏰ Reviews',['overdue review','what\'s due today','what\'s due this week']],
+      ['🎙 Mode',['whisper mode','native mode','export report']],
+      ['🔬 Fallback',['anything not matched → Ravana chat']],
+    ].map(([cat,cmds])=>`<div style="margin-bottom:8px"><div style="font-size:10px;font-weight:700;color:var(--ac);text-transform:uppercase;margin-bottom:4px">${cat}</div>${cmds.map(cmd=>`<div style="font-size:11px;padding:3px 0;border-bottom:1px solid var(--bd);color:var(--mu)"><code style="color:var(--tx)">"${cmd}"</code></div>`).join('')}</div>`).join('')}
+    </div></details>
     <div class="ai-section-head">Insights &amp; Background</div>
     ${row('insightsPage','Ravana Insights','Weekly lab health digest on the Insights page',true)}
     ${row('dashboardAlerts','Dashboard Alerts','AI-generated alerts in the dashboard strip',true)}
@@ -12315,17 +12471,29 @@ function _aiPageTools(){
   const confirmSet=new Set(['update_bottle_status','create_note','set_review_date','log_contamination']);
   const activeCount=AI_TOOLS.length-disabled.size;
 
+  const stats=_aiToolStats();
   const toolRows=AI_TOOLS.map(t=>{
     const name=t.function.name;
     const meta=toolMeta[name]||{label:name,desc:''};
     const isConfirm=confirmSet.has(name);
     const enabled=!disabled.has(name);
+    const st=stats[name];
+    const callCount=st?.calls||0;
+    const lastUsed=st?.lastTs?new Date(st.lastTs).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',hour12:true}):'Never';
+    const statusCol=!enabled?'var(--mu)':callCount>10?'var(--gn)':callCount>0?'var(--ac)':'var(--mu)';
+    const statusLabel=!enabled?'Disabled':callCount>0?`${callCount} call${callCount!==1?'s':''}`:' Unused';
     return `<div class="ai-tool-row">
       <div style="flex:1">
-        <div class="ai-tool-name">${meta.label} <code style="font-size:10px;color:var(--mu);font-weight:400">${name}</code>${isConfirm?'<span class="ai-tool-confirm-badge" title="Writes data — requires confirmation">CONFIRM</span>':''}</div>
+        <div class="ai-tool-name" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          ${meta.label}
+          <code style="font-size:10px;color:var(--mu);font-weight:400">${name}</code>
+          ${isConfirm?'<span class="ai-tool-confirm-badge">CONFIRM</span>':''}
+          <span style="font-size:10px;color:${statusCol};font-weight:600">${enabled?'●':' ○'} ${statusLabel}</span>
+        </div>
         <div class="ai-tool-desc">${meta.desc}</div>
+        ${callCount>0?`<div style="font-size:10px;color:var(--mu);margin-top:2px">Last used: ${lastUsed}</div>`:''}
       </div>
-      <label class="toggle-wrap"><input type="checkbox" ${enabled?'checked':''} onchange="_aiToolToggle('${name}',this)"><span class="toggle-slider"></span></label>
+      <label class="toggle-wrap"><input type="checkbox" ${enabled?'checked':''} onchange="_aiToolToggle('${name}',this);_aiPageTools()"><span class="toggle-slider"></span></label>
     </div>`;
   }).join('');
 
@@ -12345,6 +12513,9 @@ function _aiPageTools(){
     ${toolRows}
     <div style="margin-top:14px;padding:10px 14px;background:var(--sf2);border-radius:8px;font-size:11px;color:var(--mu)">
       <strong style="color:var(--yw)">⚠️ CONFIRM tools:</strong> update_bottle_status, create_note, set_review_date, log_contamination — these modify lab data and require your tap to confirm before executing. This cannot be disabled for safety.
+    </div>
+    <div style="margin-top:10px">
+      <button class="ai-sys-btn" style="font-size:11px" onclick="if(confirm('Clear all tool call stats?'))localStorage.removeItem(_AI_TOOL_STATS_KEY);_aiPageTools();toast('Tool stats cleared')">🗑 Clear call stats</button>
     </div>`;
 }
 
@@ -12891,7 +13062,20 @@ const AI_TOOLS=[
 // Write-operations that require user confirmation before executing
 const AI_TOOLS_CONFIRM=new Set(['update_bottle_status','create_note','set_review_date','log_contamination']);
 
+const _AI_TOOL_STATS_KEY='tcplants_ai_tool_stats';
+function _aiToolRecordCall(name){
+  try{
+    const stats=JSON.parse(localStorage.getItem(_AI_TOOL_STATS_KEY)||'{}');
+    if(!stats[name]) stats[name]={calls:0,lastTs:null};
+    stats[name].calls++;
+    stats[name].lastTs=Date.now();
+    localStorage.setItem(_AI_TOOL_STATS_KEY,JSON.stringify(stats));
+  }catch(e){}
+}
+function _aiToolStats(){ try{ return JSON.parse(localStorage.getItem(_AI_TOOL_STATS_KEY)||'{}'); }catch{ return {}; } }
+
 async function _executeTool(name, params){
+  _aiToolRecordCall(name);
   switch(name){
     case 'get_lab_summary':{
       const allBots=S.bottles||[];
@@ -13419,6 +13603,7 @@ function _initVoiceSettings(){
 let _ttsUtter=null;
 function _ttsSpeak(text, onEnd){
   if(!('speechSynthesis' in window)) return;
+  if(_aiFuncCfg().ttsResponses===false) return; // master toggle
   speechSynthesis.cancel();
   const c=_voiceCfg();
   const u=new SpeechSynthesisUtterance(text);
@@ -13888,6 +14073,7 @@ function _voiceExecute(transcript){
 
 // ── Voice lab actions (state-modifying commands) ──────────────
 function _parseVoiceAction(text){
+  if(_aiFuncCfg().voiceCommands===false) return null; // master toggle
   const t=text.toLowerCase().trim();
 
   // "contamination on [species]" / "log contamination [species]"
@@ -17869,20 +18055,19 @@ async function renderChangelog(force=false){
 }
 
 function switchSection(name){
-  // Stock deprecated — redirect to Supply
-  if(name==='stock'){ switchSection('supply'); return; }
+  // Stock fused into supply — both show sec-supply
+  if(name==='stock') name='supply';
   S.section=name;
   document.querySelectorAll('.section').forEach(el=>el.classList.remove('on'));
   const sec=document.getElementById(`sec-${name}`);
   if(sec) sec.classList.add('on');
-  // Sync drawer active state
-  document.querySelectorAll('.ndtab').forEach(t=>t.classList.toggle('active',t.dataset.sec===name));
+  // Sync drawer active state — highlight both stock and supply tabs when on supply
+  document.querySelectorAll('.ndtab').forEach(t=>t.classList.toggle('active',t.dataset.sec===name||(name==='supply'&&t.dataset.sec==='stock')));
   if(name==='reminders') renderReminders();
   if(name==='contam') renderContamDashboard();
   if(name==='analytics') renderAnalytics();
   if(name==='sterilise'){ if(_sterilActiveId===undefined) loadCustomSterilProtocol(); else renderSterilPage(); loadSterilRuns(); }
   if(name==='tools') renderBatchCalc();
-  if(name==='stock'){ loadInv().then(renderInv); } // kept for safety, unreachable due to redirect above
   if(name==='species') renderSpecies();
   if(name==='news'){ _renderPersistedPins(); _newsLoadCustomChips(); if(document.getElementById('news-toggle').checked && !_newsData) handleNewsToggle(true); }
   if(name==='calendar') renderCalendar();
