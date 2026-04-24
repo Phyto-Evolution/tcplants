@@ -161,7 +161,7 @@ nav{
 .nav-icon-btn:hover{background:var(--sf2);color:var(--tx)}
 /* ── NAV DRAWER ── */
 #nav-drawer{
-  position:fixed;top:0;left:0;bottom:0;width:300px;z-index:500;
+  position:fixed;top:0;left:0;bottom:0;width:min(300px,85vw);z-index:500;
   background:var(--sf);border-right:1px solid var(--bd);
   display:flex;flex-direction:column;
   transform:translateX(-100%);transition:transform .25s ease;
@@ -1667,6 +1667,23 @@ main > .dview, main > .editor{ margin:0 auto; }
   #tools-status-bar {
     min-height: 50px !important;
   }
+
+  /* ── Navbar: collapse to fit small screens ── */
+  /* Remove forced min-width from nav icon buttons — causes overflow on narrow screens */
+  nav .nav-icon-btn {
+    min-width: unset !important;
+    width: auto !important;
+    padding: 4px 6px !important;
+  }
+  /* Hide low-priority nav items on mobile */
+  nav .nav-home-btn     { display: none !important; }
+  #export-all-btn       { display: none !important; }
+  #export-csv-btn       { display: none !important; }
+  .lock-label           { display: none !important; }
+  .brand span           { display: none !important; }
+
+  /* Dashboard: reduce outer padding to give panels more room */
+  #notes-empty { padding: 14px 12px !important; }
 }
 
 /* Tablet optimizations (600px to 1000px) */
@@ -1689,6 +1706,11 @@ main > .dview, main > .editor{ margin:0 auto; }
     width: 400px;
     max-width: 95vw;
   }
+
+  /* Navbar: hide export-csv on tablet to reduce clutter */
+  #export-csv-btn { display: none !important; }
+  .brand span     { display: none !important; }
+  .lock-label     { display: none !important; }
 }
 
 /* Landscape mode optimization */
@@ -8683,7 +8705,7 @@ function _computeAlerts(){
   const spikes=Object.values(spMap).filter(sp=>sp.total>=3&&sp.contam/sp.total>0.1);
   if(spikes.length){
     const names=spikes.slice(0,2).map(s=>s.name).join(', ')+(spikes.length>2?` +${spikes.length-2}`:'');
-    alerts.push({level:'crit',icon:'☣️',msg:`Contamination spike: ${names}`,action:"navTo('contam')"});
+    alerts.push({level:'crit',icon:'☣️',msg:`Contamination spike: ${names}`,action:'contam'});
   }
 
   // 2. Overdue reviews — bottles past next_review (active status only)
@@ -8691,7 +8713,7 @@ function _computeAlerts(){
   const overdueNote=notes.filter(n=>n.next_review&&daysFrom(n.next_review)<0);
   const totalOverdue=overdueBot.length+overdueNote.length;
   if(totalOverdue>0){
-    alerts.push({level:'warn',icon:'⏰',msg:`${totalOverdue} overdue review${totalOverdue>1?'s':''}`,action:"navTo('reminders')"});
+    alerts.push({level:'warn',icon:'⏰',msg:`${totalOverdue} overdue review${totalOverdue>1?'s':''}`,action:'reminders'});
   }
 
   // 3. Transfer due — ≥5 bottles past 28 days since inoculation
@@ -8700,13 +8722,13 @@ function _computeAlerts(){
     return Math.floor((now-new Date(b.date_inoculated))/86400000)>=28;
   });
   if(xferDue.length>=5){
-    alerts.push({level:'warn',icon:'✂️',msg:`${xferDue.length} bottles due for transfer`,action:"navTo('bottles')"});
+    alerts.push({level:'warn',icon:'✂️',msg:`${xferDue.length} bottles due for transfer`,action:'bottles'});
   }
 
   // 4. GH plants needing attention
   const ghSick=gh.filter(p=>p.health&&p.health!=='healthy');
   if(ghSick.length){
-    alerts.push({level:'warn',icon:'🏡',msg:`${ghSick.length} GH plant${ghSick.length>1?'s':''} need attention`,action:"navTo('greenhouse')"});
+    alerts.push({level:'warn',icon:'🏡',msg:`${ghSick.length} GH plant${ghSick.length>1?'s':''} need attention`,action:'greenhouse'});
   }
 
   // 5. Supply expiry — anything expiring within 14 days or already expired
@@ -8716,7 +8738,7 @@ function _computeAlerts(){
     const expired=expiring.filter(s=>s.expiry<=todayStr).length;
     alerts.push({level:expired?'crit':'warn',icon:'📦',
       msg:expired?`${expired} supply batch${expired>1?'es':''} expired`:`${expiring.length} supply item${expiring.length>1?'s':''} expiring soon`,
-      action:"navTo('supply')"});
+      action:'supply'});
   }
 
   return alerts;
@@ -8735,8 +8757,11 @@ function _renderDashboard(){
     if(alerts.length){
       alertEl.style.display='block';
       alertEl.innerHTML=`<div class="dash-alert-strip">${
-        alerts.map(a=>`<div class="dash-alert-pill ${a.level}" onclick="${a.action}">${a.icon} ${esc(a.msg)}</div>`).join('')
+        alerts.map(a=>`<div class="dash-alert-pill ${a.level}" data-sec="${esc(a.action)}">${a.icon} ${esc(a.msg)}</div>`).join('')
       }</div>`;
+      alertEl.querySelectorAll('[data-sec]').forEach(pill=>{
+        pill.addEventListener('click',()=>navTo(pill.dataset.sec));
+      });
     } else {
       alertEl.style.display='none';
       alertEl.innerHTML='';
@@ -8989,7 +9014,22 @@ function _renderDashboard(){
           </div>`).join('')
         :`<div style="color:var(--mu);font-size:13px;padding:8px 0">Pin papers in News to see them here.</div>`)}`);
 
-    const aibarHTML='';
+    // ── 10. QUICK NOTE — inline note creation on dashboard ────
+    const aibarHTML=C('aibar',`
+      ${H('✏️ QUICK NOTE',`navTo('notes');startNewNote('generic')`,'Open full editor →')}
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <input type="text" id="dash-qn-title" placeholder="Note title…"
+          style="background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:8px 10px;font-size:13px;font-family:var(--font);color:var(--tx);width:100%;box-sizing:border-box;outline:none;transition:border-color .15s"
+          onfocus="this.style.borderColor='var(--ac)'" onblur="this.style.borderColor='var(--bd)'">
+        <textarea id="dash-qn-body" placeholder="Body (optional) — Markdown supported" rows="3"
+          style="background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:8px 10px;font-size:13px;font-family:var(--font);color:var(--tx);width:100%;box-sizing:border-box;resize:vertical;min-height:72px;line-height:1.55;outline:none;transition:border-color .15s"
+          onfocus="this.style.borderColor='var(--ac)'" onblur="this.style.borderColor='var(--bd)'"></textarea>
+        <div style="display:flex;align-items:center;gap:8px;justify-content:flex-end">
+          <span id="dash-qn-status" style="font-size:11px;color:var(--gn);flex:1;display:none"></span>
+          <button class="btn sm ghost" onclick="if(document.getElementById('dash-qn-title'))document.getElementById('dash-qn-title').value='';if(document.getElementById('dash-qn-body'))document.getElementById('dash-qn-body').value='';" style="font-size:12px">Clear</button>
+          <button class="btn sm green" id="dash-qn-save" onclick="_quickSaveNote(this)">💾 Save Note</button>
+        </div>
+      </div>`,'border-style:dashed');
 
     // ── 11. VOICE LOG — only if transcripts exist ─────────────
     const dump=_getVoiceDump().slice(-10).reverse();
@@ -13400,7 +13440,8 @@ async function saveNoteAction(){
     validateNoteData(noteToSave);
   }catch(e){toast('⚠️ Invalid data: '+e,'fail');return;}
 
-  document.getElementById('save-note-btn').disabled=true;
+  const _saveBtn=document.getElementById('save-note-btn');
+  _saveBtn.disabled=true;
   load('Encrypting & saving…');
   try{
     const keywords=_extractKeywords(body); // Group 2: body keyword stems for search
@@ -13431,9 +13472,54 @@ async function saveNoteAction(){
     updateReminderBadge();
     toast('Saved ✓ — committed to GitHub');
     renderNoteList(); await openNote(S.cur); closeNavDrawer();
-  }catch(e){toast('Save failed: '+e.message,'fail');}
-  document.getElementById('save-note-btn').disabled=false;
-  unload();
+  }catch(e){
+    toast('Save failed: '+e.message,'fail');
+  }finally{
+    _saveBtn.disabled=false;
+    unload();
+  }
+}
+
+// ── QUICK SAVE NOTE (from dashboard widget) ─────────────────
+async function _quickSaveNote(btn){
+  if(!_checkOnline()) return;
+  const titleEl=document.getElementById('dash-qn-title');
+  const bodyEl=document.getElementById('dash-qn-body');
+  const statusEl=document.getElementById('dash-qn-status');
+  const title=(titleEl?.value||'').trim();
+  const body=(bodyEl?.value||'').trim();
+  if(!title){
+    toast('Title required','fail');
+    titleEl?.focus();
+    return;
+  }
+  const prevTxt=btn.textContent;
+  btn.disabled=true; btn.textContent='Saving…';
+  if(statusEl){ statusEl.style.display='none'; }
+  try{
+    const id=uid();
+    const date=new Date().toISOString();
+    const keywords=_extractKeywords(body);
+    await writeNote(id,body,null,`lab: quick note "${title}"`);
+    const {sha,notes}=await saveNotesIndex(ns=>{
+      ns.push({id,title,date,type:'Generic Note',note_type:'generic',tags:[],keywords});
+      return ns;
+    });
+    S.notes=notes; S.notesSha=sha;
+    _writeCache();
+    LabAnalytics.calculate();
+    populateTagsDatalist();
+    updateReminderBadge();
+    if(titleEl) titleEl.value='';
+    if(bodyEl) bodyEl.value='';
+    if(statusEl){ statusEl.textContent='✓ Saved!'; statusEl.style.display='block'; setTimeout(()=>{ statusEl.style.display='none'; },3000); }
+    renderNoteList();
+    _renderDashboard();
+  }catch(e){
+    toast('Save failed: '+e.message,'fail');
+  }finally{
+    btn.disabled=false; btn.textContent=prevTxt;
+  }
 }
 
 async function deleteNote(){
