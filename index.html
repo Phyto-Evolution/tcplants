@@ -1790,6 +1790,54 @@ input, textarea, select {
   border: 1px solid var(--bd);
   border-radius: 8px;
 }
+
+/* ── AI Control Centre ─────────────────────────────────────── */
+#sec-ai main { padding: 20px; max-width: 900px; margin: 0 auto; }
+.ai-page-tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 20px; border-bottom: 1px solid var(--bd); padding-bottom: 0; }
+.ai-tab-btn { padding: 8px 16px; border-radius: 6px 6px 0 0; border: 1px solid transparent; border-bottom: 2px solid transparent; background: none; color: var(--mu); cursor: pointer; font-size: 13px; transition: color .15s, background .15s; }
+.ai-tab-btn:hover { background: var(--sf2); color: var(--tx); }
+.ai-tab-btn.active { background: var(--sf2); color: var(--ac); border-bottom: 2px solid var(--ac); font-weight: 600; }
+.ai-tab-pane { display: none; }
+.ai-tab-pane.on { display: block; }
+.ai-model-card { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--sf); border: 1px solid var(--bd); border-radius: 10px; cursor: pointer; transition: border-color .15s, background .15s; margin-bottom: 8px; }
+.ai-model-card:hover { border-color: var(--ac); background: var(--sf2); }
+.ai-model-card.active-model { border-color: var(--ac); background: rgba(88,166,255,.07); }
+.ai-model-icon { font-size: 22px; width: 36px; text-align: center; flex-shrink: 0; }
+.ai-model-info { flex: 1; }
+.ai-model-name { font-size: 14px; font-weight: 700; color: var(--tx); }
+.ai-model-desc { font-size: 11px; color: var(--mu); margin-top: 2px; line-height: 1.4; }
+.ai-model-badge { font-size: 11px; font-weight: 700; color: var(--ac); background: rgba(88,166,255,.14); padding: 2px 10px; border-radius: 12px; flex-shrink: 0; }
+.ai-stat-strip { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+.ai-stat-chip { padding: 6px 14px; background: var(--sf2); border: 1px solid var(--bd); border-radius: 20px; font-size: 12px; color: var(--tx); }
+.ai-stat-chip .asc-val { font-weight: 700; color: var(--ac); margin-left: 4px; }
+.ai-section-head { font-size: 11px; font-weight: 700; color: var(--mu); text-transform: uppercase; letter-spacing: .6px; margin: 22px 0 10px; }
+.ai-func-row { display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; background: var(--sf); border: 1px solid var(--bd); border-radius: 8px; margin-bottom: 6px; gap: 12px; }
+.ai-func-text { flex: 1; }
+.ai-func-label { font-size: 13px; font-weight: 600; color: var(--tx); }
+.ai-func-desc { font-size: 11px; color: var(--mu); margin-top: 2px; }
+.ai-act-entry { padding: 9px 12px; border-left: 3px solid var(--bd); margin-bottom: 6px; background: var(--sf); border-radius: 0 6px 6px 0; }
+.ai-act-entry.ae-groq { border-left-color: var(--ac); }
+.ai-act-entry.ae-claude { border-left-color: var(--pu); }
+.ai-act-entry.ae-gemini { border-left-color: var(--gn); }
+.ai-act-entry .ae-meta { font-size: 11px; color: var(--mu); }
+.ai-act-entry .ae-fn { font-size: 12px; font-weight: 600; color: var(--tx); }
+.ai-act-entry .ae-tok { font-size: 11px; color: var(--yw); font-weight: 600; }
+.ai-voice-row { display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; background: var(--sf); border: 1px solid var(--bd); border-radius: 8px; margin-bottom: 6px; gap: 12px; }
+.ai-voice-text { flex: 1; }
+.ai-voice-label { font-size: 13px; font-weight: 600; color: var(--tx); }
+.ai-voice-desc { font-size: 11px; color: var(--mu); margin-top: 2px; }
+.ai-key-field { width: 100%; padding: 8px 10px; background: var(--sf2); border: 1px solid var(--bd); border-radius: 6px; color: var(--tx); font-size: 12px; font-family: monospace; margin-top: 6px; box-sizing: border-box; }
+.ai-range-row { display: flex; align-items: center; gap: 10px; }
+.ai-range-row input[type=range] { flex: 1; }
+.ai-range-val { font-size: 12px; color: var(--ac); font-weight: 700; min-width: 28px; text-align: right; }
+.ai-sys-btn { padding: 8px 16px; border-radius: 6px; border: 1px solid var(--bd); background: var(--sf2); color: var(--tx); cursor: pointer; font-size: 12px; }
+.ai-sys-btn:hover { border-color: var(--ac); color: var(--ac); }
+.ai-sys-btn.danger:hover { border-color: var(--rd); color: var(--rd); }
+.ai-bar-wrap { height: 8px; background: var(--sf2); border-radius: 4px; overflow: hidden; margin-top: 4px; }
+.ai-bar-fill { height: 100%; border-radius: 4px; background: var(--ac); transition: width .4s; }
+/* Logic Flows scrollbar fix */
+#sec-logicflows main { scrollbar-width: none; -ms-overflow-style: none; }
+#sec-logicflows main::-webkit-scrollbar { display: none; }
 </style>
 <link rel="stylesheet" href="theme/skins.css">
 <script>(function(){
@@ -5705,6 +5753,35 @@ SERVICE WORKER (sw.js):
     </main>
   </div>
 
+  <!-- ── AI CONTROL CENTRE ── -->
+  <div class="section fullpage" id="sec-ai" style="display:none">
+    <header class="page-head">
+      <div class="page-head-inner">
+        <span class="page-head-icon">🤖</span>
+        <div>
+          <div class="page-head-title">AI Control Centre</div>
+          <div class="page-head-sub">Models · Voice · Functions · Context · Activity · System</div>
+        </div>
+      </div>
+    </header>
+    <main>
+      <div class="ai-page-tabs" id="ai-ctrl-tabs">
+        <button class="ai-tab-btn active" onclick="_aiCtrlTab('models',this)">⚡ Models</button>
+        <button class="ai-tab-btn" onclick="_aiCtrlTab('voice',this)">🎙 Voice</button>
+        <button class="ai-tab-btn" onclick="_aiCtrlTab('functions',this)">🔧 Functions</button>
+        <button class="ai-tab-btn" onclick="_aiCtrlTab('context',this)">🧠 Context</button>
+        <button class="ai-tab-btn" onclick="_aiCtrlTab('activity',this)">📊 Activity</button>
+        <button class="ai-tab-btn" onclick="_aiCtrlTab('system',this)">⚙️ System</button>
+      </div>
+      <div id="ai-ctrl-pane-models"    class="ai-tab-pane on"></div>
+      <div id="ai-ctrl-pane-voice"     class="ai-tab-pane"></div>
+      <div id="ai-ctrl-pane-functions" class="ai-tab-pane"></div>
+      <div id="ai-ctrl-pane-context"   class="ai-tab-pane"></div>
+      <div id="ai-ctrl-pane-activity"  class="ai-tab-pane"></div>
+      <div id="ai-ctrl-pane-system"    class="ai-tab-pane"></div>
+    </main>
+  </div>
+
   <!-- ── BATCH ACTION BAR ── -->
   <div id="batch-action-bar" style="display:none;position:fixed;bottom:0;left:0;right:0;background:var(--sf);border-top:1px solid var(--bd);padding:12px 16px;gap:10px;align-items:center;z-index:200;flex-wrap:wrap"></div>
 
@@ -5740,6 +5817,7 @@ SERVICE WORKER (sw.js):
       <button class="ndtab" data-sec="value" onclick="navTo('value')"><span class="nd-icon">💰</span>Value</button>
       <button class="ndtab" data-sec="search" onclick="navTo('search')"><span class="nd-icon">🔍</span>Search</button>
       <button class="ndtab" data-sec="gallery" onclick="navTo('gallery')"><span class="nd-icon">📸</span>Gallery</button>
+      <button class="ndtab" data-sec="ai" onclick="navTo('ai')"><span class="nd-icon">🤖</span>AI Control</button>
       <div class="nd-divider"></div>
       <button class="ndtab" onclick="closeNavDrawer();openActLog()"><span class="nd-icon">⚡</span>Activity</button>
       <button class="ndtab" onclick="closeNavDrawer();lock()" style="color:var(--rd)"><span class="nd-icon">🔒</span>Lock</button>
@@ -11607,7 +11685,17 @@ const AI_MODELS={
 const AI_MODEL_ORDER=['groq8','groq70','gemini','claude'];
 let _aiModel=localStorage.getItem('tcplants_ai_model')||'groq8';
 
-function _aiRecordUsage(){} // no-op — quota tracking removed
+const _AI_LOG_KEY='tcplants_ai_log';
+const _AI_LOG_MAX=500;
+function _aiRecordUsage(modelStr, reqRem, tokRem, tokUsed){
+  const entry={ts:Date.now(), model:_aiModel, modelStr:modelStr||'', fn:'chat', tok:tokUsed||0, reqRem:reqRem||null, tokRem:tokRem||null};
+  try{
+    const log=JSON.parse(localStorage.getItem(_AI_LOG_KEY)||'[]');
+    log.unshift(entry);
+    if(log.length>_AI_LOG_MAX) log.length=_AI_LOG_MAX;
+    localStorage.setItem(_AI_LOG_KEY,JSON.stringify(log));
+  }catch(e){}
+}
 
 function _renderAIUsageBar(){} // removed — quota tracking gone
 
@@ -11776,6 +11864,421 @@ function _syncAISettingsPanel(){
       ${active?'<span style="font-size:11px;color:var(--ac);font-weight:700">active</span>':''}
     </div>`;
   }).join('');
+}
+
+// ════════════════════════════════════════════════════════════
+// AI CONTROL CENTRE
+// ════════════════════════════════════════════════════════════
+function renderAIPage(){
+  _aiCtrlTab('models', document.querySelector('#ai-ctrl-tabs .ai-tab-btn'));
+}
+function _aiCtrlTab(name, btn){
+  document.querySelectorAll('.ai-tab-pane').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('#ai-ctrl-tabs .ai-tab-btn').forEach(b=>b.classList.remove('active'));
+  const pane=document.getElementById('ai-ctrl-pane-'+name);
+  if(pane) pane.classList.add('on');
+  if(btn) btn.classList.add('active');
+  const render={models:_aiPageModels,voice:_aiPageVoice,functions:_aiPageFunctions,context:_aiPageContext,activity:_aiPageActivity,system:_aiPageSystem};
+  if(render[name]) render[name]();
+}
+
+// ── Models tab ────────────────────────────────────────────────
+function _aiPageModels(){
+  const log=_aiGetLog();
+  const today=_aiLogToday(log);
+  const todayTok=today.reduce((s,e)=>s+(e.tok||0),0);
+  const modelCounts={};
+  today.forEach(e=>{ modelCounts[e.model]=(modelCounts[e.model]||0)+1; });
+
+  const statsHtml=`<div class="ai-stat-strip">
+    <div class="ai-stat-chip">Today calls<span class="asc-val">${today.length}</span></div>
+    <div class="ai-stat-chip">Tokens used<span class="asc-val">${todayTok.toLocaleString()}</span></div>
+    <div class="ai-stat-chip">Total log<span class="asc-val">${log.length}</span></div>
+    <div class="ai-stat-chip">Active model<span class="asc-val">${AI_MODELS[_aiModel]?.label||_aiModel}</span></div>
+  </div>`;
+
+  const modelDescs={
+    groq8:'⚡ Fast & free — voice commands, quick queries, sentence completions. 6K TPM / 30 RPM on free tier.',
+    groq70:'🔬 Deep analysis — multi-species protocols, complex reasoning, lab diagnostics. 6K TPM / 30 RPM free.',
+    gemini:'✦ Free vision + chat — contamination photo scans, free generous limits, runs via Cloudflare proxy.',
+    claude:'◇ Best reasoning — hardest problems, complex multi-step workflows. Requires Claude API key.'
+  };
+  const cardsHtml=AI_MODEL_ORDER.map(k=>{
+    const m=AI_MODELS[k];
+    const active=_aiModel===k;
+    const cnt=modelCounts[k]||0;
+    return `<div class="ai-model-card${active?' active-model':''}" onclick="_aiSetModel('${k}')">
+      <div class="ai-model-icon">${m.icon}</div>
+      <div class="ai-model-info">
+        <div class="ai-model-name">${m.label}</div>
+        <div class="ai-model-desc">${modelDescs[k]||''}</div>
+        ${cnt?`<div style="font-size:11px;color:var(--mu);margin-top:4px">${cnt} call${cnt!==1?'s':''} today</div>`:''}
+      </div>
+      ${active?'<div class="ai-model-badge">ACTIVE</div>':'<button class="btn sm ghost" style="font-size:11px" onclick="event.stopPropagation();_aiSetModel(\''+k+'\')">Use</button>'}
+    </div>`;
+  }).join('');
+
+  // Key management
+  const groqKey=localStorage.getItem('tcplants_groq_key')||'';
+  const claudeKey=localStorage.getItem('tcplants_claude_key')||'';
+  const proxyUrl=localStorage.getItem('tcplants_proxy_url')||'';
+  const keysHtml=`<div class="ai-section-head">API Keys</div>
+    <div class="ai-func-row">
+      <div class="ai-func-text">
+        <div class="ai-func-label">Groq API Key <span style="font-size:10px;color:${groqKey?'var(--gn)':'var(--rd)'}">${groqKey?'● Set':'● Not set'}</span></div>
+        <div class="ai-func-desc">Used for groq8 (Llama 3.1 8B) and groq70 (Llama 3.3 70B) + Whisper STT. Free at console.groq.com</div>
+        <input class="ai-key-field" type="password" placeholder="gsk_…" value="${groqKey?'●'.repeat(12):''}"
+          onchange="localStorage.setItem('tcplants_groq_key',this.value);toast('Groq key saved');_aiPageModels()" autocomplete="off">
+      </div>
+    </div>
+    <div class="ai-func-row">
+      <div class="ai-func-text">
+        <div class="ai-func-label">Claude API Key <span style="font-size:10px;color:${claudeKey?'var(--gn)':'var(--rd)'}">${claudeKey?'● Set':'● Not set'}</span></div>
+        <div class="ai-func-desc">Anthropic key for Claude model. console.anthropic.com/settings/keys</div>
+        <input class="ai-key-field" type="password" placeholder="sk-ant-…" value="${claudeKey?'●'.repeat(12):''}"
+          onchange="localStorage.setItem('tcplants_claude_key',this.value);toast('Claude key saved');_aiPageModels()" autocomplete="off">
+      </div>
+    </div>
+    <div class="ai-func-row">
+      <div class="ai-func-text">
+        <div class="ai-func-label">Cloudflare Proxy URL <span style="font-size:10px;color:${proxyUrl?'var(--gn)':'var(--mu)'}">${proxyUrl?'● Set':'○ Optional'}</span></div>
+        <div class="ai-func-desc">Used for Gemini (free) and proxied calls. Default: plantking.ape.workers.dev</div>
+        <input class="ai-key-field" type="url" placeholder="https://yourworker.workers.dev" value="${proxyUrl}"
+          onchange="localStorage.setItem('tcplants_proxy_url',this.value);if(typeof _aiProxyURL!=='undefined')_aiProxyURL=this.value;toast('Proxy URL saved')" autocomplete="off">
+      </div>
+    </div>`;
+
+  document.getElementById('ai-ctrl-pane-models').innerHTML=statsHtml+cardsHtml+keysHtml;
+}
+function _aiSetModel(k){
+  _aiModel=k;
+  localStorage.setItem('tcplants_ai_model',k);
+  _updateAIModelUI();
+  toast('Model: '+AI_MODELS[k].label);
+  _aiPageModels();
+}
+function _aiGetLog(){
+  try{ return JSON.parse(localStorage.getItem(_AI_LOG_KEY)||'[]'); }catch{ return []; }
+}
+function _aiLogToday(log){
+  const start=new Date(); start.setHours(0,0,0,0);
+  return log.filter(e=>e.ts>=start.getTime());
+}
+
+// ── Voice tab ─────────────────────────────────────────────────
+function _aiPageVoice(){
+  const c=_voiceCfg();
+  const voices=(typeof speechSynthesis!=='undefined')?speechSynthesis.getVoices().filter(v=>v.lang.startsWith('en')):[];
+  const voiceOpts=voices.map(v=>`<option value="${v.name}"${c.voice===v.name?' selected':''}>${v.name}</option>`).join('');
+
+  const row=(label,desc,id,checked)=>`<div class="ai-voice-row">
+    <div class="ai-voice-text"><div class="ai-voice-label">${label}</div><div class="ai-voice-desc">${desc}</div></div>
+    <label class="toggle-wrap"><input type="checkbox" id="${id}"${checked?' checked':''} onchange="_saveVoiceSettings()"><span class="toggle-slider"></span></label>
+  </div>`;
+
+  document.getElementById('ai-ctrl-pane-voice').innerHTML=`
+    <div class="ai-section-head">STT — Speech to Text</div>
+    <div class="ai-voice-row">
+      <div class="ai-voice-text"><div class="ai-voice-label">STT Engine</div><div class="ai-voice-desc">Whisper uses Groq API (higher accuracy). Native uses browser built-in (offline).</div></div>
+      <div style="display:flex;gap:6px">
+        <button id="set-stt-native" class="btn sm${c.mode!=='whisper'?' ':'  ghost'}" onclick="_setSTTMode('native')">Native</button>
+        <button id="set-stt-whisper" class="btn sm${c.mode==='whisper'?' ':'  ghost'}" onclick="_setSTTMode('whisper')">Whisper</button>
+      </div>
+    </div>
+    ${row('Wake Word — "Hey Ravana"','Say "Hey Ravana" to trigger voice input hands-free (Lab Mode)','set-voice-wake',!!c.wake)}
+    ${row('Lab Mode','Forces Whisper + TTS on + wake word on. Optimised for bench use.','set-lab-mode',!!c.labMode)}
+    <div id="set-voice-whisper-opts" style="${c.mode==='whisper'?'':'display:none'}">
+      ${row('Auto-send after silence','Automatically submit after silence is detected','set-whisper-autosend',c.whisperAutoSend!==false)}
+      <div class="ai-voice-row">
+        <div class="ai-voice-text"><div class="ai-voice-label">Silence threshold (s)</div><div class="ai-voice-desc">Seconds of silence before auto-send triggers</div></div>
+        <div class="ai-range-row">
+          <input type="range" id="set-whisper-silence" min="1" max="5" step="0.5" value="${c.whisperSilence||2}" oninput="this.nextElementSibling.textContent=this.value;_saveVoiceSettings()">
+          <span class="ai-range-val">${c.whisperSilence||2}s</span>
+        </div>
+      </div>
+    </div>
+    <div id="set-voice-native-opts" style="${c.mode==='whisper'?'display:none':''}">
+      ${row('Confirm before send','Show transcript for review before sending','set-voice-confirm',c.confirm!==false)}
+      ${row('Confirm commands','Require tap to confirm voice commands','set-voice-cmd-confirm',c.cmdConfirm!==false)}
+    </div>
+    <div class="ai-section-head">Noise Suppression</div>
+    ${row('Noise suppression','Reduces background lab noise (fans, HVAC)','set-voice-noise',c.noise!==false)}
+    ${row('Echo cancellation','Prevents TTS audio from looping back','set-voice-echo',c.echo!==false)}
+    ${row('Auto gain control','Keeps input volume consistent','set-voice-agc',c.agc!==false)}
+    <div class="ai-voice-row">
+      <div class="ai-voice-text"><div class="ai-voice-label">Noise gate (dB)</div><div class="ai-voice-desc">Ignore inputs below this volume. Higher = quieter environment needed.</div></div>
+      <div class="ai-range-row">
+        <input type="range" id="set-voice-gate" min="0" max="40" value="${c.gate||10}" oninput="this.nextElementSibling.textContent=this.value;_saveVoiceSettings()">
+        <span class="ai-range-val">${c.gate||10}</span>
+      </div>
+    </div>
+    <div class="ai-section-head">TTS — Text to Speech</div>
+    ${row('Enable TTS','Ravana reads responses aloud','set-voice-tts',!!c.tts)}
+    <div class="ai-voice-row">
+      <div class="ai-voice-text"><div class="ai-voice-label">Voice</div><div class="ai-voice-desc">Select browser TTS voice for Ravana</div></div>
+      <select id="set-voice-voice" onchange="_saveVoiceSettings()" style="padding:5px 8px;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-size:12px">
+        <option value="">Default</option>${voiceOpts}
+      </select>
+    </div>
+    <div class="ai-voice-row">
+      <div class="ai-voice-text"><div class="ai-voice-label">Speed</div><div class="ai-voice-desc">TTS speaking rate</div></div>
+      <div class="ai-range-row">
+        <input type="range" id="set-voice-rate" min="0.5" max="2" step="0.1" value="${c.rate||1}" oninput="this.nextElementSibling.textContent=parseFloat(this.value).toFixed(1)+'×';_saveVoiceSettings()">
+        <span class="ai-range-val">${(c.rate||1).toFixed(1)}×</span>
+      </div>
+    </div>
+    <div class="ai-voice-row">
+      <div class="ai-voice-text"><div class="ai-voice-label">Pitch</div><div class="ai-voice-desc">TTS pitch</div></div>
+      <div class="ai-range-row">
+        <input type="range" id="set-voice-pitch" min="0.5" max="2" step="0.1" value="${c.pitch||1}" oninput="this.nextElementSibling.textContent=parseFloat(this.value).toFixed(1);_saveVoiceSettings()">
+        <span class="ai-range-val">${(c.pitch||1).toFixed(1)}</span>
+      </div>
+    </div>
+    <div style="margin-top:14px;display:flex;gap:8px">
+      <button class="ai-sys-btn" onclick="_ttsSpeak('Ravana is ready. Forest Studio Labs, Kelambakkam.')">🔊 Test TTS</button>
+      <button class="ai-sys-btn" onclick="_toggleLabMode(!_voiceCfg().labMode)">🧪 Toggle Lab Mode</button>
+    </div>`;
+}
+
+// ── Functions tab ─────────────────────────────────────────────
+const _AI_FUNC_KEY='tcplants_ai_funcs';
+function _aiFuncCfg(){
+  try{ return JSON.parse(localStorage.getItem(_AI_FUNC_KEY)||'{}'); }catch{ return {}; }
+}
+function _aiFuncToggle(fn, el){
+  const c=_aiFuncCfg();
+  c[fn]=el.checked;
+  localStorage.setItem(_AI_FUNC_KEY,JSON.stringify(c));
+}
+function _aiPageFunctions(){
+  const c=_aiFuncCfg();
+  const on=(k)=>c[k]!==false; // default true
+  const off=(k)=>!!c[k];      // default false
+
+  const row=(key,label,desc,defaultOn)=>{
+    const chk=defaultOn?on(key):off(key);
+    return `<div class="ai-func-row">
+      <div class="ai-func-text"><div class="ai-func-label">${label}</div><div class="ai-func-desc">${desc}</div></div>
+      <label class="toggle-wrap"><input type="checkbox" ${chk?'checked':''} onchange="_aiFuncToggle('${key}',this)"><span class="toggle-slider"></span></label>
+    </div>`;
+  };
+
+  document.getElementById('ai-ctrl-pane-functions').innerHTML=`
+    <div class="ai-section-head">Chat &amp; Analysis</div>
+    ${row('chat','Ravana Chat','Main conversational AI — responds to lab questions, protocols, species advice',true)}
+    ${row('contamAnalysis','Contamination Analysis','AI-assisted contamination identification when logging a contam event',true)}
+    ${row('recipeSuggest','Recipe Check','AI reviews media recipes and flags potential issues or improvements',true)}
+    ${row('speciesSuggest','Species Suggestions','Auto-suggest genus/species when adding new accessions or bottles',true)}
+    <div class="ai-section-head">Voice &amp; Commands</div>
+    ${row('voiceCommands','Voice Commands','Parse spoken lab commands — "add 3 bottles of Nepenthes rajah"',true)}
+    ${row('ttsResponses','TTS Responses','Read Ravana chat responses aloud via speech synthesis',true)}
+    ${row('wakeWord','Wake Word Detection','Listen for "Hey Ravana" in background to trigger voice input',false)}
+    <div class="ai-section-head">Insights &amp; Background</div>
+    ${row('insightsPage','Ravana Insights Page','Generate weekly lab health digest on the Insights page',true)}
+    ${row('dashboardAlerts','Dashboard AI Alerts','Include AI-generated alerts in the dashboard alert strip',true)}
+    ${row('speciesPanel','Species Detail Panel','Load GBIF data + AI notes when opening a species record',true)}
+    <div class="ai-section-head">Model Assignments</div>
+    <div style="font-size:12px;color:var(--mu);padding:10px 0 6px">Which model handles each task class:</div>
+    ${['Quick queries → groq8 (8B)', 'Deep analysis → groq70 (70B)', 'Vision / contamination scan → gemini', 'Complex multi-step → claude'].map(t=>`<div style="font-size:12px;color:var(--tx);padding:5px 0;border-bottom:1px solid var(--bd)">${t}</div>`).join('')}
+    <div style="margin-top:10px;font-size:11px;color:var(--mu)">To override model assignments, use the Models tab to set the active model for this session.</div>`;
+}
+
+// ── Context tab ───────────────────────────────────────────────
+const _AI_CTX_KEY='tcplants_ai_context';
+function _aiCtxCfg(){
+  try{ return JSON.parse(localStorage.getItem(_AI_CTX_KEY)||'{}'); }catch{ return {}; }
+}
+function _aiCtxSave(){
+  const c={
+    notes:   parseInt(document.getElementById('aictx-notes')?.value||5),
+    bottles: document.getElementById('aictx-bottles')?.checked!==false,
+    species: document.getElementById('aictx-species')?.checked!==false,
+    recipes: document.getElementById('aictx-recipes')?.checked!==false,
+    contam:  document.getElementById('aictx-contam')?.checked!==false,
+    supplies:document.getElementById('aictx-supplies')?.checked!==false,
+    maxChars:parseInt(document.getElementById('aictx-maxchars')?.value||3000),
+  };
+  localStorage.setItem(_AI_CTX_KEY,JSON.stringify(c));
+  toast('Context settings saved');
+}
+function _aiPageContext(){
+  const c=_aiCtxCfg();
+  const on=(k,def=true)=>c[k]!==undefined?!!c[k]:def;
+  const ctxRow=(id,label,desc,def=true)=>`<div class="ai-ctx-row">
+    <div class="ai-func-text"><div class="ai-func-label">${label}</div><div class="ai-func-desc">${desc}</div></div>
+    <label class="toggle-wrap"><input type="checkbox" id="aictx-${id}" ${on(id,def)?'checked':''} onchange="_aiCtxSave()"><span class="toggle-slider"></span></label>
+  </div>`;
+
+  // Live estimate of context size
+  const notesCount=Math.min((S.notes||[]).length, c.notes||5);
+  const estChars=(notesCount*120)+((S.bottles||[]).filter(b=>b.status!=='trashed').length*40)+((S.accs||[]).length*30)+200;
+
+  document.getElementById('ai-ctrl-pane-context').innerHTML=`
+    <div class="ai-section-head">What to include in every AI call</div>
+    <div class="ai-ctx-row">
+      <div class="ai-func-text"><div class="ai-func-label">Recent notes count</div><div class="ai-func-desc">How many of your most recent notes Ravana sees as context</div></div>
+      <div class="ai-range-row">
+        <input type="range" id="aictx-notes" min="0" max="20" value="${c.notes||5}" oninput="this.nextElementSibling.textContent=this.value+' notes';_aiCtxSave()">
+        <span class="ai-range-val">${c.notes||5}</span>
+      </div>
+    </div>
+    ${ctxRow('bottles','Bottle summary','Active bottle counts by species and stage')}
+    ${ctxRow('species','Species list','All registered species/accessions')}
+    ${ctxRow('recipes','Recipes','Media recipes and sterilisation protocols')}
+    ${ctxRow('contam','Contam events','Recent contamination incidents (last 30 days)')}
+    ${ctxRow('supplies','Supply levels','Current supply stock levels and low-stock flags')}
+    <div class="ai-ctx-row">
+      <div class="ai-func-text"><div class="ai-func-label">Max context chars</div><div class="ai-func-desc">Hard cap on total characters sent per call. Lower = faster + fewer tokens used.</div></div>
+      <div class="ai-range-row">
+        <input type="range" id="aictx-maxchars" min="1000" max="8000" step="500" value="${c.maxChars||3000}" oninput="this.nextElementSibling.textContent=parseInt(this.value).toLocaleString();_aiCtxSave()">
+        <span class="ai-range-val">${(c.maxChars||3000).toLocaleString()}</span>
+      </div>
+    </div>
+    <div style="margin-top:14px;padding:10px 14px;background:var(--sf2);border-radius:8px;font-size:12px;color:var(--mu)">
+      📐 Estimated context per call: ~<strong style="color:var(--tx)">${estChars.toLocaleString()}</strong> chars (~<strong style="color:var(--tx)">${Math.round(estChars/4).toLocaleString()}</strong> tokens). Groq free tier limit: 6,000 TPM.
+    </div>`;
+}
+
+// ── Activity tab ──────────────────────────────────────────────
+function _aiPageActivity(){
+  const log=_aiGetLog();
+  const today=_aiLogToday(log);
+  const week=log.filter(e=>e.ts>=(Date.now()-7*864e5));
+  const tokToday=today.reduce((s,e)=>s+(e.tok||0),0);
+  const tokWeek=week.reduce((s,e)=>s+(e.tok||0),0);
+
+  // Per-model breakdown today
+  const modelBreak={};
+  today.forEach(e=>{ if(!modelBreak[e.model]) modelBreak[e.model]={calls:0,tok:0}; modelBreak[e.model].calls++; modelBreak[e.model].tok+=(e.tok||0); });
+
+  const breakHtml=Object.entries(modelBreak).map(([k,v])=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--bd);font-size:12px">
+      <span>${AI_MODELS[k]?.icon||'?'} <strong>${AI_MODELS[k]?.label||k}</strong></span>
+      <span style="color:var(--mu)">${v.calls} call${v.calls!==1?'s':''} · <span style="color:var(--yw)">${v.tok.toLocaleString()} tok</span></span>
+    </div>`).join('') || '<div style="font-size:12px;color:var(--mu);padding:8px 0">No calls today</div>';
+
+  // Rate limit indicator (Groq: 6K TPM, ~180K per day on free tier)
+  const groqTokToday=today.filter(e=>e.model==='groq8'||e.model==='groq70').reduce((s,e)=>s+(e.tok||0),0);
+  const groqPct=Math.min(100,Math.round((groqTokToday/180000)*100));
+
+  // Recent log entries
+  const entriesHtml=log.slice(0,50).map(e=>{
+    const t=new Date(e.ts);
+    const timeStr=t.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});
+    const dateStr=t.toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+    const mclass=e.model==='claude'?'ae-claude':e.model==='gemini'?'ae-gemini':'ae-groq';
+    const mi=AI_MODELS[e.model];
+    return `<div class="ai-act-entry ${mclass}">
+      <div style="display:flex;justify-content:space-between">
+        <span class="ae-fn">${mi?.icon||'?'} ${mi?.label||e.model}</span>
+        <span class="ae-tok">${e.tok?e.tok.toLocaleString()+' tok':'—'}</span>
+      </div>
+      <div class="ae-meta">${dateStr} ${timeStr}${e.reqRem!=null?' · '+e.reqRem+' req rem':''}${e.tokRem!=null?' · '+e.tokRem.toLocaleString()+' tok rem':''}</div>
+    </div>`;
+  }).join('') || '<div style="font-size:12px;color:var(--mu)">No activity logged yet. Start a conversation with Ravana.</div>';
+
+  document.getElementById('ai-ctrl-pane-activity').innerHTML=`
+    <div class="ai-stat-strip">
+      <div class="ai-stat-chip">Today calls<span class="asc-val">${today.length}</span></div>
+      <div class="ai-stat-chip">Today tokens<span class="asc-val">${tokToday.toLocaleString()}</span></div>
+      <div class="ai-stat-chip">This week<span class="asc-val">${week.length} calls</span></div>
+      <div class="ai-stat-chip">Week tokens<span class="asc-val">${tokWeek.toLocaleString()}</span></div>
+    </div>
+    <div class="ai-section-head">Today — model breakdown</div>
+    ${breakHtml}
+    <div class="ai-section-head">Groq daily token usage (free tier ~180K/day)</div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--mu);margin-bottom:4px">
+      <span>Groq tokens today: <strong style="color:var(--tx)">${groqTokToday.toLocaleString()}</strong></span>
+      <span>${groqPct}%</span>
+    </div>
+    <div class="ai-bar-wrap"><div class="ai-bar-fill" style="width:${groqPct}%;background:${groqPct>80?'var(--rd)':groqPct>50?'var(--yw)':'var(--ac)'}"></div></div>
+    <div class="ai-section-head">Recent calls (last 50)</div>
+    ${entriesHtml}
+    <div style="margin-top:14px">
+      <button class="ai-sys-btn danger" onclick="_aiClearLog()">🗑 Clear activity log</button>
+    </div>`;
+}
+function _aiClearLog(){
+  if(!confirm('Clear all AI activity logs?')) return;
+  localStorage.removeItem(_AI_LOG_KEY);
+  toast('AI log cleared');
+  _aiPageActivity();
+}
+
+// ── System tab ────────────────────────────────────────────────
+function _aiPageSystem(){
+  const proxyUrl=localStorage.getItem('tcplants_proxy_url')||'';
+  const cached=localStorage.getItem('tcplants_cache');
+  const cachedSize=cached?Math.round(cached.length/1024)+'KB':'—';
+  const logSize=Math.round((localStorage.getItem(_AI_LOG_KEY)||'').length/1024);
+  const allKeys=Object.keys(localStorage).filter(k=>k.startsWith('tcplants_'));
+  const totalSize=allKeys.reduce((s,k)=>s+(localStorage.getItem(k)||'').length,0);
+
+  document.getElementById('ai-ctrl-pane-system').innerHTML=`
+    <div class="ai-section-head">Proxy &amp; Connectivity</div>
+    <div class="ai-func-row">
+      <div class="ai-func-text">
+        <div class="ai-func-label">Cloudflare Worker URL</div>
+        <div class="ai-func-desc">Routes Gemini + proxied Claude calls. Leave blank to use keys directly.</div>
+        <input class="ai-key-field" id="ai-sys-proxy" type="url" placeholder="https://yourworker.workers.dev" value="${proxyUrl}" autocomplete="off">
+      </div>
+      <button class="btn sm" style="margin-left:10px;flex-shrink:0" onclick="const v=document.getElementById('ai-sys-proxy').value.trim();localStorage.setItem('tcplants_proxy_url',v);if(typeof _aiProxyURL!=='undefined')_aiProxyURL=v;toast(v?'Proxy saved':'Proxy cleared')">Save</button>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+      <button class="ai-sys-btn" onclick="_aiTestProxy()">🔌 Test Proxy</button>
+      <button class="ai-sys-btn" onclick="_aiTestGroq()">⚡ Test Groq</button>
+    </div>
+    <div id="ai-sys-test-result" style="margin-top:8px;font-size:12px;color:var(--mu)"></div>
+
+    <div class="ai-section-head">Storage</div>
+    <div style="font-size:12px;color:var(--tx);line-height:2">
+      Cache size: <strong>${cachedSize}</strong><br>
+      AI log size: <strong>${logSize}KB</strong> (${_aiGetLog().length} entries)<br>
+      Total tcplants localStorage: <strong>${Math.round(totalSize/1024)}KB</strong>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+      <button class="ai-sys-btn danger" onclick="if(confirm('Clear app cache? App will reload data from GitHub.'))localStorage.removeItem('tcplants_cache');toast('Cache cleared')">🗑 Clear Cache</button>
+      <button class="ai-sys-btn danger" onclick="_aiClearLog();_aiPageSystem()">🗑 Clear AI Log</button>
+      <button class="ai-sys-btn danger" onclick="if(confirm('Reset ALL AI settings to defaults?')){['tcplants_ai_model','tcplants_ai_funcs','tcplants_ai_context',_AI_LOG_KEY,VOICE_KEY].forEach(k=>localStorage.removeItem(k));_aiModel='groq8';_updateAIModelUI();toast('AI settings reset');_aiPageSystem()}">↺ Reset AI Settings</button>
+    </div>
+
+    <div class="ai-section-head">System Prompt Preview</div>
+    <div style="font-size:11px;color:var(--mu);margin-bottom:6px">First 600 chars of AI_RULEBOOK:</div>
+    <pre style="font-size:10px;color:var(--tx);background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:10px 12px;overflow-x:auto;white-space:pre-wrap;word-break:break-word;max-height:180px;overflow-y:auto">${(typeof AI_RULEBOOK!=='undefined'?AI_RULEBOOK.substring(0,600):'—')+'…'}</pre>
+
+    <div class="ai-section-head">Version &amp; Build</div>
+    <div style="font-size:12px;color:var(--mu);line-height:1.8">
+      AI framework: <strong style="color:var(--tx)">Ravana v3.11+</strong><br>
+      Models available: <strong style="color:var(--tx)">${AI_MODEL_ORDER.length}</strong> (${AI_MODEL_ORDER.map(k=>AI_MODELS[k].label).join(', ')})<br>
+      Voice system: <strong style="color:var(--tx)">Whisper + Web Speech API</strong><br>
+      Tool use: <strong style="color:var(--tx)">Agent loop, max 3 rounds</strong>
+    </div>`;
+}
+async function _aiTestProxy(){
+  const res=document.getElementById('ai-sys-test-result');
+  if(res) res.textContent='Testing proxy…';
+  const url=localStorage.getItem('tcplants_proxy_url')||'https://plantking.ape.workers.dev';
+  try{
+    const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'ping'})});
+    const t=await r.text();
+    if(res) res.innerHTML=`<span style="color:var(--gn)">✓ Proxy reachable (${r.status})</span>`;
+  }catch(e){
+    if(res) res.innerHTML=`<span style="color:var(--rd)">✗ Proxy unreachable: ${e.message}</span>`;
+  }
+}
+async function _aiTestGroq(){
+  const res=document.getElementById('ai-sys-test-result');
+  if(res) res.textContent='Testing Groq API…';
+  const key=localStorage.getItem('tcplants_groq_key')||'';
+  if(!key){ if(res) res.innerHTML=`<span style="color:var(--rd)">✗ No Groq API key set</span>`; return; }
+  try{
+    const r=await fetch('https://api.groq.com/openai/v1/models',{headers:{Authorization:'Bearer '+key}});
+    const d=await r.json();
+    if(d.data){ if(res) res.innerHTML=`<span style="color:var(--gn)">✓ Groq connected — ${d.data.length} models available</span>`; }
+    else { if(res) res.innerHTML=`<span style="color:var(--rd)">✗ Groq error: ${d.error?.message||'unknown'}</span>`; }
+  }catch(e){
+    if(res) res.innerHTML=`<span style="color:var(--rd)">✗ ${e.message}</span>`;
+  }
 }
 
 // ── AI panel maximize ─────────────────────────────────────────
@@ -16779,6 +17282,7 @@ function navTo(sec){
     else if(sec==='changelog') renderChangelog();
     else if(sec==='gallery'){}  // lazy — user clicks Load Gallery
     else if(sec==='logicflows'){} // static page — no render needed
+    else if(sec==='ai') renderAIPage();
   }
 }
 
