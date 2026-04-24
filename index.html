@@ -82,6 +82,26 @@ body{background:var(--bg);color:var(--tx);font-family:var(--font);font-size:14px
 .llogo .ic{font-size:42px;display:block;margin-bottom:8px}
 .llogo h1{font-size:20px;font-weight:700}
 .llogo p{font-size:13px;color:var(--mu);margin-top:6px;line-height:1.6}
+/* login plant loader */
+#login-plant-anim{
+  position:absolute;inset:0;z-index:10;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:var(--bg);
+  opacity:0;pointer-events:none;
+  transition:opacity .35s ease;
+}
+#login-plant-anim.on{opacity:1;pointer-events:auto}
+#login-plant-svg{
+  width:140px;height:160px;
+  --plant-pct:0%;
+  clip-path:inset(0 0 calc(100% - var(--plant-pct)) 0);
+  transition:clip-path .3s cubic-bezier(.4,0,.2,1);
+  overflow:visible;
+}
+#login-plant-label{
+  margin-top:18px;font-size:13px;color:var(--mu);
+  font-weight:500;letter-spacing:.03em;min-height:20px;
+}
 /* login theme toggle */
 #login-theme-btn{
   background:var(--sf);border:1px solid var(--bd);border-radius:50%;
@@ -1911,6 +1931,36 @@ input, textarea, select {
 
 <div id="login">
   <canvas id="login-wave" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;transition:opacity .5s;background:transparent"></canvas>
+
+  <!-- Plant sprouting loader — shown during login data fetch -->
+  <div id="login-plant-anim">
+    <svg id="login-plant-svg" viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg">
+      <!-- Soil -->
+      <rect x="8" y="109" width="84" height="16" rx="5" fill="rgba(139,100,60,.3)"/>
+      <rect x="18" y="105" width="64" height="9" rx="4" fill="rgba(139,100,60,.45)"/>
+      <!-- Roots -->
+      <path d="M50,114 Q38,121 32,128" stroke="rgba(139,100,60,.55)" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+      <path d="M50,114 Q62,122 68,129" stroke="rgba(139,100,60,.55)" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+      <path d="M50,114 Q48,124 46,130" stroke="rgba(139,100,60,.4)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+      <!-- Main stem -->
+      <path d="M50,108 C50,95 49,75 50,14" stroke="#4caf50" stroke-width="3.8" stroke-linecap="round" fill="none"/>
+      <!-- Lower left leaf -->
+      <path d="M50,88 C44,80 28,78 22,64 C36,68 48,78 50,88Z" fill="#66bb6a"/>
+      <!-- Lower right leaf -->
+      <path d="M50,72 C57,63 73,60 78,46 C64,51 51,62 50,72Z" fill="#4caf50"/>
+      <!-- Upper left leaf -->
+      <path d="M50,52 C43,43 29,39 25,25 C39,30 49,41 50,52Z" fill="#81c784"/>
+      <!-- Upper right leaf (small) -->
+      <path d="M50,36 C56,28 67,25 70,14 C59,18 51,27 50,36Z" fill="#66bb6a"/>
+      <!-- Stem tip / bud -->
+      <ellipse cx="50" cy="11" rx="5.5" ry="8" fill="#a5d6a7"/>
+      <ellipse cx="50" cy="8" rx="3.5" ry="5.5" fill="#c8e6c9"/>
+      <!-- Tiny shine on bud -->
+      <ellipse cx="48" cy="6" rx="1.5" ry="2" fill="rgba(255,255,255,.4)"/>
+    </svg>
+    <div id="login-plant-label">Connecting…</div>
+  </div>
+
   <button id="login-wave-btn" onclick="_loginWaveToggle()" title="Toggle background waves" style="position:absolute;bottom:14px;right:14px;z-index:2;background:transparent;border:1px solid var(--bd);border-radius:14px;color:var(--mu);cursor:pointer;font-size:11px;padding:3px 10px;opacity:.5;transition:opacity .2s">〜</button>
   <!-- Login screen controls -->
   <div id="login-controls" style="position:absolute;top:18px;right:18px;display:flex;align-items:center;gap:8px;z-index:2">
@@ -18147,6 +18197,56 @@ document.getElementById('ne-type').addEventListener('change',function(){
 });
 
 // ════════════════════════════════════════════════════════════
+// LOGIN PLANT ANIMATION
+// ════════════════════════════════════════════════════════════
+let _lPlantRaf=null, _lPlantCur=0, _lPlantVel=0;
+
+function _loginPlantSet(pct){
+  const svg=document.getElementById('login-plant-svg');
+  if(svg) svg.style.setProperty('--plant-pct',Math.min(100,Math.max(0,pct))+'%');
+  const lbl=document.getElementById('login-plant-label');
+  if(!lbl) return;
+  if(pct<20) lbl.textContent='Connecting…';
+  else if(pct<45) lbl.textContent='Verifying…';
+  else if(pct<70) lbl.textContent='Loading data…';
+  else if(pct<92) lbl.textContent='Almost there…';
+  else lbl.textContent='Ready!';
+}
+
+function _loginPlantShow(){
+  _lPlantCur=0; _lPlantVel=0;
+  _loginPlantSet(0);
+  document.getElementById('login-plant-anim').classList.add('on');
+  // Organic ticker: eases toward 88% and slows — fast load = fast growth, slow load = slow growth
+  function tick(){
+    const pull=(88-_lPlantCur)*0.018; // spring toward 88%
+    _lPlantVel=_lPlantVel*0.82+pull;  // dampen velocity
+    _lPlantCur=Math.min(88,_lPlantCur+_lPlantVel);
+    _loginPlantSet(_lPlantCur);
+    if(_lPlantCur<87.9) _lPlantRaf=requestAnimationFrame(tick);
+  }
+  _lPlantRaf=requestAnimationFrame(tick);
+}
+
+function _loginPlantDone(){
+  cancelAnimationFrame(_lPlantRaf); _lPlantRaf=null;
+  _loginPlantSet(100);
+  setTimeout(()=>{
+    const el=document.getElementById('login-plant-anim');
+    el.classList.remove('on');
+    // Reset after fade
+    setTimeout(()=>_loginPlantSet(0),400);
+  },700);
+}
+
+function _loginPlantFail(){
+  cancelAnimationFrame(_lPlantRaf); _lPlantRaf=null;
+  const el=document.getElementById('login-plant-anim');
+  el.classList.remove('on');
+  setTimeout(()=>_loginPlantSet(0),400);
+}
+
+// ════════════════════════════════════════════════════════════
 // LOGIN / LOCK
 // ════════════════════════════════════════════════════════════
 async function login(){
@@ -18163,6 +18263,7 @@ async function login(){
   const pw=tok;
   document.getElementById('lbtn').disabled=true;
   document.getElementById('lbtn').textContent='Unlocking…';
+  _loginPlantShow();
   try{
     const r=await fetch(`${API}/repos/${REPO}`,{headers:{Authorization:`token ${tok}`}});
     if(!r.ok) throw new Error('GitHub token invalid or lacks repo access.');
@@ -18178,7 +18279,6 @@ async function login(){
       if(cached.greenhouse){ S.greenhouse=cached.greenhouse; S.ghTransfers=cached.ghTransfers||[]; S.greenhouseSha=cached.greenhouseSha; }
       toast('⚡ Loaded from cache');
     }else{
-      load('Loading all data…');
       const _safe=fn=>fn.catch(()=>null);
       const [_nR,_aR,_rR,_bR,_gR,_sR,_jR,_vR,_slR]=await Promise.all([_safe(loadNotesIndex()),_safe(loadAccessions()),_safe(loadRecipes()),_safe(loadBottles()),_safe(loadGreenhouse()),_safe(loadSupplies()),_safe(loadJournal()),_safe(loadValue()),_safe(loadSales())]);
       const {notes=[],sha:nSha=null}=_nR||{};
@@ -18203,6 +18303,8 @@ async function login(){
       S.sales=salesData||[]; S.salesSha=slSha;
       _writeCache();
     }
+    _loginPlantDone();
+    await new Promise(r=>setTimeout(r,700)); // let plant finish growing before switching
     document.getElementById('login').style.display='none';
     document.getElementById('app').classList.add('on');
     renderNoteList(); renderAccList(); renderRecList(); renderBottleList(); renderGHList();
@@ -18248,6 +18350,7 @@ async function login(){
       err.textContent=e.message; err.style.display='block';
       S.pw=null; S.tok=null;
     }
+    _loginPlantFail();
   }
   document.getElementById('lbtn').disabled=false;
   document.getElementById('lbtn').textContent='Sign In →';
