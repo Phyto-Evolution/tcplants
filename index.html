@@ -1062,7 +1062,7 @@ main > .dview, main > .editor{ margin:0 auto; }
 /* ── SPLIT PANE ── */
 .editor-body-wrap{position:relative}
 .pane-btns{display:flex;gap:2px;margin-bottom:6px}
-.pane-btn{background:var(--sf2);border:1px solid var(--bd);border-radius:4px;color:var(--mu);cursor:pointer;font-size:11px;padding:3px 8px;font-family:var(--font)}
+.pane-btn{background:var(--sf2);border:1px solid var(--bd);border-radius:4px;color:var(--mu);cursor:pointer;font-size:11px;padding:3px 8px;font-family:var(--font);touch-action:manipulation;line-height:1.4}
 .pane-btn.active{background:var(--ac);color:#0d1117;border-color:var(--ac)}
 .editor-body-wrap[data-pane="editor"] #ne-preview{display:none}
 .editor-body-wrap[data-pane="preview"] #ne-body{display:none}
@@ -1636,6 +1636,13 @@ main > .dview, main > .editor{ margin:0 auto; }
     min-height: 44px !important;
     min-width: 44px !important;
     padding: 10px 16px !important;
+  }
+  /* Pane toggle buttons must stay compact — don't apply 44px bloat */
+  .pane-btn {
+    min-height: unset !important;
+    min-width: unset !important;
+    padding: 5px 10px !important;
+    font-size: 11px !important;
   }
 
   /* Voice/mic button: prominent on mobile */
@@ -2287,9 +2294,9 @@ input, textarea, select {
           <label>Notes <span style="font-weight:400;color:var(--mu)">(Markdown)</span></label>
           <div class="editor-body-wrap" id="editor-body-wrap" data-pane="editor">
             <div class="pane-btns">
-              <button type="button" class="pane-btn active" data-pane="editor">✏️ Edit</button>
-              <button type="button" class="pane-btn" data-pane="split">⬛ Split</button>
-              <button type="button" class="pane-btn" data-pane="preview">👁 Preview</button>
+              <button type="button" class="pane-btn active" data-pane="editor" onclick="_setPaneMode(this)">✏️ Edit</button>
+              <button type="button" class="pane-btn" data-pane="split" onclick="_setPaneMode(this)">⬛ Split</button>
+              <button type="button" class="pane-btn" data-pane="preview" onclick="_setPaneMode(this)">👁 Preview</button>
             </div>
             <div class="editor-toolbar">
               <button class="tb-btn" id="tb-h2"     title="Heading 2 (##)">H2</button>
@@ -3214,6 +3221,7 @@ input, textarea, select {
           <div style="font-size:13px;line-height:1.6"><strong>⏰ Alarm tray chip</strong> — bottom widget bar now shows a persistent ⏰ countdown chip to the next enabled alarm from any section. Turns red + pulses when firing. Tap navigates to Calendar and opens alarm panel.</div>
           <div style="font-size:13px;line-height:1.6"><strong>🔔 Session counter chip</strong> — Ravana panel header shows a live "N calls · X tok" chip that increments after every call, visible from the chat panel without opening Activity.</div>
           <div style="font-size:13px;line-height:1.6"><strong>📈 Enriched log entries</strong> — every call now records: input tokens, output tokens, response duration (ms), prompt snippet (first 100 chars), call type, error code. Errors are logged too with ✗ status.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🔧 Mobile nav + pomo fixes</strong> — clock no longer overlaps nav items on narrow screens; 🍅 Pomodoro FAB hidden until login; pane toggle (Edit/Split/Preview) now uses direct <code>onclick</code> + <code>touch-action:manipulation</code> — works on iOS scroll containers.</div>
         </div>
       </div>
       <!-- v3.12 collapse -->
@@ -5114,6 +5122,7 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
             <tr><td>Wiki-links</td><td><code>_wikiPreprocess()</code> finds <code>[[title]]</code> → <code>&lt;span class="wikilink"&gt;</code> · click → openNote · <code>renderBacklinks(id)</code> shows reverse links</td></tr>
             <tr><td>History</td><td><code>fetchNoteHistory(id)</code> → GitHub commits API → list with sha/date → click → ghGet(sha) → dec → show modal → restore</td></tr>
             <tr><td>Camera / QR</td><td><code>openCamera()</code> → getUserMedia → ZXing BrowserQRCodeReader → decode → insertBarcodeResult → appended to ne-body</td></tr>
+            <tr><td>Pane toggle</td><td><code>_setPaneMode(btn)</code> — called via <code>onclick</code> on each pane button; sets <code>#editor-body-wrap[data-pane]</code> attribute; CSS attribute selectors drive Edit/Split/Preview layout; calls <code>_updatePreview()</code> on non-editor panes. <code>_wirePaneToggle()</code> wires only the textarea <code>input</code> listener for live preview refresh.</td></tr>
           </table>
         </div>
       </div></div></details>
@@ -9950,16 +9959,13 @@ function _updatePreview(){
   const body=document.getElementById('ne-body').value;
   document.getElementById('ne-preview').innerHTML=sanitizeMarkdown(_wikiPreprocess(body));
 }
-function _wirePaneToggle(){
+function _setPaneMode(btn){
   const wrap=document.getElementById('editor-body-wrap');
-  wrap.querySelectorAll('.pane-btn').forEach(btn=>{
-    btn.addEventListener('click',function(){
-      wrap.querySelectorAll('.pane-btn').forEach(b=>b.classList.remove('active'));
-      this.classList.add('active');
-      wrap.dataset.pane=this.dataset.pane;
-      if(this.dataset.pane!=='editor') _updatePreview();
-    });
-  });
+  wrap.querySelectorAll('.pane-btn').forEach(b=>b.classList.toggle('active',b===btn));
+  wrap.dataset.pane=btn.dataset.pane;
+  if(btn.dataset.pane!=='editor') _updatePreview();
+}
+function _wirePaneToggle(){
   document.getElementById('ne-body').addEventListener('input',()=>{
     const wrap=document.getElementById('editor-body-wrap');
     if(wrap.dataset.pane!=='editor') _updatePreview();
