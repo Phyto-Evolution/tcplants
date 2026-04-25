@@ -2780,10 +2780,12 @@ input, textarea, select {
         <div class="field">
           <label>Size grade</label>
           <select id="gh-size-grade">
-            <option value="seedling">🌱 Seedling</option>
-            <option value="small">🪴 Small</option>
-            <option value="medium">🌿 Medium</option>
-            <option value="adult">🌳 Adult</option>
+            <option value="sapling">🪴 Sapling</option>
+            <option value="s">S</option>
+            <option value="m">M</option>
+            <option value="l">L</option>
+            <option value="xl">XL</option>
+            <option value="xxl">XXL</option>
           </select>
         </div>
         <div class="field" style="display:flex;align-items:flex-end;padding-bottom:2px">
@@ -6093,30 +6095,35 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
       <div id="ghi-step1">
         <!-- Format table always visible -->
         <div style="margin-bottom:14px">
-          <div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--tx)">📋 CSV column format</div>
+          <div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--tx)">📋 Column reference</div>
           <table style="width:100%;border-collapse:collapse;font-size:12px">
             <tr style="background:var(--sf2)"><th style="padding:5px 8px;text-align:left;border:1px solid var(--bd)">Column</th><th style="padding:5px 8px;text-align:left;border:1px solid var(--bd)">Required</th><th style="padding:5px 8px;text-align:left;border:1px solid var(--bd)">Allowed values / notes</th></tr>
-            <tr><td style="padding:5px 8px;border:1px solid var(--bd);font-family:var(--mono);font-weight:700">species</td><td style="padding:5px 8px;border:1px solid var(--bd);color:var(--gn)">✓ required</td><td style="padding:5px 8px;border:1px solid var(--bd)">Any name. Hybrids with commas: wrap in quotes — <code>"Nep × (rajah × lowii)"</code></td></tr>
-            <tr><td style="padding:5px 8px;border:1px solid var(--bd);font-family:var(--mono)">quantity</td><td style="padding:5px 8px;border:1px solid var(--bd);color:var(--mu)">optional</td><td style="padding:5px 8px;border:1px solid var(--bd)">Integer (default: 1)</td></tr>
-            <tr><td style="padding:5px 8px;border:1px solid var(--bd);font-family:var(--mono)">health</td><td style="padding:5px 8px;border:1px solid var(--bd);color:var(--mu)">optional</td><td style="padding:5px 8px;border:1px solid var(--bd)"><code>healthy</code> · <code>stressed</code> · <code>dormant</code> · <code>declined</code> (default: healthy)</td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--bd);font-family:var(--mono);font-weight:700">species</td><td style="padding:5px 8px;border:1px solid var(--bd);color:var(--gn)">✓ required</td><td style="padding:5px 8px;border:1px solid var(--bd)">Any name. Aliases: <code>plant</code>, <code>name</code>, <code>scientific_name</code>. Hybrids with commas: wrap in quotes.</td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--bd);font-family:var(--mono)">quantity</td><td style="padding:5px 8px;border:1px solid var(--bd);color:var(--mu)">optional</td><td style="padding:5px 8px;border:1px solid var(--bd)">Integer (default: 1). Aliases: <code>qty</code>, <code>count</code></td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--bd);font-family:var(--mono)">health</td><td style="padding:5px 8px;border:1px solid var(--bd);color:var(--mu)">optional</td><td style="padding:5px 8px;border:1px solid var(--bd)"><code>healthy</code> · <code>stressed</code> · <code>dormant</code> · <code>declined</code> (default: healthy). Alias: <code>status</code></td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--bd);font-family:var(--mono)">size_grade</td><td style="padding:5px 8px;border:1px solid var(--bd);color:var(--mu)">optional</td><td style="padding:5px 8px;border:1px solid var(--bd)"><code>sapling</code> · <code>s</code> · <code>m</code> · <code>l</code> · <code>xl</code> · <code>xxl</code> (default: s)</td></tr>
             <tr><td style="padding:5px 8px;border:1px solid var(--bd);font-family:var(--mono)">source</td><td style="padding:5px 8px;border:1px solid var(--bd);color:var(--mu)">optional</td><td style="padding:5px 8px;border:1px solid var(--bd)"><code>greenhouse</code> · <code>seeds</code> · <code>wild</code> · <code>other-lab</code> · <code>nursery</code> (default: greenhouse)</td></tr>
-            <tr><td style="padding:5px 8px;border:1px solid var(--bd);font-family:var(--mono)">location</td><td style="padding:5px 8px;border:1px solid var(--bd);color:var(--mu)">optional</td><td style="padding:5px 8px;border:1px solid var(--bd)">Bench / section label — used for ⊞ Bench view grouping</td></tr>
-            <tr><td style="padding:5px 8px;border:1px solid var(--bd);font-family:var(--mono)">next_inspection</td><td style="padding:5px 8px;border:1px solid var(--bd);color:var(--mu)">optional</td><td style="padding:5px 8px;border:1px solid var(--bd)">Date: <code>YYYY-MM-DD</code></td></tr>
-            <tr><td style="padding:5px 8px;border:1px solid var(--bd);font-family:var(--mono)">accession_number</td><td style="padding:5px 8px;border:1px solid var(--bd);color:var(--mu)">optional</td><td style="padding:5px 8px;border:1px solid var(--bd)">Stored as a reference note on the plant</td></tr>
-            <tr><td style="padding:5px 8px;border:1px solid var(--bd);font-family:var(--mono)">notes</td><td style="padding:5px 8px;border:1px solid var(--bd);color:var(--mu)">optional</td><td style="padding:5px 8px;border:1px solid var(--bd)">Free text observations</td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--bd);font-family:var(--mono)">location</td><td style="padding:5px 8px;border:1px solid var(--bd);color:var(--mu)">optional</td><td style="padding:5px 8px;border:1px solid var(--bd)">Bench / section label — used for ⊞ Bench view grouping. Alias: <code>bench</code></td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--bd);font-family:var(--mono)">next_inspection</td><td style="padding:5px 8px;border:1px solid var(--bd);color:var(--mu)">optional</td><td style="padding:5px 8px;border:1px solid var(--bd)">Date: <code>YYYY-MM-DD</code>. Alias: <code>inspection_date</code></td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--bd);font-family:var(--mono)">accession_number</td><td style="padding:5px 8px;border:1px solid var(--bd);color:var(--mu)">optional</td><td style="padding:5px 8px;border:1px solid var(--bd)">Stored as a reference note on the plant. Alias: <code>accession</code></td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--bd);font-family:var(--mono)">notes</td><td style="padding:5px 8px;border:1px solid var(--bd);color:var(--mu)">optional</td><td style="padding:5px 8px;border:1px solid var(--bd)">Free text observations. Alias: <code>remarks</code></td></tr>
           </table>
           <div style="margin-top:8px;font-size:11px;color:var(--mu);line-height:1.6">
-            The first row must be the header. Column order must match exactly. Download the template for a ready-to-fill file.
+            Header row required. Column order is flexible — unrecognised columns are ignored. Delimiter auto-detected: comma, tab (Excel/Sheets paste), or semicolon all work.
           </div>
         </div>
-        <div style="display:flex;gap:8px;margin-bottom:14px">
+        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
           <button class="btn sm ghost" onclick="downloadGHCsvTemplate()" style="border-color:#52b788;color:#52b788">⬇ Download template CSV</button>
           <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
-            <input type="file" id="ghi-file" accept=".csv,.txt" onchange="handleGHCsvFile(this)" style="display:none">
-            <span class="btn sm ghost" onclick="document.getElementById('ghi-file').click()">📂 Upload file</span>
+            <input type="file" id="ghi-file" onchange="handleGHCsvFile(this)" style="display:none">
+            <span class="btn sm ghost" onclick="document.getElementById('ghi-file').click()">📂 Upload any file</span>
           </label>
         </div>
-        <label style="font-size:12px;font-weight:600;display:block;margin-bottom:5px">Paste CSV content here</label>
+        <div style="display:flex;gap:6px;margin-bottom:14px">
+          <input id="ghi-url" type="url" placeholder="Or paste a URL (CSV link, Google Sheets…)" style="flex:1;background:var(--sf);border:1px solid var(--bd);border-radius:7px;padding:6px 10px;font-size:12px;color:var(--fg)">
+          <button class="btn sm ghost" onclick="fetchGHCsvUrl()" style="white-space:nowrap">⬇ Fetch</button>
+        </div>
+        <label style="font-size:12px;font-weight:600;display:block;margin-bottom:5px">Paste data here (CSV, TSV, or copy-paste from Sheets/Excel)</label>
         <textarea id="ghi-paste" rows="6" placeholder="species,quantity,health,source,location,next_inspection,accession_number,notes&#10;Vanilla planifolia,3,healthy,greenhouse,Bench 3A,2026-06-01,,Main mother plant&#10;Nepenthes rajah,1,healthy,wild,Shade house,,,Highland form&#10;&quot;Nepenthes × (rajah × lowii)&quot;,2,stressed,greenhouse,Bench 2,,,Unregistered hybrid" style="width:100%;font-family:var(--mono);font-size:12px;margin-bottom:12px"></textarea>
         <button class="btn sm" onclick="parseGHCsv()">Preview import →</button>
       </div>
@@ -9181,7 +9188,7 @@ function _renderDashboard(){
     const prices=(S.value||{}).prices||{};
     let v=0;
     for(const b of allBots){if(['discarded','contaminated'].includes(b.status))continue;v+=(parseInt(b.quantity)||1)*(parseFloat(prices['stage_'+b.status])||0);}
-    for(const p of (S.greenhouse||[])){v+=(parseInt(p.quantity)||1)*(parseFloat(prices['gh_'+(p.size_grade||'small')])||0);}
+    for(const p of (S.greenhouse||[])){v+=(parseInt(p.quantity)||1)*(parseFloat(prices['gh_'+_normalizeGrade(p.size_grade)])||0);}
     if(v>=100000) return '₹'+Math.round(v/100000*10)/10+'L';
     if(v>=1000) return '₹'+Math.round(v/1000*10)/10+'k';
     return v?'₹'+v:'—';
@@ -15843,6 +15850,7 @@ function onAccSourceChange(val){
 // ── GH CSV IMPORT ───────────────────────────────────────────────
 function openGHImport(){
   document.getElementById('ghi-paste').value='';
+  const urlEl=document.getElementById('ghi-url'); if(urlEl) urlEl.value='';
   document.getElementById('ghi-step1').style.display='';
   document.getElementById('ghi-step2').style.display='none';
   document.getElementById('gh-import-modal').style.display='flex';
@@ -15855,16 +15863,39 @@ function closeGHImport(){
 function handleGHCsvFile(input){
   const f=input.files[0]; if(!f) return;
   const reader=new FileReader();
-  reader.onload=e=>{ document.getElementById('ghi-paste').value=e.target.result; };
+  reader.onload=e=>{ document.getElementById('ghi-paste').value=e.target.result; toast('File loaded — click Preview import →','ok'); };
   reader.readAsText(f);
 }
 
-function _parseCSVLine(line){
+async function fetchGHCsvUrl(){
+  let url=(document.getElementById('ghi-url').value||'').trim();
+  if(!url){ toast('Enter a URL first','fail'); return; }
+  // Auto-convert Google Sheets edit URL to CSV export
+  const gcMatch=url.match(/docs\.google\.com\/spreadsheets\/d\/([^/]+)/);
+  if(gcMatch){ url=`https://docs.google.com/spreadsheets/d/${gcMatch[1]}/export?format=csv`; }
+  try{
+    const r=await fetch(url);
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    document.getElementById('ghi-paste').value=await r.text();
+    toast('Loaded — click Preview import →','ok');
+  }catch(e){ toast('Could not fetch: '+e.message+' — try downloading the file and uploading it','fail'); }
+}
+
+function _detectDelimiter(line){
+  const tabs=(line.match(/\t/g)||[]).length;
+  const semis=(line.match(/;/g)||[]).length;
+  const commas=(line.match(/,/g)||[]).length;
+  if(tabs>=commas&&tabs>=semis) return '\t';
+  if(semis>commas) return ';';
+  return ',';
+}
+
+function _parseCSVLine(line, delim=','){
   const out=[]; let cur=''; let inQ=false;
   for(let i=0;i<line.length;i++){
     const c=line[i];
     if(c==='"'){ if(inQ&&line[i+1]==='"'){cur+='"';i++;} else inQ=!inQ; }
-    else if(c===','&&!inQ){ out.push(cur.trim()); cur=''; }
+    else if(c===delim&&!inQ){ out.push(cur.trim()); cur=''; }
     else cur+=c;
   }
   out.push(cur.trim()); return out;
@@ -15872,24 +15903,27 @@ function _parseCSVLine(line){
 
 function parseGHCsv(){
   const raw=document.getElementById('ghi-paste').value.trim();
-  if(!raw){ toast('Paste or upload CSV first','fail'); return; }
+  if(!raw){ toast('Paste or upload data first','fail'); return; }
   const lines=raw.split(/\r?\n/).filter(l=>l.trim()&&!l.trim().startsWith('#'));
   if(lines.length<2){ toast('Need at least a header row + one data row','fail'); return; }
-  const headerRaw=_parseCSVLine(lines[0]).map(h=>h.toLowerCase().replace(/[^a-z_]/g,'_').replace(/_+/g,'_').replace(/^_|_$/g,''));
-  // Map common aliases
-  const colMap={species:['species','plant','name','scientific_name'],quantity:['quantity','qty','count','num'],health:['health','status','condition'],source:['source','origin'],location:['location','bench','spot'],next_inspection:['next_inspection','inspect','inspection_date'],accession_number:['accession_number','accession','acc_num','acc'],notes:['notes','note','remarks']};
+  const delim=_detectDelimiter(lines[0]);
+  const headerRaw=_parseCSVLine(lines[0],delim).map(h=>h.toLowerCase().replace(/[^a-z_]/g,'_').replace(/_+/g,'_').replace(/^_|_$/g,''));
+  const colMap={species:['species','plant','name','scientific_name'],quantity:['quantity','qty','count','num'],health:['health','status','condition'],size_grade:['size_grade','size','grade'],source:['source','origin'],location:['location','bench','spot'],next_inspection:['next_inspection','inspect','inspection_date'],accession_number:['accession_number','accession','acc_num','acc'],notes:['notes','note','remarks']};
   const colIdx={};
   Object.entries(colMap).forEach(([key,aliases])=>{ colIdx[key]=headerRaw.findIndex(h=>aliases.includes(h)); });
   const VALID_HEALTH=new Set(['healthy','stressed','dormant','declined']);
+  const VALID_GRADE=new Set(['sapling','s','m','l','xl','xxl']);
   const VALID_SOURCE=new Set(['greenhouse','wild','lab','nursery','trade','lab-propagated','other-lab','own-cultivar','sister-lab','swap','commercial','botanical-garden','donated','rescue','seeds']);
   const rows=[];
   for(let i=1;i<lines.length;i++){
-    const vals=_parseCSVLine(lines[i]);
+    const vals=_parseCSVLine(lines[i],delim);
     const get=k=>colIdx[k]>=0?(vals[colIdx[k]]||'').trim():'';
     const species=get('species');
     const qty=parseInt(get('quantity'))||1;
     const rawHealth=(get('health')||'healthy').toLowerCase();
     const health=VALID_HEALTH.has(rawHealth)?rawHealth:'healthy';
+    const rawGrade=_normalizeGrade((get('size_grade')||'s').toLowerCase());
+    const size_grade=VALID_GRADE.has(rawGrade)?rawGrade:'s';
     const rawSrc=(get('source')||'greenhouse').toLowerCase();
     const source=VALID_SOURCE.has(rawSrc)?rawSrc:'greenhouse';
     const location=get('location')||null;
@@ -15898,7 +15932,7 @@ function parseGHCsv(){
     const notes=get('notes')||null;
     const isHybrid=species.includes('×')||species.includes('x ')||species.toLowerCase().includes('hybrid');
     const error=!species?'Species name required':(qty<1?'Quantity must be ≥1':null);
-    rows.push({species,quantity:qty,health,source,location,next_inspection,accession_number,notes,isHybrid,_line:i+1,_valid:!error,_error:error});
+    rows.push({species,quantity:qty,health,size_grade,source,location,next_inspection,accession_number,notes,isHybrid,_line:i+1,_valid:!error,_error:error});
   }
   window._ghImportRows=rows;
   _showGHImportPreview(rows);
@@ -15955,6 +15989,7 @@ async function saveGHImport(){
       const noteParts=[r.notes, r.accession_number?`Accession ref: ${r.accession_number}`:null].filter(Boolean);
       return {
         id:uid(), species:r.species, quantity:r.quantity, health:r.health,
+        size_grade:r.size_grade||'s',
         source:r.source, location:r.location, next_inspection:r.next_inspection,
         notes:noteParts.join('\n')||null,
         flair_ids:ghFid?[ghFid]:[],
@@ -15997,11 +16032,11 @@ async function saveGHImport(){
 
 function downloadGHCsvTemplate(){
   const csv=[
-    'species,quantity,health,source,location,next_inspection,accession_number,notes',
-    'Vanilla planifolia,3,healthy,greenhouse,Bench 3A,2026-05-15,VAN-001,Main mother plant',
-    'Nepenthes rajah,1,stressed,wild,Shade house,,NEP-001,Highland form — needs monitoring',
-    '"Nepenthes × (rajah × lowii)",2,healthy,greenhouse,Bench 2,,,Unregistered hybrid — own cross 2025',
-    'Musa acuminata,5,healthy,lab,Propagation bench,2026-06-01,,From Stage IV batch April 2026',
+    'species,quantity,health,size_grade,source,location,next_inspection,accession_number,notes',
+    'Vanilla planifolia,3,healthy,m,greenhouse,Bench 3A,2026-05-15,VAN-001,Main mother plant',
+    'Nepenthes rajah,1,stressed,l,wild,Shade house,,NEP-001,Highland form — needs monitoring',
+    '"Nepenthes × (rajah × lowii)",2,healthy,s,greenhouse,Bench 2,,,Unregistered hybrid — own cross 2025',
+    'Musa acuminata,5,healthy,xxl,lab,Propagation bench,2026-06-01,,From Stage IV batch April 2026',
   ].join('\n');
   const blob=new Blob([csv],{type:'text/csv'});
   const a=document.createElement('a');
@@ -16419,7 +16454,7 @@ function _populateGHEditor(p){
   document.getElementById('gh-quantity').value=p?p.quantity||1:1;
   document.getElementById('gh-health').value=p?p.health||'healthy':'healthy';
   document.getElementById('gh-source').value=p?p.source||'lab':'lab';
-  document.getElementById('gh-size-grade').value=p?p.size_grade||'small':'small';
+  document.getElementById('gh-size-grade').value=p?_normalizeGrade(p.size_grade):'s';
   document.getElementById('gh-location').value=p?p.location||'':'Q5JV+2X Kelambakkam, Tamil Nadu';
   document.getElementById('gh-notes-text').value=p?p.notes||'':'';
   document.getElementById('gh-date-added').value=p?p.date_added||new Date().toISOString().slice(0,10):new Date().toISOString().slice(0,10);
@@ -16455,7 +16490,7 @@ async function saveGHPlantAction(){
   const quantity=parseInt(document.getElementById('gh-quantity').value)||1;
   const health=document.getElementById('gh-health').value||'healthy';
   const source=document.getElementById('gh-source').value||'wild';
-  const size_grade=document.getElementById('gh-size-grade').value||'small';
+  const size_grade=document.getElementById('gh-size-grade').value||'s';
   const location=document.getElementById('gh-location').value.trim()||null;
   const date_added=document.getElementById('gh-date-added').value||new Date().toISOString().slice(0,10);
   const next_inspection=document.getElementById('gh-next-inspection').value||null;
@@ -17855,9 +17890,13 @@ function _renderRecOverview(){
 // VALUE INVENTORY
 // ════════════════════════════════════════════════════════════
 const VALUE_STAGES=['prepared','inoculated','growing','subcultured','rooting','hardening','weaned','dormant'];
-const VALUE_GH_GRADES=['seedling','small','medium','adult'];
+const VALUE_GH_GRADES=['sapling','s','m','l','xl','xxl'];
 const VALUE_STAGE_LABEL={prepared:'Prepared',inoculated:'Inoculated',growing:'Growing',subcultured:'Subcultured',rooting:'Rooting',hardening:'Hardening',weaned:'Weaned',dormant:'Dormant'};
-const VALUE_GRADE_LABEL={seedling:'🌱 Seedling',small:'🪴 Small',medium:'🌿 Medium',adult:'🌳 Adult'};
+const VALUE_GRADE_LABEL={sapling:'🪴 Sapling',s:'S',m:'M',l:'L',xl:'XL',xxl:'XXL'};
+function _normalizeGrade(g){
+  const map={seedling:'sapling',small:'s',medium:'m',adult:'l'};
+  return map[g]||g||'s';
+}
 function fmtINR(n){
   if(!n&&n!==0) return '—';
   return '₹'+Number(n).toLocaleString('en-IN',{maximumFractionDigits:0});
@@ -17883,7 +17922,7 @@ function renderValueSection(){
   // GH totals per grade
   const gradeCount={};
   for(const p of ghPlants){
-    const grade=p.size_grade||'small';
+    const grade=_normalizeGrade(p.size_grade);
     gradeCount[grade]=(gradeCount[grade]||0)+(parseInt(p.quantity)||1);
   }
 
@@ -18086,9 +18125,9 @@ function renderSalesPage(tab){
 function _salesNewHtml(){
   const prices=(S.value||{}).prices||{};
   const VALUE_STAGES=['prepared','inoculated','growing','subcultured','rooting','hardening','weaned'];
-  const VALUE_GH_GRADES=['seedling','small','medium','adult'];
+  const VALUE_GH_GRADES=['sapling','s','m','l','xl','xxl'];
   const stageOpts=VALUE_STAGES.map(s=>`<option value="bottle_${s}">🫙 Bottle — ${s.charAt(0).toUpperCase()+s.slice(1)} (₹${parseFloat(prices['stage_'+s])||0}/bottle)</option>`).join('');
-  const gradeOpts=VALUE_GH_GRADES.map(g=>`<option value="gh_${g}">🌱 GH Plant — ${g.charAt(0).toUpperCase()+g.slice(1)} (₹${parseFloat(prices['gh_'+g])||0}/plant)</option>`).join('');
+  const gradeOpts=VALUE_GH_GRADES.map(g=>`<option value="gh_${g}">🌱 GH Plant — ${VALUE_GRADE_LABEL[g]||g.toUpperCase()} (₹${parseFloat(prices['gh_'+g])||0}/plant)</option>`).join('');
 
   // Unique species from bottles + GH
   const spSet=new Set([...(S.bottles||[]).map(b=>b.species), ...(S.greenhouse||[]).map(p=>p.species)].filter(Boolean));
@@ -18144,7 +18183,7 @@ function _saleAddLine(){
     <td><select onchange="_saleLineAutoPrice(this,${idx})" style="min-width:130px">
       <option value="">— type —</option>
       ${['prepared','inoculated','growing','subcultured','rooting','hardening','weaned'].map(s=>`<option value="bottle_${s}">🫙 ${s.charAt(0).toUpperCase()+s.slice(1)}</option>`).join('')}
-      ${['seedling','small','medium','adult'].map(g=>`<option value="gh_${g}">🌱 GH ${g.charAt(0).toUpperCase()+g.slice(1)}</option>`).join('')}
+      ${['sapling','s','m','l','xl','xxl'].map(g=>`<option value="gh_${g}">🌱 GH ${VALUE_GRADE_LABEL[g]||g.toUpperCase()}</option>`).join('')}
     </select></td>
     <td><input type="number" min="1" value="1" oninput="_saleLineCalc()" style="width:55px"></td>
     <td><input type="number" min="0" value="0" id="sale-unit-${idx}" oninput="_saleLineCalc()" style="width:75px"></td>
