@@ -1935,6 +1935,25 @@ input, textarea, select {
 .ai-sys-btn.danger:hover { border-color: var(--rd); color: var(--rd); }
 .ai-bar-wrap { height: 8px; background: var(--sf2); border-radius: 4px; overflow: hidden; margin-top: 4px; }
 .ai-bar-fill { height: 100%; border-radius: 4px; background: var(--ac); transition: width .4s; }
+.ai-filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.ai-filter-btn{padding:3px 10px;border-radius:12px;border:1px solid var(--bd);background:transparent;color:var(--mu);cursor:pointer;font-size:11px;font-weight:600}
+.ai-filter-btn.active{background:var(--ac);color:#fff;border-color:transparent}
+.ai-term-wrap{font-family:'Courier New',monospace;font-size:11px;background:var(--sf);border:1px solid var(--bd);border-radius:6px;overflow:hidden}
+.ai-term-row{display:flex;align-items:center;gap:8px;padding:5px 10px;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .1s;min-width:0}
+.ai-term-row:hover{background:var(--sf2)}
+.ai-term-row:last-child{border-bottom:none}
+.ai-term-n{width:26px;text-align:right;flex-shrink:0;color:var(--mu)}
+.ai-term-time{width:58px;flex-shrink:0;color:var(--mu)}
+.ai-term-model{width:62px;flex-shrink:0;font-weight:700}
+.ai-term-model.tm-groq{color:var(--ac)}
+.ai-term-model.tm-claude{color:var(--pu)}
+.ai-term-model.tm-gemini{color:var(--gn)}
+.ai-term-tok{width:84px;flex-shrink:0;color:var(--yw)}
+.ai-term-dur{width:36px;flex-shrink:0;color:var(--mu)}
+.ai-term-prompt{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--tx)}
+.ai-term-dot{width:12px;flex-shrink:0;text-align:right}
+.ai-term-expand{padding:8px 12px 10px;background:var(--sf2);border-bottom:1px solid var(--bd);font-family:'Courier New',monospace;font-size:11px;color:var(--mu);line-height:1.8;white-space:pre-wrap;word-break:break-word}
+.ai-term-err .ai-term-prompt,.ai-term-err .ai-term-dot{color:var(--rd)}
 /* Logic Flows scrollbar fix */
 #sec-logicflows main { scrollbar-width: none; -ms-overflow-style: none; }
 #sec-logicflows main::-webkit-scrollbar { display: none; }
@@ -3168,16 +3187,26 @@ input, textarea, select {
       <!-- VERSION HEADER -->
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
         <h1 style="font-size:22px;font-weight:800;margin:0">🌿 TC Plants Lab Notes</h1>
-        <span class="help-version-badge">v3.12</span>
+        <span class="help-version-badge">v3.13</span>
         <button class="btn xs ghost" onclick="navTo('changelog')" style="border-color:var(--pu);color:var(--pu)">📋 Changelog →</button>
         <button class="btn xs ghost" onclick="navTo('logicflows')" style="margin-left:4px;border-color:var(--ac);color:var(--ac)">🔗 Logic Flows →</button>
       </div>
       <p style="color:var(--mu);font-size:13px;margin-bottom:20px">April 2026 · Encrypted · GitHub-backed · Single-file PWA</p>
 
-      <!-- WHAT'S NEW v3.12 -->
+      <!-- WHAT'S NEW v3.13 -->
       <div style="background:linear-gradient(135deg,rgba(63,185,80,.1),rgba(88,166,255,.08));border:1px solid rgba(63,185,80,.3);border-radius:10px;padding:18px 20px;margin-bottom:10px">
-        <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v3.12</div>
+        <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v3.13</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
+          <div style="font-size:13px;line-height:1.6"><strong>📊 Terminal call log</strong> — Ravana Insights → Activity tab rebuilt as a monospace terminal list. Each row: #N · time · model · in→out tokens · duration · prompt preview. Click any row to expand full details. Filter by Today / Week / All / Errors. Export full log as JSON.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>⏰ Alarm tray chip</strong> — bottom widget bar now shows a persistent ⏰ countdown chip to the next enabled alarm from any section. Turns red + pulses when firing. Tap navigates to Calendar and opens alarm panel.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🔔 Session counter chip</strong> — Ravana panel header shows a live "N calls · X tok" chip that increments after every call, visible from the chat panel without opening Activity.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>📈 Enriched log entries</strong> — every call now records: input tokens, output tokens, response duration (ms), prompt snippet (first 100 chars), call type, error code. Errors are logged too with ✗ status.</div>
+        </div>
+      </div>
+      <!-- v3.12 collapse -->
+      <details style="margin-bottom:8px">
+        <summary style="cursor:pointer;font-size:12px;color:var(--mu);padding:6px 0;font-weight:600;letter-spacing:.04em">▸ v3.12 release notes</summary>
+        <div style="background:var(--sf2);border-radius:8px;padding:12px;margin-top:6px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
           <div style="font-size:13px;line-height:1.6"><strong>🍅 Lab Pomodoro</strong> — floating 🍅 FAB, 3 presets (25/5, 50/10, 90/20), circular progress ring, Web Audio chimes, session log in localStorage.</div>
           <div style="font-size:13px;line-height:1.6"><strong>🔥 Contamination-free Streak</strong> — dashboard panel: days since last contam, emoji milestones at 7/14/30+ days, confetti burst on milestone.</div>
           <div style="font-size:13px;line-height:1.6"><strong>🌿 Species Spotlight</strong> — daily random species card (date-seeded), IUCN badge, native distribution, refreshes each day.</div>
@@ -3190,7 +3219,7 @@ input, textarea, select {
           <div style="font-size:13px;line-height:1.6"><strong>🪴 Size grades revamped</strong> — Sapling / S / M / L / XL / XXL (6 tiers, replaces 4). Old values silently migrated via <code>_normalizeGrade()</code>.</div>
           <div style="font-size:13px;line-height:1.6"><strong>⬆ Smart GH import</strong> — accepts any file type; URL fetch (Google Sheets auto-converted); tab/semicolon/comma auto-detected; <code>size_grade</code> column added.</div>
         </div>
-      </div>
+      </details>
 
       <!-- v3.11 collapse -->
       <details style="margin-bottom:8px">
@@ -4711,7 +4740,7 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
     <main style="flex:1;overflow-y:auto;padding:28px 32px;max-width:980px;width:100%;box-sizing:border-box">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
         <h1 style="font-size:20px;font-weight:800;margin:0">🔗 Logic Flows</h1>
-        <span style="background:linear-gradient(135deg,var(--ac),var(--pu));color:#0d1117;border-radius:12px;font-size:11px;font-weight:800;padding:2px 9px;letter-spacing:.04em">v3.12</span>
+        <span style="background:linear-gradient(135deg,var(--ac),var(--pu));color:#0d1117;border-radius:12px;font-size:11px;font-weight:800;padding:2px 9px;letter-spacing:.04em">v3.13</span>
         <button onclick="_lfExpandAll()" class="btn xs ghost" style="margin-left:auto">Expand all</button>
         <button onclick="_lfCollapseAll()" class="btn xs ghost">Collapse all</button>
       </div>
@@ -5355,6 +5384,21 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
           <tr><td>"export report" / "download report" <span style="color:var(--gn)">(v3.11)</span></td><td>exportLabReport('csv')</td><td>No</td></tr>
           <tr><td>Anything else</td><td>askAI(transcript)</td><td>Yes</td></tr>
         </table>
+
+        <h3 class="help-h3" style="margin-top:14px">Activity Log + Session Chip (v3.13)</h3>
+        <p style="font-size:12px;color:var(--mu)">Every call to <code>askAI()</code> records a log entry in <code>localStorage.tcplants_ai_log</code> (max 500 entries, newest-first). The Activity tab in Ravana Insights renders this as a terminal-style monospace list.</p>
+        <table class="help-table">
+          <tr><th>Function / Field</th><th>What it does</th></tr>
+          <tr><td><code>_aiRecordUsage(modelStr, reqRem, tokRem, tokUsed, opts)</code></td><td>Writes log entry; opts carries: <code>inTok</code>, <code>outTok</code>, <code>dur</code> (ms), <code>prompt</code> (first 100 chars), <code>fn</code> (call type), <code>err</code>, <code>errCode</code>. Increments session counters.</td></tr>
+          <tr><td><code>_aiSessionCalls</code> / <code>_aiSessionTok</code></td><td>Module-level counters reset on page load. Incremented by <code>_aiRecordUsage()</code>.</td></tr>
+          <tr><td><code>_aiUpdateSessionChip()</code></td><td>Updates <code>#ai-session-chip</code> in the Ravana panel header with "N calls · X tok".</td></tr>
+          <tr><td><code>_aiActivityFilter</code></td><td>Module-level string: <code>'today'</code> | <code>'week'</code> | <code>'all'</code> | <code>'errors'</code>. Persists across tab switches within the session.</td></tr>
+          <tr><td><code>_aiSetActivityFilter(f)</code></td><td>Sets <code>_aiActivityFilter</code> and re-renders the pane.</td></tr>
+          <tr><td><code>_aiTermExpand(row, idx, filter)</code></td><td>Toggles an expand row below the clicked terminal row. Shows full timestamp, model, fn, token breakdown (in/out/total), duration, prompt snippet, rate-limit remaining.</td></tr>
+          <tr><td><code>_aiExportLog()</code></td><td>Creates a JSON Blob of the full log, triggers browser download as <code>ravana-log-YYYY-MM-DD.json</code>.</td></tr>
+          <tr><td><code>_callAIDirect()</code></td><td>Now returns <code>{inTok, outTok}</code> in addition to <code>tokUsed</code>. Groq: <code>prompt_tokens</code>/<code>completion_tokens</code>. Claude: <code>input_tokens</code>/<code>output_tokens</code>.</td></tr>
+          <tr><td>Error entries</td><td>Errors in <code>askAI()</code> catch block now call <code>_aiRecordUsage()</code> with <code>err:true, errCode:e.status</code>. Displayed with red ● dot in terminal.</td></tr>
+        </table>
       </div></div></details>
 
       <!-- ═══ GREENHOUSE FLOW ═══ -->
@@ -5932,10 +5976,10 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
       <summary>
         <span style="width:28px;height:28px;border-radius:7px;background:rgba(255,200,0,.12);display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">⏰</span>
         <div style="flex:1">
-          <div style="font-size:13px;font-weight:700">Calendar Alarms (v3.12)</div>
-          <div style="font-size:11px;color:var(--mu);margin-top:2px">localStorage · IST tick · Web Audio · fire modal</div>
+          <div style="font-size:13px;font-weight:700">Calendar Alarms + Tray Chip (v3.12–3.13)</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:2px">localStorage · IST tick · Web Audio · fire modal · widget tray · OS notification</div>
         </div>
-        <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center"><span class="lf-pill lf-pill-yw">_loadAlarms()</span><span class="lf-pill lf-pill-yw">_renderAlarms()</span><span class="lf-pill">_playAlarmSound()</span><span class="lf-pill">_showAlarmModal()</span></div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center"><span class="lf-pill lf-pill-yw">_loadAlarms()</span><span class="lf-pill lf-pill-yw">_nextAlarmMinutes()</span><span class="lf-pill">_showAlarmModal()</span><span class="lf-pill">_openCalendarAlarms()</span></div>
         <span class="lf-caret">›</span>
       </summary>
       <div class="lf-body">
@@ -5955,8 +5999,17 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
           <tr><td><code>_showAlarmModal(alarm)</code></td><td>Populates <code>#alarm-modal</code> with time + label → adds class <code>.on</code> → plays sound</td></tr>
           <tr><td><code>_dismissAlarm()</code></td><td>Removes <code>.on</code> from modal → stops sound</td></tr>
         </table>
-        <h3 class="help-h3" style="margin-top:14px">Tick logic</h3>
-        <p style="font-size:12px;color:var(--mu)">A <code>setInterval</code> running every 10 seconds checks all enabled alarms. IST is computed as <code>UTC + 330 minutes</code>. The current time in <code>HH:MM</code> is compared against each alarm's time string. If it matches and <code>!_firedAlarms.has(alarmId+'@'+HH:MM)</code>, the alarm fires and the key is added to the set. The set entry is not cleared — so the alarm will not re-fire within the same session for the same minute.</p>
+        <h3 class="help-h3" style="margin-top:14px">Tick logic + tray chip (v3.13)</h3>
+        <p style="font-size:12px;color:var(--mu)">A <code>setInterval(check, 1000)</code> runs every second. Alarm matching only runs when <code>ist.getSeconds() &lt;= 4</code> (first 4 seconds of each minute). A <code>_trayTick</code> counter increments each second; every 10 ticks it calls <code>_updateWidgetTray()</code> to refresh the countdown chip. When an alarm fires: <code>_showAlarmModal()</code> sets <code>#alarm-modal.on</code> and calls <code>_updateWidgetTray()</code> immediately — the chip switches to red <code>🔔 Alarm!</code>. <code>_dismissAlarm()</code> also calls <code>_updateWidgetTray()</code> to revert the chip back to the countdown.</p>
+        <table class="help-table">
+          <tr><th>Function</th><th>What it does (v3.13 additions)</th></tr>
+          <tr><td><code>_nextAlarmMinutes()</code></td><td>Finds the nearest enabled alarm — computes IST current minute, diffs against each alarm's HH:MM, wraps at 1440. Returns <code>{alarm, diff}</code> or null.</td></tr>
+          <tr><td><code>_openCalendarAlarms()</code></td><td>Calls <code>navTo('calendar')</code> then after 250ms auto-opens the alarm panel if it's currently hidden.</td></tr>
+          <tr><td><code>_addAlarm()</code></td><td>Now also requests <code>Notification.permission</code> on first alarm creation (if still 'default').</td></tr>
+          <tr><td><code>_showAlarmModal()</code></td><td>Now also fires an OS notification via <code>new Notification()</code> if permission is 'granted'. Calls <code>_updateWidgetTray()</code>.</td></tr>
+          <tr><td><code>_dismissAlarm()</code></td><td>Now calls <code>_updateWidgetTray()</code> after removing <code>.on</code>.</td></tr>
+          <tr><td><code>_saveAlarms()</code></td><td>Now calls <code>_updateWidgetTray()</code> so chip appears/disappears when alarms are added/removed/toggled.</td></tr>
+        </table>
         </div>
       </div></details>
 
@@ -6310,6 +6363,7 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
 <div id="ai-panel" role="dialog" aria-label="Ravana AI Assistant">
   <div id="ai-head">
     <div class="ai-title" id="ai-title-label">⚡ Ravana</div>
+    <span id="ai-session-chip" style="display:none;font-size:10px;color:var(--mu);font-weight:600;padding:2px 7px;border-radius:10px;background:var(--sf2);border:1px solid var(--bd);white-space:nowrap"></span>
     <button id="ai-user-btn" onclick="_cycleRavanaUser()" title="Switch user — Shiva / Kumar" style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;background:var(--sf2);border:1px solid var(--bd);cursor:pointer;white-space:nowrap">👤 Shiva</button>
     <button class="al-hbtn" id="ai-model-toggle" aria-label="Cycle AI model: Quick, Deep, Claude" onclick="_cycleAIModel()" title="Tap to cycle: Quick → Deep → Claude" style="font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px;background:var(--sf2);border:1px solid var(--bd)">⚡ Quick</button>
     <button class="al-hbtn" aria-label="API key settings" onclick="_toggleAIKeyRow()" title="API key">⚙️</button>
@@ -12547,14 +12601,27 @@ let _aiModel=localStorage.getItem('tcplants_ai_model')||'groq8';
 
 const _AI_LOG_KEY='tcplants_ai_log';
 const _AI_LOG_MAX=500;
-function _aiRecordUsage(modelStr, reqRem, tokRem, tokUsed){
-  const entry={ts:Date.now(), model:_aiModel, modelStr:modelStr||'', fn:'chat', tok:tokUsed||0, reqRem:reqRem||null, tokRem:tokRem||null};
+let _aiSessionCalls=0,_aiSessionTok=0;
+let _aiActivityFilter='today';
+function _aiRecordUsage(modelStr,reqRem,tokRem,tokUsed,opts){
+  opts=opts||{};
+  const entry={ts:Date.now(),model:_aiModel,modelStr:modelStr||'',fn:opts.fn||'chat',tok:tokUsed||0,inTok:opts.inTok||null,outTok:opts.outTok||null,dur:opts.dur||null,prompt:opts.prompt||null,err:opts.err||false,errCode:opts.errCode||null,reqRem:reqRem||null,tokRem:tokRem||null};
+  _aiSessionCalls++;
+  _aiSessionTok+=entry.tok;
+  _aiUpdateSessionChip();
   try{
     const log=JSON.parse(localStorage.getItem(_AI_LOG_KEY)||'[]');
     log.unshift(entry);
     if(log.length>_AI_LOG_MAX) log.length=_AI_LOG_MAX;
     localStorage.setItem(_AI_LOG_KEY,JSON.stringify(log));
   }catch(e){}
+}
+function _aiUpdateSessionChip(){
+  const chip=document.getElementById('ai-session-chip');
+  if(!chip) return;
+  if(_aiSessionCalls===0){chip.style.display='none';return;}
+  chip.style.display='';
+  chip.textContent=`${_aiSessionCalls} call${_aiSessionCalls!==1?'s':''} · ${_aiSessionTok.toLocaleString()} tok`;
 }
 
 function _renderAIUsageBar(){} // removed — quota tracking gone
@@ -13340,67 +13407,117 @@ function _aiPreviewContext(){
 // ── Activity tab ──────────────────────────────────────────────
 function _aiPageActivity(){
   const log=_aiGetLog();
-  const today=_aiLogToday(log);
-  const week=log.filter(e=>e.ts>=(Date.now()-7*864e5));
+  const now=Date.now();
+  const todayStart=new Date();todayStart.setHours(0,0,0,0);
+  const today=log.filter(e=>e.ts>=todayStart.getTime());
+  const week=log.filter(e=>e.ts>=(now-7*864e5));
   const tokToday=today.reduce((s,e)=>s+(e.tok||0),0);
   const tokWeek=week.reduce((s,e)=>s+(e.tok||0),0);
-
-  // Per-model breakdown today
-  const modelBreak={};
-  today.forEach(e=>{ if(!modelBreak[e.model]) modelBreak[e.model]={calls:0,tok:0}; modelBreak[e.model].calls++; modelBreak[e.model].tok+=(e.tok||0); });
-
-  const breakHtml=Object.entries(modelBreak).map(([k,v])=>`
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--bd);font-size:12px">
-      <span>${AI_MODELS[k]?.icon||'?'} <strong>${AI_MODELS[k]?.label||k}</strong></span>
-      <span style="color:var(--mu)">${v.calls} call${v.calls!==1?'s':''} · <span style="color:var(--yw)">${v.tok.toLocaleString()} tok</span></span>
-    </div>`).join('') || '<div style="font-size:12px;color:var(--mu);padding:8px 0">No calls today</div>';
-
-  // Rate limit indicator (Groq: 6K TPM, ~180K per day on free tier)
+  const errToday=today.filter(e=>e.err).length;
   const groqTokToday=today.filter(e=>e.model==='groq8'||e.model==='groq70').reduce((s,e)=>s+(e.tok||0),0);
   const groqPct=Math.min(100,Math.round((groqTokToday/180000)*100));
 
-  // Recent log entries
-  const entriesHtml=log.slice(0,50).map(e=>{
+  // Filtered set
+  let filtered=log;
+  if(_aiActivityFilter==='today') filtered=today;
+  else if(_aiActivityFilter==='week') filtered=week;
+  else if(_aiActivityFilter==='errors') filtered=log.filter(e=>e.err);
+
+  const totalInSet=filtered.length;
+  const termRows=filtered.map((e,i)=>{
     const t=new Date(e.ts);
-    const timeStr=t.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});
-    const dateStr=t.toLocaleDateString('en-IN',{day:'numeric',month:'short'});
-    const mclass=e.model==='claude'?'ae-claude':e.model==='gemini'?'ae-gemini':'ae-groq';
-    const mi=AI_MODELS[e.model];
-    return `<div class="ai-act-entry ${mclass}">
-      <div style="display:flex;justify-content:space-between">
-        <span class="ae-fn">${mi?.icon||'?'} ${mi?.label||e.model}</span>
-        <span class="ae-tok">${e.tok?e.tok.toLocaleString()+' tok':'—'}</span>
-      </div>
-      <div class="ae-meta">${dateStr} ${timeStr}${e.reqRem!=null?' · '+e.reqRem+' req rem':''}${e.tokRem!=null?' · '+e.tokRem.toLocaleString()+' tok rem':''}</div>
+    const timeStr=t.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+    const modelKey=e.model==='claude'?'claude':e.model==='gemini'?'gemini':'groq';
+    const modelLabel=AI_MODELS[e.model]?.label||e.model;
+    const tokStr=(e.inTok!=null&&e.outTok!=null)?`${e.inTok}→${e.outTok}`:(e.tok?(e.tok.toLocaleString()+' tok'):'—');
+    const durStr=e.dur!=null?(e.dur>=1000?(e.dur/1000).toFixed(1)+'s':e.dur+'ms'):'—';
+    const promptPreview=e.prompt?`"${e.prompt.substring(0,50)}${e.prompt.length>50?'…':''}"`:e.err?`✗ ${e.errCode||'err'}`:'—';
+    const n=totalInSet-i;
+    const dotColor=e.err?'var(--rd)':'var(--gn)';
+    const errCls=e.err?' ai-term-err':'';
+    return `<div class="ai-term-row${errCls}" onclick="_aiTermExpand(this,${i},'${_aiActivityFilter}')">
+      <span class="ai-term-n">#${n}</span>
+      <span class="ai-term-time">${timeStr}</span>
+      <span class="ai-term-model tm-${modelKey}">${esc(modelLabel)}</span>
+      <span class="ai-term-tok">${esc(tokStr)}</span>
+      <span class="ai-term-dur">${durStr}</span>
+      <span class="ai-term-prompt">${esc(promptPreview)}</span>
+      <span class="ai-term-dot" style="color:${dotColor}">●</span>
     </div>`;
-  }).join('') || '<div style="font-size:12px;color:var(--mu)">No activity logged yet. Start a conversation with Ravana.</div>';
+  }).join('')||`<div style="padding:14px 12px;font-size:12px;color:var(--mu);font-family:inherit">${_aiActivityFilter==='errors'?'No errors logged.':'No activity in this period. Start a conversation with Ravana.'}</div>`;
 
   document.getElementById('ai-ctrl-pane-activity').innerHTML=`
     <div class="ai-stat-strip">
-      <div class="ai-stat-chip">Today calls<span class="asc-val">${today.length}</span></div>
-      <div class="ai-stat-chip">Today tokens<span class="asc-val">${tokToday.toLocaleString()}</span></div>
-      <div class="ai-stat-chip">This week<span class="asc-val">${week.length} calls</span></div>
-      <div class="ai-stat-chip">Week tokens<span class="asc-val">${tokWeek.toLocaleString()}</span></div>
+      <div class="ai-stat-chip">Today<span class="asc-val">${today.length} calls</span></div>
+      <div class="ai-stat-chip">Today tok<span class="asc-val">${tokToday.toLocaleString()}</span></div>
+      <div class="ai-stat-chip">Week<span class="asc-val">${week.length} calls</span></div>
+      <div class="ai-stat-chip">Week tok<span class="asc-val">${tokWeek.toLocaleString()}</span></div>
+      ${errToday>0?`<div class="ai-stat-chip" style="border-color:var(--rd)">Errors<span class="asc-val" style="color:var(--rd)">${errToday}</span></div>`:''}
+      ${_aiSessionCalls>0?`<div class="ai-stat-chip" style="border-color:var(--pu)">Session<span class="asc-val" style="color:var(--pu)">${_aiSessionCalls} · ${_aiSessionTok.toLocaleString()} tok</span></div>`:''}
     </div>
-    <div class="ai-section-head">Today — model breakdown</div>
-    ${breakHtml}
-    <div class="ai-section-head">Groq daily token usage (free tier ~180K/day)</div>
+    <div class="ai-section-head">Groq free tier</div>
     <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--mu);margin-bottom:4px">
-      <span>Groq tokens today: <strong style="color:var(--tx)">${groqTokToday.toLocaleString()}</strong></span>
+      <span>Today: <strong style="color:var(--tx)">${groqTokToday.toLocaleString()}</strong> / 180K</span>
       <span>${groqPct}%</span>
     </div>
     <div class="ai-bar-wrap"><div class="ai-bar-fill" style="width:${groqPct}%;background:${groqPct>80?'var(--rd)':groqPct>50?'var(--yw)':'var(--ac)'}"></div></div>
-    <div class="ai-section-head">Recent calls (last 50)</div>
-    ${entriesHtml}
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:18px;margin-bottom:10px">
+      <div class="ai-filter-row" style="margin-bottom:0">
+        ${['today','week','all','errors'].map(f=>`<button class="ai-filter-btn${_aiActivityFilter===f?' active':''}" onclick="_aiSetActivityFilter('${f}')">${f==='today'?'Today':f==='week'?'This week':f==='all'?'All':'Errors'}</button>`).join('')}
+      </div>
+      <button class="ai-sys-btn" style="font-size:11px;padding:4px 10px" onclick="_aiExportLog()">⬇ Export</button>
+    </div>
+    <div class="ai-term-wrap">${termRows}</div>
     <div style="margin-top:14px">
-      <button class="ai-sys-btn danger" onclick="_aiClearLog()">🗑 Clear activity log</button>
+      <button class="ai-sys-btn danger" onclick="_aiClearLog()">🗑 Clear log</button>
     </div>`;
+}
+function _aiSetActivityFilter(f){_aiActivityFilter=f;_aiPageActivity();}
+function _aiTermExpand(row,idx,filter){
+  const existing=document.querySelector('.ai-term-expand');
+  const wasThis=existing&&existing.dataset.for===idx+'_'+filter;
+  if(existing) existing.remove();
+  if(wasThis) return;
+  const log=_aiGetLog();
+  let filtered=log;
+  const todayStart=new Date();todayStart.setHours(0,0,0,0);
+  if(filter==='today') filtered=log.filter(e=>e.ts>=todayStart.getTime());
+  else if(filter==='week') filtered=log.filter(e=>e.ts>=Date.now()-7*864e5);
+  else if(filter==='errors') filtered=log.filter(e=>e.err);
+  const e=filtered[idx]; if(!e) return;
+  const t=new Date(e.ts);
+  const lines=[
+    `ts:       ${t.toLocaleString('en-IN')}`,
+    `model:    ${AI_MODELS[e.model]?.label||e.model} (${e.modelStr||e.model})`,
+    `fn:       ${e.fn||'chat'}`,
+    e.err?`status:   ✗ error ${e.errCode||'unknown'}`:`status:   ✓ ok`,
+    `tokens:   ${e.inTok!=null?`in=${e.inTok}  out=${e.outTok}  total=${e.tok}`:(e.tok||0)+' total'}`,
+    `duration: ${e.dur!=null?(e.dur>=1000?(e.dur/1000).toFixed(2)+'s':e.dur+'ms'):'—'}`,
+    e.reqRem!=null?`req-rem:  ${e.reqRem}`:'',
+    e.tokRem!=null?`tok-rem:  ${e.tokRem.toLocaleString()}`:'',
+    `prompt:   ${e.prompt||'(not recorded — older entry)'}`,
+  ].filter(Boolean).join('\n');
+  const div=document.createElement('div');
+  div.className='ai-term-expand'; div.dataset.for=idx+'_'+filter;
+  div.textContent=lines;
+  row.after(div);
 }
 function _aiClearLog(){
   if(!confirm('Clear all AI activity logs?')) return;
   localStorage.removeItem(_AI_LOG_KEY);
   toast('AI log cleared');
   _aiPageActivity();
+}
+function _aiExportLog(){
+  const log=_aiGetLog();
+  if(!log.length){toast('No log to export','warn');return;}
+  const blob=new Blob([JSON.stringify(log,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download='ravana-log-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
+  toast('Log exported');
 }
 
 // ── System tab ────────────────────────────────────────────────
@@ -13466,7 +13583,7 @@ function _aiPageSystem(){
 
     <div class="ai-section-head">Build Info</div>
     <div style="font-size:12px;color:var(--mu);line-height:2">
-      AI framework: <strong style="color:var(--tx)">Ravana v3.12 — Master Control</strong><br>
+      AI framework: <strong style="color:var(--tx)">Ravana v3.13 — Master Control</strong><br>
       Models: <strong style="color:var(--tx)">${AI_MODEL_ORDER.map(k=>AI_MODELS[k].label).join(' · ')}</strong><br>
       Tools: <strong style="color:var(--tx)">${AI_TOOLS.length} registered · ${AI_TOOLS.length-_aiToolDisabledSet().size} active</strong><br>
       Voice: <strong style="color:var(--tx)">Whisper (Groq) + Web Speech API + TTS</strong><br>
@@ -14001,9 +14118,13 @@ async function askAI(prompt){
   const sanitizedPrompt=prompt.replace(/[^\w\s\.\,\!\?\'\"\-\(\)]/g,'').substring(0,2000);
   const fullPrompt=_getEffectiveRulebook()+'\n\n---\n## Lab Data Context'+context+'\n\n---\nUser question: '+sanitizedPrompt;
 
+  const _t0=Date.now();
+  const _promptSnippet=prompt.substring(0,100);
   try{
     let text='';
     let tokUsed=0;
+    let inTok=0;
+    let outTok=0;
     let reqRem=null;
     let tokRem=null;
 
@@ -14024,7 +14145,8 @@ async function askAI(prompt){
       } else {
         const result=await _callAIDirect(provider, model, fullPrompt, key);
         raw={text:result.text,tool_call:null};
-        tokUsed=result.tokUsed; reqRem=result.reqRem; tokRem=result.tokRem;
+        tokUsed=result.tokUsed; inTok=result.inTok||0; outTok=result.outTok||0;
+        reqRem=result.reqRem; tokRem=result.tokRem;
       }
       if(raw.tool_call){
         const {name,params}=raw.tool_call;
@@ -14039,7 +14161,7 @@ async function askAI(prompt){
     }
 
     if(!text) text='No response from Ravana.';
-    _aiRecordUsage(model, reqRem, tokRem, tokUsed);
+    _aiRecordUsage(model,reqRem,tokRem,tokUsed,{inTok:inTok||null,outTok:outTok||null,dur:Date.now()-_t0,prompt:_promptSnippet,fn:'chat'});
     thinking.remove();
     msgs.innerHTML+=`<div class="ai-msg ai">${esc(text).replace(/\n/g,'<br>')}</div>`;
     msgs.scrollTop=msgs.scrollHeight;
@@ -14047,6 +14169,7 @@ async function askAI(prompt){
     setTimeout(()=>{ if(!_aiMaximised&&msgs.scrollHeight>msgs.clientHeight+120) _toggleAIMaximise(); },80);
     return text;
   }catch(e){
+    _aiRecordUsage(_aiModel,null,null,0,{dur:Date.now()-_t0,prompt:_promptSnippet,fn:'chat',err:true,errCode:e.status||0});
     thinking.remove();
     let errMsg=e.message||'Unknown error';
     if(e.status===503||e.status===502) errMsg='AI service unavailable — tried fallback. Try again in a moment.';
@@ -14168,21 +14291,27 @@ async function _callAIDirect(provider, model, prompt, key){
   const d=await r.json();
   let text='';
   let tokUsed=0;
+  let inTok=0;
+  let outTok=0;
   let reqRem=null;
   let tokRem=null;
 
   if(provider==='groq'){
     text=d.choices?.[0]?.message?.content||'';
-    tokUsed=d.usage?.total_tokens||0;
+    inTok=d.usage?.prompt_tokens||0;
+    outTok=d.usage?.completion_tokens||0;
+    tokUsed=d.usage?.total_tokens||inTok+outTok;
     reqRem=parseInt(r.headers.get('x-ratelimit-remaining-requests'))||null;
     tokRem=parseInt(r.headers.get('x-ratelimit-remaining-tokens'))||null;
   } else {
     text=d.content?.[0]?.text||'';
-    tokUsed=(d.usage?.input_tokens||0)+(d.usage?.output_tokens||0);
+    inTok=d.usage?.input_tokens||0;
+    outTok=d.usage?.output_tokens||0;
+    tokUsed=inTok+outTok;
     reqRem=parseInt(r.headers.get('anthropic-ratelimit-requests-remaining'))||null;
   }
 
-  return {text, tokUsed, reqRem, tokRem};
+  return {text, tokUsed, inTok, outTok, reqRem, tokRem};
 }
 
 async function _callGemini(messages){
