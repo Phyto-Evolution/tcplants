@@ -1974,6 +1974,32 @@ input, textarea, select {
 .ai-term-dot{width:12px;flex-shrink:0;text-align:right}
 .ai-term-expand{padding:8px 12px 10px;background:var(--sf2);border-bottom:1px solid var(--bd);font-family:'Courier New',monospace;font-size:11px;color:var(--mu);line-height:1.8;white-space:pre-wrap;word-break:break-word}
 .ai-term-err .ai-term-prompt,.ai-term-err .ai-term-dot{color:var(--rd)}
+/* ── AI CONTROL PANEL ── */
+.ai-ctl-card{background:var(--sf2);border:1px solid var(--bd);border-radius:12px;padding:16px;margin-bottom:14px}
+.ai-ctl-master{border-radius:14px;padding:18px;margin-bottom:16px;transition:background .3s,border-color .3s;border:1px solid rgba(248,81,73,.35);background:linear-gradient(135deg,rgba(248,81,73,.07),rgba(248,81,73,.03))}
+.ai-ctl-master.bg-on{border-color:rgba(63,185,80,.35);background:linear-gradient(135deg,rgba(63,185,80,.07),rgba(63,185,80,.03))}
+.ai-ctl-master-row{display:flex;align-items:center;gap:12px}
+.ai-ctl-master-icon{font-size:28px;flex-shrink:0;line-height:1}
+.ai-ctl-master-text{flex:1}
+.ai-ctl-master-title{font-size:14px;font-weight:800;letter-spacing:-.2px}
+.ai-ctl-master-sub{font-size:11px;color:var(--mu);margin-top:3px;line-height:1.5}
+.ai-ctl-status{margin-top:12px;display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;padding:6px 10px;border-radius:8px;background:var(--sf);border:1px solid var(--bd)}
+.ai-ctl-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.ai-ctl-section{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);margin:16px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--bd)}
+.ai-ctl-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid color-mix(in srgb,var(--bd) 50%,transparent)}
+.ai-ctl-row:last-child{border-bottom:none;padding-bottom:0}
+.ai-ctl-feat{flex:1;min-width:0}
+.ai-ctl-feat-name{font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px}
+.ai-ctl-feat-desc{font-size:11px;color:var(--mu);margin-top:2px;line-height:1.4}
+.ai-ctl-pill-row{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px}
+.ai-ctl-pill{padding:4px 12px;border-radius:14px;border:1px solid var(--bd);background:transparent;color:var(--mu);cursor:pointer;font-size:11px;font-weight:600;transition:all .15s;touch-action:manipulation}
+.ai-ctl-pill.active{background:var(--ac);color:#fff;border-color:transparent}
+.ai-ctl-days{display:flex;gap:4px;margin-top:8px}
+.ai-ctl-day{width:34px;height:30px;border-radius:7px;border:1px solid var(--bd);background:transparent;color:var(--mu);cursor:pointer;font-size:10px;font-weight:700;transition:all .15s;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
+.ai-ctl-day.active{background:var(--ac);color:#fff;border-color:transparent}
+.ai-ctl-next{font-size:11px;color:var(--mu);margin-top:10px;padding:7px 10px;background:var(--sf);border:1px solid var(--bd);border-radius:7px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.ai-ctl-run{margin-left:auto;padding:3px 10px;border-radius:10px;border:1px solid var(--ac);background:transparent;color:var(--ac);cursor:pointer;font-size:10px;font-weight:700;touch-action:manipulation;white-space:nowrap}
+.ai-ctl-run:hover{background:rgba(88,166,255,.1)}
 /* Logic Flows scrollbar fix */
 #sec-logicflows main { scrollbar-width: none; -ms-overflow-style: none; }
 #sec-logicflows main::-webkit-scrollbar { display: none; }
@@ -3222,6 +3248,7 @@ input, textarea, select {
           <div style="font-size:13px;line-height:1.6"><strong>🔔 Session counter chip</strong> — Ravana panel header shows a live "N calls · X tok" chip that increments after every call, visible from the chat panel without opening Activity.</div>
           <div style="font-size:13px;line-height:1.6"><strong>📈 Enriched log entries</strong> — every call now records: input tokens, output tokens, response duration (ms), prompt snippet (first 100 chars), call type, error code. Errors are logged too with ✗ status.</div>
           <div style="font-size:13px;line-height:1.6"><strong>🔧 Mobile nav + pomo fixes</strong> — clock no longer overlaps nav items on narrow screens; 🍅 Pomodoro FAB hidden until login; pane toggle (Edit/Split/Preview) now uses direct <code>onclick</code> + <code>touch-action:manipulation</code> — works on iOS scroll containers.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🎛 AI Budget Control</strong> — new Control tab in AI Master Panel. Master background ON/OFF switch (chat always works). Per-feature toggles: journal batch, species insights, stock analysis, inline parse. Journal cycle: Daily or Weekly with day-of-week picker. "Next run" display + manual Run Now trigger. All persisted in localStorage.</div>
         </div>
       </div>
       <!-- v3.12 collapse -->
@@ -5421,6 +5448,24 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
           <tr><td><code>_callAIDirect()</code></td><td>Now returns <code>{inTok, outTok}</code> in addition to <code>tokUsed</code>. Groq: <code>prompt_tokens</code>/<code>completion_tokens</code>. Claude: <code>input_tokens</code>/<code>output_tokens</code>.</td></tr>
           <tr><td>Error entries</td><td>Errors in <code>askAI()</code> catch block now call <code>_aiRecordUsage()</code> with <code>err:true, errCode:e.status</code>. Displayed with red ● dot in terminal.</td></tr>
         </table>
+
+        <h3 class="help-h3" style="margin-top:14px">AI Budget Control — Control tab (v3.13)</h3>
+        <p style="font-size:12px;color:var(--mu)">New <strong>🎛 Control</strong> tab in AI Master Panel. Provides a master background ON/OFF switch and per-feature token gates. Chat, voice, and quick-chips are always unrestricted.</p>
+        <table class="help-table">
+          <tr><th>Key / Function</th><th>What it does</th></tr>
+          <tr><td><code>_AI_BG_KEY</code> (<code>tcplants_ai_bg</code>)</td><td><code>'0'</code> = background AI off; absent or <code>'1'</code> = on. Master switch.</td></tr>
+          <tr><td><code>_AI_BUDGET_KEY</code> (<code>tcplants_ai_budget</code>)</td><td>JSON object: <code>{journal, insights, stock, inline}</code> — each boolean. Default all true.</td></tr>
+          <tr><td><code>_AI_CYCLE_KEY</code> (<code>tcplants_ai_cycle</code>)</td><td>JSON: <code>{freq:'daily'|'weekly', day:0–6, enabled:bool}</code>. Controls journal parse schedule.</td></tr>
+          <tr><td><code>_aiBlocked(feat)</code></td><td>Returns true if master is off OR <code>feat</code> is false in budget. All background callers call this at entry.</td></tr>
+          <tr><td><code>_aiBgEnabled()</code></td><td>Reads <code>_AI_BG_KEY</code> from localStorage.</td></tr>
+          <tr><td><code>_aiBudget()</code> / <code>_aiBudgetSet(feat,val)</code></td><td>Read/write feature budget with defaults merged in.</td></tr>
+          <tr><td><code>_aiCycleCfg()</code> / <code>_aiCycleSet(patch)</code></td><td>Read/patch journal cycle config.</td></tr>
+          <tr><td><code>_journalCycleDue(ist)</code></td><td>Returns true if cycle should fire now — checks daily/weekly mode, day-of-week match, and 6-day dedup window.</td></tr>
+          <tr><td><code>_aiNextCycleStr()</code></td><td>Computes "Tue 29 Apr · 1:00am IST" display string for next scheduled run.</td></tr>
+          <tr><td><code>_aiSetBg(on)</code></td><td>Writes master key + calls <code>_aiPageControl()</code> + toasts.</td></tr>
+          <tr><td><code>_aiPageControl()</code></td><td>Renders the full Control tab: master card, journal cycle section, feature rows with toggle-switch per feature.</td></tr>
+          <tr><td>Guarded functions</td><td><code>_batchParseUnparsedJournal</code>, <code>parseJournalWithRavana</code>, <code>RavanaInsights._runAnalysis</code>, <code>_stockRavanaInsight</code> — all check <code>_aiBlocked(feat)</code> at entry and return early with a toast or inline message.</td></tr>
+        </table>
       </div></div></details>
 
       <!-- ═══ GREENHOUSE FLOW ═══ -->
@@ -6096,6 +6141,7 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
         <button class="ai-tab-btn" onclick="_aiCtrlTab('context',this)">🧠 Context</button>
         <button class="ai-tab-btn" onclick="_aiCtrlTab('activity',this)">📊 Activity</button>
         <button class="ai-tab-btn" onclick="_aiCtrlTab('system',this)">⚙️ System</button>
+        <button class="ai-tab-btn" onclick="_aiCtrlTab('control',this)">🎛 Control</button>
       </div>
       <div id="ai-ctrl-pane-persona"   class="ai-tab-pane on"></div>
       <div id="ai-ctrl-pane-models"    class="ai-tab-pane"></div>
@@ -6105,6 +6151,7 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
       <div id="ai-ctrl-pane-context"   class="ai-tab-pane"></div>
       <div id="ai-ctrl-pane-activity"  class="ai-tab-pane"></div>
       <div id="ai-ctrl-pane-system"    class="ai-tab-pane"></div>
+      <div id="ai-ctrl-pane-control"   class="ai-tab-pane"></div>
     </main>
   </div>
 
@@ -7503,6 +7550,7 @@ async function deleteJournalEntry(){
 
 // ── Ravana Parse ────────────────────────────────────────────
 async function parseJournalWithRavana(){
+  if(_aiBlocked('inline')){ toast('Inline journal parse is off — enable in AI Control → Feature Budget','warn'); return; }
   const e=S.journal.find(x=>x.id===S.curJournal); if(!e) return;
   if(e.parseEnabled===false){ toast('Parsing is paused for this entry — enable it first','fail'); return; }
   const btn=document.getElementById('journal-parse-btn');
@@ -7747,6 +7795,7 @@ async function _setJournalParseEnabled(id, enabled){
 }
 
 async function _batchParseUnparsedJournal(silent=false){
+  if(_aiBlocked('journal')){ if(!silent) toast('Journal parse blocked — enable in AI Control → Feature Budget','warn'); return; }
   // Only parse entries where parseEnabled is not explicitly false
   const unparsed=(S.journal||[]).filter(e=>!e.parsed && e.parseEnabled!==false && e.body && e.body.trim().length>30);
   if(!unparsed.length){ if(!silent) toast('All journal entries already parsed'); return; }
@@ -7786,28 +7835,35 @@ Omit arrays if nothing found. Title: ${e.title||'Untitled'}\nDate: ${e.date}\n\n
   }
 }
 
+function _journalCycleDue(ist){
+  const cfg=_aiCycleCfg();
+  if(!cfg.enabled) return false;
+  const lastRun=localStorage.getItem(JOURNAL_PARSE_KEY)||'';
+  if(cfg.freq==='daily'){
+    return lastRun!==ist.toDateString();
+  }
+  // weekly: must be the right day of week, and not run in the last 6 days
+  if(ist.getDay()!==cfg.day) return false;
+  if(!lastRun) return true;
+  const diffMs=ist.getTime()-new Date(lastRun).getTime();
+  return diffMs >= 6*24*3600000;
+}
+
 function _scheduleOvernightJournalParse(){
-  // Check every minute if it's 1am IST (UTC+5:30 = UTC+330min)
-  // IST 01:00 = UTC 19:30 → fire when local IST hour===1 && minute<2
+  // Check every minute if it's 1am IST (UTC+5:30)
   const check=()=>{
     const now=new Date();
-    // IST offset: UTC+5:30
-    const istMs=now.getTime()+(5.5*3600000);
-    const ist=new Date(istMs);
-    if(ist.getHours()===1 && ist.getMinutes()<2){
-      const lastRun=localStorage.getItem(JOURNAL_PARSE_KEY)||'';
-      if(lastRun!==ist.toDateString()){
-        _batchParseUnparsedJournal(true);
-      }
+    const ist=new Date(now.getTime()+(5.5*3600000));
+    if(ist.getHours()===1 && ist.getMinutes()<2 && _journalCycleDue(ist)){
+      _batchParseUnparsedJournal(true);
     }
   };
   setInterval(check, 60000);
-  // Also check on login: if last run wasn't today and there are unparsed entries, run silently
-  const lastRun=localStorage.getItem(JOURNAL_PARSE_KEY);
-  const today=new Date().toDateString();
+  // On login: run silently if cycle is due and there are unparsed entries
+  const now=new Date();
+  const ist=new Date(now.getTime()+(5.5*3600000));
   const hasUnparsed=(S.journal||[]).some(e=>!e.parsed&&e.body?.trim().length>30);
-  if(hasUnparsed && lastRun!==today){
-    // Run in background 8s after login — doesn't block the UI
+  if(hasUnparsed && _journalCycleDue(ist)){
     setTimeout(()=>_batchParseUnparsedJournal(true), 8000);
   }
 }
@@ -8255,6 +8311,10 @@ const RavanaInsights={
   // ── Deep AI analysis — reads PubMed + GBIF before responding ─
   async _runAnalysis(spName){
     const el=document.getElementById('ri-analysis'); if(!el) return;
+    if(_aiBlocked('insights')){
+      el.innerHTML=`<div style="padding:14px;background:var(--sf2);border:1px solid var(--bd);border-radius:8px;font-size:12px;color:var(--mu)">🔒 Species analysis is off — enable it in <strong style="cursor:pointer;color:var(--ac)" onclick="navTo('ai');_aiCtrlTab('control',document.querySelector('[onclick*=control]'))">AI Control → Feature Budget</strong>.</div>`;
+      return;
+    }
     const btn=document.getElementById('ri-ask-btn'); if(btn){btn.disabled=true;btn.classList.add('btn-loading');}
     const badge=document.getElementById('ri-papers-badge');
     const papersList=document.getElementById('ri-papers-list');
@@ -12908,7 +12968,7 @@ function _aiCtrlTab(name, btn){
   const pane=document.getElementById('ai-ctrl-pane-'+name);
   if(!pane) return;
   pane.classList.add('on');
-  const fns={persona:_aiPagePersona,models:_aiPageModels,voice:_aiPageVoice,functions:_aiPageFunctions,tools:_aiPageTools,context:_aiPageContext,activity:_aiPageActivity,system:_aiPageSystem};
+  const fns={persona:_aiPagePersona,models:_aiPageModels,voice:_aiPageVoice,functions:_aiPageFunctions,tools:_aiPageTools,context:_aiPageContext,activity:_aiPageActivity,system:_aiPageSystem,control:_aiPageControl};
   try{ if(fns[name]) fns[name](); }
   catch(e){ pane.innerHTML='<div style="padding:20px;color:var(--rd);font-size:13px">⚠️ Render error: '+e.message+'</div>'; console.error(e); }
 }
@@ -13630,6 +13690,169 @@ async function _callAISimple(prompt){
   const provider=_selectAIProvider();
   const result=await _callAIProvider(provider,fullPrompt,'',1024);
   return result?.text||result||'';
+}
+
+// ════════════════════════════════════════════════════════════
+// AI BUDGET CONTROL — master off, per-feature gates, cycle schedule
+// ════════════════════════════════════════════════════════════
+const _AI_BG_KEY='tcplants_ai_bg';
+const _AI_BUDGET_KEY='tcplants_ai_budget';
+const _AI_CYCLE_KEY='tcplants_ai_cycle';
+const _AI_BUDGET_DEFAULTS={journal:true,insights:true,stock:true,inline:true};
+
+function _aiBgEnabled(){ return localStorage.getItem(_AI_BG_KEY)!=='0'; }
+function _aiBudget(){
+  try{ return {..._AI_BUDGET_DEFAULTS,...JSON.parse(localStorage.getItem(_AI_BUDGET_KEY)||'{}')}; }
+  catch{ return {..._AI_BUDGET_DEFAULTS}; }
+}
+function _aiBudgetSet(feat,val){
+  const b=_aiBudget(); b[feat]=val;
+  localStorage.setItem(_AI_BUDGET_KEY,JSON.stringify(b));
+  _aiPageControl();
+}
+function _aiCycleCfg(){
+  try{ return {...{freq:'weekly',day:1,enabled:true},...JSON.parse(localStorage.getItem(_AI_CYCLE_KEY)||'{}')}; }
+  catch{ return {freq:'weekly',day:1,enabled:true}; }
+}
+function _aiCycleSet(patch){
+  const c=_aiCycleCfg(); Object.assign(c,patch);
+  localStorage.setItem(_AI_CYCLE_KEY,JSON.stringify(c));
+  _aiPageControl();
+}
+function _aiBlocked(feat){
+  if(!_aiBgEnabled()) return true;
+  return _aiBudget()[feat]===false;
+}
+function _aiSetBg(on){
+  localStorage.setItem(_AI_BG_KEY,on?'1':'0');
+  _aiPageControl();
+  toast(on?'✅ Background AI enabled':'⏸ Background AI paused — chat still works');
+}
+function _aiNextCycleStr(){
+  const cfg=_aiCycleCfg();
+  if(!cfg.enabled) return 'Cycle disabled';
+  const now=new Date();
+  const ist=new Date(now.getTime()+(5.5*3600000));
+  const dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const monNames=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const fmt=d=>`${dayNames[d.getDay()]} ${d.getDate()} ${monNames[d.getMonth()]}`;
+  if(cfg.freq==='daily'){
+    const next=new Date(ist);
+    if(ist.getHours()>=1) next.setDate(next.getDate()+1);
+    next.setHours(1,0,0,0);
+    return fmt(next)+' · 1:00am IST';
+  }
+  // weekly
+  const today=ist.getDay();
+  let diff=(cfg.day-today+7)%7;
+  if(diff===0 && ist.getHours()>=1) diff=7;
+  const next=new Date(ist);
+  next.setDate(next.getDate()+diff);
+  return fmt(next)+' · 1:00am IST';
+}
+
+function _aiPageControl(){
+  const pane=document.getElementById('ai-ctrl-pane-control'); if(!pane) return;
+  const bgOn=_aiBgEnabled();
+  const bgt=_aiBudget();
+  const cyc=_aiCycleCfg();
+  const lastRun=localStorage.getItem(JOURNAL_PARSE_KEY)||'';
+  const dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+  const featRow=(key,icon,name,desc)=>{
+    const on=bgt[key]!==false;
+    const id=`ai-feat-${key}`;
+    return `<div class="ai-ctl-row">
+      <div class="ai-ctl-feat">
+        <div class="ai-ctl-feat-name">${icon} ${name}</div>
+        <div class="ai-ctl-feat-desc">${desc}</div>
+      </div>
+      <label class="toggle-switch" style="flex-shrink:0">
+        <input type="checkbox" id="${id}" ${on?'checked':''} onchange="_aiBudgetSet('${key}',this.checked)">
+        <div class="toggle-track"></div>
+      </label>
+    </div>`;
+  };
+
+  const freqPill=(f,label)=>`<button class="ai-ctl-pill${cyc.freq===f?' active':''}" onclick="_aiCycleSet({freq:'${f}'})">${label}</button>`;
+  const dayBtn=(d,abbr)=>`<button class="ai-ctl-day${cyc.day===d?' active':''}" onclick="_aiCycleSet({day:${d}})">${abbr}</button>`;
+
+  pane.innerHTML=`
+    <div style="font-size:15px;font-weight:800;margin-bottom:4px">🎛 AI Budget Control</div>
+    <div style="font-size:12px;color:var(--mu);margin-bottom:16px">Manage what Ravana is allowed to call automatically. Chat, voice, and quick-chips are never blocked.</div>
+
+    <!-- MASTER SWITCH -->
+    <div class="ai-ctl-master${bgOn?' bg-on':''}">
+      <div class="ai-ctl-master-row">
+        <div class="ai-ctl-master-icon">${bgOn?'🟢':'🔴'}</div>
+        <div class="ai-ctl-master-text">
+          <div class="ai-ctl-master-title">Background AI — ${bgOn?'ON':'OFF'}</div>
+          <div class="ai-ctl-master-sub">${bgOn?'All enabled features can call the API automatically.':'All background features are paused. Chat &amp; voice still work normally.'}</div>
+        </div>
+        <label class="toggle-switch" style="flex-shrink:0">
+          <input type="checkbox" ${bgOn?'checked':''} onchange="_aiSetBg(this.checked)" style="opacity:0;width:0;height:0">
+          <div class="toggle-track"></div>
+        </label>
+      </div>
+      <div class="ai-ctl-status">
+        <div class="ai-ctl-dot" style="background:${bgOn?'var(--gn)':'var(--rd)'};box-shadow:0 0 5px ${bgOn?'var(--gn)':'var(--rd)'}"></div>
+        <span style="color:${bgOn?'var(--gn)':'var(--rd)'}">
+          ${bgOn
+            ? Object.values(bgt).filter(Boolean).length+' feature'+( Object.values(bgt).filter(Boolean).length!==1?'s':'')+' active'
+            : 'Background paused — 0 automatic calls'}
+        </span>
+        <span style="margin-left:auto;color:var(--mu);font-size:10px">Chat always works</span>
+      </div>
+    </div>
+
+    <!-- JOURNAL CYCLE -->
+    <div class="ai-ctl-section">📓 Journal Parse Cycle</div>
+    <div class="ai-ctl-card" style="padding:14px">
+      <div class="ai-ctl-row" style="padding-top:0">
+        <div class="ai-ctl-feat">
+          <div class="ai-ctl-feat-name">Auto-parse cycle</div>
+          <div class="ai-ctl-feat-desc">Runs silently — parses all unparsed journal entries at 1:00am IST</div>
+        </div>
+        <label class="toggle-switch" style="flex-shrink:0">
+          <input type="checkbox" ${cyc.enabled?'checked':''} onchange="_aiCycleSet({enabled:this.checked})">
+          <div class="toggle-track"></div>
+        </label>
+      </div>
+      ${cyc.enabled?`
+      <div style="margin-top:4px">
+        <div style="font-size:11px;font-weight:700;color:var(--mu);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em">Frequency</div>
+        <div class="ai-ctl-pill-row">
+          ${freqPill('daily','Daily')}
+          ${freqPill('weekly','Weekly')}
+        </div>
+      </div>
+      ${cyc.freq==='weekly'?`
+      <div style="margin-top:10px">
+        <div style="font-size:11px;font-weight:700;color:var(--mu);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em">Run on</div>
+        <div class="ai-ctl-days">
+          ${[1,2,3,4,5,6,0].map((d,i)=>dayBtn(d,['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][i])).join('')}
+        </div>
+      </div>`:''}
+      <div class="ai-ctl-next">
+        <span>⏰</span>
+        <span>Next run: <strong>${_aiNextCycleStr()}</strong></span>
+        ${lastRun?`<span style="margin-left:4px;color:var(--mu)">· Last: ${lastRun}</span>`:''}
+        <button class="ai-ctl-run" onclick="_batchParseUnparsedJournal(false)">▶ Run now</button>
+      </div>`:'<div style="font-size:11px;color:var(--mu);margin-top:8px;padding:8px;background:var(--sf);border-radius:6px">Cycle is disabled — use manual parse per entry or the Run now button.</div>'}
+    </div>
+
+    <!-- FEATURE BUDGET -->
+    <div class="ai-ctl-section">🎚 Feature Budget</div>
+    <div class="ai-ctl-card" style="padding:4px 14px 4px">
+      ${featRow('journal','📓','Journal batch parse','Uses tokens for each unparsed entry during cycle')}
+      ${featRow('insights','🔬','Species Insights analysis','Deep 7-section PubMed + lab analysis per species')}
+      ${featRow('stock','📦','Stock analysis','Reorder narrative when you click Analyse Stock')}
+      ${featRow('inline','📖','Inline journal parse','Per-entry Parse with Ravana button')}
+    </div>
+
+    <div style="font-size:11px;color:var(--mu);margin-top:6px;line-height:1.7">
+      🔒 <strong>Always unrestricted:</strong> Chat input, voice commands, AI quick-chips, model test, schedule day summaries.
+    </div>`;
 }
 async function _aiTestProxy(){
   const res=document.getElementById('ai-sys-test-result');
@@ -21400,6 +21623,7 @@ async function _invDelete(id){
 let _stockRavanaTimer=null;
 
 async function _stockRavanaInsight(){
+  if(_aiBlocked('stock')){ toast('Stock analysis is off — enable in AI Control → Feature Budget','warn'); return; }
   const btn=document.getElementById('stock-ravana-btn');
   const panel=document.getElementById('stock-ravana-panel');
   const body=document.getElementById('stock-ravana-body');
