@@ -834,7 +834,8 @@ main > .dview, main > .editor{ margin:0 auto; }
 #re-base-custom-wrap{display:none;margin-top:6px}
 
 /* ── POMODORO WIDGET ── */
-#pomo-widget{position:fixed;bottom:22px;right:22px;z-index:320;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+#pomo-widget{position:fixed;bottom:22px;right:22px;z-index:320;display:none;flex-direction:column;align-items:flex-end;gap:8px}
+#pomo-widget.on{display:flex}
 #pomo-fab{width:46px;height:46px;border-radius:50%;background:var(--sf);border:1px solid var(--bd);box-shadow:0 4px 16px rgba(0,0,0,.3);cursor:pointer;font-size:21px;display:flex;align-items:center;justify-content:center;transition:all .2s;line-height:1}
 #pomo-fab:hover{background:var(--sf2);transform:scale(1.09)}
 #pomo-fab.running{border-color:var(--gn);box-shadow:0 0 0 3px rgba(63,185,80,.25),0 4px 16px rgba(0,0,0,.3)}
@@ -1769,18 +1770,30 @@ main > .dview, main > .editor{ margin:0 auto; }
   }
 
   /* ── Navbar: collapse to fit small screens ── */
-  /* Remove forced min-width from nav icon buttons — causes overflow on narrow screens */
   nav .nav-icon-btn {
     min-width: unset !important;
     width: auto !important;
     padding: 4px 6px !important;
   }
+  /* Clock: drop absolute centering, become an inline flex item after brand */
+  #nav-clock {
+    position: static !important;
+    transform: none !important;
+    padding: 2px 5px !important;
+    order: 2 !important;
+  }
+  #nc-time { font-size: 12px !important; letter-spacing: 0 !important; }
+  #nc-day  { display: none !important; }
+  /* Weather chip takes too much space — nav drawer has the full widget */
+  #weather-chip { display: none !important; }
   /* Hide low-priority nav items on mobile */
-  nav .nav-home-btn     { display: none !important; }
-  #export-all-btn       { display: none !important; }
-  #export-csv-btn       { display: none !important; }
-  .lock-label           { display: none !important; }
-  .brand span           { display: none !important; }
+  nav .nav-home-btn { display: none !important; }
+  #export-all-btn   { display: none !important; }
+  #export-csv-btn   { display: none !important; }
+  #nav-qr-btn       { display: none !important; }
+  #nav-reload-btn   { display: none !important; }
+  .lock-label       { display: none !important; }
+  .brand span       { display: none !important; }
 
   /* Dashboard: reduce outer padding to give panels more room */
   #notes-empty { padding: 14px 12px !important; }
@@ -2111,13 +2124,13 @@ input, textarea, select {
     </div>
     <button id="weather-chip" title="Lab &amp; Greenhouse weather" aria-label="Lab and greenhouse weather">🌡️ —</button>
     <span id="offline-pill" aria-label="Offline mode">● Offline</span>
-    <button class="nav-icon-btn" title="Scan QR / Barcode" aria-label="Scan QR code or barcode" onclick="openQRScan()" style="font-size:15px">📷</button>
+    <button class="nav-icon-btn" id="nav-qr-btn" title="Scan QR / Barcode" aria-label="Scan QR code or barcode" onclick="openQRScan()" style="font-size:15px">📷</button>
     <button class="nav-icon-btn" id="export-all-btn" title="Export ZIP" aria-label="Export all data as ZIP">⬇</button>
     <button class="nav-icon-btn" id="export-csv-btn" title="Export CSV" aria-label="Export data as CSV">CSV</button>
     <button class="nav-icon-btn" id="lock-btn" title="Lock" aria-label="Lock or unlock" style="display:flex;align-items:center;gap:4px;font-size:13px;color:var(--mu);padding:4px 9px;border:1px solid var(--bd);border-radius:6px">🔒 <span class="lock-label">Lock</span></button>
     <button class="nav-icon-btn" title="Settings" aria-label="Open settings" onclick="openSettings()" style="font-size:16px">⚙️</button>
     <button id="theme-btn" title="Toggle theme" aria-label="Toggle light or dark theme">☀️</button>
-    <button class="nav-icon-btn" onclick="window.location.reload()" title="Reload app" aria-label="Reload app" style="font-size:13px;opacity:.6">↺</button>
+    <button class="nav-icon-btn" id="nav-reload-btn" onclick="window.location.reload()" title="Reload app" aria-label="Reload app" style="font-size:13px;opacity:.6">↺</button>
   </nav>
 
   <!-- ── NOTES ── -->
@@ -19156,6 +19169,7 @@ async function login(){
     document.getElementById('ql-fab').classList.add('on');
     document.getElementById('ai-btn').classList.add('on');
     document.getElementById('lab-footer-bar').classList.add('on');
+    document.getElementById('pomo-widget').classList.add('on');
     loadEncryptedKeys().then(()=>{ _initAIKeyHint(); _initVoiceSettings(); });
     document.getElementById('actlog-tab').classList.add('on');
     fetchActivityLog();
@@ -19296,6 +19310,7 @@ function lock(){
   document.getElementById('ai-panel').classList.remove('on');
   document.getElementById('lab-footer-bar').classList.remove('on');
   document.getElementById('actlog-tab').classList.remove('on');
+  document.getElementById('pomo-widget').classList.remove('on');
   _stopWakeListener();
   document.getElementById('actlog-panel').classList.remove('open');
   sessionStorage.clear();
