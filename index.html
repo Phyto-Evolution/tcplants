@@ -734,6 +734,8 @@ main > .dview, main > .editor{ margin:0 auto; }
 .widget-chip-label{flex:1;white-space:nowrap}
 .widget-chip-close{background:transparent;border:none;color:var(--mu);cursor:pointer;font-size:13px;padding:0 2px;line-height:1}
 .widget-chip-close:hover{color:var(--rd)}
+.widget-chip-alert{border-color:var(--rd)!important;color:var(--rd)!important;animation:alm-pulse 0.8s ease-in-out infinite alternate}
+@keyframes alm-pulse{from{opacity:1}to{opacity:0.55}}
 /* timers */
 .timer-grid{display:flex;flex-direction:column;gap:10px}
 .tmr{background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:12px;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
@@ -10764,6 +10766,7 @@ function _loadAlarms(){
 function _saveAlarms(arr){
   localStorage.setItem(_ALARM_KEY,JSON.stringify(arr));
   _updateAlarmBtn();
+  _updateWidgetTray();
 }
 function _updateAlarmBtn(){
   const btn=document.getElementById('cal-alarm-btn');
@@ -10792,6 +10795,7 @@ function _addAlarm(){
   document.getElementById('al-label-input').value='';
   _renderAlarms();
   toast('Alarm set for '+t);
+  if(typeof Notification!=='undefined'&&Notification.permission==='default')Notification.requestPermission();
 }
 function _removeAlarm(id){
   _saveAlarms(_loadAlarms().filter(a=>a.id!=id));
@@ -10852,30 +10856,57 @@ function _showAlarmModal(alarm){
   document.getElementById('alm-fire-time').textContent=alarm.time;
   document.getElementById('alm-fire-label').textContent=alarm.label||'';
   document.getElementById('alarm-modal').classList.add('on');
+  _updateWidgetTray();
+  if(typeof Notification!=='undefined'&&Notification.permission==='granted'){
+    try{new Notification('⏰ '+(alarm.label||'Alarm'),{body:alarm.time,icon:'/favicon.png'});}catch(e){}
+  }
 }
 function _dismissAlarm(){
   document.getElementById('alarm-modal').classList.remove('on');
+  _updateWidgetTray();
 }
 (function _alarmLoop(){
+  let _trayTick=0;
   function check(){
     const now=new Date();
     const ist=new Date(now.getTime()+((now.getTimezoneOffset()+330)*60000));
-    if(ist.getSeconds()>4) return;
-    const hh=String(ist.getHours()).padStart(2,'0');
-    const mm=String(ist.getMinutes()).padStart(2,'0');
-    const cur=`${hh}:${mm}`;
-    const today=ist.toISOString().slice(0,10);
-    _loadAlarms().forEach(a=>{
-      if(!a.enabled||a.time!==cur) return;
-      const key=`${a.id}:${today}`;
-      if(_firedAlarms.has(key)) return;
-      _firedAlarms.add(key);
-      _playAlarmSound();
-      _showAlarmModal(a);
-    });
+    if(ist.getSeconds()<=4){
+      const hh=String(ist.getHours()).padStart(2,'0');
+      const mm=String(ist.getMinutes()).padStart(2,'0');
+      const cur=`${hh}:${mm}`;
+      const today=ist.toISOString().slice(0,10);
+      _loadAlarms().forEach(a=>{
+        if(!a.enabled||a.time!==cur) return;
+        const key=`${a.id}:${today}`;
+        if(_firedAlarms.has(key)) return;
+        _firedAlarms.add(key);
+        _playAlarmSound();
+        _showAlarmModal(a);
+      });
+    }
+    if(++_trayTick>=10){_trayTick=0;_updateWidgetTray();}
   }
   setInterval(check,1000);
 })();
+function _nextAlarmMinutes(){
+  const now=new Date();
+  const ist=new Date(now.getTime()+((now.getTimezoneOffset()+330)*60000));
+  const curMin=ist.getHours()*60+ist.getMinutes();
+  const enabled=_loadAlarms().filter(a=>a.enabled);
+  if(!enabled.length) return null;
+  let best=null;
+  for(const a of enabled){
+    const [h,m]=a.time.split(':').map(Number);
+    let diff=(h*60+m)-curMin;
+    if(diff<=0) diff+=1440;
+    if(best===null||diff<best.diff) best={alarm:a,diff};
+  }
+  return best;
+}
+function _openCalendarAlarms(){
+  navTo('calendar');
+  setTimeout(()=>{const p=document.getElementById('cal-alarm-panel');if(p&&p.style.display==='none')_toggleAlarmPanel();},250);
+}
 
 // ── POMODORO ─────────────────────────────────────────────────
 let _pomoMode='idle',_pomoWorkMin=25,_pomoBreakMin=5,_pomoElapsed=0,_pomoInterval=null;
@@ -21500,6 +21531,20 @@ function _updateWidgetTray(){
     if(SS.running&&SS.steps[SS.cur]) lbl+=` · Step ${SS.cur+1}/${SS.steps.length}: ${SS.steps[SS.cur].name.slice(0,20)}`;
     const action=_widgetMin.stepper?`restoreWidget('stepper')`:`navTo('sterilise')`;
     chips.push(`<div class="widget-chip" onclick="${action}"><span class="widget-chip-label">${lbl}</span>${_widgetMin.stepper?`<button class="widget-chip-close" onclick="event.stopPropagation();closeWidget('stepper')">✕</button>`:''}</div>`);
+  }
+
+  // Alarms — show firing state or countdown to next enabled alarm
+  const _alarmFiring=document.getElementById('alarm-modal')?.classList.contains('on');
+  const _nextAlarm=_nextAlarmMinutes();
+  if(_alarmFiring||_nextAlarm){
+    let lbl;
+    if(_alarmFiring){
+      lbl='🔔 Alarm!';
+    } else {
+      const h=Math.floor(_nextAlarm.diff/60),m=_nextAlarm.diff%60;
+      lbl=`⏰ ${_nextAlarm.alarm.label||_nextAlarm.alarm.time} · ${h>0?h+'h '+m+'m':m+'m'}`;
+    }
+    chips.push(`<div class="widget-chip${_alarmFiring?' widget-chip-alert':''}" onclick="_openCalendarAlarms()"><span class="widget-chip-label">${lbl}</span></div>`);
   }
 
   tray.innerHTML=chips.join('');
