@@ -34,6 +34,20 @@ Files like `COMPLETION_STATUS.md`, `SESSION_LOG.md`, `IMPLEMENTATION_SUMMARY.md`
 
 ---
 
+### RULE 5: Every feature change must update Help + Logic Flows in the same commit
+
+When you build or change any feature — no matter how small — you must update the relevant segments of the **Help** section and the **Logic Flows** section in `index.html` before committing. This is not a separate follow-up task; it is part of the feature itself and must be included in the same push.
+
+- If you added a function: add it to the relevant Logic Flows function table
+- If you changed behaviour: update the description in Help
+- If you added a UI element: document it in the relevant Help section card
+- Version badge in Help + Logic Flows: bump patch version if behaviour changed (e.g. v3.12 → v3.13)
+- What's New box in Help: add a bullet for the change
+
+**Why:** Multiple sessions have shipped features with zero documentation. The Help and Logic Flows sections become stale and mislead future Claude sessions and the user alike.
+
+---
+
 ### RULE 4: No superficial work
 
 Do not stub, scaffold, or partially implement. If you build something, build it completely — working logic, real data, real UI. Do not add a function that returns a placeholder, a section that renders "Coming soon", or a handler that logs to console instead of doing the thing. If a feature cannot be completed in this session, say so and do nothing rather than landing dead code. The next Claude reading this repo will mistake stubs for real implementations.
