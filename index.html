@@ -3166,26 +3166,43 @@ input, textarea, select {
       <!-- VERSION HEADER -->
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
         <h1 style="font-size:22px;font-weight:800;margin:0">🌿 TC Plants Lab Notes</h1>
-        <span class="help-version-badge">v3.11</span>
+        <span class="help-version-badge">v3.12</span>
         <button class="btn xs ghost" onclick="navTo('changelog')" style="border-color:var(--pu);color:var(--pu)">📋 Changelog →</button>
         <button class="btn xs ghost" onclick="navTo('logicflows')" style="margin-left:4px;border-color:var(--ac);color:var(--ac)">🔗 Logic Flows →</button>
       </div>
       <p style="color:var(--mu);font-size:13px;margin-bottom:20px">April 2026 · Encrypted · GitHub-backed · Single-file PWA</p>
 
-      <!-- WHAT'S NEW v3.11 -->
+      <!-- WHAT'S NEW v3.12 -->
       <div style="background:linear-gradient(135deg,rgba(63,185,80,.1),rgba(88,166,255,.08));border:1px solid rgba(63,185,80,.3);border-radius:10px;padding:18px 20px;margin-bottom:10px">
-        <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v3.11</div>
+        <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v3.12</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
-          <div style="font-size:13px;line-height:1.6"><strong>🌍 GBIF C/E/F complete</strong> — Native distribution tag row in species detail, taxonomy hierarchy (order/class/kingdom) saved on import, and one-tap bulk import of all accepted CP genera from 5 families.</div>
-          <div style="font-size:13px;line-height:1.6"><strong>📊 Species Performance Ranking</strong> — new Analytics card: scored table (score/100, contam%, multiplication×, avg cycle days, active bottles) for every species with ≥2 notes.</div>
-          <div style="font-size:13px;line-height:1.6"><strong>💰 Lab Cost Tracking</strong> — new Analytics card: 6-month supply spend bar chart + estimated ₹ cost per bottle (total supply spend ÷ total bottles created).</div>
-          <div style="font-size:13px;line-height:1.6"><strong>📥 Export Report</strong> — one-click 3-CSV download (bottles, notes, greenhouse) + print-ready HTML report. Also triggered by voice: "export report".</div>
-          <div style="font-size:13px;line-height:1.6"><strong>📷 QR on GH Plants</strong> — greenhouse plant detail now has a 📷 QR tab with scannable code, print + copy buttons. Scanner and URL params (<code>?gh=id</code>) route directly to the plant.</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🔗 Passage Tracking</strong> — bottles can now reference a parent bottle (source code lookup). Lineage shown in detail: "Passaged from" + "Passaged to" chips.</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🎙 New voice commands</strong> — "add N bottles of [species]", "open bottle FSL-XXXX", "show species [name]", "export report" — all instant, no AI call.</div>
-          <div style="font-size:13px;line-height:1.6"><strong>📦 Dashboard 10-card stat band</strong> — added Recipes, Supplies low-stock, Contam 30d, Vault value (₹), Journal 7d alongside the original 5. 2-row wrap layout.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🍅 Lab Pomodoro</strong> — floating 🍅 FAB, 3 presets (25/5, 50/10, 90/20), circular progress ring, Web Audio chimes, session log in localStorage.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🔥 Contamination-free Streak</strong> — dashboard panel: days since last contam, emoji milestones at 7/14/30+ days, confetti burst on milestone.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🌿 Species Spotlight</strong> — daily random species card (date-seeded), IUCN badge, native distribution, refreshes each day.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>☑ Daily Lab Checklist</strong> — 5 default tasks, auto-resets each morning, add/remove items, progress bar, persisted in localStorage.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🌳 Bottle Lineage Tree</strong> — recursive SVG tree of passage history per bottle. Bezier connectors, clickable nodes, shown in bottle detail.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>📸 Growth Photo Strip</strong> — horizontal filmstrip of gallery thumbnails per bottle (sorted by date), shown in bottle detail.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>⚗️ Recipe Inline Scaler</strong> — open any saved recipe → enter target bottle count → all ingredient quantities scale in real-time.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>⏰ Calendar Alarms</strong> — set named alarms with time in IST; full-screen fire modal with Web Audio 3-pulse sound; alarms toggle on/off; persisted in localStorage.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🌱 Login animation</strong> — plant sprouts from soil as data loads; grows at the speed of the network.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🪴 Size grades revamped</strong> — Sapling / S / M / L / XL / XXL (6 tiers, replaces 4). Old values silently migrated via <code>_normalizeGrade()</code>.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>⬆ Smart GH import</strong> — accepts any file type; URL fetch (Google Sheets auto-converted); tab/semicolon/comma auto-detected; <code>size_grade</code> column added.</div>
         </div>
       </div>
+
+      <!-- v3.11 collapse -->
+      <details style="margin-bottom:8px">
+        <summary style="cursor:pointer;font-size:12px;color:var(--mu);padding:6px 0;font-weight:600;letter-spacing:.04em">▸ v3.11 release notes</summary>
+        <div style="background:var(--sf2);border-radius:8px;padding:12px;margin-top:6px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px">
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">🌍 GBIF C/E/F complete</strong> — Native distribution, taxonomy hierarchy, bulk CP genus import.</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">📊 Species Performance Ranking</strong> — score/100, contam%, multiplication×, avg cycle days.</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">💰 Lab Cost Tracking</strong> — 6-month supply spend + ₹/bottle estimate.</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">📥 Export Report</strong> — 3-CSV + print-ready HTML, voice-triggered.</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">📷 QR on GH Plants</strong> — scannable code, <code>?gh=id</code> deep link.</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">🔗 Passage Tracking</strong> — parent bottle reference, lineage chips.</div>
+          <div style="font-size:12px;color:var(--mu);line-height:1.6"><strong style="color:var(--tx)">📦 Dashboard 10-card stat band</strong> — Recipes, Supplies, Contam 30d, Vault ₹, Journal 7d.</div>
+        </div>
+      </details>
 
       <!-- v3.9 / v3.10 collapse -->
       <details style="margin-bottom:8px">
@@ -3541,6 +3558,10 @@ input, textarea, select {
         <p>On Save, all bottles are created immediately. Each batch within the session gets its own <code>batch_id</code>; all share the <code>session_id</code>. A purple <strong>S</strong> badge appears in the list for session bottles. The bottle detail shows session date, batch count, and autoclave parameters.</p>
         <h3>Passage Tracking (v3.11)</h3>
         <p>In the bottle editor, fill <strong>Source bottle (passage)</strong> with the parent bottle's code (e.g. <code>FSL-2026-0012</code>). A live hint confirms the match (green = found, red = not found). The saved bottle shows a <strong>Passaged from →</strong> link to the parent and a <strong>Passaged to ↓</strong> chip section listing all child bottles.</p>
+        <h3>🌳 Bottle Lineage Tree <span style="color:var(--gn)">(v3.12)</span></h3>
+        <p>When a bottle has a parent or children, a <strong>🌳 Lineage Tree</strong> section appears in the bottle detail. It renders a recursive SVG family tree: the current bottle in blue, ancestors above it, descendants below. Nodes are connected by bezier curves and are clickable to navigate directly to any bottle in the tree.</p>
+        <h3>📸 Growth Photo Strip <span style="color:var(--gn)">(v3.12)</span></h3>
+        <p>If the Photo Gallery contains photos linked to this bottle (matched by bottle code in the photo metadata), a horizontal <strong>photo filmstrip</strong> appears in the bottle detail — 80×80 px thumbnails, sorted chronologically, scrollable. Click any thumbnail to open the full photo in the Gallery lightbox.</p>
         <h3>Send to Greenhouse</h3>
         <p>Every bottle detail shows a <strong>🏡 Send to GH</strong> button. Tap it when a culture is subcultured and plants are ready to go back to the greenhouse. You choose how many plants, and the app merges them into an existing greenhouse entry for that species (or creates a new one). A transfer event is logged for traceability.</p>
         <h3>List Filters</h3>
@@ -3576,6 +3597,7 @@ input, textarea, select {
           <tr><td>Species</td><td>Taxonomy autocomplete + Browse modal. Hybrids (×) fully supported.</td></tr>
           <tr><td>Quantity</td><td>Number of plants — tracked via the Quantity Ledger tab.</td></tr>
           <tr><td>Health status</td><td>Healthy 🟢 / Stressed 🟡 / Dormant ⚪ / Declined 🔴 — coloured dot in list + bench view.</td></tr>
+          <tr><td>Size grade</td><td>🪴 Sapling · S · M · L · XL · XXL — used by Value Vault to calculate market value per grade. Old values (Seedling/Small/Medium/Adult) are silently remapped on load.</td></tr>
           <tr><td>Source</td><td>12 options: 🧪 Lab output · 🌿 Own cultivar · 🌍 Wild · 🔬 Sister lab/exchange · 🤝 Swap/barter · 🏪 Commercial vendor · 🌱 Nursery · 🏛 Botanical garden · 🎁 Donated · ♻️ Rescue · 🌾 Seeds/spores · ↔️ Trade. Badge shown in list.</td></tr>
           <tr><td>Date added</td><td>Logged as the first entry in the Quantity Ledger.</td></tr>
           <tr><td>Greenhouse location</td><td>Bench, section, shade house — defines bench view grouping. Defaults to <strong>Q5JV+2X Kelambakkam, Tamil Nadu</strong> for new plants (linked to map for climate reference).</td></tr>
@@ -3636,17 +3658,24 @@ input, textarea, select {
           <tr><td>🔔 chip in header</td><td>Exact days until / past inspection</td></tr>
         </table>
 
-        <h3>⬆ CSV Mass Import</h3>
-        <p>Click <strong>⬆ CSV</strong> in the list panel header to open the import modal.</p>
+        <h3>⬆ CSV / Spreadsheet Mass Import</h3>
+        <p>Click <strong>⬆ CSV</strong> in the list panel header to open the import modal. Three ways to get data in:</p>
+        <table><tr><th>Method</th><th>How</th></tr>
+          <tr><td>📂 Upload any file</td><td>Click "Upload any file" — accepts CSV, TSV, TXT, or any text format. No file-type restriction.</td></tr>
+          <tr><td>⬇ Fetch from URL</td><td>Paste any public CSV link (e.g. Dropbox, raw GitHub). Google Sheets edit URLs are auto-converted to <code>/export?format=csv</code>. Click Fetch.</td></tr>
+          <tr><td>Paste data</td><td>Copy from Excel / Google Sheets (tab-separated) or type CSV directly. Delimiter is auto-detected: comma, tab, or semicolon.</td></tr>
+        </table>
+        <p><strong>Column reference</strong> — column order is flexible, unrecognised columns are ignored. Common aliases (e.g. <code>qty</code>, <code>bench</code>, <code>status</code>) are accepted automatically.</p>
         <table><tr><th>Column</th><th>Required</th><th>Notes</th></tr>
-          <tr><td>species</td><td>✓</td><td>Scientific name or hybrid. Wrap in quotes if it contains commas: <code>"Nepenthes × (rajah × lowii)"</code></td></tr>
-          <tr><td>quantity</td><td></td><td>Integer, default 1</td></tr>
-          <tr><td>health</td><td></td><td>healthy · stressed · dormant · declined (default: healthy)</td></tr>
+          <tr><td>species</td><td>✓</td><td>Scientific name or hybrid. Aliases: plant, name, scientific_name</td></tr>
+          <tr><td>quantity</td><td></td><td>Integer, default 1. Alias: qty, count</td></tr>
+          <tr><td>health</td><td></td><td>healthy · stressed · dormant · declined (default: healthy). Alias: status</td></tr>
+          <tr><td>size_grade</td><td></td><td>sapling · s · m · l · xl · xxl (default: s). Aliases: size, grade</td></tr>
           <tr><td>source</td><td></td><td>greenhouse · wild · lab · nursery · trade · own-cultivar · sister-lab · swap · commercial · botanical-garden · donated · rescue · seeds (default: greenhouse)</td></tr>
-          <tr><td>location</td><td></td><td>Bench label — used for bench view grouping</td></tr>
-          <tr><td>next_inspection</td><td></td><td>YYYY-MM-DD</td></tr>
-          <tr><td>accession_number</td><td></td><td>Stored as a reference note; does not auto-link to Registry</td></tr>
-          <tr><td>notes</td><td></td><td>Free text</td></tr>
+          <tr><td>location</td><td></td><td>Bench label — used for bench view grouping. Alias: bench</td></tr>
+          <tr><td>next_inspection</td><td></td><td>YYYY-MM-DD. Alias: inspection_date</td></tr>
+          <tr><td>accession_number</td><td></td><td>Stored as a reference note; does not auto-link to Registry. Alias: accession</td></tr>
+          <tr><td>notes</td><td></td><td>Free text. Alias: remarks</td></tr>
         </table>
         <p>The preview table shows every parsed row with a HYBRID badge (detected by ×), colour-coded health, and ✓ / ✕ validity. Invalid rows (missing species) are skipped on import. All imported plants automatically get the <strong>🏡 GH flair</strong> and have their condition_log and quantity_log initialised. Click <strong>⬇ Download template</strong> for a ready-to-fill sample CSV.</p>
         <p><strong>Auto-taxonomy registration:</strong> Any species in the CSV not already in your taxonomy is automatically added to <strong>Custom Species</strong> with source = Greenhouse and the GH flair. They appear immediately in the autocomplete across all sections.</p>
@@ -3720,6 +3749,16 @@ input, textarea, select {
         <p>Up to 8 species ranked by combined note + bottle activity. Each shows 📋 note count and 🫙 bottle count. Click any → Species hub.</p>
         <h3>Row 4 — Media Recipes + Greenhouse</h3>
         <p>Side by side: last 5 saved recipes (click to open, + New shortcut) and healthy greenhouse stock plants (click to open, with "Lab → GH ready" alert when subcultured bottles exist).</p>
+        <h3>🔥 Contamination-free Streak Panel</h3>
+        <p>Dashboard card showing days elapsed since your last contamination log. Emoji milestones at 7 days (🌱), 14 days (💪), and 30+ days (🏆) with a confetti burst animation. Click to navigate to Contamination.</p>
+        <h3>🌿 Species Spotlight</h3>
+        <p>Daily randomly-selected species card (date-seeded so it's the same species all day). Shows species name, IUCN badge, native distribution, and a brief bio if available in your taxonomy. Changes each day.</p>
+        <h3>☑ Daily Lab Checklist</h3>
+        <p>5 default tasks (check autoclave pressure gauge, review bottle statuses, note contamination observations, check humidity/temperature, review upcoming subcultures). Auto-resets at midnight. Add custom tasks or remove defaults. Progress bar at the top. Data persisted in <code>localStorage</code> (key: <code>tcplants_checklist</code>).</p>
+        <h3>🍅 Lab Pomodoro (floating FAB)</h3>
+        <p>A 🍅 button floats in the bottom-right corner on all pages. Click to open the Pomodoro panel (slides in from the right). Three presets: 25/5 min, 50/10 min, 90/20 min. Shows a circular SVG progress ring. Web Audio API chimes when a work or break period ends. Session log stored in <code>localStorage</code> (key: <code>tcplants_pomo_sessions</code>).</p>
+        <h3>🌱 Login Plant Sprouting Animation</h3>
+        <p>While data loads after sign-in, a plant animation grows from soil in real time — growth speed reflects actual network load progress. Each data file loaded advances the animation.</p>
       </div>
 
       <h2 id="h-species" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
@@ -3826,7 +3865,7 @@ input, textarea, select {
       <h2 id="h-calendar" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
         <span style="width:32px;height:32px;border-radius:8px;background:rgba(255,200,0,.15);display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">📅</span>
         <span style="flex:1">Calendar</span>
-        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">Month grid · day panel · create from date · export</span>
+        <span style="font-size:11px;font-weight:400;color:var(--mu);letter-spacing:0">Month grid · day panel · create from date · alarms · export</span>
       </h2>
       <div class="help-section-card">
         <p>Monthly view of all lab activity. Navigate with <strong>‹ ›</strong> or <strong>Today</strong>.</p>
@@ -3840,6 +3879,16 @@ input, textarea, select {
         <p>Click any day → a panel lists all entries with type, stage, and species. Click any entry to open it. On mobile the panel is full-screen.</p>
         <h3>Creating Notes from the Calendar</h3>
         <p>Click a day → <strong>+ New note on this date</strong> (past) or <strong>+ Schedule note for this date</strong> (future). Past dates set the experiment date; future dates pre-fill the Next Review Date.</p>
+        <h3>⏰ Alarms <span style="color:var(--gn)">(v3.12)</span></h3>
+        <p>Click the <strong>⏰ Alarms</strong> button in the calendar header to open the alarm panel. Alarms fire at the exact minute in IST, play a 3-pulse Web Audio sound, and show a full-screen modal.</p>
+        <table><tr><th>Action</th><th>How</th></tr>
+          <tr><td>Add alarm</td><td>Enter a time (HH:MM) and optional label → click ＋ Add. Alarm appears in the list immediately.</td></tr>
+          <tr><td>Toggle on/off</td><td>Click the toggle switch on any alarm card. Off alarms are greyed out and will not fire.</td></tr>
+          <tr><td>Delete alarm</td><td>Click ✕ on the alarm card.</td></tr>
+          <tr><td>Dismiss</td><td>When the alarm fires, a full-screen modal shows the time and label. Click Dismiss to close it.</td></tr>
+        </table>
+        <p>Alarms check every 10 seconds. Each alarm fires at most once per minute (deduplication prevents re-firing within the same minute). All alarm state is persisted in <code>localStorage</code> (key: <code>tcplants_alarms</code>).</p>
+        <div class="help-tip">💡 Alarms only fire while the app tab is open. They use IST (UTC+5:30). If you switch to another tab, the alarm will fire as soon as you come back within the same minute window.</div>
         <h3>Exporting</h3>
         <p>Click <strong>⬇ Export → This week / This month</strong>. A print-ready window opens with all entries expanded — note bodies, badges, and contamination/review flags. Save as PDF via the browser print dialog.</p>
       </div>
@@ -4310,11 +4359,11 @@ input, textarea, select {
       <div class="help-section-card">
         <p>Nav drawer → <strong>💰 Value</strong>. Estimates your current lab inventory value from bottles + greenhouse stock using configurable prices.</p>
         <h3>Prices Tab</h3>
-        <p>Set base prices (₹) for 8 categories: bottles by stage (I, II, III, IV, Weaned, Rooting) and GH plants by size grade (Seedling, Small, Medium, Adult). Prices auto-save with an 800ms debounce after you stop typing.</p>
+        <p>Set base prices (₹) for 12 categories: bottles by stage (I, II, III, IV, Weaned, Rooting) and GH plants by size grade (🪴 Sapling, S, M, L, XL, XXL). Prices auto-save with an 800ms debounce after you stop typing.</p>
         <h3>Vault Tab</h3>
         <p>Live calculated total: <code>Σ(bottles by stage × stage price) + Σ(GH plants × grade price × quantity)</code>. Full breakdown by category with species-level detail.</p>
         <table><tr><th>Setting</th><th>Where</th></tr>
-          <tr><td>Size grade (Seedling / Small / Medium / Adult)</td><td>GH plant editor → Size Grade field</td></tr>
+          <tr><td>Size grade (Sapling / S / M / L / XL / XXL)</td><td>GH plant editor → Size Grade field. Old values (Seedling/Small/Medium/Adult) are remapped automatically.</td></tr>
           <tr><td>Dashboard stat card</td><td>Shows compact total (₹12k / ₹1.2L format), navigates to Value page</td></tr>
         </table>
         <div class="help-tip">💡 Set the 8 base prices once in the Prices tab — the Vault auto-updates as you add or remove bottles and plants. Species-level overrides are planned for a future update.</div>
@@ -4660,7 +4709,7 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
     <main style="flex:1;overflow-y:auto;padding:28px 32px;max-width:980px;width:100%;box-sizing:border-box">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
         <h1 style="font-size:20px;font-weight:800;margin:0">🔗 Logic Flows</h1>
-        <span style="background:linear-gradient(135deg,var(--ac),var(--pu));color:#0d1117;border-radius:12px;font-size:11px;font-weight:800;padding:2px 9px;letter-spacing:.04em">v3.11</span>
+        <span style="background:linear-gradient(135deg,var(--ac),var(--pu));color:#0d1117;border-radius:12px;font-size:11px;font-weight:800;padding:2px 9px;letter-spacing:.04em">v3.12</span>
         <button onclick="_lfExpandAll()" class="btn xs ghost" style="margin-left:auto">Expand all</button>
         <button onclick="_lfCollapseAll()" class="btn xs ghost">Collapse all</button>
       </div>
@@ -4748,6 +4797,7 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
         <a href="#lf-gbif" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid rgba(63,185,80,.4);color:var(--gn);text-decoration:none;background:rgba(63,185,80,.06)">🌍 GBIF</a>
         <a href="#lf-value" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid rgba(255,180,0,.4);color:#e3a000;text-decoration:none;background:rgba(255,180,0,.06)">💰 Value</a>
         <a href="#lf-export" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid var(--bd);color:var(--tx);text-decoration:none;background:var(--sf)">📥 Export</a>
+        <a href="#lf-alarms" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid rgba(255,200,0,.4);color:var(--yw);text-decoration:none;background:rgba(255,200,0,.06)">⏰ Alarms</a>
         <a href="#lf-gaps" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid rgba(248,81,73,.4);color:var(--rd);text-decoration:none;background:rgba(248,81,73,.06)">⚠️ Gaps</a>
       </div>
 
@@ -5384,6 +5434,24 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
           <tr><td><code>ghTab('qr')</code></td><td>Calls <code>_renderGHQRCanvas(S.curGH)</code> → <code>QRCode.toCanvas()</code></td></tr>
           <tr><td>QR scanner / URL param</td><td><code>?gh=id</code> → <code>navTo('greenhouse'); openGHPlant(id)</code></td></tr>
         </table>
+
+        <h3 class="help-h3" style="margin-top:14px">Smart CSV Import (v3.12)</h3>
+        <table class="help-table">
+          <tr><th>Component</th><th>What changed</th></tr>
+          <tr><td>File upload</td><td>Removed <code>accept=".csv,.txt"</code> restriction — any file type accepted</td></tr>
+          <tr><td>URL fetch</td><td><code>fetchGHCsvUrl()</code> — fetches any public URL; Google Sheets edit URLs auto-converted to <code>/export?format=csv</code></td></tr>
+          <tr><td>Delimiter detection</td><td><code>_detectDelimiter(firstLine)</code> counts tabs vs semicolons vs commas, picks the majority. Fixes copy-paste from Excel/Sheets (tab-separated).</td></tr>
+          <tr><td><code>_parseCSVLine(line, delim)</code></td><td>Now accepts <code>delim</code> parameter (default <code>,</code>). Handles quoted fields with embedded delimiters.</td></tr>
+          <tr><td>size_grade column</td><td>Added to <code>colMap</code> (aliases: size, grade). Parsed + stored on imported plants. <code>_normalizeGrade()</code> applied to incoming values.</td></tr>
+          <tr><td>Column order</td><td>Always flexible via header matching — was already flexible, but help text now correctly states this.</td></tr>
+        </table>
+
+        <h3 class="help-h3" style="margin-top:14px">Size Grade Normalisation (v3.12)</h3>
+        <table class="help-table">
+          <tr><th>Function</th><th>Purpose</th></tr>
+          <tr><td><code>_normalizeGrade(g)</code></td><td>Maps legacy values: seedling→sapling, small→s, medium→m, adult→l. Falls through to g itself if already a new value. Returns 's' for null/undefined.</td></tr>
+        </table>
+        <p>Applied at: vault calculation (line 9191), form population (openGHPlant), import parser. Plant records with old grade values continue to function without any migration step.</p>
       </div></div></details>
 
       <!-- ═══ DASHBOARD FLOW ═══ -->
@@ -5392,9 +5460,9 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
         <span style="width:28px;height:28px;border-radius:7px;background:rgba(210,153,34,.12);display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🏠</span>
         <div style="flex:1">
           <div style="font-size:13px;font-weight:700">Dashboard — Render Pipeline</div>
-          <div style="font-size:11px;color:var(--mu);margin-top:2px">10 stat cards · 5 alert types · active strips · species grid</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:2px">10 stat cards · 5 alert types · active strips · 7 fun features · species grid</div>
         </div>
-        <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center"><span class="lf-pill lf-pill-yw">_renderDashboard()</span><span class="lf-pill lf-pill-yw">_computeAlerts()</span></div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center"><span class="lf-pill lf-pill-yw">_renderDashboard()</span><span class="lf-pill lf-pill-yw">_computeAlerts()</span><span class="lf-pill">_contamStreak()</span><span class="lf-pill">_clInit()</span><span class="lf-pill">_pomoPanelToggle()</span></div>
         <span class="lf-caret">›</span>
       </summary>
       <div class="lf-body">
@@ -5425,6 +5493,18 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
           <tr><td>≥5 active bottles past 28d inoculation</td><td><span style="color:var(--yw)">warn</span></td><td>bottles</td></tr>
           <tr><td>GH plants with health ≠ healthy</td><td><span style="color:var(--yw)">warn</span></td><td>greenhouse</td></tr>
           <tr><td>Supply batch expired or expiring &lt;14d</td><td><span style="color:var(--rd)">info</span></td><td>supply</td></tr>
+        </table>
+
+        <h3 class="help-h3" style="margin-top:14px">7 Fun Features (v3.12)</h3>
+        <table class="help-table">
+          <tr><th>Feature</th><th>Where</th><th>State</th><th>Key functions</th></tr>
+          <tr><td>🔥 Contamination Streak</td><td>Dashboard panel <code>grid-area:streak</code></td><td>Computed from S.notes contam dates</td><td><code>_contamStreak()</code></td></tr>
+          <tr><td>🌿 Species Spotlight</td><td>Dashboard panel <code>grid-area:spotlight</code></td><td>Date-seeded random from S.taxSpecies</td><td>Inline in <code>_renderDashboard()</code></td></tr>
+          <tr><td>☑ Daily Checklist</td><td>Dashboard panel <code>grid-area:checklist</code></td><td>localStorage <code>tcplants_checklist</code>, auto-resets midnight</td><td><code>_clInit() _clToggle() _clAdd() _clRemove()</code></td></tr>
+          <tr><td>🍅 Pomodoro</td><td>Floating FAB <code>#pomo-fab</code>, panel <code>#pomo-panel</code></td><td>localStorage <code>tcplants_pomo_sessions</code></td><td><code>_pomoPanelToggle() _pomoToggle() _pomoTick() _playPomoChime()</code></td></tr>
+          <tr><td>🌳 Lineage Tree</td><td>Bottle detail — passage section</td><td>Computed from S.bottles parent_id chain</td><td><code>_treeAncestor() _renderLineageTree()</code></td></tr>
+          <tr><td>📸 Photo Strip</td><td>Bottle detail — below lineage</td><td>Filtered from S.gallery by bottle code</td><td>Inline render in <code>openBottle()</code></td></tr>
+          <tr><td>⚗️ Recipe Inline Scaler</td><td>Recipe detail panel</td><td>Stateless — recomputes on each input change</td><td><code>_recScaleRender() _recScaleUpdate()</code></td></tr>
         </table>
       </div></div></details>
 
@@ -5806,10 +5886,10 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
         <p style="font-size:12px;color:var(--mu);margin:0 0 10px">Nav drawer → 💰 Value. Estimates live inventory value from bottles + greenhouse stock using user-configured base prices.</p>
         <table class="help-table">
           <tr><th>Component</th><th>Detail</th></tr>
-          <tr><td>Prices tab</td><td>8 base prices: bottles by stage (I–IV, Weaned, Rooting) + GH plants by size_grade (Seedling/Small/Medium/Adult). Saved to <code>S.value.prices</code> with 800ms debounce auto-save.</td></tr>
+          <tr><td>Prices tab</td><td>12 base prices: bottles by stage (I–IV, Weaned, Rooting) + GH plants by size_grade (Sapling / S / M / L / XL / XXL). Saved to <code>S.value.prices</code> with 800ms debounce auto-save.</td></tr>
           <tr><td>Vault tab</td><td>Live calculated: <code>Σ(bottles by stage × stagePrice) + Σ(GH plants × gradePrice × quantity)</code>. Species-level breakdown with overrides (pending). Vault total shown in INR.</td></tr>
           <tr><td>Dashboard stat card</td><td>Compact ₹ value — formatted with <code>fmtINR()</code> (Indian locale: ₹12k / ₹1.2L)</td></tr>
-          <tr><td>GH plant size_grade</td><td>New field on GH plant form: Seedling / Small / Medium / Adult. Used in vault calculation.</td></tr>
+          <tr><td>GH plant size_grade</td><td>6-tier grade: Sapling / S / M / L / XL / XXL. Old values remapped by <code>_normalizeGrade()</code> at read time. Keys: <code>gh_sapling</code>, <code>gh_s</code>, <code>gh_m</code>, <code>gh_l</code>, <code>gh_xl</code>, <code>gh_xxl</code>.</td></tr>
           <tr><td>State</td><td><code>S.value = {prices:{}, overrides:{}}</code> · <code>S.valueSha</code> — 8th load in login Promise.all</td></tr>
           <tr><td>File</td><td>value/data.enc</td></tr>
         </table>
@@ -5845,13 +5925,46 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
         </table>
       </div></div></details>
 
+      <!-- ═══ CALENDAR ALARMS ═══ -->
+      <details id="lf-alarms">
+      <summary>
+        <span style="width:28px;height:28px;border-radius:7px;background:rgba(255,200,0,.12);display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">⏰</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">Calendar Alarms (v3.12)</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:2px">localStorage · IST tick · Web Audio · fire modal</div>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center"><span class="lf-pill lf-pill-yw">_loadAlarms()</span><span class="lf-pill lf-pill-yw">_renderAlarms()</span><span class="lf-pill">_playAlarmSound()</span><span class="lf-pill">_showAlarmModal()</span></div>
+        <span class="lf-caret">›</span>
+      </summary>
+      <div class="lf-body">
+        <div style="background:transparent">
+        <h2 class="help-h2" style="color:var(--yw)">⏰ Calendar Alarms (v3.12)</h2>
+        <p style="font-size:12px;color:var(--mu);margin:0 0 10px">Alarm state is persisted in <code>localStorage</code> key <code>tcplants_alarms</code>. A deduplication set <code>_firedAlarms</code> prevents re-firing within the same minute.</p>
+        <table class="help-table">
+          <tr><th>Function</th><th>What it does</th></tr>
+          <tr><td><code>_loadAlarms()</code></td><td>Parses <code>localStorage.tcplants_alarms</code> → Array of <code>{id, time, label, enabled}</code></td></tr>
+          <tr><td><code>_saveAlarms(arr)</code></td><td>JSON-stringifies and writes back to localStorage</td></tr>
+          <tr><td><code>_addAlarm()</code></td><td>Reads time + label inputs → pushes new alarm → <code>_saveAlarms()</code> → <code>_renderAlarms()</code></td></tr>
+          <tr><td><code>_toggleAlarmEnabled(id)</code></td><td>Flips <code>alarm.enabled</code> → saves</td></tr>
+          <tr><td><code>_removeAlarm(id)</code></td><td>Filters by id → saves → re-renders</td></tr>
+          <tr><td><code>_renderAlarms()</code></td><td>Rebuilds alarm card list in <code>#cal-alarm-panel</code></td></tr>
+          <tr><td><code>_updateAlarmBtn()</code></td><td>Shows/hides 🔔 badge on ⏰ Alarms button based on enabled alarms count</td></tr>
+          <tr><td><code>_playAlarmSound()</code></td><td>Web Audio API: 3-pulse sine wave + harmonic. No external files. Ramps gain in/out.</td></tr>
+          <tr><td><code>_showAlarmModal(alarm)</code></td><td>Populates <code>#alarm-modal</code> with time + label → adds class <code>.on</code> → plays sound</td></tr>
+          <tr><td><code>_dismissAlarm()</code></td><td>Removes <code>.on</code> from modal → stops sound</td></tr>
+        </table>
+        <h3 class="help-h3" style="margin-top:14px">Tick logic</h3>
+        <p style="font-size:12px;color:var(--mu)">A <code>setInterval</code> running every 10 seconds checks all enabled alarms. IST is computed as <code>UTC + 330 minutes</code>. The current time in <code>HH:MM</code> is compared against each alarm's time string. If it matches and <code>!_firedAlarms.has(alarmId+'@'+HH:MM)</code>, the alarm fires and the key is added to the set. The set entry is not cleared — so the alarm will not re-fire within the same session for the same minute.</p>
+        </div>
+      </div></details>
+
       <!-- ═══ KNOWN ISSUES ═══ -->
       <details id="lf-gaps">
       <summary style="border-color:rgba(248,81,73,.25)!important">
         <span style="width:28px;height:28px;border-radius:7px;background:rgba(248,81,73,.12);display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">⚠️</span>
         <div style="flex:1">
           <div style="font-size:13px;font-weight:700;color:var(--rd)">Known Gaps &amp; Latent Bugs</div>
-          <div style="font-size:11px;color:var(--mu);margin-top:2px">7 fixed · 4 open · 1 priority queue item</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:2px">9 fixed · 3 open · 1 priority queue item</div>
         </div>
         <span class="lf-pill lf-pill-rd">Telegram frozen</span>
         <span class="lf-pill lf-pill-rd">CSP pending</span>
@@ -5871,8 +5984,11 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
           <tr><td><s>Batch checkbox invisible</s></td><td>Fixed v3.9</td><td>CSS width:100% scoped to text inputs only</td><td>✅ Fixed</td></tr>
           <tr><td><s>Offline check inconsistency</s></td><td>Fixed v3.10</td><td>Removed Haiku monkey-patches — all load functions fail naturally on network error</td><td>✅ Fixed</td></tr>
           <tr><td><s>updateReminderBadge not called after bottle saves</s></td><td>Fixed v3.8</td><td>Badge now updates after all saves</td><td>✅ Fixed</td></tr>
+          <tr><td><s>GH CSV import: tab-separated data parsed as single column</s></td><td>Fixed v3.12</td><td><code>_detectDelimiter()</code> now auto-selects comma/tab/semicolon. Copy-paste from Excel/Sheets works.</td><td>✅ Fixed</td></tr>
+          <tr><td><s>GH import: file accept restricted to .csv/.txt</s></td><td>Fixed v3.12</td><td>Removed accept restriction — any file accepted</td><td>✅ Fixed</td></tr>
           <tr><td>Telegram integration frozen</td><td>Settings UI exists, function commented out</td><td>Alert settings visible but non-functional</td><td>Frozen</td></tr>
           <tr><td>Two inventory systems (Stock ≠ Supply)</td><td>Stock now redirects to Supply (v3.11)</td><td>Stock UI still exists but unreachable. Low-stock alerts use S.supplies.</td><td>Partially resolved</td></tr>
+          <tr><td>Alarm clock fires only while tab is open</td><td>Calendar → ⏰ Alarms</td><td>No service worker push — alarms rely on <code>setInterval</code>. Will not fire if tab is closed or sleeping on mobile.</td><td>Design constraint</td></tr>
           <tr><td>Agentic Ravana tool-use</td><td>askAI() / _executeTool()</td><td>Write tools (create_note, create_bottle, log_contam) have confirm gate scaffolded but not fully implemented</td><td>Pending — priority queue</td></tr>
         </table>
         </div>
