@@ -780,14 +780,15 @@ main > .dview, main > .editor{ margin:0 auto; }
 /* ── DASHBOARD REDESIGN ── */
 #dash-panels{display:grid;gap:12px;grid-template-columns:repeat(24,1fr);grid-template-areas:
   "donut donut donut donut donut donut donut donut alerts alerts alerts alerts alerts alerts alerts alerts activity activity activity activity activity activity activity activity"
-  "contam contam contam contam contam contam contam contam contam contam contam contam contam contam contam contam contam contam contam contam contam contam contam contam"
-  "species species species species species species species species species species species species gh gh gh gh gh gh gh gh gh gh gh gh"
+  "contam contam contam contam contam contam contam contam contam contam contam contam contam contam contam contam streak streak streak streak streak streak streak streak"
+  "species species species species species species species species spotlight spotlight spotlight spotlight spotlight spotlight spotlight spotlight gh gh gh gh gh gh gh gh"
   "recent recent recent recent recent recent recent recent pinned pinned pinned pinned pinned pinned pinned pinned research research research research research research research research"
+  "checklist checklist checklist checklist checklist checklist checklist checklist checklist checklist checklist checklist checklist checklist checklist checklist checklist checklist checklist checklist checklist checklist checklist checklist"
   "aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar"
   "voice voice voice voice voice voice voice voice voice voice voice voice voice voice voice voice voice voice voice voice voice voice voice voice";
 }
-@media(max-width:900px){#dash-panels{grid-template-columns:repeat(12,1fr);grid-template-areas:"donut donut donut donut donut donut alerts alerts alerts alerts alerts alerts""activity activity activity activity activity activity contam contam contam contam contam contam""species species species species species species species species species species species species""gh gh gh gh gh gh gh gh gh gh gh gh""recent recent recent recent recent recent pinned pinned pinned pinned pinned pinned""research research research research research research research research research research research research""aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar""voice voice voice voice voice voice voice voice voice voice voice voice";}}
-@media(max-width:580px){#dash-panels{grid-template-columns:1fr;grid-template-areas:"donut""alerts""activity""contam""species""gh""recent""pinned""research""aibar""voice";}}
+@media(max-width:900px){#dash-panels{grid-template-columns:repeat(12,1fr);grid-template-areas:"donut donut donut donut donut donut alerts alerts alerts alerts alerts alerts""activity activity activity activity activity activity contam contam contam contam contam contam""streak streak streak streak streak streak streak streak streak streak streak streak""species species species species species species spotlight spotlight spotlight spotlight spotlight spotlight""gh gh gh gh gh gh gh gh gh gh gh gh""recent recent recent recent recent recent pinned pinned pinned pinned pinned pinned""research research research research research research research research research research research research""checklist checklist checklist checklist checklist checklist checklist checklist checklist checklist checklist checklist""aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar""voice voice voice voice voice voice voice voice voice voice voice voice";}}
+@media(max-width:580px){#dash-panels{grid-template-columns:1fr;grid-template-areas:"donut""alerts""activity""contam""streak""species""spotlight""gh""recent""pinned""research""checklist""aibar""voice";}}
 .dc{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;min-width:0;overflow:hidden}
 .dc-label{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
 .dc-label a,.dc-label span[onclick]{color:var(--ac);cursor:pointer;font-size:9px;font-weight:700;text-transform:none;letter-spacing:0}
@@ -830,6 +831,56 @@ main > .dview, main > .editor{ margin:0 auto; }
 /* custom media */
 #re-base-custom-wrap{display:none;margin-top:6px}
 
+/* ── POMODORO WIDGET ── */
+#pomo-widget{position:fixed;bottom:22px;right:22px;z-index:320;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+#pomo-fab{width:46px;height:46px;border-radius:50%;background:var(--sf);border:1px solid var(--bd);box-shadow:0 4px 16px rgba(0,0,0,.3);cursor:pointer;font-size:21px;display:flex;align-items:center;justify-content:center;transition:all .2s;line-height:1}
+#pomo-fab:hover{background:var(--sf2);transform:scale(1.09)}
+#pomo-fab.running{border-color:var(--gn);box-shadow:0 0 0 3px rgba(63,185,80,.25),0 4px 16px rgba(0,0,0,.3)}
+#pomo-panel{background:var(--sf);border:1px solid var(--bd);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.3);padding:16px 18px;width:210px;display:none;flex-direction:column;gap:10px}
+#pomo-panel.open{display:flex}
+.pomo-mode{font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;text-align:center}
+.pomo-presets{display:flex;gap:5px;justify-content:center}
+.pomo-preset{background:var(--sf2);border:1px solid var(--bd);border-radius:12px;color:var(--mu);cursor:pointer;font-size:11px;font-weight:700;padding:4px 10px;transition:all .15s}
+.pomo-preset:hover{border-color:var(--ac);color:var(--ac)}
+.pomo-preset.active{background:rgba(88,166,255,.12);border-color:var(--ac);color:var(--ac)}
+.pomo-controls{display:flex;gap:8px;justify-content:center;align-items:center}
+.pomo-ctrl-btn{background:var(--sf2);border:1px solid var(--bd);border-radius:8px;color:var(--tx);cursor:pointer;font-size:17px;padding:6px 14px;transition:all .15s;line-height:1}
+.pomo-ctrl-btn:hover{background:var(--sf3,var(--sf2))}
+.pomo-ctrl-btn.go{background:rgba(63,185,80,.2);border-color:var(--gn);color:var(--gn);font-size:20px;padding:8px 18px}
+.pomo-session-log{font-size:10px;color:var(--mu);text-align:center}
+/* ── CLEAN STREAK ── */
+.dc-streak-num{font-family:var(--mono);font-size:42px;font-weight:900;line-height:1;margin-bottom:4px}
+/* ── RECIPE SCALE ── */
+.rec-scale-wrap{border-top:1px solid var(--bd);margin-top:16px;padding-top:14px}
+.rec-scale-out{background:var(--sf2);border-radius:8px;padding:10px 12px;margin-top:10px;line-height:1.85}
+.rec-scale-out div{font-size:12px;display:flex;gap:8px;align-items:baseline}
+.rec-scale-out .rsl{color:var(--mu);min-width:110px;font-size:11px;flex-shrink:0}
+.rec-scale-out .rsv{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--tx)}
+/* ── GROWTH PHOTO STRIP ── */
+.bot-photo-strip{display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px;scrollbar-width:none}
+.bot-photo-strip::-webkit-scrollbar{display:none}
+.bot-photo-frame{flex-shrink:0;cursor:pointer;border-radius:8px;overflow:hidden;border:1px solid var(--bd);width:80px;height:80px;position:relative;transition:border-color .15s}
+.bot-photo-frame:hover{border-color:var(--ac)}
+.bot-photo-frame img{width:100%;height:100%;object-fit:cover;display:block}
+.bpf-date{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.65);color:#fff;font-size:9px;font-weight:600;padding:2px 4px;text-align:center}
+/* ── DAILY CHECKLIST ── */
+.cl-item{display:flex;align-items:center;gap:10px;padding:7px 4px;border-bottom:1px solid var(--sf2)}
+.cl-item:last-child{border-bottom:none}
+.cl-item.done .cl-text{text-decoration:line-through;color:var(--mu);opacity:.7}
+.cl-cb{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--bd);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:transparent}
+.cl-cb.checked{background:var(--gn);border-color:var(--gn)}
+.cl-text{font-size:13px;flex:1;cursor:pointer}
+.cl-del{background:transparent;border:none;color:transparent;cursor:pointer;font-size:12px;padding:2px 5px;border-radius:4px;transition:color .15s;line-height:1}
+.cl-item:hover .cl-del{color:var(--mu)}
+.cl-del:hover{color:var(--rd)!important}
+/* ── SPECIES SPOTLIGHT ── */
+.spotlight-sp{font-size:15px;font-weight:700;font-style:italic;margin-bottom:6px;line-height:1.3}
+.spotlight-iucn{display:inline-block;font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;margin-bottom:10px;letter-spacing:.05em}
+/* ── CONFETTI ── */
+.confetti-piece{position:fixed;top:-12px;border-radius:2px;animation:confetti-fall linear forwards;pointer-events:none;z-index:10000}
+@keyframes confetti-fall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
+/* ── SVG PASSAGE TREE ── */
+.tree-svg-node{cursor:pointer}.tree-svg-node.cur{cursor:default}
 /* ── HELP ── */
 .help-body{max-width:960px;margin:0 auto}
 .help-body h2{font-size:22px;font-weight:700;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)}
@@ -2375,6 +2426,7 @@ input, textarea, select {
         </div>
         <table class="spec-table" id="rv-spec"></table>
         <div class="md" id="rv-body" style="margin-top:20px"></div>
+        <div id="rv-scale"></div>
       </div>
       <div class="editor" id="rec-editor">
         <div class="ehead" id="re-head">New Media Recipe</div>
@@ -6190,6 +6242,32 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
 <!-- Taxonomy autocomplete dropdown -->
 <div id="tax-dropdown"></div>
 
+<!-- Pomodoro Timer Widget -->
+<div id="pomo-widget">
+  <div id="pomo-panel">
+    <div class="pomo-mode" id="pomo-mode-lbl" style="color:var(--mu)">READY</div>
+    <div style="display:flex;justify-content:center">
+      <svg width="96" height="96" viewBox="0 0 96 96">
+        <circle cx="48" cy="48" r="42" fill="none" stroke="var(--sf2)" stroke-width="6"/>
+        <circle id="pomo-ring-prog" cx="48" cy="48" r="42" fill="none" stroke="var(--gn)" stroke-width="6"
+          stroke-linecap="round" stroke-dasharray="263.89" stroke-dashoffset="263.89"
+          transform="rotate(-90 48 48)" style="transition:stroke-dashoffset .9s linear"/>
+        <text id="pomo-time-svg" x="48" y="55" text-anchor="middle" font-family="monospace" font-weight="900" font-size="19" fill="currentColor">25:00</text>
+      </svg>
+    </div>
+    <div class="pomo-presets">
+      <button class="pomo-preset active" onclick="_pomoSetPreset(25,5,this)">25/5</button>
+      <button class="pomo-preset" onclick="_pomoSetPreset(50,10,this)">50/10</button>
+      <button class="pomo-preset" onclick="_pomoSetPreset(90,15,this)">90/15</button>
+    </div>
+    <div class="pomo-controls">
+      <button class="pomo-ctrl-btn" onclick="_pomoReset()" title="Reset">↺</button>
+      <button class="pomo-ctrl-btn go" id="pomo-play-btn" onclick="_pomoToggle()">▶</button>
+    </div>
+    <div class="pomo-session-log" id="pomo-session-log">0 sessions today</div>
+  </div>
+  <button id="pomo-fab" onclick="_pomoPanelToggle()" title="Lab Pomodoro Timer">🍅</button>
+</div>
 <!-- Alarm fire modal -->
 <div id="alarm-modal">
   <div id="alm-card">
@@ -9365,9 +9443,80 @@ function _renderDashboard(){
         }).join('')}
       </div>`,'padding:12px 18px'):'';
 
+    // ── 12. CLEAN STREAK ──────────────────────────────────────
+    const streakDays=_contamStreak();
+    const MILE_KEY='tcplants_streak_mile';
+    const lastMile=parseInt(localStorage.getItem(MILE_KEY)||'0');
+    const mileStones=[7,14,30,60,90,180,365];
+    const hitMile=mileStones.find(m=>m>lastMile&&streakDays>=m);
+    if(hitMile){localStorage.setItem(MILE_KEY,hitMile);setTimeout(_spawnConfetti,500);}
+    const streakIcon=streakDays>=90?'🏆':streakDays>=30?'🔥':streakDays>=7?'⭐':'🌱';
+    const streakCol=streakDays>=30?'var(--gn)':streakDays>=7?'var(--yw)':'var(--mu)';
+    const nextMile=mileStones.find(m=>m>streakDays);
+    const streakHTML=C('streak',`
+      ${H('☣️ CLEAN STREAK')}
+      <div style="text-align:center;padding:6px 0">
+        <div style="font-size:38px;line-height:1;margin-bottom:6px">${streakIcon}</div>
+        <div class="dc-streak-num" style="color:${streakCol}">${streakDays}</div>
+        <div style="font-size:11px;color:var(--mu);margin-bottom:8px">days without contamination</div>
+        ${nextMile?`<div style="font-size:10px;color:var(--ac)">${nextMile-streakDays}d to ${nextMile}-day milestone</div>`:`<div style="font-size:10px;color:var(--gn)">🏆 Milestone achieved!</div>`}
+      </div>`);
+
+    // ── 13. SPECIES SPOTLIGHT ─────────────────────────────────
+    const spotSp=(()=>{
+      const accs=S.accs||[]; if(!accs.length) return null;
+      return accs[Math.floor(Date.now()/86400000)%accs.length];
+    })();
+    const spotlightHTML=spotSp?C('spotlight',`
+      ${H('🌟 SPECIES SPOTLIGHT',`navTo('registry');openAccession('${spotSp.id}')`,'Open →')}
+      <div class="spotlight-sp">${esc(spotSp.species||spotSp.accession||'?')}</div>
+      ${spotSp.iucn?(()=>{const c={'CR':'#f85149','EN':'#d29922','VU':'#f97316','NT':'#58a6ff','LC':'#3fb950'}[spotSp.iucn]||'var(--mu)';return`<span class="spotlight-iucn" style="background:${c}22;color:${c};border:1px solid ${c}55">${esc(spotSp.iucn)}</span>`;})():''}
+      <div style="font-size:12px;color:var(--mu);line-height:1.75">
+        ${(()=>{
+          const sp=(spotSp.species||'').toLowerCase();
+          const spBots=(S.bottles||[]).filter(b=>b.species&&b.species.toLowerCase()===sp);
+          const actSp=spBots.filter(b=>['inoculated','growing'].includes(b.status)).length;
+          const spNotes=(S.notes||[]).filter(n=>n.species&&n.species.toLowerCase()===sp);
+          const lastN=[...spNotes].sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
+          return `<div>🫙 ${spBots.length} bottles · ${actSp} active</div>
+            <div>📋 ${spNotes.length} notes${lastN?` · last ${fmtDateShort(lastN.date)}`:''}</div>
+            ${spotSp.native_distribution?`<div style="font-size:11px;margin-top:2px;color:var(--mu)">🌍 ${esc(spotSp.native_distribution.slice(0,55))}${spotSp.native_distribution.length>55?'…':''}</div>`:''}`;
+        })()}
+      </div>`):
+    C('spotlight',`${H('🌟 SPECIES SPOTLIGHT')}<div style="color:var(--mu);font-size:13px;padding:12px 0">Add species to Registry for daily spotlight.</div>`);
+
+    // ── 14. DAILY CHECKLIST ───────────────────────────────────
+    const clData=_clInit();
+    const clToday=todayStr;
+    const clChecked=new Set(clData.checked[clToday]||[]);
+    const clTotal=clData.tasks.length, clDone=clData.tasks.filter(t=>clChecked.has(t.id)).length;
+    const clPct=clTotal?Math.round(clDone/clTotal*100):0;
+    const checkSvg=`<svg width="10" height="10" viewBox="0 0 10 10"><path d="M1.5 5L4 7.5L8.5 2" stroke="white" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>`;
+    const checklistHTML=C('checklist',`
+      ${H('☑ LAB CHECKLIST')}
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="flex:1;background:var(--sf2);border-radius:4px;height:5px;overflow:hidden">
+          <div style="width:${clPct}%;height:100%;background:${clPct===100?'var(--gn)':'var(--ac)'};border-radius:4px;transition:width .3s"></div>
+        </div>
+        <span style="font-size:11px;font-weight:700;color:${clPct===100?'var(--gn)':'var(--mu)'};flex-shrink:0">${clDone}/${clTotal}</span>
+      </div>
+      <div class="dc-fade"><div class="dc-scroll">
+        ${clData.tasks.map(t=>`<div class="cl-item${clChecked.has(t.id)?' done':''}">
+          <div class="cl-cb${clChecked.has(t.id)?' checked':''}" onclick="_clToggle(${t.id})">${clChecked.has(t.id)?checkSvg:''}</div>
+          <span class="cl-text" onclick="_clToggle(${t.id})">${esc(t.text)}</span>
+          <button class="cl-del" onclick="_clRemove(${t.id})" title="Remove">✕</button>
+        </div>`).join('')}
+      </div></div>
+      <div style="display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--sf2)">
+        <input id="cl-new-input" type="text" placeholder="Add task…"
+          style="flex:1;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-size:12px;padding:5px 8px;font-family:var(--font);outline:none"
+          onkeydown="if(event.key==='Enter')_clAdd()">
+        <button class="btn xs ghost" onclick="_clAdd()" style="flex-shrink:0">+ Add</button>
+      </div>`);
+
     // ── Assemble — CSS class handles layout ───────────────────
     pEl.style.cssText='';
-    pEl.innerHTML=donutHTML+alertsHTML+actHTML+contamHTML+spHTML+ghHTML+recentHTML+pinnedHTML+researchHTML+aibarHTML+voiceHTML;
+    pEl.innerHTML=donutHTML+alertsHTML+actHTML+contamHTML+streakHTML+spHTML+spotlightHTML+ghHTML+recentHTML+pinnedHTML+researchHTML+checklistHTML+aibarHTML+voiceHTML;
   }
 }
 
@@ -10604,6 +10753,200 @@ function _dismissAlarm(){
   }
   setInterval(check,1000);
 })();
+
+// ── POMODORO ─────────────────────────────────────────────────
+let _pomoMode='idle',_pomoWorkMin=25,_pomoBreakMin=5,_pomoElapsed=0,_pomoInterval=null;
+const _POMO_KEY='tcplants_pomo_sessions';
+function _pomoPanelToggle(){document.getElementById('pomo-panel').classList.toggle('open');}
+function _pomoSetPreset(w,b,btn){
+  if(_pomoInterval) return;
+  _pomoWorkMin=w;_pomoBreakMin=b;_pomoElapsed=0;_pomoMode='idle';
+  document.querySelectorAll('.pomo-preset').forEach(el=>el.classList.remove('active'));
+  btn.classList.add('active');
+  _pomoRender();
+}
+function _pomoToggle(){
+  if(_pomoMode==='idle'){
+    _pomoMode='work';_pomoElapsed=0;
+    _pomoInterval=setInterval(_pomoTick,1000);
+    document.getElementById('pomo-fab').classList.add('running');
+  } else if(_pomoInterval){
+    clearInterval(_pomoInterval);_pomoInterval=null;
+    document.getElementById('pomo-fab').classList.remove('running');
+  } else {
+    _pomoInterval=setInterval(_pomoTick,1000);
+    document.getElementById('pomo-fab').classList.add('running');
+  }
+  _pomoRender();
+}
+function _pomoReset(){
+  if(_pomoInterval){clearInterval(_pomoInterval);_pomoInterval=null;}
+  _pomoElapsed=0;_pomoMode='idle';
+  document.getElementById('pomo-fab').classList.remove('running');
+  _pomoRender();
+}
+function _pomoTick(){
+  _pomoElapsed++;
+  const total=(_pomoMode==='work'?_pomoWorkMin:_pomoBreakMin)*60;
+  if(_pomoElapsed>=total){_pomoSessionDone();return;}
+  _pomoRender();
+}
+function _pomoSessionDone(){
+  clearInterval(_pomoInterval);_pomoInterval=null;
+  _playPomoChime(_pomoMode==='work');
+  if(_pomoMode==='work'){
+    const today=new Date().toISOString().slice(0,10);
+    const d=JSON.parse(localStorage.getItem(_POMO_KEY)||'{}');
+    d[today]=(d[today]||0)+1;
+    localStorage.setItem(_POMO_KEY,JSON.stringify(d));
+    toast(`Work session done 🍅 — take a ${_pomoBreakMin}min break!`,'info');
+    _pomoMode='break';
+  } else {
+    toast('Break done — ready for next session?','info');
+    _pomoMode='idle';
+  }
+  _pomoElapsed=0;
+  _pomoInterval=setInterval(_pomoTick,1000);
+  _pomoRender();
+}
+function _pomoRender(){
+  const timeEl=document.getElementById('pomo-time-svg');
+  const modeEl=document.getElementById('pomo-mode-lbl');
+  const playBtn=document.getElementById('pomo-play-btn');
+  const ring=document.getElementById('pomo-ring-prog');
+  const sessionEl=document.getElementById('pomo-session-log');
+  if(!timeEl) return;
+  const isWork=_pomoMode!=='break';
+  const total=(isWork?_pomoWorkMin:_pomoBreakMin)*60;
+  const rem=Math.max(0,total-_pomoElapsed);
+  const mm=String(Math.floor(rem/60)).padStart(2,'0');
+  const ss=String(rem%60).padStart(2,'0');
+  timeEl.textContent=`${mm}:${ss}`;
+  modeEl.textContent=_pomoMode==='break'?'BREAK TIME':_pomoMode==='work'?'FOCUS':'READY';
+  modeEl.style.color=_pomoMode==='break'?'var(--ac)':_pomoMode==='work'?'var(--gn)':'var(--mu)';
+  const col=_pomoMode==='break'?'#58a6ff':'#3fb950';
+  ring.style.stroke=col;
+  const circ=2*Math.PI*42;
+  ring.style.strokeDashoffset=String(circ*(1-_pomoElapsed/total));
+  if(playBtn) playBtn.textContent=_pomoInterval?'⏸':'▶';
+  const today=new Date().toISOString().slice(0,10);
+  const d=JSON.parse(localStorage.getItem(_POMO_KEY)||'{}');
+  const n=d[today]||0;
+  if(sessionEl) sessionEl.textContent=n>0?`${n} session${n!==1?'s':''} today ✓`:'0 sessions today';
+}
+function _playPomoChime(isWork){
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    const freqs=isWork?[659,784,880]:[523,659,784];
+    freqs.forEach((f,i)=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.type='sine';o.frequency.value=f;
+      g.gain.setValueAtTime(0,ctx.currentTime+i*.2);
+      g.gain.linearRampToValueAtTime(0.38,ctx.currentTime+i*.2+0.02);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+i*.2+0.45);
+      o.connect(g);g.connect(ctx.destination);
+      o.start(ctx.currentTime+i*.2);o.stop(ctx.currentTime+i*.2+0.5);
+    });
+  }catch(e){}
+}
+
+// ── CONFETTI ─────────────────────────────────────────────────
+function _spawnConfetti(){
+  const cols=['#3fb950','#58a6ff','#d29922','#f97316','#bc8cff','#f85149','#fff'];
+  for(let i=0;i<70;i++){
+    const el=document.createElement('div');
+    el.className='confetti-piece';
+    const w=5+Math.random()*7, h=6+Math.random()*12;
+    el.style.cssText=`left:${Math.random()*100}%;width:${w}px;height:${h}px;background:${cols[Math.floor(Math.random()*cols.length)]};animation-duration:${1.4+Math.random()*2.2}s;animation-delay:${Math.random()*.9}s;transform:rotate(${Math.random()*360}deg)`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),4000);
+  }
+}
+
+// ── CONTAMINATION STREAK ─────────────────────────────────────
+function _contamStreak(){
+  const all=S.notes||[];
+  const contams=all.filter(n=>n.type==='Contamination Log'&&n.date).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  if(!contams.length){
+    const first=[...all].filter(n=>n.date).sort((a,b)=>new Date(a.date)-new Date(b.date))[0];
+    if(!first) return 0;
+    return Math.max(0,Math.floor((Date.now()-new Date(first.date))/86400000));
+  }
+  return Math.max(0,Math.floor((Date.now()-new Date(contams[0].date))/86400000));
+}
+
+// ── DAILY CHECKLIST ──────────────────────────────────────────
+const _CL_KEY='tcplants_checklist';
+const _CL_DEF=['Check autoclave pressure gauge','Review bottle statuses & log changes','Note any contamination observations','Check humidity & temperature logs','Review upcoming subcultures this week'];
+function _clInit(){
+  let d=null;
+  try{d=JSON.parse(localStorage.getItem(_CL_KEY)||'null');}catch(e){}
+  if(!d){d={tasks:_CL_DEF.map((t,i)=>({id:i+1,text:t})),checked:{}};localStorage.setItem(_CL_KEY,JSON.stringify(d));}
+  return d;
+}
+function _clToggle(id){
+  const d=_clInit();
+  const today=new Date().toISOString().slice(0,10);
+  const checked=d.checked[today]||[];
+  const idx=checked.indexOf(id);
+  if(idx===-1) checked.push(id); else checked.splice(idx,1);
+  d.checked[today]=checked;
+  Object.keys(d.checked).filter(k=>k<today).forEach(k=>delete d.checked[k]);
+  localStorage.setItem(_CL_KEY,JSON.stringify(d));
+  _renderDashboard();
+}
+function _clAdd(){
+  const inp=document.getElementById('cl-new-input'); if(!inp) return;
+  const text=inp.value.trim(); if(!text) return;
+  const d=_clInit();
+  const maxId=Math.max(0,...d.tasks.map(t=>t.id));
+  d.tasks.push({id:maxId+1,text});
+  localStorage.setItem(_CL_KEY,JSON.stringify(d));
+  inp.value='';
+  _renderDashboard();
+}
+function _clRemove(id){
+  const d=_clInit();
+  d.tasks=d.tasks.filter(t=>t.id!==id);
+  const today=new Date().toISOString().slice(0,10);
+  if(d.checked[today]) d.checked[today]=d.checked[today].filter(x=>x!==id);
+  localStorage.setItem(_CL_KEY,JSON.stringify(d));
+  _renderDashboard();
+}
+
+// ── RECIPE INLINE SCALE ──────────────────────────────────────
+function _recScaleRender(r){
+  const el=document.getElementById('rv-scale'); if(!el) return;
+  if(!r.sucrose&&!r.agar&&!r.pgr){el.innerHTML='';return;}
+  window._recScaleCur=r;
+  el.innerHTML=`<div class="rec-scale-wrap">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+      <span style="font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--mu)">⚗️ Scale Recipe</span>
+      <input type="number" id="rec-sv" value="1000" min="1" max="50000" step="100"
+        style="width:80px;background:var(--sf2);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--mono);font-size:13px;font-weight:700;padding:4px 8px;outline:none;text-align:right"
+        oninput="_recScaleUpdate()">
+      <span style="font-size:12px;color:var(--mu)">mL</span>
+      <button class="btn xs ghost" onclick="navigator.clipboard?.writeText(document.getElementById('rec-scale-out')?.innerText||'')" style="margin-left:auto">⎘ Copy</button>
+    </div>
+    <div id="rec-scale-out" class="rec-scale-out"></div>
+  </div>`;
+  _recScaleUpdate();
+}
+function _recScaleUpdate(){
+  const r=window._recScaleCur; if(!r) return;
+  const el=document.getElementById('rec-scale-out'); if(!el) return;
+  const vol=parseFloat(document.getElementById('rec-sv')?.value)||1000;
+  const fmt=n=>n%1===0?String(n):parseFloat(n.toPrecision(4)).toString();
+  const rows=[];
+  if(r.base) rows.push(['Base medium',esc(r.base)+' — prepare standard stock solution']);
+  if(r.sucrose) rows.push(['Sucrose',`${fmt(parseFloat(r.sucrose)*vol/1000)} g`]);
+  if(r.agar) rows.push(['Gelrite/Agar',`${fmt(parseFloat(r.agar)*vol/1000)} g`]);
+  if(r.pgr) rows.push(['PGR',esc(r.pgr)]);
+  if(r.ph) rows.push(['pH target',esc(r.ph)+' (adjust before autoclave)']);
+  if(r.autoclave) rows.push(['Autoclave',esc(r.autoclave)]);
+  rows.push(['Make up to',`${vol} mL with distilled water`]);
+  el.innerHTML=rows.map(([l,v])=>`<div><span class="rsl">${l}</span><span class="rsv">${v}</span></div>`).join('');
+}
 
 // ── ANALYTICS ────────────────────────────────────────────────
 function renderAnalytics(){
@@ -16448,8 +16791,17 @@ function openBottle(id){
     ${(b.parent_id||(S.bottles||[]).some(x=>x.parent_id===id))?`
     <div style="padding:12px 16px;border-top:1px solid var(--bd)">
       <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin-bottom:8px">🌳 Passage Lineage</div>
-      <div id="bottle-tree-pane" style="font-size:12px"></div>
+      <div id="bottle-tree-pane"></div>
     </div>`:''}
+    ${(()=>{
+      if(typeof _galLoaded==='undefined'||!_galLoaded||!(_galItems?.length)) return '';
+      const photos=(_galItems||[]).filter(p=>p.bottle_id&&b.code&&p.bottle_id.trim().toLowerCase()===b.code.trim().toLowerCase()&&p.thumb).sort((a,c)=>(a.date||'')<(c.date||'')?-1:1);
+      if(!photos.length) return '';
+      return `<div style="padding:12px 16px;border-top:1px solid var(--bd)">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin-bottom:8px">📷 Growth Photos (${photos.length})</div>
+        <div class="bot-photo-strip">${photos.map(p=>`<div class="bot-photo-frame" onclick="navTo('gallery');setTimeout(()=>{loadGallery().then(()=>_galOpenLightbox('${esc(p.id)}'))},100)" title="${esc(p.title||p.date||'')}"><img src="${p.thumb}" alt="${esc(p.title||'')}"><div class="bpf-date">${esc(p.date||'')}</div></div>`).join('')}</div>
+      </div>`;
+    })()}
   `;
   showBotDetail();
   // Generate QR code
@@ -17176,6 +17528,7 @@ function openRecipe(id){
   if(recBottles.length) rows.push([`🫙 Bottles`, `<a style="color:var(--ac);cursor:pointer" onclick="navTo('bottles');S.bottleSearch='';setBotFilter('all');renderBottleList()">${recBottles.length} bottle${recBottles.length!==1?'s':''} use this recipe</a>`]);
   document.getElementById('rv-spec').innerHTML=rows.map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('');
   document.getElementById('rv-body').innerHTML=r.notes_md?sanitizeMarkdown(r.notes_md):'';
+  _recScaleRender(r);
   showRec('view');
 }
 
@@ -21786,29 +22139,55 @@ function _bcParseIngredients(rec, totalML, mlPerBot){
 function renderPassageTree(bottleId){
   const el=document.getElementById('bottle-tree-pane'); if(!el) return;
   const bottles=S.bottles||[];
-  const root=_treeAncestor(bottleId, bottles);
-  el.innerHTML=_treeNodeHtml(root, bottleId, bottles, 0);
-  el.querySelectorAll('[data-bot-id]').forEach(n=>n.addEventListener('click',()=>{
-    const id=n.dataset.botId;
-    if(id!==bottleId){navTo('bottles');openBottle(id);}
-  }));
+  const rootId=_treeAncestor(bottleId,bottles);
+  const NW=134,NH=38,XG=8,YG=46;
+  const SC={inoculated:'#58a6ff',growing:'#3fb950',subcultured:'#d29922',contaminated:'#f85149',discarded:'#8b949e',prepared:'#8b949e',rooting:'#52b788',hardening:'#f4a261',weaned:'#3fb950'};
+  function buildNode(id,depth){
+    const b=bottles.find(x=>x.id===id);
+    const ch=bottles.filter(x=>x.parent_id===id).map(c=>buildNode(c.id,depth+1));
+    return{id,b,depth,ch};
+  }
+  function countLeaves(n){return n.ch.length?n.ch.reduce((s,c)=>s+countLeaves(c),0):1;}
+  function layout(n,x0){
+    const lv=countLeaves(n);
+    n.x=x0+(lv*(NW+XG)/2)-(NW/2);
+    n.y=n.depth*(NH+YG);
+    let cx=x0;
+    n.ch.forEach(c=>{layout(c,cx);cx+=countLeaves(c)*(NW+XG);});
+  }
+  function allNodes(n){return[n,...n.ch.flatMap(c=>allNodes(c))];}
+  const root=buildNode(rootId,0);
+  layout(root,0);
+  const nodes=allNodes(root);
+  const svgW=Math.max(...nodes.map(n=>n.x+NW))+4;
+  const svgH=Math.max(...nodes.map(n=>n.y+NH))+4;
+  let lines='',rects='';
+  nodes.forEach(n=>{
+    n.ch.forEach(c=>{
+      const x1=n.x+NW/2,y1=n.y+NH,x2=c.x+NW/2,y2=c.y,cy=(y1+y2)/2;
+      lines+=`<path d="M${x1},${y1} C${x1},${cy} ${x2},${cy} ${x2},${y2}" stroke="var(--bd)" stroke-width="1.5" fill="none" stroke-linecap="round"/>`;
+    });
+    const col=SC[n.b?.status||'']||'#8b949e';
+    const isCur=n.id===bottleId;
+    const code=n.b?(n.b.code||n.b.id).replace(/^FSL-/,''):n.id.slice(0,8);
+    const sp=n.b?.species?n.b.species.split(' ').slice(0,2).map((w,i)=>i===0?w[0]+'.':w.slice(0,7)).join(' '):'';
+    rects+=`<g class="tree-svg-node${isCur?' cur':''}" data-bid="${esc(n.id)}" transform="translate(${n.x},${n.y})">
+      <rect width="${NW}" height="${NH}" rx="7" fill="${isCur?col+'22':'var(--sf)'}" stroke="${isCur?col:'var(--bd)'}" stroke-width="${isCur?2:1}"/>
+      <circle cx="10" cy="${NH/2}" r="3.5" fill="${col}"/>
+      <text x="20" y="${NH/2+(sp?-4:1)}" font-size="11" font-weight="${isCur?700:500}" fill="var(--tx)" font-family="monospace">${esc(code)}</text>
+      ${sp?`<text x="20" y="${NH/2+9}" font-size="9" fill="var(--mu)" font-family="sans-serif" font-style="italic">${esc(sp)}</text>`:''}
+    </g>`;
+  });
+  el.innerHTML=`<div style="overflow-x:auto;padding:4px 0"><svg viewBox="0 0 ${svgW} ${svgH}" width="${Math.min(svgW,560)}" style="overflow:visible;display:block">${lines}${rects}</svg></div>`;
+  el.querySelectorAll('[data-bid]').forEach(g=>{
+    const id=g.dataset.bid;
+    if(id!==bottleId) g.addEventListener('click',()=>{navTo('bottles');openBottle(id);});
+  });
 }
 
-function _treeAncestor(id, bottles){
+function _treeAncestor(id,bottles){
   const b=bottles.find(x=>x.id===id); if(!b) return id;
   return b.parent_id?_treeAncestor(b.parent_id,bottles):id;
-}
-
-function _treeNodeHtml(id, currentId, bottles, depth){
-  const b=bottles.find(x=>x.id===id);
-  const label=b?`${b.code||b.id} — ${b.species||'?'} ${b.stage?`[${b.stage}]`:''}`:id;
-  const isCurrent=id===currentId;
-  const children=bottles.filter(x=>x.parent_id===id);
-  const childrenHtml=children.map(c=>_treeNodeHtml(c.id,currentId,bottles,depth+1)).join('');
-  return `<div class="tree-node${depth===0?' root':''}">
-    <div class="tree-node-label${isCurrent?' current':''}" data-bot-id="${esc(id)}" title="Open bottle">${depth>0?'└ ':''}${esc(label)}</div>
-    ${childrenHtml}
-  </div>`;
 }
 
 // ════════════════════════════════════════════════════════════
