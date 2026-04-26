@@ -225,6 +225,51 @@ export default {
       }
     }
 
+    // ── POST /api/web/search ──────────────────────────────────
+    // Uses Brave Search API if BRAVE_KEY is set, else DuckDuckGo instant answers
+    if (url.pathname === '/api/web/search' && request.method === 'POST') {
+      let body;
+      try { body = await request.json(); } catch { return err('Invalid JSON', 400, origin); }
+      const { q, n = 5 } = body;
+      if (!q) return err('q (query) required', 400, origin);
+      const numResults = Math.min(Math.max(1, parseInt(n) || 5), 10);
+
+      const braveKey = env.BRAVE_KEY || '';
+      try {
+        if (braveKey) {
+          // Brave Search API — 2000 free queries/month
+          const r = await fetch(
+            `https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(q)}&count=${numResults}&search_lang=en`,
+            { headers: { 'Accept': 'application/json', 'X-Subscription-Token': braveKey } }
+          );
+          const d = await r.json();
+          if (!r.ok) return err(d.message || 'Brave Search error ' + r.status, r.status, origin);
+          const results = (d.web?.results || []).slice(0, numResults).map(item => ({
+            title: item.title || '',
+            url: item.url || '',
+            snippet: item.description || '',
+          }));
+          return json({ results, source: 'brave', query: q }, 200, origin);
+        } else {
+          // DuckDuckGo instant answers — no key required, limited
+          const r = await fetch(
+            `https://api.duckduckgo.com/?q=${encodeURIComponent(q)}&format=json&no_html=1&skip_disambig=1`,
+            { headers: { 'Accept': 'application/json' } }
+          );
+          const d = await r.json();
+          const results = [];
+          if (d.AbstractText) results.push({ title: d.Heading || q, url: d.AbstractURL || '', snippet: d.AbstractText });
+          (d.RelatedTopics || []).slice(0, numResults - 1).forEach(t => {
+            if (t.Text) results.push({ title: t.Text.slice(0, 80), url: t.FirstURL || '', snippet: t.Text });
+          });
+          if (!results.length) return json({ results: [], source: 'ddg', query: q, note: 'No results. Add BRAVE_KEY to Cloudflare env for full web search.' }, 200, origin);
+          return json({ results, source: 'ddg', query: q }, 200, origin);
+        }
+      } catch (e) {
+        return err('Search error: ' + e.message, 502, origin);
+      }
+    }
+
     return err('Not found', 404, origin);
   },
 };
