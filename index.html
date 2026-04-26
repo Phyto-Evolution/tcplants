@@ -834,7 +834,7 @@ main > .dview, main > .editor{ margin:0 auto; }
 #re-base-custom-wrap{display:none;margin-top:6px}
 
 /* ── POMODORO WIDGET ── */
-#pomo-widget{position:fixed;bottom:22px;right:22px;z-index:320;display:none;flex-direction:column;align-items:flex-end;gap:8px}
+#pomo-widget{position:fixed;bottom:22px;left:22px;z-index:320;display:none;flex-direction:column;align-items:flex-start;gap:8px}
 #pomo-widget.on{display:flex}
 #pomo-fab{width:46px;height:46px;border-radius:50%;background:var(--sf);border:1px solid var(--bd);box-shadow:0 4px 16px rgba(0,0,0,.3);cursor:pointer;font-size:21px;display:flex;align-items:center;justify-content:center;transition:all .2s;line-height:1}
 #pomo-fab:hover{background:var(--sf2);transform:scale(1.09)}
@@ -851,6 +851,105 @@ main > .dview, main > .editor{ margin:0 auto; }
 .pomo-ctrl-btn:hover{background:var(--sf3,var(--sf2))}
 .pomo-ctrl-btn.go{background:rgba(63,185,80,.2);border-color:var(--gn);color:var(--gn);font-size:20px;padding:8px 18px}
 .pomo-session-log{font-size:10px;color:var(--mu);text-align:center}
+/* ── EMOJI PICKER ── */
+#emoji-picker-pop{position:fixed;z-index:500;background:var(--sf);border:1px solid var(--bd);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.35);width:320px;max-height:380px;display:none;flex-direction:column;overflow:hidden}
+#emoji-picker-pop.open{display:flex}
+#ep-search{padding:8px 10px;background:var(--sf2);border:none;border-bottom:1px solid var(--bd);border-radius:0;color:var(--tx);font-size:13px;width:100%;outline:none;font-family:var(--font)}
+#ep-cats{display:flex;gap:2px;padding:5px 8px;border-bottom:1px solid var(--bd);flex-shrink:0;overflow-x:auto;scrollbar-width:none}
+#ep-cats::-webkit-scrollbar{display:none}
+.ep-cat{background:transparent;border:none;border-radius:6px;cursor:pointer;font-size:16px;padding:4px 6px;transition:background .12s;flex-shrink:0}
+.ep-cat:hover,.ep-cat.active{background:var(--sf2)}
+#ep-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:1px;padding:6px;overflow-y:auto;flex:1}
+.ep-em{background:transparent;border:none;border-radius:6px;cursor:pointer;font-size:20px;padding:4px;text-align:center;transition:background .1s;line-height:1.2}
+.ep-em:hover{background:var(--sf2)}
+#ep-recent-row{padding:4px 6px 2px;font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;flex-shrink:0}
+/* ── EDITOR STATUS BAR ── */
+.ed-status{font-size:10px;color:var(--mu);padding:3px 6px;text-align:right;background:var(--sf2);border:1px solid var(--bd);border-top:none;border-radius:0 0 6px 6px;user-select:none;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-shrink:0}
+.ed-status span{color:var(--tx);font-weight:600}
+/* ── FIND / REPLACE BAR ── */
+.ed-find-bar{display:none;align-items:center;gap:5px;padding:5px 8px;background:var(--sf2);border:1px solid var(--bd);border-top:none;flex-wrap:wrap}
+.ed-find-bar.open{display:flex}
+.ed-find-bar input{background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-size:12px;padding:3px 7px;width:130px;outline:none;font-family:var(--mono)}
+.ed-find-bar input:focus{border-color:var(--ac)}
+.ed-find-bar .ef-count{font-size:11px;color:var(--mu);min-width:30px}
+.ed-find-btn{background:var(--sf);border:1px solid var(--bd);border-radius:5px;color:var(--tx);cursor:pointer;font-size:11px;padding:3px 7px;white-space:nowrap}
+.ed-find-btn:hover{border-color:var(--ac);color:var(--ac)}
+.ed-find-btn.close{color:var(--rd);border-color:transparent}
+.ed-find-sep{color:var(--bd);font-size:16px;line-height:1;margin:0 2px}
+/* ── DOI / REFERENCE FIELD ── */
+.doi-section{margin-top:10px;border:1px solid var(--bd);border-radius:8px;overflow:hidden}
+.doi-section-head{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--sf2);cursor:pointer;user-select:none;font-size:12px;font-weight:600;color:var(--mu)}
+.doi-section-head:hover{color:var(--tx)}
+.doi-section-body{padding:8px 10px;display:none}
+.doi-section.open .doi-section-body{display:block}
+.doi-section.open .doi-chevron{transform:rotate(90deg)}
+.doi-chevron{display:inline-block;transition:transform .15s;font-size:10px}
+.doi-input-row{display:flex;gap:5px;margin-bottom:6px}
+.doi-input-row input{flex:1;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-size:12px;padding:4px 8px;font-family:var(--mono);outline:none}
+.doi-input-row input:focus{border-color:var(--ac)}
+.doi-add-btn{background:var(--ac);border:none;border-radius:5px;color:#0d1117;cursor:pointer;font-size:12px;font-weight:700;padding:4px 10px;white-space:nowrap}
+.doi-chip{display:inline-flex;align-items:center;gap:4px;background:rgba(88,166,255,.1);border:1px solid rgba(88,166,255,.25);border-radius:12px;color:var(--ac);font-size:11px;font-family:var(--mono);padding:2px 8px 2px 6px;margin:2px}
+.doi-chip a{color:var(--ac);text-decoration:none}
+.doi-chip a:hover{text-decoration:underline}
+.doi-chip-del{background:none;border:none;color:var(--mu);cursor:pointer;font-size:11px;padding:0;line-height:1;margin-left:2px}
+.doi-chip-del:hover{color:var(--rd)}
+.doi-list{display:flex;flex-wrap:wrap;gap:2px}
+/* ── ATTACHMENT CHIPS ── */
+.att-section{margin-top:12px;border-top:1px solid var(--bd);padding-top:10px}
+.att-section-lbl{font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.att-chips{display:flex;flex-wrap:wrap;gap:5px}
+.att-chip{display:inline-flex;align-items:center;gap:5px;background:var(--sf2);border:1px solid var(--bd);border-radius:8px;cursor:pointer;font-size:12px;padding:4px 8px;transition:border-color .12s;max-width:220px}
+.att-chip:hover{border-color:var(--ac)}
+.att-chip-icon{font-size:14px;flex-shrink:0}
+.att-chip-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;color:var(--tx)}
+.att-chip-size{color:var(--mu);font-size:10px;flex-shrink:0}
+.att-chip-del{background:none;border:none;color:var(--mu);cursor:pointer;font-size:11px;padding:0 2px;line-height:1;flex-shrink:0}
+.att-chip-del:hover{color:var(--rd)}
+.att-upload-btn{background:transparent;border:1px dashed var(--bd);border-radius:8px;color:var(--mu);cursor:pointer;font-size:12px;padding:4px 10px;transition:all .15s}
+.att-upload-btn:hover{border-color:var(--ac);color:var(--ac);background:rgba(88,166,255,.05)}
+/* ── FILE BROWSER ── */
+#sec-files main{display:flex;flex-direction:column;height:100%;overflow:hidden}
+.fb-layout{display:grid;grid-template-columns:220px 1fr;height:100%;overflow:hidden;gap:0}
+@media(max-width:700px){.fb-layout{grid-template-columns:1fr}}
+.fb-tree{border-right:1px solid var(--bd);overflow-y:auto;padding:10px 0;flex-shrink:0;background:var(--sf2)}
+.fb-tree-item{display:flex;align-items:center;gap:6px;padding:6px 14px;cursor:pointer;font-size:13px;color:var(--mu);transition:background .1s;border-left:2px solid transparent;user-select:none}
+.fb-tree-item:hover{background:var(--sf);color:var(--tx)}
+.fb-tree-item.active{background:rgba(88,166,255,.08);color:var(--ac);border-left-color:var(--ac);font-weight:600}
+.fb-tree-group{padding:6px 14px 3px;font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.07em;margin-top:6px}
+.fb-main{display:flex;flex-direction:column;overflow:hidden}
+.fb-toolbar{display:flex;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--bd);flex-shrink:0;flex-wrap:wrap;background:var(--sf)}
+.fb-search{background:var(--sf2);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-size:12px;padding:5px 10px;outline:none;width:200px}
+.fb-search:focus{border-color:var(--ac)}
+.fb-filter-pills{display:flex;gap:3px;flex-wrap:wrap}
+.fb-fpill{background:var(--sf2);border:1px solid var(--bd);border-radius:10px;color:var(--mu);cursor:pointer;font-size:11px;padding:3px 9px;transition:all .12s}
+.fb-fpill.active,.fb-fpill:hover{background:rgba(88,166,255,.12);border-color:var(--ac);color:var(--ac)}
+.fb-count{font-size:11px;color:var(--mu);margin-left:auto;white-space:nowrap}
+.fb-list{flex:1;overflow-y:auto;padding:10px 14px}
+.fb-empty{text-align:center;color:var(--mu);padding:40px 20px;font-size:13px}
+.fb-file-card{display:grid;grid-template-columns:36px 1fr auto;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;cursor:pointer;transition:background .1s;border:1px solid transparent}
+.fb-file-card:hover{background:var(--sf2);border-color:var(--bd)}
+.fb-file-card.selected{background:rgba(88,166,255,.06);border-color:var(--ac)}
+.fb-file-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.fb-file-icon.pdf{background:rgba(248,81,73,.12)}
+.fb-file-icon.img{background:rgba(63,185,80,.12)}
+.fb-file-icon.csv{background:rgba(210,153,34,.12)}
+.fb-file-icon.other{background:var(--sf2)}
+.fb-file-info{overflow:hidden}
+.fb-file-name{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--tx)}
+.fb-file-meta{font-size:11px;color:var(--mu);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fb-file-acts{display:flex;gap:4px;flex-shrink:0}
+.fb-file-btn{background:var(--sf2);border:1px solid var(--bd);border-radius:6px;color:var(--mu);cursor:pointer;font-size:11px;padding:4px 7px;transition:all .12s;white-space:nowrap}
+.fb-file-btn:hover{border-color:var(--ac);color:var(--ac)}
+.fb-file-btn.del:hover{border-color:var(--rd);color:var(--rd)}
+/* ── FILE PREVIEW PANEL ── */
+.fb-preview{position:fixed;top:0;right:0;bottom:0;width:min(55vw,680px);background:var(--sf);border-left:1px solid var(--bd);z-index:400;display:none;flex-direction:column;box-shadow:-8px 0 32px rgba(0,0,0,.2)}
+.fb-preview.open{display:flex}
+.fb-preview-head{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--bd);flex-shrink:0}
+.fb-preview-title{flex:1;font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fb-preview-body{flex:1;overflow:hidden;position:relative}
+.fb-preview-body embed,.fb-preview-body iframe,.fb-preview-body img{width:100%;height:100%;border:none;display:block}
+.fb-preview-body pre{padding:16px;overflow:auto;height:100%;margin:0;font-family:var(--mono);font-size:12px;color:var(--tx);background:var(--bg);white-space:pre-wrap;word-break:break-all}
+@media(max-width:700px){.fb-preview{width:100vw}}
 /* ── CLEAN STREAK ── */
 .dc-streak-num{font-family:var(--mono);font-size:42px;font-weight:900;line-height:1;margin-bottom:4px}
 /* ── RECIPE SCALE ── */
@@ -2216,6 +2315,14 @@ input, textarea, select {
           </div>
         </div>
         <div class="md" id="nv-body"></div>
+        <div id="nv-dois" style="display:none;margin-top:14px">
+          <div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">📚 References (DOI)</div>
+          <div id="nv-dois-list" class="doi-list"></div>
+        </div>
+        <div id="nv-attachments" style="display:none;margin-top:14px">
+          <div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">📎 Attachments</div>
+          <div id="nv-att-chips" class="att-chips"></div>
+        </div>
         <div id="nv-backlinks" style="margin-top:24px;display:none">
           <div style="font-size:12px;font-weight:600;color:var(--mu);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">Linked from</div>
           <div id="nv-backlinks-list" style="display:flex;flex-direction:column;gap:4px"></div>
@@ -2325,12 +2432,16 @@ input, textarea, select {
               <button type="button" class="pane-btn" data-pane="preview" onclick="_setPaneMode(this)">👁 Preview</button>
             </div>
             <div class="editor-toolbar">
+              <button class="tb-btn" id="tb-h1"     title="Heading 1 (#)">H1</button>
               <button class="tb-btn" id="tb-h2"     title="Heading 2 (##)">H2</button>
               <button class="tb-btn" id="tb-h3"     title="Heading 3 (###)">H3</button>
               <div class="tb-div"></div>
               <button class="tb-btn" id="tb-bold"   title="Bold (Ctrl+B)"><b>B</b></button>
               <button class="tb-btn" id="tb-italic" title="Italic (Ctrl+I)"><i>I</i></button>
               <button class="tb-btn" id="tb-strike" title="Strikethrough"><s>S</s></button>
+              <button class="tb-btn" id="tb-mark"   title="Highlight text">▐H</button>
+              <button class="tb-btn" id="tb-sup"    title="Superscript">x²</button>
+              <button class="tb-btn" id="tb-sub"    title="Subscript">x₂</button>
               <div class="tb-div"></div>
               <button class="tb-btn" id="tb-code"   title="Inline code">`c`</button>
               <button class="tb-btn" id="tb-codebl" title="Code block">```</button>
@@ -2340,16 +2451,58 @@ input, textarea, select {
               <button class="tb-btn" id="tb-ul"     title="Bullet list">• List</button>
               <button class="tb-btn" id="tb-ol"     title="Numbered list">1. List</button>
               <button class="tb-btn" id="tb-task"   title="Task / checkbox list">☑ Task</button>
+              <button class="tb-btn" id="tb-indent" title="Indent (Tab)">→</button>
+              <button class="tb-btn" id="tb-outdent" title="Outdent (Shift+Tab)">←</button>
+              <div class="tb-div"></div>
+              <button class="tb-btn" id="tb-alignl" title="Align left">⬅</button>
+              <button class="tb-btn" id="tb-alignc" title="Align centre">≡</button>
+              <button class="tb-btn" id="tb-alignr" title="Align right">➡</button>
               <div class="tb-div"></div>
               <button class="tb-btn" id="tb-link"   title="Link (Ctrl+K)">🔗</button>
               <button class="tb-btn" id="img-btn"   title="Embed image">🖼</button>
               <button class="tb-btn" id="tbl-btn"   title="Insert table">⊞</button>
               <button class="tb-btn" id="wiki-btn"  title="Insert wiki link">[[]]</button>
-              <button class="tb-btn" id="cam-btn" title="Camera / Barcode">📷</button>
+              <button class="tb-btn" id="cam-btn"   title="Camera / Barcode">📷</button>
+              <button class="tb-btn" id="tb-clearfmt" title="Clear inline formatting">✕fmt</button>
+              <div class="tb-div"></div>
+              <button class="tb-btn" id="tb-emoji"  title="Insert emoji">😊</button>
+              <button class="tb-btn" id="tb-attach" title="Attach file (PDF, CSV, image…)">📎</button>
+              <button class="tb-btn" id="tb-find"   title="Find / Replace in editor (Ctrl+Shift+F)">🔍</button>
+            </div>
+            <div class="ed-find-bar" id="ne-find-bar">
+              <input id="ne-find-input" placeholder="Find…" spellcheck="false">
+              <span class="ef-count" id="ne-find-count"></span>
+              <button class="ed-find-btn" id="ne-find-prev" title="Previous">↑</button>
+              <button class="ed-find-btn" id="ne-find-next" title="Next">↓</button>
+              <span class="ed-find-sep">|</span>
+              <input id="ne-rep-input" placeholder="Replace with…" spellcheck="false">
+              <button class="ed-find-btn" id="ne-rep-one">Replace</button>
+              <button class="ed-find-btn" id="ne-rep-all">All</button>
+              <button class="ed-find-btn close" id="ne-find-close">✕</button>
             </div>
             <textarea id="ne-body" placeholder="Write lab notes here…"></textarea>
             <div id="ne-preview" class="md"></div>
+            <div class="ed-status" id="ne-status"><span id="ne-stat-wc">0 words</span><span id="ne-stat-ln">Line 1</span></div>
             <div class="tmpl-hint" id="ne-tmpl-hint"></div>
+            <div class="doi-section" id="ne-doi-section">
+              <div class="doi-section-head" onclick="_toggleDoiSection('ne')">
+                <span class="doi-chevron">›</span>
+                <span>📚 DOI / References</span>
+                <span id="ne-doi-count" style="margin-left:auto;background:rgba(88,166,255,.15);border-radius:8px;padding:1px 6px;font-size:10px;font-weight:700;color:var(--ac);display:none">0</span>
+              </div>
+              <div class="doi-section-body">
+                <div style="font-size:11px;color:var(--mu);margin-bottom:6px">Attach DOI references to this note — non-PDF papers, datasets, or any DOI-addressable resource.</div>
+                <div class="doi-input-row">
+                  <input type="text" id="ne-doi-input" placeholder="e.g. 10.1007/s11240-020-01875-5" spellcheck="false">
+                  <button class="doi-add-btn" onclick="_doiAdd('ne')">+ Add</button>
+                </div>
+                <div class="doi-list" id="ne-doi-list"></div>
+              </div>
+            </div>
+            <div class="att-section" id="ne-att-section" style="display:none">
+              <div class="att-section-lbl">📎 Attachments</div>
+              <div class="att-chips" id="ne-att-chips"></div>
+            </div>
           </div>
         </div>
         <div class="eactions">
@@ -2611,8 +2764,14 @@ input, textarea, select {
             <div class="tb-div"></div>
             <button class="tb-btn" id="rb-link"   title="Link (Ctrl+K)">🔗</button>
             <button class="tb-btn" id="rb-tbl"    title="Insert table">⊞</button>
+            <div class="tb-div"></div>
+            <button class="tb-btn" id="rb-attach" title="Attach file (PDF, protocol, data…)">📎</button>
           </div>
           <textarea id="rr-notes" placeholder="Preparation steps, special additions, observations…"></textarea>
+          <div class="att-section" id="rec-att-section" style="display:none;margin-top:0;border-top:none;padding-top:6px">
+            <div class="att-section-lbl">📎 Attachments</div>
+            <div class="att-chips" id="rec-att-chips"></div>
+          </div>
         </div>
         <div class="eactions">
           <button class="btn" style="background:var(--pu);color:#0d1117" id="save-rec-btn">💾 Save Recipe</button>
@@ -2779,6 +2938,11 @@ input, textarea, select {
       <div class="field">
         <label>Notes</label>
         <textarea id="bot-notes-text" rows="4" placeholder="Any extra notes (markdown supported)…"></textarea>
+      </div>
+      <div class="field">
+        <label>Attachments</label>
+        <div class="att-chips" id="bot-att-chips" style="min-height:28px"></div>
+        <button class="att-upload-btn" style="margin-top:6px" onclick="_attPickerOpen('bottles',null,'bot-att-chips')">📎 Attach file…</button>
       </div>
       <div style="height:32px"></div>
     </div></div>
@@ -4555,6 +4719,9 @@ input, textarea, select {
             <button class="tb-btn" id="je-bold"   title="Bold (Ctrl+B)"><b>B</b></button>
             <button class="tb-btn" id="je-italic" title="Italic (Ctrl+I)"><i>I</i></button>
             <button class="tb-btn" id="je-strike" title="Strikethrough"><s>S</s></button>
+            <button class="tb-btn" id="je-mark"   title="Highlight text">▐H</button>
+            <button class="tb-btn" id="je-sup"    title="Superscript">x²</button>
+            <button class="tb-btn" id="je-sub"    title="Subscript">x₂</button>
             <div class="tb-div"></div>
             <button class="tb-btn" id="je-code"   title="Inline code">`c`</button>
             <button class="tb-btn" id="je-codebl" title="Code block">```</button>
@@ -4564,23 +4731,63 @@ input, textarea, select {
             <button class="tb-btn" id="je-ul"     title="Bullet list">• List</button>
             <button class="tb-btn" id="je-ol"     title="Numbered list">1. List</button>
             <button class="tb-btn" id="je-task"   title="Task list">☑</button>
+            <button class="tb-btn" id="je-indent" title="Indent">→</button>
+            <button class="tb-btn" id="je-outdent" title="Outdent">←</button>
+            <div class="tb-div"></div>
+            <button class="tb-btn" id="je-alignl" title="Align left">⬅</button>
+            <button class="tb-btn" id="je-alignc" title="Align centre">≡</button>
+            <button class="tb-btn" id="je-alignr" title="Align right">➡</button>
             <div class="tb-div"></div>
             <button class="tb-btn" id="je-link"   title="Link (Ctrl+K)">🔗</button>
             <button class="tb-btn" id="je-img"    title="Image (URL or upload)">🖼</button>
             <button class="tb-btn" id="je-iframe" title="Embed iframe (YouTube, Maps…)">⧉</button>
             <button class="tb-btn" id="je-tbl"    title="Table">⊞</button>
+            <button class="tb-btn" id="je-clearfmt" title="Clear inline formatting">✕fmt</button>
             <div class="tb-div"></div>
+            <button class="tb-btn" id="je-emoji"  title="Insert emoji">😊</button>
+            <button class="tb-btn" id="je-attach" title="Attach file">📎</button>
+            <button class="tb-btn" id="je-find"   title="Find / Replace (Ctrl+Shift+F)">🔍</button>
             <button class="tb-btn" id="je-preview-toggle" title="Toggle preview" onclick="_toggleJournalPreview()" style="color:var(--ac)">👁</button>
           </div>
           <!-- Auto-flair pills row — shown when je-auto-flair is checked and matches exist -->
           <div id="je-auto-flair-pills" style="display:none;flex-wrap:wrap;gap:5px;padding:5px 14px;border-bottom:1px solid var(--bd);background:var(--sf2);align-items:center"><span style="font-size:10px;color:var(--mu);margin-right:4px">matched flairs:</span></div>
           <!-- Body: write pane -->
+          <div class="ed-find-bar" id="je-find-bar" style="border-bottom:1px solid var(--bd)">
+            <input id="je-find-input" placeholder="Find…" spellcheck="false">
+            <span class="ef-count" id="je-find-count"></span>
+            <button class="ed-find-btn" id="je-find-prev" title="Previous">↑</button>
+            <button class="ed-find-btn" id="je-find-next" title="Next">↓</button>
+            <span class="ed-find-sep">|</span>
+            <input id="je-rep-input" placeholder="Replace with…" spellcheck="false">
+            <button class="ed-find-btn" id="je-rep-one">Replace</button>
+            <button class="ed-find-btn" id="je-rep-all">All</button>
+            <button class="ed-find-btn close" id="je-find-close">✕</button>
+          </div>
           <textarea id="je-body" oninput="_jeExtractFlairs()" placeholder="Write freely…
 
 Ideas, observations, protocol thoughts, species notes — anything.
 Use Ravana to extract structured data once you're done writing." style="flex:1;padding:16px 20px;background:transparent;border:none;outline:none;resize:none;font-size:14px;line-height:1.8;color:var(--tx);font-family:var(--font)"></textarea>
+          <div class="ed-status" id="je-status" style="border-radius:0;border-left:none;border-right:none"><span id="je-stat-wc">0 words</span><span id="je-stat-ln">Line 1</span></div>
           <!-- Preview pane (hidden by default) -->
           <div id="je-preview" class="md" style="display:none;flex:1;padding:16px 20px;overflow-y:auto;font-size:14px;line-height:1.8"></div>
+          <div class="doi-section" id="je-doi-section" style="border-radius:0;border-left:none;border-right:none;border-bottom:none">
+            <div class="doi-section-head" onclick="_toggleDoiSection('je')">
+              <span class="doi-chevron">›</span>
+              <span>📚 DOI / References</span>
+              <span id="je-doi-count" style="margin-left:auto;background:rgba(88,166,255,.15);border-radius:8px;padding:1px 6px;font-size:10px;font-weight:700;color:var(--ac);display:none">0</span>
+            </div>
+            <div class="doi-section-body">
+              <div class="doi-input-row">
+                <input type="text" id="je-doi-input" placeholder="e.g. 10.1038/s41598-020-68529-z" spellcheck="false">
+                <button class="doi-add-btn" onclick="_doiAdd('je')">+ Add</button>
+              </div>
+              <div class="doi-list" id="je-doi-list"></div>
+            </div>
+          </div>
+          <div class="att-section" id="je-att-section" style="display:none;padding:6px 14px;border-top:1px solid var(--bd)">
+            <div class="att-section-lbl">📎 Attachments</div>
+            <div class="att-chips" id="je-att-chips"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -6169,6 +6376,20 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
     <main id="sales-main"></main>
   </div>
 
+  <!-- ── FILE BROWSER ── -->
+  <div class="section fullpage" id="sec-files">
+    <header class="page-head">
+      <div class="page-head-inner">
+        <span class="page-head-icon">🗂</span>
+        <div>
+          <div class="page-head-title">File Browser</div>
+          <div class="page-head-sub">Attachments · References · Exports</div>
+        </div>
+      </div>
+    </header>
+    <main id="files-main" style="flex:1;overflow:hidden;display:flex;flex-direction:column"></main>
+  </div>
+
   <!-- ── BATCH ACTION BAR ── -->
   <div id="batch-action-bar" style="display:none;position:fixed;bottom:0;left:0;right:0;background:var(--sf);border-top:1px solid var(--bd);padding:12px 16px;gap:10px;align-items:center;z-index:200;flex-wrap:wrap"></div>
 
@@ -6205,6 +6426,7 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
       <button class="ndtab" data-sec="search" onclick="navTo('search')"><span class="nd-icon">🔍</span>Search</button>
       <button class="ndtab" data-sec="gallery" onclick="navTo('gallery')"><span class="nd-icon">📸</span>Gallery</button>
       <button class="ndtab" data-sec="ai" onclick="navTo('ai')"><span class="nd-icon">🤖</span>AI Control</button>
+      <button class="ndtab" data-sec="files" onclick="navTo('files')"><span class="nd-icon">🗂</span>Files<span class="nd-badge" id="nd-fbadge" style="display:none">0</span></button>
       <div class="nd-divider"></div>
       <button class="ndtab" onclick="closeNavDrawer();openActLog()"><span class="nd-icon">⚡</span>Activity</button>
       <button class="ndtab" onclick="closeNavDrawer();lock()" style="color:var(--rd)"><span class="nd-icon">🔒</span>Lock</button>
@@ -6489,6 +6711,24 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
 <!-- ═══════════ OVERLAYS (must be before <script> so getElementById finds them) ═══════════ -->
 <!-- Taxonomy autocomplete dropdown -->
 <div id="tax-dropdown"></div>
+
+<!-- Emoji Picker Popup -->
+<div id="emoji-picker-pop">
+  <input id="ep-search" placeholder="Search emoji…" oninput="_epSearch(this.value)" autocomplete="off">
+  <div id="ep-cats"></div>
+  <div id="ep-recent-row" style="display:none">Recently used</div>
+  <div id="ep-grid"></div>
+</div>
+
+<!-- File Preview Panel -->
+<div id="fb-preview-panel" class="fb-preview">
+  <div class="fb-preview-head">
+    <span class="fb-preview-title" id="fb-pv-title">Preview</span>
+    <a id="fb-pv-dl" style="font-size:11px;color:var(--ac);cursor:pointer;margin-right:8px">⬇ Download</a>
+    <button onclick="_fbPreviewClose()" style="background:none;border:none;color:var(--mu);cursor:pointer;font-size:16px;line-height:1">✕</button>
+  </div>
+  <div class="fb-preview-body" id="fb-pv-body"></div>
+</div>
 
 <!-- Pomodoro Timer Widget -->
 <div id="pomo-widget">
@@ -7329,6 +7569,27 @@ function openJournalEntry(id){
   const tags=e.tags?.length?` · ${e.tags.map(t=>`#${t}`).join(' ')}`:'';
   document.getElementById('jv-meta').textContent=fmtJournalTs(e.date)+(e.updatedAt&&e.updatedAt!==e.date?' · edited '+fmtJournalTs(e.updatedAt):'')+tags;
   document.getElementById('jv-body').innerHTML=sanitizeMarkdown(e.body||'');
+  // DOI references in view
+  let jvDoi=document.getElementById('jv-dois');
+  if(!jvDoi){
+    jvDoi=document.createElement('div'); jvDoi.id='jv-dois';
+    document.getElementById('jv-body').after(jvDoi);
+  }
+  if(e.dois&&e.dois.length){
+    jvDoi.style.display='';
+    jvDoi.innerHTML='<div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin:12px 0 6px">📚 References (DOI)</div><div class="doi-list">'+e.dois.map(d=>`<span class="doi-chip"><a href="https://doi.org/${esc(d)}" target="_blank" rel="noopener">📖 ${esc(d)}</a></span>`).join('')+'</div>';
+  } else { jvDoi.style.display='none'; }
+  // Attachments in view
+  let jvAtt=document.getElementById('jv-att');
+  if(!jvAtt){
+    jvAtt=document.createElement('div'); jvAtt.id='jv-att';
+    jvDoi.after(jvAtt);
+  }
+  _attLoadIndex().then(()=>{
+    const entries=(_attIndex||[]).filter(a=>a.source==='journal'&&a.sourceId===id);
+    jvAtt.style.display=entries.length?'':'none';
+    if(entries.length) jvAtt.innerHTML='<div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin:12px 0 6px">📎 Attachments</div><div class="att-chips">'+entries.map(a=>{const{cls,em}=_attIconFor(a.mime);return`<span class="att-chip" onclick="_attPreview('${a.id}')"><span class="att-chip-icon ${cls}">${em}</span><span class="att-chip-name">${esc(a.name)}</span><span class="att-chip-size">${_attFmtSize(a.size)}</span></span>`;}).join('')+'</div>';
+  });
   // Show stored parse results if already parsed, clear otherwise
   const pr=document.getElementById('journal-parse-results');
   const parseBtn=document.getElementById('journal-parse-btn');
@@ -7363,6 +7624,8 @@ function startNewJournalEntry(){
   document.getElementById('je-tags').value='';
   document.getElementById('je-body').value='';
   window._jeMatchedFlairIds=[];
+  _doiLoad('je',[]);
+  const jeAttSec=document.getElementById('je-att-section'); if(jeAttSec) jeAttSec.style.display='none';
   const afp=document.getElementById('je-auto-flair-pills'); if(afp) afp.style.display='none';
   // Reset preview to write mode
   const pv=document.getElementById('je-preview'); if(pv) pv.style.display='none';
@@ -7381,6 +7644,8 @@ function editJournalEntry(){
   document.getElementById('je-tags').value=(e.tags||[]).join(', ');
   document.getElementById('je-body').value=e.body||'';
   window._jeMatchedFlairIds=e.flair_ids||[];
+  _doiLoad('je', e.dois||[]);
+  _attLoadIndex().then(()=>_attRenderChips(e.id,'je-att-chips','journal'));
   const afp=document.getElementById('je-auto-flair-pills'); if(afp) afp.style.display='none';
   // Reset preview to write mode
   const pv2=document.getElementById('je-preview'); if(pv2) pv2.style.display='none';
@@ -7474,22 +7739,24 @@ async function saveJournalEntry(){
   const tags=document.getElementById('je-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
   const autoFlairOn=document.getElementById('je-auto-flair')?.checked;
   const flair_ids=autoFlairOn?(window._jeMatchedFlairIds||[]):[];
+  const dois=(_doiStore['je']||[]).slice();
   if(!body){ toast('Write something first','fail'); return; }
   const now=new Date();
   const nowIso=now.toISOString();
-  const today=nowIso.slice(0,10);
   let entry;
   if(S.editingJournal){
     entry=S.journal.find(x=>x.id===S.editingJournal);
     if(entry){
       const bodyChanged=entry.body!==body;
-      entry.title=title||fmtJournalTs(nowIso); entry.body=body; entry.tags=tags; entry.flair_ids=flair_ids;
+      entry.title=title||fmtJournalTs(nowIso); entry.body=body; entry.tags=tags; entry.flair_ids=flair_ids; entry.dois=dois;
       entry.updatedAt=nowIso;
       if(bodyChanged){ entry.parsed=false; entry.parsedAt=null; entry.summary=null; entry.extracts=[]; }
+      if(_attIndex) _attIndex.filter(a=>a.source==='journal'&&a.sourceId===null).forEach(a=>{a.sourceId=entry.id;a.sourceTitle=entry.title;});
     }
   } else {
-    entry={id:'j-'+uid(), date:nowIso, title:title||fmtJournalTs(nowIso), body, tags, flair_ids, parsed:false, parsedAt:null, summary:null, extracts:[], parseEnabled:true};
+    entry={id:'j-'+uid(), date:nowIso, title:title||fmtJournalTs(nowIso), body, tags, flair_ids, dois, parsed:false, parsedAt:null, summary:null, extracts:[], parseEnabled:true};
     S.journal.unshift(entry);
+    if(_attIndex) _attIndex.filter(a=>a.source==='journal'&&a.sourceId===null).forEach(a=>{a.sourceId=entry.id;a.sourceTitle=entry.title;});
   }
   load('Saving journal…');
   try{
@@ -9909,6 +10176,19 @@ async function openNote(id){
     S.bodyCache[id]=body;
     document.getElementById('nv-body').innerHTML=sanitizeMarkdown(_wikiPreprocess(body));
     _renderBacklinks(id);
+    // DOI references
+    const doiPanel=document.getElementById('nv-dois');
+    if(doiPanel){ _doiViewRender('nv-dois-list',m.dois||[]); doiPanel.style.display=(m.dois&&m.dois.length)?'':'none'; }
+    // Attachments
+    _attLoadIndex().then(()=>{
+      const chips=document.getElementById('nv-att-chips');
+      const attPanel=document.getElementById('nv-attachments');
+      if(chips&&attPanel){
+        const entries=(_attIndex||[]).filter(a=>a.source==='notes'&&a.sourceId===id);
+        attPanel.style.display=entries.length?'':'none';
+        chips.innerHTML=entries.map(a=>{const{cls,em}=_attIconFor(a.mime);return`<span class="att-chip" onclick="_attPreview('${a.id}')"><span class="att-chip-icon ${cls}">${em}</span><span class="att-chip-name">${esc(a.name)}</span><span class="att-chip-size">${_attFmtSize(a.size)}</span></span>`;}).join('');
+      }
+    });
     // Bottle cross-link
     const noteBottles=S.bottles.filter(b=>b.note_id===id);
     const nbBtn=document.getElementById('note-bottles-btn');
@@ -15495,6 +15775,8 @@ function startNewNote(mode='tc'){
   document.getElementById('ne-tmpl-hint').textContent='';
   const pinCb=document.getElementById('ne-pin-cb'); if(pinCb) pinCb.checked=false;
   populateRecipeSelect();
+  _doiLoad('ne',[]);
+  const neAttSec=document.getElementById('ne-att-section'); if(neAttSec) neAttSec.style.display='none';
   const wrap=document.getElementById('editor-body-wrap');
   wrap.dataset.pane='editor';
   wrap.querySelectorAll('.pane-btn').forEach(b=>b.classList.toggle('active',b.dataset.pane==='editor'));
@@ -15536,6 +15818,8 @@ async function startEditNote(){
     document.getElementById('ne-tmpl-hint').textContent='';
     const pinCb=document.getElementById('ne-pin-cb'); if(pinCb) pinCb.checked=!!m.pinned;
     populateRecipeSelect(m.recipe_id||'');
+    _doiLoad('ne', m.dois||[]);
+    _attLoadIndex().then(()=>_attRenderChips(id,'ne-att-chips','notes'));
     const wrap=document.getElementById('editor-body-wrap');
     wrap.dataset.pane='editor';
     wrap.querySelectorAll('.pane-btn').forEach(b=>b.classList.toggle('active',b.dataset.pane==='editor'));
@@ -15562,6 +15846,7 @@ async function saveNoteAction(){
   const body   =document.getElementById('ne-body').value;
   const note_type=isGeneric?'generic':'tc';
   const pinned=isGeneric?!!(document.getElementById('ne-pin-cb')?.checked):false;
+  const dois=(_doiStore['ne']||[]).slice();
   if(!title){toast('Title is required','fail');return;}
 
   // Validate input (Task #18)
@@ -15574,14 +15859,16 @@ async function saveNoteAction(){
   _saveBtn.disabled=true;
   load('Encrypting & saving…');
   try{
-    const keywords=_extractKeywords(body); // Group 2: body keyword stems for search
+    const keywords=_extractKeywords(body);
     if(S.editing){
       const ef=await ghGet(`${DIR}/${S.editing}.enc`);
       await writeNote(S.editing,body,ef.sha,`lab: update "${title}"`);
       const editingId=S.editing;
+      // update attachment sourceId/sourceTitle for any _unsaved entries
+      if(_attIndex) _attIndex.filter(a=>a.source==='notes'&&a.sourceId===null).forEach(a=>{a.sourceId=editingId;a.sourceTitle=title;});
       const {sha,notes}=await saveNotesIndex(ns=>{
         const idx=ns.findIndex(n=>n.id===editingId);
-        if(idx!==-1) ns[idx]={...ns[idx],title,type,stage,species,tags,next_review:review,recipe_id,cultures_out,note_type,pinned,keywords};
+        if(idx!==-1) ns[idx]={...ns[idx],title,type,stage,species,tags,next_review:review,recipe_id,cultures_out,note_type,pinned,keywords,dois};
         return ns;
       });
       S.notes=notes; S.notesSha=sha; S.cur=editingId;
@@ -15589,8 +15876,9 @@ async function saveNoteAction(){
       const id=uid(), date=S.calDate ? new Date(S.calDate).toISOString() : new Date().toISOString();
       S.calDate=null;
       await writeNote(id,body,null,`lab: add "${title}"`);
+      if(_attIndex) _attIndex.filter(a=>a.source==='notes'&&a.sourceId===null).forEach(a=>{a.sourceId=id;a.sourceTitle=title;});
       const {sha,notes}=await saveNotesIndex(ns=>{
-        ns.push({id,title,date,type,stage,species,tags,next_review:review,recipe_id,cultures_out,note_type,pinned,keywords});
+        ns.push({id,title,date,type,stage,species,tags,next_review:review,recipe_id,cultures_out,note_type,pinned,keywords,dois});
         return ns;
       });
       S.notes=notes; S.notesSha=sha; S.cur=id;
@@ -15800,23 +16088,498 @@ function insertTable(taId){
   mdWrap(taId,'\n| Header 1 | Header 2 | Header 3 |\n|----------|----------|----------|\n| Cell     | Cell     | Cell     |\n','','');
 }
 
+// ════════════════════════════════════════════════════════════
+// STATUS BAR
+// ════════════════════════════════════════════════════════════
+function _wireStatusBar(taId, barId, wcId, lnId){
+  const ta=document.getElementById(taId);
+  if(!ta) return;
+  function update(){
+    const v=ta.value;
+    const wc=v.trim()?v.trim().split(/\s+/).length:0;
+    const ch=v.length;
+    const ln=v.slice(0,ta.selectionStart).split('\n').length;
+    const wEl=document.getElementById(wcId); if(wEl) wEl.textContent=wc+' words · '+ch+' chars';
+    const lEl=document.getElementById(lnId); if(lEl) lEl.textContent='Line '+ln;
+  }
+  ta.addEventListener('input',update);
+  ta.addEventListener('click',update);
+  ta.addEventListener('keyup',update);
+  update();
+}
+
+// ════════════════════════════════════════════════════════════
+// FIND / REPLACE BAR
+// ════════════════════════════════════════════════════════════
+function _wireFindBar(pfx){
+  const ta=document.getElementById(pfx==='ne'?'ne-body':'je-body');
+  if(!ta) return;
+  let _matches=[], _mIdx=0;
+  function doFind(q){
+    _matches=[]; _mIdx=0;
+    const cnt=document.getElementById(pfx+'-find-count');
+    if(!q){if(cnt)cnt.textContent='';return;}
+    const v=ta.value; let i=0;
+    while((i=v.indexOf(q,i))!==-1){_matches.push(i);i+=q.length;}
+    if(cnt) cnt.textContent=_matches.length?`${_mIdx+1}/${_matches.length}`:'No match';
+    if(_matches.length){ta.focus();ta.setSelectionRange(_matches[0],_matches[0]+q.length);}
+  }
+  function nav(dir){ if(!_matches.length)return; _mIdx=(_mIdx+dir+_matches.length)%_matches.length; const q=document.getElementById(pfx+'-find-input').value; ta.focus(); ta.setSelectionRange(_matches[_mIdx],_matches[_mIdx]+q.length); const cnt=document.getElementById(pfx+'-find-count'); if(cnt)cnt.textContent=`${_mIdx+1}/${_matches.length}`; }
+  const fi=document.getElementById(pfx+'-find-input');
+  const ri=document.getElementById(pfx+'-rep-input');
+  if(fi) fi.addEventListener('input',()=>doFind(fi.value));
+  if(fi) fi.addEventListener('keydown',e=>{ if(e.key==='Enter'){e.preventDefault();nav(e.shiftKey?-1:1);} });
+  const prev=document.getElementById(pfx+'-find-prev'); if(prev) prev.onclick=()=>nav(-1);
+  const next=document.getElementById(pfx+'-find-next'); if(next) next.onclick=()=>nav(1);
+  const ro=document.getElementById(pfx+'-rep-one');
+  if(ro) ro.onclick=()=>{ if(!_matches.length||!fi)return; const q=fi.value,r=ri?ri.value:''; ta.value=ta.value.slice(0,_matches[_mIdx])+r+ta.value.slice(_matches[_mIdx]+q.length); doFind(q); };
+  const ra=document.getElementById(pfx+'-rep-all');
+  if(ra) ra.onclick=()=>{ if(!fi)return; const q=fi.value,r=ri?ri.value:''; if(!q)return; const c=(ta.value.split(q).length-1); ta.value=ta.value.split(q).join(r); _matches=[]; const cnt=document.getElementById(pfx+'-find-count'); if(cnt)cnt.textContent=`Replaced ${c}`; };
+  const cl=document.getElementById(pfx+'-find-close');
+  if(cl) cl.onclick=()=>_findBarToggle(pfx);
+}
+function _findBarToggle(pfx){
+  const bar=document.getElementById(pfx+'-find-bar');
+  if(!bar) return;
+  const open=bar.classList.toggle('open');
+  if(open) setTimeout(()=>{ const fi=document.getElementById(pfx+'-find-input'); if(fi)fi.focus(); },50);
+}
+
+// ════════════════════════════════════════════════════════════
+// DOI / REFERENCE FIELD
+// ════════════════════════════════════════════════════════════
+function _toggleDoiSection(pfx){
+  document.getElementById(pfx+'-doi-section').classList.toggle('open');
+}
+const _doiStore={ne:[],je:[]};
+function _doiRender(pfx){
+  const list=document.getElementById(pfx+'-doi-list'); if(!list) return;
+  const count=document.getElementById(pfx+'-doi-count');
+  list.innerHTML=(_doiStore[pfx]||[]).map((d,i)=>`<span class="doi-chip"><a href="https://doi.org/${esc(d)}" target="_blank" rel="noopener" title="Open ${esc(d)}">📖 ${esc(d)}</a><button class="doi-chip-del" onclick="_doiRemove('${pfx}',${i})">✕</button></span>`).join('');
+  if(count){ const n=(_doiStore[pfx]||[]).length; count.textContent=n; count.style.display=n?'':'none'; }
+}
+function _doiAdd(pfx){
+  const inp=document.getElementById(pfx+'-doi-input'); if(!inp) return;
+  let v=inp.value.trim().replace(/^https?:\/\/doi\.org\//i,'').replace(/^doi:/i,'');
+  if(!v){ toast('Enter a DOI','fail'); return; }
+  if(!_doiStore[pfx]) _doiStore[pfx]=[];
+  if(_doiStore[pfx].includes(v)){ toast('Already added','fail'); return; }
+  _doiStore[pfx].push(v);
+  inp.value='';
+  _doiRender(pfx);
+  document.getElementById(pfx+'-doi-section').classList.add('open');
+}
+function _doiRemove(pfx, idx){
+  _doiStore[pfx].splice(idx,1);
+  _doiRender(pfx);
+}
+function _doiLoad(pfx, dois){
+  _doiStore[pfx]=dois||[];
+  _doiRender(pfx);
+}
+function _doiViewRender(containerId, dois){
+  const el=document.getElementById(containerId); if(!el) return;
+  const parent=document.getElementById(containerId.replace('-list','s')||containerId+'_wrap');
+  if(!dois||!dois.length){ if(parent) parent.style.display='none'; return; }
+  if(parent) parent.style.display='';
+  el.innerHTML=dois.map(d=>`<span class="doi-chip"><a href="https://doi.org/${esc(d)}" target="_blank" rel="noopener">📖 ${esc(d)}</a></span>`).join('');
+}
+
+// ════════════════════════════════════════════════════════════
+// EMOJI PICKER
+// ════════════════════════════════════════════════════════════
+const _EP_CATS=[
+  {icon:'😊',label:'People',emojis:'😀😁😂🤣😃😄😅😆😉😊😋😎😍🥰😘😗😙😚🙂🤗🤩🤔🤨😐😑😶🙄😏😣😥😮🤐😯😪😫🥱😴😌😛😜😝🤤😒😓😔😕🙃🤑😲☹😖😞😟😤😢😭😦😧😨😩🤯😬😰😱🥵🥶😳🤪😵💫🤠🥳🥸🤡🤥🤫🤭🧐🤓😈👿👺👹💀☠👻👽🤖💩🙌👏🙏👌✌🤞🤟🤘☝👆👇👈👉👍👎✊👊🤛🤜🤝🫶❤️🧡💛💚💙💜🖤🤍🤎💔❣💕💞💓💗💖💘💝'
+  },
+  {icon:'🌿',label:'Plants',emojis:'🌱🌿☘️🍀🎋🎍🌾🌵🎄🌲🌳🌴🪵🪴🪹🪺🌺🌸🌼🌻🌹🥀🌷🌱🪷🌾🍃🍂🍁🍄🪸🌊🌸🌼🌻🌺💐🪻🌴🌵🎋🌾🌿🍀☘🪨🌍🌎🌏🌐🗺🧭🏔⛰🌋🗻🏞🛤🌅🌄🌠🎇🌌🌇🌆🏙🌃🌉🌁'},
+  {icon:'🔬',label:'Science',emojis:'🔬🧫🧪🧬🔭🩺💊💉🩹🧴🧹🧺🧻🧼🧽🧯⚗️🔩🔧🔨⚙️🛠🧲💡🔦🕯📡🔋🪫💻🖥🖨🖱⌨📱☎📞📟📠📺📻🧮⏱⏲⏰🕰⏳⌛🔑🗝🔒🔓🗄📊📈📉📋📌📍📎🖇📏📐✂️🗃🗂🗄📥📤📦📧📨📩📪📫📬📭📮🗳✏✒🖊🖋📝📓📔📒📕📗📘📙📚'},
+  {icon:'⚗',label:'Lab',emojis:'⚗🧪🔬🧬🧫🌡️💧🫧🌊🧊❄️🔥💨🌪🫀🫁🦠🪲🐛🦋🐝🐞🪳🦗🪰🕷🦟🐜🐌🐢🦎🐍🐸🦔🐁🐀🐇🦦🦡🦨🐓🐧🐦🦅🦆🦉🦚🦜🌸🌺🌹🌷🌼🌻💐🍄🌾🌵🎋🌴🎍🌲🌳🪵🪴🍃🍂🍁🌿☘🍀🌱'},
+  {icon:'🍎',label:'Food',emojis:'🍎🍊🍋🍇🍓🫐🍈🍒🍑🥭🍍🥥🥝🍅🍆🥑🫒🥦🥬🥒🌶🫑🌽🥕🧄🧅🥔🍠🫚🧅🥜🌰🍞🥐🥖🫓🥨🧀🥚🍳🧇🥞🧈🍖🍗🥩🥓🌮🌯🫔🥙🧆🥚🍳🥘🍲🫕🥣🥗🍿🧂🧃🍱🍘🍙🍚🍛🍜🍝🍠🍢🍣🍤🍥🥮🍡🧁🍦🍧🍨🍩🍪🎂🍰🍫🍬🍭🍮🍯🍼🥛☕🫖🍵🧋🍶🍺🍻🥂🍷🫗🍸🍹🧉🍾'},
+  {icon:'🔭',label:'Objects',emojis:'📎🖇📌📍✂️🗂📋📊📈📉🗒🗓📆📅🗑📁📂🗂📓📔📒📕📗📘📙📚📖🔖🏷🔬🔭🧲💡🔦🕯🔋🖥💻📱⌚📷📸📹🎥📽🎞🎤🎧🎼🎵🎶🎹🥁🎷🎺🎸🎻🪗🎮🕹🎲♟🎯🎳🏆🥇🥈🥉🏅🎗🎫🎟🎪🤹🎭🎨🖼🎠🎡🎢💈🎪🚂🚃🚄🚅🚆✈🚀🛸🛩🪂⛵🚤🛥🛳⛴🚢'},
+  {icon:'♻',label:'Symbols',emojis:'✅❌⭕❓❕‼⁉🔴🟠🟡🟢🔵🟣⚫⚪🟤🔺🔻🔷🔶🔹🔸▪▫◾◽◼◻♻♾🔄🔃↩↪⬅➡⬆⬇↗↖↘↙🔀🔁🔂⏩⏪⏫⏬⏭⏮🔼🔽⏸⏹⏺🎦🔅🔆📶📳📴📵🔕🔔🔉🔊🔇💯✔☑🔘🔲🔳⬜⬛🔈♀♂⚧☯☮✡☸🕉✝☦🛐⛎♈♉♊♋♌♍♎♏♐♑♒♓⛎🔯🉐㊙㊗🈴🈵🈹🈲🅰🅱🆎🆑🆘🆔🆕🆖🆗🆙🆚🈸🈶🈺🈷✴🆚💠🌐🗺🧭'},
+];
+let _epTargetTa=null, _epTargetBtn=null, _epCat=0;
+const _EP_RECENT_KEY='tcplants_recent_emoji';
+function _emojiOpen(taId, btnId){
+  const pop=document.getElementById('emoji-picker-pop');
+  if(pop.classList.contains('open')&&_epTargetTa===taId){ _emojiClose(); return; }
+  _epTargetTa=taId; _epTargetBtn=btnId;
+  const btn=document.getElementById(btnId);
+  if(btn){
+    const r=btn.getBoundingClientRect();
+    pop.style.left=Math.min(r.left,window.innerWidth-330)+'px';
+    pop.style.top=(r.bottom+4)+'px';
+  }
+  _epBuildCats();
+  _epRenderCat(0);
+  pop.classList.add('open');
+  setTimeout(()=>{ const si=document.getElementById('ep-search'); if(si){si.value='';si.focus();} },50);
+  document.addEventListener('mousedown',_epOutsideClick,{once:false,capture:true});
+}
+function _emojiClose(){
+  document.getElementById('emoji-picker-pop').classList.remove('open');
+  document.removeEventListener('mousedown',_epOutsideClick,true);
+  _epTargetTa=null; _epTargetBtn=null;
+}
+function _epOutsideClick(e){
+  const pop=document.getElementById('emoji-picker-pop');
+  if(!pop.contains(e.target)&&e.target.id!==_epTargetBtn){ _emojiClose(); }
+}
+function _epBuildCats(){
+  const cats=document.getElementById('ep-cats'); if(!cats) return;
+  cats.innerHTML=_EP_CATS.map((c,i)=>`<button class="ep-cat${i===_epCat?' active':''}" title="${c.label}" onclick="_epRenderCat(${i})">${c.icon}</button>`).join('');
+}
+function _epRenderCat(idx){
+  _epCat=idx;
+  document.querySelectorAll('.ep-cat').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  const recent=JSON.parse(localStorage.getItem(_EP_RECENT_KEY)||'[]');
+  const rRow=document.getElementById('ep-recent-row');
+  const grid=document.getElementById('ep-grid'); if(!grid) return;
+  let html='';
+  if(idx===0&&recent.length){
+    rRow.style.display='block';
+    html+=recent.map(e=>`<button class="ep-em" onclick="_epInsert('${e}')">${e}</button>`).join('');
+    html+='<div style="grid-column:1/-1;height:1px;background:var(--bd);margin:2px 0"></div>';
+  } else { rRow.style.display='none'; }
+  html+=_EP_CATS[idx].emojis.split('').filter(c=>c.trim()).map(e=>`<button class="ep-em" onclick="_epInsert('${e}')">${e}</button>`).join('');
+  grid.innerHTML=html;
+}
+function _epSearch(q){
+  const grid=document.getElementById('ep-grid'); if(!grid) return;
+  if(!q){ _epRenderCat(_epCat); return; }
+  q=q.toLowerCase();
+  const all=_EP_CATS.flatMap(c=>c.emojis.split('').filter(e=>e.trim()));
+  const matches=[...new Set(all)].filter(e=>e.includes(q)||_EP_CATS.some(c=>c.label.toLowerCase().includes(q)&&c.emojis.includes(e)));
+  grid.innerHTML=matches.length?matches.map(e=>`<button class="ep-em" onclick="_epInsert('${e}')">${e}</button>`).join(''):'<div style="padding:12px;color:var(--mu);font-size:12px;grid-column:1/-1">No results</div>';
+}
+function _epInsert(emoji){
+  if(!_epTargetTa) return;
+  const ta=document.getElementById(_epTargetTa); if(!ta) return;
+  const s=ta.selectionStart, e=ta.selectionEnd;
+  ta.value=ta.value.slice(0,s)+emoji+ta.value.slice(e);
+  ta.selectionStart=ta.selectionEnd=s+emoji.length;
+  ta.focus();
+  const recent=JSON.parse(localStorage.getItem(_EP_RECENT_KEY)||'[]');
+  const updated=[emoji,...recent.filter(x=>x!==emoji)].slice(0,10);
+  localStorage.setItem(_EP_RECENT_KEY,JSON.stringify(updated));
+  _emojiClose();
+}
+
+// ════════════════════════════════════════════════════════════
+// BINARY ENCRYPTION (for file attachments)
+// ════════════════════════════════════════════════════════════
+async function encBin(arrayBuffer){
+  const salt=crypto.getRandomValues(new Uint8Array(16));
+  const iv=crypto.getRandomValues(new Uint8Array(12));
+  const key=await deriveKey(S.pw,salt);
+  const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,arrayBuffer);
+  return JSON.stringify({v:2,s:b64e(salt),i:b64e(iv),d:b64e(ct)});
+}
+async function decBin(raw){
+  const {s,i,d}=JSON.parse(raw);
+  const key=await deriveKey(S.pw,b64d(s));
+  return crypto.subtle.decrypt({name:'AES-GCM',iv:b64d(i)},key,b64d(d));
+}
+
+// ════════════════════════════════════════════════════════════
+// ATTACHMENTS
+// ════════════════════════════════════════════════════════════
+const ATT_IDX='attachments/_index.enc';
+let _attIndex=null, _attIndexSha=null;
+
+function _attIconFor(mime){
+  if(!mime) return {cls:'other',em:'📄'};
+  if(mime.includes('pdf')) return {cls:'pdf',em:'📕'};
+  if(mime.startsWith('image/')) return {cls:'img',em:'🖼'};
+  if(mime.includes('csv')||mime.includes('spreadsheet')||mime.includes('excel')) return {cls:'csv',em:'📊'};
+  if(mime.includes('text')) return {cls:'other',em:'📝'};
+  return {cls:'other',em:'📄'};
+}
+function _attFmtSize(bytes){
+  if(bytes<1024) return bytes+'B';
+  if(bytes<1048576) return (bytes/1024).toFixed(1)+'KB';
+  return (bytes/1048576).toFixed(1)+'MB';
+}
+
+async function _attLoadIndex(){
+  if(_attIndex) return _attIndex;
+  try{
+    const f=await ghGet(ATT_IDX);
+    if(!f){ _attIndex=[]; _attIndexSha=null; return []; }
+    _attIndexSha=f.sha;
+    _attIndex=JSON.parse(await dec(ghDec(f.content)));
+  }catch(e){ _attIndex=[]; _attIndexSha=null; }
+  return _attIndex;
+}
+async function _attSaveIndex(){
+  const res=await ghPut(ATT_IDX, await enc(JSON.stringify(_attIndex)), _attIndexSha, 'lab: update attachments index');
+  _attIndexSha=res.content.sha;
+  _updateFileBadge();
+}
+
+function _updateFileBadge(){
+  const n=(_attIndex||[]).length;
+  const b=document.getElementById('nd-fbadge');
+  if(b){ b.textContent=n; b.style.display=n?'':'none'; }
+}
+
+async function _attPickerOpen(source, sourceId, chipContainerId, sourceTitle){
+  const input=document.createElement('input');
+  input.type='file';
+  input.accept='*/*';
+  input.multiple=true;
+  input.onchange=async e=>{
+    const files=[...e.target.files]; if(!files.length) return;
+    load('Uploading '+files.length+' file(s)…');
+    try{
+      await _attLoadIndex();
+      for(const file of files){
+        const id=uid();
+        const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+        const path=`attachments/${source}/${sourceId||'_unsaved'}/${id}-${safeName}.enc`;
+        const buf=await file.arrayBuffer();
+        const encContent=await encBin(buf);
+        await ghPut(path, encContent, null, `lab: attach "${file.name}"`);
+        const entry={id,name:file.name,size:file.size,mime:file.type||'application/octet-stream',date:new Date().toISOString(),source,sourceId:sourceId||null,sourceTitle:sourceTitle||'',path};
+        _attIndex.push(entry);
+      }
+      await _attSaveIndex();
+      _attRenderChips(sourceId, chipContainerId, source);
+      toast(files.length+' file(s) attached ✓');
+    }catch(err){ toast('Upload failed: '+err.message,'fail'); }
+    unload();
+  };
+  input.click();
+}
+
+function _attRenderChips(sourceId, containerId, source){
+  const el=document.getElementById(containerId); if(!el) return;
+  const entries=(_attIndex||[]).filter(a=>a.sourceId===sourceId&&a.source===source);
+  const section=el.closest('.att-section')||document.getElementById(containerId.replace('-chips','-section').replace('att-chips','att-section'));
+  if(section) section.style.display=entries.length?'':'none';
+  el.innerHTML=entries.map(a=>{
+    const {cls,em}=_attIconFor(a.mime);
+    return `<span class="att-chip" onclick="_attPreview('${a.id}')"><span class="att-chip-icon ${cls}">${em}</span><span class="att-chip-name" title="${esc(a.name)}">${esc(a.name)}</span><span class="att-chip-size">${_attFmtSize(a.size)}</span><button class="att-chip-del" onclick="event.stopPropagation();_attDelete('${a.id}')" title="Remove">✕</button></span>`;
+  }).join('');
+  if(entries.length) el.innerHTML+= `<button class="att-upload-btn" onclick="_attPickerOpen('${source}','${sourceId||''}','${containerId}')">＋ Attach</button>`;
+}
+
+async function _attDelete(id){
+  if(!confirm('Remove this attachment?')) return;
+  const entry=(_attIndex||[]).find(a=>a.id===id); if(!entry) return;
+  load('Removing…');
+  try{
+    const f=await ghGet(entry.path);
+    if(f) await ghDel(entry.path, f.sha, `lab: remove attachment "${entry.name}"`);
+    _attIndex=_attIndex.filter(a=>a.id!==id);
+    await _attSaveIndex();
+    document.querySelectorAll('.att-chip').forEach(c=>{ if(c.querySelector('.att-chip-del[onclick*="'+id+'"]')) c.remove(); });
+    toast('Attachment removed');
+  }catch(e){ toast('Remove failed: '+e.message,'fail'); }
+  unload();
+}
+
+async function _attPreview(id){
+  const entry=(_attIndex||[]).find(a=>a.id===id); if(!entry) return;
+  load('Decrypting…');
+  try{
+    const f=await ghGet(entry.path); if(!f) throw new Error('File not found in repo');
+    const raw=ghDec(f.content);
+    const ab=await decBin(raw);
+    const blob=new Blob([ab],{type:entry.mime||'application/octet-stream'});
+    const url=URL.createObjectURL(blob);
+    _fbShowPreview(entry, url);
+  }catch(e){ toast('Preview failed: '+e.message,'fail'); }
+  unload();
+}
+
+// ════════════════════════════════════════════════════════════
+// FILE BROWSER
+// ════════════════════════════════════════════════════════════
+let _fbFilter='all', _fbSource=null, _fbSearch='', _fbBlobUrls=[];
+
+function _fbSourceLabel(s){ return {notes:'📋 Notes',journal:'📓 Journal',recipes:'🧪 Recipes',bottles:'🫙 Bottles',exports:'📤 Exports'}[s]||s; }
+
+async function renderFileBrowser(){
+  const main=document.getElementById('files-main'); if(!main) return;
+  main.innerHTML='<div style="padding:20px;color:var(--mu)">Loading attachments index…</div>';
+  await _attLoadIndex();
+  const idx=_attIndex||[];
+  const sources=[...new Set(idx.map(a=>a.source))].sort();
+  main.innerHTML=`
+    <div class="fb-layout">
+      <div class="fb-tree" id="fb-tree"></div>
+      <div class="fb-main">
+        <div class="fb-toolbar">
+          <input class="fb-search" id="fb-search-input" placeholder="Search files…" oninput="_fbSearchChange(this.value)">
+          <div class="fb-filter-pills" id="fb-filter-pills">
+            <button class="fb-fpill active" onclick="_fbTypeFilter('all',this)">All types</button>
+            <button class="fb-fpill" onclick="_fbTypeFilter('pdf',this)">📕 PDF</button>
+            <button class="fb-fpill" onclick="_fbTypeFilter('img',this)">🖼 Image</button>
+            <button class="fb-fpill" onclick="_fbTypeFilter('csv',this)">📊 CSV</button>
+          </div>
+          <span class="fb-count" id="fb-count">0 files</span>
+        </div>
+        <div class="fb-list" id="fb-list"></div>
+      </div>
+    </div>`;
+  _fbRenderTree(sources);
+  _fbRenderList();
+}
+
+function _fbRenderTree(sources){
+  const tree=document.getElementById('fb-tree'); if(!tree) return;
+  let html=`<div class="fb-tree-item${_fbSource===null?' active':''}" onclick="_fbSetSource(null)">🗂 All Files</div>`;
+  html+=`<div class="fb-tree-group">By section</div>`;
+  const allSources=['notes','journal','recipes','bottles','exports'];
+  allSources.forEach(s=>{
+    const n=(_attIndex||[]).filter(a=>a.source===s).length;
+    html+=`<div class="fb-tree-item${_fbSource===s?' active':''}" onclick="_fbSetSource('${s}')">${_fbSourceLabel(s)} <span style="margin-left:auto;font-size:10px;color:var(--mu)">${n}</span></div>`;
+  });
+  tree.innerHTML=html;
+}
+
+function _fbSetSource(src){
+  _fbSource=src;
+  document.querySelectorAll('.fb-tree-item').forEach(el=>{
+    el.classList.toggle('active', src===null?el.textContent.includes('All Files'):el.textContent.includes(_fbSourceLabel(src)));
+  });
+  _fbRenderList();
+}
+
+function _fbTypeFilter(type, btn){
+  _fbFilter=type;
+  document.querySelectorAll('.fb-fpill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  _fbRenderList();
+}
+function _fbSearchChange(q){ _fbSearch=q; _fbRenderList(); }
+
+function _fbRenderList(){
+  const list=document.getElementById('fb-list'); if(!list) return;
+  let entries=_attIndex||[];
+  if(_fbSource) entries=entries.filter(a=>a.source===_fbSource);
+  if(_fbFilter!=='all') entries=entries.filter(a=>{
+    const {cls}=_attIconFor(a.mime);
+    return cls===_fbFilter;
+  });
+  if(_fbSearch) entries=entries.filter(a=>a.name.toLowerCase().includes(_fbSearch.toLowerCase())||(a.sourceTitle||'').toLowerCase().includes(_fbSearch.toLowerCase()));
+  entries=[...entries].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const cnt=document.getElementById('fb-count'); if(cnt) cnt.textContent=entries.length+' file'+(entries.length!==1?'s':'');
+  if(!entries.length){
+    list.innerHTML=`<div class="fb-empty">📂 No files here yet.<br><span style="font-size:12px">Attach files from Notes, Journal, Recipes or Bottles editors.</span></div>`;
+    return;
+  }
+  list.innerHTML=entries.map(a=>{
+    const {cls,em}=_attIconFor(a.mime);
+    const srcLabel=a.sourceTitle?`${_fbSourceLabel(a.source)}: ${a.sourceTitle}`:_fbSourceLabel(a.source);
+    return `<div class="fb-file-card" onclick="_attPreview('${a.id}')">
+      <div class="fb-file-icon ${cls}">${em}</div>
+      <div class="fb-file-info">
+        <div class="fb-file-name">${esc(a.name)}</div>
+        <div class="fb-file-meta">${srcLabel} · ${_attFmtSize(a.size)} · ${fmtDateShort(a.date)}</div>
+      </div>
+      <div class="fb-file-acts" onclick="event.stopPropagation()">
+        <button class="fb-file-btn" onclick="_attPreview('${a.id}')">👁 View</button>
+        <button class="fb-file-btn del" onclick="_attDelete('${a.id}');renderFileBrowser()">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function _fbShowPreview(entry, blobUrl){
+  _fbBlobUrls.forEach(u=>URL.revokeObjectURL(u));
+  _fbBlobUrls=[blobUrl];
+  const panel=document.getElementById('fb-preview-panel');
+  const title=document.getElementById('fb-pv-title');
+  const body=document.getElementById('fb-pv-body');
+  const dl=document.getElementById('fb-pv-dl');
+  if(!panel) return;
+  if(title) title.textContent=entry.name;
+  if(dl){ dl.href=blobUrl; dl.download=entry.name; }
+  const mime=entry.mime||'';
+  if(mime.includes('pdf')){
+    body.innerHTML=`<embed src="${blobUrl}" type="application/pdf" width="100%" height="100%">`;
+  } else if(mime.startsWith('image/')){
+    body.innerHTML=`<img src="${blobUrl}" style="max-width:100%;max-height:100%;object-fit:contain;margin:auto;display:block">`;
+  } else if(mime.includes('text')||mime.includes('csv')){
+    fetch(blobUrl).then(r=>r.text()).then(t=>{ body.innerHTML=`<pre>${esc(t)}</pre>`; });
+  } else {
+    body.innerHTML=`<div style="padding:24px;color:var(--mu);text-align:center"><div style="font-size:48px;margin-bottom:12px">${_attIconFor(mime).em}</div><div style="margin-bottom:16px">${esc(entry.name)}</div><a href="${blobUrl}" download="${esc(entry.name)}" class="btn" style="display:inline-block;padding:8px 18px">⬇ Download</a></div>`;
+  }
+  panel.classList.add('open');
+}
+function _fbPreviewClose(){
+  document.getElementById('fb-preview-panel').classList.remove('open');
+  _fbBlobUrls.forEach(u=>URL.revokeObjectURL(u));
+  _fbBlobUrls=[];
+}
+
+function mdIndentLines(taId, dir){
+  const ta=document.getElementById(taId);
+  const s=ta.selectionStart, e=ta.selectionEnd;
+  const val=ta.value;
+  const lineStart=val.lastIndexOf('\n',s-1)+1;
+  const lineEnd=val.indexOf('\n',e); const end=lineEnd===-1?val.length:lineEnd;
+  const lines=val.slice(lineStart,end).split('\n');
+  const updated=lines.map(l=>dir==='in'?'  '+l:l.replace(/^ {1,2}/,''));
+  ta.value=val.slice(0,lineStart)+updated.join('\n')+val.slice(end);
+  ta.selectionStart=s+(dir==='in'?2:-(val.slice(lineStart,s+1).match(/^ {1,2}/)?.[0]?.length||0));
+  ta.selectionEnd=s+updated.join('\n').length-(lines.join('\n').length-Math.max(0,e-lineStart));
+  ta.selectionStart=lineStart; ta.selectionEnd=lineStart+updated.join('\n').length;
+  ta.focus();
+}
+function mdAlignWrap(taId, align){
+  const ta=document.getElementById(taId);
+  const s=ta.selectionStart, e=ta.selectionEnd;
+  const sel=ta.value.slice(s,e)||'aligned text';
+  const ins=`<div style="text-align:${align}">${sel}</div>`;
+  ta.value=ta.value.slice(0,s)+ins+ta.value.slice(e);
+  ta.selectionStart=s; ta.selectionEnd=s+ins.length;
+  ta.focus();
+}
+function mdClearFmt(taId){
+  const ta=document.getElementById(taId);
+  const s=ta.selectionStart, e=ta.selectionEnd;
+  if(s===e) return;
+  let sel=ta.value.slice(s,e);
+  sel=sel.replace(/\*\*(.+?)\*\*/g,'$1').replace(/\*(.+?)\*/g,'$1')
+         .replace(/~~(.+?)~~/g,'$1').replace(/`(.+?)`/g,'$1')
+         .replace(/_{2}(.+?)_{2}/g,'$1').replace(/_(.+?)_/g,'$1')
+         .replace(/<mark>([\s\S]+?)<\/mark>/g,'$1')
+         .replace(/<sup>([\s\S]+?)<\/sup>/g,'$1')
+         .replace(/<sub>([\s\S]+?)<\/sub>/g,'$1');
+  ta.value=ta.value.slice(0,s)+sel+ta.value.slice(e);
+  ta.selectionStart=s; ta.selectionEnd=s+sel.length;
+  ta.focus();
+}
 // Generic toolbar factory — builds action map for any textarea ID
 function makeTB(taId){
   return {
-    h2:     ()=>mdLinePrefix(taId,'## '),
-    h3:     ()=>mdLinePrefix(taId,'### '),
-    bold:   ()=>mdWrap(taId,'**','**','bold text'),
-    italic: ()=>mdWrap(taId,'*','*','italic text'),
-    strike: ()=>mdWrap(taId,'~~','~~','strikethrough'),
-    code:   ()=>mdWrap(taId,'`','`','code'),
-    codebl: ()=>mdWrap(taId,'\n```\n','\n```\n','code here'),
-    quote:  ()=>mdLinePrefix(taId,'> '),
-    hr:     ()=>mdWrap(taId,'\n\n---\n\n','',''),
-    ul:     ()=>mdLinePrefix(taId,'- '),
-    ol:     ()=>mdLinePrefix(taId,'1. '),
-    task:   ()=>mdLinePrefix(taId,'- [ ] '),
-    link:   ()=>mdWrap(taId,'[','](https://)','link text'),
-    tbl:    ()=>insertTable(taId),
+    h1:       ()=>mdLinePrefix(taId,'# '),
+    h2:       ()=>mdLinePrefix(taId,'## '),
+    h3:       ()=>mdLinePrefix(taId,'### '),
+    bold:     ()=>mdWrap(taId,'**','**','bold text'),
+    italic:   ()=>mdWrap(taId,'*','*','italic text'),
+    strike:   ()=>mdWrap(taId,'~~','~~','strikethrough'),
+    mark:     ()=>mdWrap(taId,'<mark>','</mark>','highlighted'),
+    sup:      ()=>mdWrap(taId,'<sup>','</sup>','sup'),
+    sub:      ()=>mdWrap(taId,'<sub>','</sub>','sub'),
+    code:     ()=>mdWrap(taId,'`','`','code'),
+    codebl:   ()=>mdWrap(taId,'\n```\n','\n```\n','code here'),
+    quote:    ()=>mdLinePrefix(taId,'> '),
+    hr:       ()=>mdWrap(taId,'\n\n---\n\n','',''),
+    ul:       ()=>mdLinePrefix(taId,'- '),
+    ol:       ()=>mdLinePrefix(taId,'1. '),
+    task:     ()=>mdLinePrefix(taId,'- [ ] '),
+    indent:   ()=>mdIndentLines(taId,'in'),
+    outdent:  ()=>mdIndentLines(taId,'out'),
+    alignl:   ()=>mdAlignWrap(taId,'left'),
+    alignc:   ()=>mdAlignWrap(taId,'center'),
+    alignr:   ()=>mdAlignWrap(taId,'right'),
+    clearfmt: ()=>mdClearFmt(taId),
+    link:     ()=>mdWrap(taId,'[','](https://)','link text'),
+    tbl:      ()=>insertTable(taId),
   };
 }
 
@@ -15824,11 +16587,15 @@ function makeTB(taId){
 function wireToolbar(prefix, taId, extraBtns={}){
   const tb=makeTB(taId);
   const map={
-    [`${prefix}h2`]:tb.h2, [`${prefix}h3`]:tb.h3,
+    [`${prefix}h1`]:tb.h1, [`${prefix}h2`]:tb.h2, [`${prefix}h3`]:tb.h3,
     [`${prefix}bold`]:tb.bold, [`${prefix}italic`]:tb.italic, [`${prefix}strike`]:tb.strike,
+    [`${prefix}mark`]:tb.mark, [`${prefix}sup`]:tb.sup, [`${prefix}sub`]:tb.sub,
     [`${prefix}code`]:tb.code, [`${prefix}codebl`]:tb.codebl,
     [`${prefix}quote`]:tb.quote, [`${prefix}hr`]:tb.hr,
     [`${prefix}ul`]:tb.ul, [`${prefix}ol`]:tb.ol, [`${prefix}task`]:tb.task,
+    [`${prefix}indent`]:tb.indent, [`${prefix}outdent`]:tb.outdent,
+    [`${prefix}alignl`]:tb.alignl, [`${prefix}alignc`]:tb.alignc, [`${prefix}alignr`]:tb.alignr,
+    [`${prefix}clearfmt`]:tb.clearfmt,
     [`${prefix}link`]:tb.link, [`${prefix}tbl`]:tb.tbl,
     ...extraBtns,
   };
@@ -15836,7 +16603,14 @@ function wireToolbar(prefix, taId, extraBtns={}){
 }
 
 // Notes toolbar
-wireToolbar('tb-','ne-body',{'img-btn':insertImage});
+wireToolbar('tb-','ne-body',{
+  'img-btn': insertImage,
+  'tb-emoji': ()=>_emojiOpen('ne-body','tb-emoji'),
+  'tb-attach': ()=>_attPickerOpen('notes', S.editing||S.cur, 'ne-att-chips'),
+  'tb-find': ()=>_findBarToggle('ne'),
+});
+_wireStatusBar('ne-body','ne-status','ne-stat-wc','ne-stat-ln');
+_wireFindBar('ne');
 
 // Journal toolbar
 function insertJournalImage(){
@@ -15969,55 +16743,89 @@ function _toggleJournalPreview(){
 
 // Wire journal toolbar — calls after DOM is ready (wireToolbar needs IDs to exist)
 function _wireJournalToolbar(){
-  const tb=makeTB('je-body');
-  const extra={
-    'je-h1': ()=>mdLinePrefix('je-body','# '),
-    'je-img': insertJournalImage,
-    'je-iframe': insertJournalIframe,
-  };
-  wireToolbar('je-','je-body', extra);
+  wireToolbar('je-','je-body', {
+    'je-h1':    ()=>mdLinePrefix('je-body','# '),
+    'je-img':   insertJournalImage,
+    'je-iframe':insertJournalIframe,
+    'je-emoji': ()=>_emojiOpen('je-body','je-emoji'),
+    'je-attach':()=>_attPickerOpen('journal', S.editingJournal||S.curJournal, 'je-att-chips'),
+    'je-find':  ()=>_findBarToggle('je'),
+  });
+  _wireStatusBar('je-body','je-status','je-stat-wc','je-stat-ln');
+  _wireFindBar('je');
 }
 // Wire on first open (called from startNewJournalEntry and editJournalEntry)
 // Also wire now in case it's already in DOM
 _wireJournalToolbar();
 
 // Recipes toolbar
-wireToolbar('rb-','rr-notes');
+wireToolbar('rb-','rr-notes',{
+  'rb-attach': ()=>{const r=S.recs.find(x=>x.id===S.curRec); _attPickerOpen('recipes',S.curRec||'_new','rec-att-chips',r?.name||'Recipe');}
+});
 
+function _editorKeydown(e, taId, saveFn){
+  const ta=e.target;
+  const tb=makeTB(taId);
+  const s=ta.selectionStart, end=ta.selectionEnd;
+  if(e.ctrlKey||e.metaKey){
+    if(e.key==='b'){e.preventDefault();tb.bold();return;}
+    if(e.key==='i'){e.preventDefault();tb.italic();return;}
+    if(e.key==='k'){e.preventDefault();tb.link();return;}
+    if(e.key==='s'){e.preventDefault();saveFn();return;}
+    if(e.key==='d'){e.preventDefault();_dupLine(ta);return;}
+    if(e.shiftKey&&e.key==='F'){e.preventDefault();_findBarToggle(taId==='ne-body'?'ne':'je');return;}
+  }
+  if(e.altKey&&(e.key==='ArrowUp'||e.key==='ArrowDown')){
+    e.preventDefault(); _moveLine(ta,e.key==='ArrowUp'?-1:1); return;
+  }
+  if(e.key==='Tab'){
+    e.preventDefault();
+    const multiLine=ta.value.slice(s,end).includes('\n');
+    if(multiLine||s!==end){ mdIndentLines(taId, e.shiftKey?'out':'in'); }
+    else if(!e.shiftKey){ ta.value=ta.value.slice(0,s)+'  '+ta.value.slice(end); ta.selectionStart=ta.selectionEnd=s+2; }
+    return;
+  }
+  if(e.key==='Enter'){
+    const lineStart=ta.value.lastIndexOf('\n',s-1)+1;
+    const line=ta.value.slice(lineStart,s);
+    const ulM=line.match(/^(\s*)([-*+])\s+/);
+    const olM=line.match(/^(\s*)(\d+)\.\s+/);
+    const taskM=line.match(/^(\s*)([-*+])\s+\[([ x])\]\s+/);
+    let prefix=null;
+    if(taskM&&line.trim().length>taskM[0].length) prefix=taskM[1]+'- [ ] ';
+    else if(ulM&&line.trim().length>ulM[0].length) prefix=ulM[1]+ulM[2]+' ';
+    else if(olM&&line.trim().length>olM[0].length) prefix=olM[1]+(parseInt(olM[2])+1)+'. ';
+    if(prefix){ e.preventDefault(); const ins='\n'+prefix; ta.value=ta.value.slice(0,s)+ins+ta.value.slice(end); ta.selectionStart=ta.selectionEnd=s+ins.length; }
+  }
+}
+function _dupLine(ta){
+  const s=ta.selectionStart;
+  const ls=ta.value.lastIndexOf('\n',s-1)+1;
+  let le=ta.value.indexOf('\n',s); if(le===-1) le=ta.value.length;
+  const line=ta.value.slice(ls,le);
+  ta.value=ta.value.slice(0,le)+'\n'+line+ta.value.slice(le);
+  ta.selectionStart=ta.selectionEnd=le+1+s-ls;
+}
+function _moveLine(ta,dir){
+  const s=ta.selectionStart;
+  const val=ta.value;
+  const lines=val.split('\n');
+  let chars=0, curLine=0;
+  for(let i=0;i<lines.length;i++){ if(chars+lines[i].length>=s){curLine=i;break;} chars+=lines[i].length+1; }
+  const target=curLine+dir;
+  if(target<0||target>=lines.length) return;
+  [lines[curLine],lines[target]]=[lines[target],lines[curLine]];
+  ta.value=lines.join('\n');
+  let newPos=lines.slice(0,target).join('\n').length+(target>0?1:0)+(s-chars);
+  ta.selectionStart=ta.selectionEnd=Math.max(0,Math.min(newPos,ta.value.length));
+}
 // Keyboard shortcuts — notes textarea
-document.getElementById('ne-body').addEventListener('keydown',e=>{
-  const tb=makeTB('ne-body');
-  if(e.ctrlKey||e.metaKey){
-    if(e.key==='b'){e.preventDefault();tb.bold();}
-    else if(e.key==='i'){e.preventDefault();tb.italic();}
-    else if(e.key==='k'){e.preventDefault();tb.link();}
-    else if(e.key==='s'){e.preventDefault();saveNoteAction();}
-  }
-  if(e.key==='Tab'){e.preventDefault();const ta=e.target,s=ta.selectionStart;ta.value=ta.value.slice(0,s)+'  '+ta.value.slice(ta.selectionEnd);ta.selectionStart=ta.selectionEnd=s+2;}
-});
-
+document.getElementById('ne-body').addEventListener('keydown',e=>_editorKeydown(e,'ne-body',saveNoteAction));
 // Keyboard shortcuts — journal textarea
-document.getElementById('je-body').addEventListener('keydown',e=>{
-  const tb=makeTB('je-body');
-  if(e.ctrlKey||e.metaKey){
-    if(e.key==='b'){e.preventDefault();tb.bold();}
-    else if(e.key==='i'){e.preventDefault();tb.italic();}
-    else if(e.key==='k'){e.preventDefault();tb.link();}
-    else if(e.key==='s'){e.preventDefault();saveJournalEntry();}
-  }
-  if(e.key==='Tab'){e.preventDefault();const ta=e.target,s=ta.selectionStart;ta.value=ta.value.slice(0,s)+'  '+ta.value.slice(ta.selectionEnd);ta.selectionStart=ta.selectionEnd=s+2;}
-});
+document.getElementById('je-body').addEventListener('keydown',e=>_editorKeydown(e,'je-body',saveJournalEntry));
 
 // Keyboard shortcuts — recipe textarea
-document.getElementById('rr-notes').addEventListener('keydown',e=>{
-  const tb=makeTB('rr-notes');
-  if(e.ctrlKey||e.metaKey){
-    if(e.key==='b'){e.preventDefault();tb.bold();}
-    else if(e.key==='i'){e.preventDefault();tb.italic();}
-    else if(e.key==='k'){e.preventDefault();tb.link();}
-  }
-  if(e.key==='Tab'){e.preventDefault();const ta=e.target,s=ta.selectionStart;ta.value=ta.value.slice(0,s)+'  '+ta.value.slice(ta.selectionEnd);ta.selectionStart=ta.selectionEnd=s+2;}
-});
+document.getElementById('rr-notes').addEventListener('keydown',e=>_editorKeydown(e,'rr-notes',saveRecipe));
 
 // ════════════════════════════════════════════════════════════
 // ACCESSION REGISTRY
@@ -19251,6 +20059,7 @@ function navTo(sec){
     else if(sec==='gallery'){}  // lazy — user clicks Load Gallery
     else if(sec==='logicflows'){} // static page — no render needed
     else if(sec==='ai') renderAIPage();
+    else if(sec==='files') renderFileBrowser();
   }
 }
 
