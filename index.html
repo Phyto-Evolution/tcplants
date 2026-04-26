@@ -806,7 +806,10 @@ main > .dview, main > .editor{ margin:0 auto; }
 }
 @media(max-width:900px){#dash-panels{grid-template-columns:repeat(12,1fr);grid-template-areas:"donut donut donut donut donut donut alerts alerts alerts alerts alerts alerts""activity activity activity activity activity activity contam contam contam contam contam contam""streak streak streak streak streak streak streak streak streak streak streak streak""species species species species species species spotlight spotlight spotlight spotlight spotlight spotlight""gh gh gh gh gh gh gh gh gh gh gh gh""recent recent recent recent recent recent pinned pinned pinned pinned pinned pinned""research research research research research research research research research research research research""checklist checklist checklist checklist checklist checklist checklist checklist checklist checklist checklist checklist""aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar aibar""voice voice voice voice voice voice voice voice voice voice voice voice";}}
 @media(max-width:580px){#dash-panels{grid-template-columns:1fr;grid-template-areas:"donut""alerts""activity""contam""streak""species""spotlight""gh""recent""pinned""research""checklist""aibar""voice";}}
-.dc{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.dc{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;min-width:0;overflow:hidden;position:relative;transition:box-shadow .15s}
+.dc-drag-handle{position:absolute;top:9px;right:11px;font-size:14px;color:var(--bd);cursor:grab;opacity:0;transition:opacity .15s;z-index:3;user-select:none;line-height:1;padding:2px 3px}
+.dc:hover .dc-drag-handle{opacity:.65}
+.dc.dc-drag-over{box-shadow:0 0 0 2px var(--ac) inset;background:var(--sf2)}
 .dc-label{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
 .dc-label a,.dc-label span[onclick]{color:var(--ac);cursor:pointer;font-size:9px;font-weight:700;text-transform:none;letter-spacing:0}
 .dc-num{font-size:32px;font-weight:800;line-height:1;margin-bottom:2px}
@@ -3536,16 +3539,24 @@ input, textarea, select {
       <!-- VERSION HEADER -->
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
         <h1 style="font-size:22px;font-weight:800;margin:0">🌿 Forest Studio Labs</h1>
-        <span class="help-version-badge">v3.17</span>
+        <span class="help-version-badge">v3.18</span>
         <button class="btn xs ghost" onclick="navTo('changelog')" style="border-color:var(--pu);color:var(--pu)">📋 Changelog →</button>
         <button class="btn xs ghost" onclick="navTo('logicflows')" style="margin-left:4px;border-color:var(--ac);color:var(--ac)">🔗 Logic Flows →</button>
       </div>
       <p style="color:var(--mu);font-size:13px;margin-bottom:20px">April 2026 · Encrypted · GitHub-backed · Single-file PWA</p>
 
-      <!-- WHAT'S NEW v3.17 -->
+      <!-- WHAT'S NEW v3.18 -->
       <div style="background:linear-gradient(135deg,rgba(63,185,80,.1),rgba(88,166,255,.08));border:1px solid rgba(63,185,80,.3);border-radius:10px;padding:18px 20px;margin-bottom:10px">
-        <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v3.17</div>
+        <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v3.18</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
+          <div style="font-size:13px;line-height:1.6"><strong>⠿ Drag-and-drop dashboard</strong> — every dashboard card has a drag handle (appears on hover). Drag any panel and drop it on another to swap positions. Layout is saved to localStorage and survives reloads. Reset button in Settings → Appearance.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🏠 Home button fixed</strong> — the nav-bar 🏠 button now correctly navigates to the Home section (dashboard) instead of landing on the Notes section.</div>
+        </div>
+      </div>
+      <!-- v3.17 collapse -->
+      <details style="margin-bottom:8px">
+        <summary style="cursor:pointer;font-size:12px;color:var(--mu);padding:6px 0;font-weight:600;letter-spacing:.04em">▸ v3.17 release notes</summary>
+        <div style="background:var(--sf2);border-radius:8px;padding:12px;margin-top:6px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
           <div style="font-size:13px;line-height:1.6"><strong>🏠 Home section</strong> — Dashboard is now its own top-level section (Home tab), separate from Notes. Quick actions, alert strip, stats band, and recent/upcoming panels live here. Notes section simplified to a clean list + empty state.</div>
           <div style="font-size:13px;line-height:1.6"><strong>🌿 Registry &amp; Recipes blank-page fix</strong> — navigating to Registry or Recipes now immediately renders the list and shows the empty state, fixing the blank-page bug on first nav.</div>
           <div style="font-size:13px;line-height:1.6"><strong>📅 Calendar sidebar</strong> — Calendar section now has a persistent right-side panel showing the next 14 days agenda and current-month stats (lab notes, bottles, journal, contam count). Hidden on mobile.</div>
@@ -3553,7 +3564,7 @@ input, textarea, select {
           <div style="font-size:13px;line-height:1.6"><strong>🟢 Green theme (4th skin)</strong> — theme cycle now has 4 steps: Dark → Light → Paper → Green (radioactive phosphor / lab radiation aesthetic). Green has dot-scan-line texture and neon glow on version badges.</div>
           <div style="font-size:13px;line-height:1.6"><strong>🖨 Invoice v2</strong> — full redesign: header with GSTIN/CIN, Bill-From party box, itemised table with subtotal row, amount-in-words (Indian numbering: Crore/Lakh/Thousand), T&amp;C block, bank details placeholder, signature box, and page footer.</div>
         </div>
-      </div>
+      </details>
       <!-- v3.16 collapse -->
       <details style="margin-bottom:8px">
         <summary style="cursor:pointer;font-size:12px;color:var(--mu);padding:6px 0;font-weight:600;letter-spacing:.04em">▸ v3.16 release notes</summary>
@@ -5176,7 +5187,7 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
     <main style="flex:1;overflow-y:auto;padding:28px 32px;max-width:980px;width:100%;box-sizing:border-box">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
         <h1 style="font-size:20px;font-weight:800;margin:0">🔗 Logic Flows</h1>
-        <span style="background:linear-gradient(135deg,var(--ac),var(--pu));color:#0d1117;border-radius:12px;font-size:11px;font-weight:800;padding:2px 9px;letter-spacing:.04em">v3.17</span>
+        <span style="background:linear-gradient(135deg,var(--ac),var(--pu));color:#0d1117;border-radius:12px;font-size:11px;font-weight:800;padding:2px 9px;letter-spacing:.04em">v3.18</span>
         <button onclick="_lfExpandAll()" class="btn xs ghost" style="margin-left:auto">Expand all</button>
         <button onclick="_lfCollapseAll()" class="btn xs ghost">Collapse all</button>
       </div>
@@ -6033,6 +6044,18 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
           <tr><td>🌳 Lineage Tree</td><td>Bottle detail — passage section</td><td>Computed from S.bottles parent_id chain</td><td><code>_treeAncestor() _renderLineageTree()</code></td></tr>
           <tr><td>📸 Photo Strip</td><td>Bottle detail — below lineage</td><td>Filtered from S.gallery by bottle code</td><td>Inline render in <code>openBottle()</code></td></tr>
           <tr><td>⚗️ Recipe Inline Scaler</td><td>Recipe detail panel</td><td>Stateless — recomputes on each input change</td><td><code>_recScaleRender() _recScaleUpdate()</code></td></tr>
+        </table>
+
+        <h3 class="help-h3" style="margin-top:14px">Drag-and-Drop Layout (v3.18)</h3>
+        <p style="font-size:12px;color:var(--mu);margin:0 0 8px">Each <code>.dc</code> card has <code>draggable="true"</code> and a hover-reveal grip handle. Swaps CSS <code>grid-area</code> values between two cards. Layout persisted in <code>localStorage['tcplants_dash_layout']</code> as <code>{panelKey:swappedArea}</code>.</p>
+        <table class="help-table">
+          <tr><th>Function</th><th>Purpose</th></tr>
+          <tr><td><code>_dashLayout</code></td><td>Module-level object, initialised from localStorage at page load</td></tr>
+          <tr><td><code>_dashGetArea(def)</code></td><td>Returns saved area for panel key, or <code>def</code> if not remapped</td></tr>
+          <tr><td><code>_dashSaveLayout()</code></td><td>Reads current DOM grid-area values, writes delta map to localStorage</td></tr>
+          <tr><td><code>_dashResetLayout()</code></td><td>Clears localStorage key, resets <code>_dashLayout={}</code>, re-renders dashboard</td></tr>
+          <tr><td><code>_dashWireDrag(pEl)</code></td><td>Called after <code>pEl.innerHTML</code> set; attaches dragstart/dragover/drop listeners to all <code>.dc</code> children</td></tr>
+          <tr><td>Settings reset</td><td>Settings → Appearance → "↺ Reset" button calls <code>_dashResetLayout()</code></td></tr>
         </table>
       </div></div></details>
 
@@ -7085,6 +7108,13 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
             <div class="set-row-sub">Dark or light mode</div>
           </div>
           <button class="btn xs ghost" id="set-theme-btn" onclick="_setToggleTheme()">☀️ Light</button>
+        </div>
+        <div class="set-row">
+          <div class="set-row-info">
+            <div class="set-row-label">Dashboard layout</div>
+            <div class="set-row-sub">Drag panels to rearrange. Reset returns to default grid.</div>
+          </div>
+          <button class="btn xs ghost" onclick="_dashResetLayout()">↺ Reset</button>
         </div>
         <div class="set-row">
           <div class="set-row-info">
@@ -9924,6 +9954,59 @@ function _computeAlerts(){
   return alerts;
 }
 
+// ── Dashboard drag-and-drop layout ───────────────────────────
+let _dashLayout=(()=>{try{return JSON.parse(localStorage.getItem('tcplants_dash_layout')||'{}');}catch{return{};}})();
+function _dashGetArea(def){return _dashLayout[def]||def;}
+function _dashSaveLayout(){
+  const pEl=document.getElementById('dash-panels');if(!pEl)return;
+  const layout={};
+  pEl.querySelectorAll('.dc[data-dckey]').forEach(el=>{
+    const key=el.dataset.dckey;
+    const area=(el.style.gridArea||key).trim();
+    if(area!==key)layout[key]=area;
+  });
+  localStorage.setItem('tcplants_dash_layout',JSON.stringify(layout));
+  _dashLayout=layout;
+}
+function _dashResetLayout(){
+  localStorage.removeItem('tcplants_dash_layout');
+  _dashLayout={};
+  _renderDashboard();
+  toast('Dashboard layout reset');
+}
+function _dashWireDrag(pEl){
+  let dragSrc=null;
+  pEl.querySelectorAll('.dc[data-dckey]').forEach(el=>{
+    el.addEventListener('dragstart',e=>{
+      dragSrc=el;
+      e.dataTransfer.effectAllowed='move';
+      requestAnimationFrame(()=>el.style.opacity='0.45');
+    });
+    el.addEventListener('dragend',()=>{
+      if(dragSrc)dragSrc.style.opacity='';
+      dragSrc=null;
+      pEl.querySelectorAll('.dc').forEach(c=>c.classList.remove('dc-drag-over'));
+    });
+    el.addEventListener('dragover',e=>{
+      e.preventDefault();
+      if(dragSrc&&el!==dragSrc)el.classList.add('dc-drag-over');
+    });
+    el.addEventListener('dragleave',()=>el.classList.remove('dc-drag-over'));
+    el.addEventListener('drop',e=>{
+      e.preventDefault();
+      el.classList.remove('dc-drag-over');
+      if(!dragSrc||dragSrc===el)return;
+      const srcArea=(dragSrc.style.gridArea||dragSrc.dataset.dckey).trim();
+      const dstArea=(el.style.gridArea||el.dataset.dckey).trim();
+      dragSrc.style.gridArea=dstArea;
+      el.style.gridArea=srcArea;
+      dragSrc.style.opacity='';
+      dragSrc=null;
+      _dashSaveLayout();
+    });
+  });
+}
+
 function _renderDashboard(){
   const labName=localStorage.getItem('tcplants_lab_name')||'';
   const syncEl=document.getElementById('dash-last-sync');
@@ -10041,7 +10124,7 @@ function _renderDashboard(){
     pEl.className=''; pEl.style.cssText='';
 
     // ── helpers ───────────────────────────────────────────────
-    const C=(area,content,extra='')=>`<div class="dc" style="grid-area:${area};${extra}">${content}</div>`;
+    const C=(area,content,extra='')=>`<div class="dc" data-dckey="${area}" style="grid-area:${_dashGetArea(area)};${extra}" draggable="true"><div class="dc-drag-handle" title="Drag to rearrange">⠿</div>${content}</div>`;
     const H=(label,action='',actionLabel='')=>`<div class="dc-label">${label}${action?`<span onclick="${action}" style="color:var(--ac);cursor:pointer;font-size:10px">${actionLabel}</span>`:''}</div>`;
     const Row=(icon,title,sub,action,badge='',badgeCol='var(--mu)')=>`
       <div class="dc-row" onclick="${action}">
@@ -10301,6 +10384,7 @@ function _renderDashboard(){
     // ── Assemble — CSS class handles layout ───────────────────
     pEl.style.cssText='';
     pEl.innerHTML=donutHTML+alertsHTML+actHTML+contamHTML+streakHTML+spHTML+spotlightHTML+ghHTML+recentHTML+pinnedHTML+researchHTML+checklistHTML+aibarHTML+voiceHTML;
+    _dashWireDrag(pEl);
   }
 }
 
@@ -22652,20 +22736,12 @@ function scaleMedia(){
 // HOME BUTTON
 // ════════════════════════════════════════════════════════════
 function goHome(){
-  // Close all side panels
   document.getElementById('cal-day-panel')?.classList.remove('on');
   document.getElementById('history-panel')?.classList.remove('on');
   document.getElementById('sp-detail-panel')?.classList.remove('open');
   closeActLog();
   closeSettings();
-  // Navigate to notes home (dashboard)
-  document.querySelectorAll('.nd-list-area').forEach(el=>el.classList.remove('on'));
-  closeNavDrawer();
-  switchSection('notes');
-  S.cur=null;
-  showNote('empty');
-  renderNoteList();
-  _renderDashboard();
+  navTo('home');
 }
 
 // ════════════════════════════════════════════════════════════
