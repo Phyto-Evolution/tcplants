@@ -3551,6 +3551,8 @@ input, textarea, select {
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
           <div style="font-size:13px;line-height:1.6"><strong>⠿ Drag-and-drop dashboard</strong> — every dashboard card has a drag handle (appears on hover). Drag any panel and drop it on another to swap positions. Layout is saved to localStorage and survives reloads. Reset button in Settings → Appearance.</div>
           <div style="font-size:13px;line-height:1.6"><strong>🏠 Home button fixed</strong> — the nav-bar 🏠 button now correctly navigates to the Home section (dashboard) instead of landing on the Notes section.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🏷 Preset flairs (46 presets)</strong> — Species → Flairs tab now has an "⚡ Load preset flairs" button. Browse 46 curated presets across 6 categories (Provenance, Conservation, Geography, Culture performance, Plant trait, Media/Recipe). Checkboxes let you pick exactly what you need; already-existing flairs are greyed out.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🎨 Theme cycle fixed</strong> — green theme removed; cycle is now Dark → Light → Paper → Dark. Icons and labels now show the <em>current</em> theme (was showing next). Any saved "green" session auto-falls back to dark.</div>
         </div>
       </div>
       <!-- v3.17 collapse -->
@@ -4239,7 +4241,17 @@ input, textarea, select {
         <p>Once saved, the species appears immediately in the autocomplete dropdown for all Species fields across the app (notes, bottles, accessions, greenhouse).</p>
         <p>Each row in the Custom Species list has an <strong>✏️ Edit</strong> button (opens form pre-filled, button changes to "Update Species") and <strong>✕ Delete</strong>. Editing does not affect existing notes or bottles that already use that name.</p>
         <h3>Flairs</h3>
-        <p>Define coloured labels in the <strong>Flairs</strong> tab — e.g. <em>Borneo clone</em>, <em>Highland form</em>, <em>SCV-01</em>. The <strong>🏡 GH</strong> flair is a system flair created automatically the first time you use a Greenhouse source. Flairs are now also assignable to <strong>media recipes</strong> and are required when adding custom species. They appear as pills in lists and as sub-rows in the species autocomplete dropdown.</p>
+        <p>Define coloured labels in the <strong>Flairs</strong> tab. The <strong>🏡 GH</strong> flair is auto-created by the system. Flairs are assignable to accessions, bottles, and media recipes. They appear as pills in lists and detail views.</p>
+        <p><strong>⚡ Preset flairs</strong> — click "Load preset flairs" in the Flairs tab to browse 46 curated presets across 6 categories and bulk-add with checkboxes. Already-existing flairs are greyed out automatically.</p>
+        <table class="help-table" style="margin-top:8px">
+          <tr><th>Category</th><th>Colour</th><th>Examples</th></tr>
+          <tr><td>Provenance</td><td>Blue</td><td>🌍 Wild collected · 🏔 Highland ecotype · 🤝 Exchange material</td></tr>
+          <tr><td>Conservation status</td><td>Red</td><td>🔴 CR · 🟠 EN · 🟡 VU · ⚠️ CITES · 🏛 Type specimen</td></tr>
+          <tr><td>Geography / Ecotype</td><td>Green</td><td>🌏 Borneo · Western Ghats · Sri Lanka endemic · Himalayan form</td></tr>
+          <tr><td>Culture performance</td><td>Purple</td><td>⭐ Elite clone · ⚡ Fast multiplier · ✅ Certified clean</td></tr>
+          <tr><td>Plant trait</td><td>Yellow</td><td>🌸 Flowering selected · 🍃 Variegated · 💪 Vigorous growth</td></tr>
+          <tr><td>Media / Recipe tag</td><td>Orange</td><td>🧪 MS-based · ✂️ Multiplication medium · 🌱 Rooting medium</td></tr>
+        </table>
       </div>
 
       <h2 id="h-reminders" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:32px 0 12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
@@ -12910,6 +12922,15 @@ async function _taxDeleteCustomSpecies(id){
   }
 }
 
+const _FLAIR_PRESETS=[
+  {cat:'Provenance',color:'blue',items:['🌍 Wild collected','🏔 Highland ecotype','🏝 Island form','🌿 Ex-situ conservation','🧬 Clonal selection','🔬 Lab-propagated origin','🤝 Exchange material','🎁 Donated specimen','🛒 Purchased stock','🌾 Nursery-sourced']},
+  {cat:'Conservation status',color:'red',items:['🔴 CR — Critically Endangered','🟠 EN — Endangered','🟡 VU — Vulnerable','⚠️ CITES Appendix I','⚠️ CITES Appendix II','🏛 Type specimen','🌿 Conservation priority']},
+  {cat:'Geography / Ecotype',color:'green',items:['🌏 Borneo ecotype','🌏 Western Ghats','🌏 Sri Lanka endemic','🌏 Himalayan form','🌏 Northeast India','🌏 Peninsular India','🌏 Southeast Asia','🌏 African ecotype','🌏 South American']},
+  {cat:'Culture performance',color:'purple',items:['⭐ Elite clone','⚡ Fast multiplier','🐌 Slow grower','✅ Certified clean','⚠️ Contamination-prone','🌡 Cold-stored stock','🧊 Cryo candidate','💰 High commercial value','🔒 Restricted material','📚 Research line']},
+  {cat:'Plant trait',color:'yellow',items:['🌸 Flowering selected','🍃 Variegated form','💪 Vigorous growth','🌼 Compact / Dwarf form','🔵 Colour variant','🌱 Rare morphology','🔑 Key accession','🧬 Hybrid / Cross']},
+  {cat:'Media / Recipe tag',color:'orange',items:['🧪 MS-based','🧪 WPM-based','🧪 B5-based','💊 Hormone-free','✂️ Multiplication medium','🌱 Rooting medium','☀️ Hardening mix','🔬 Embryo rescue','🧫 Selective medium','🍬 High-sucrose protocol']},
+];
+
 function _renderFlairsPanel(){
   const el=document.getElementById('sp-flairs');
   const flairs=S.taxFlairs||[];
@@ -12940,7 +12961,19 @@ function _renderFlairsPanel(){
       <button class="btn sm green" onclick="_taxSaveFlair()">Add Flair</button>
       <button class="btn sm ghost" onclick="document.getElementById('flair-add-form').style.display='none'">Cancel</button>
     </div>
-    <button class="btn ghost sm" style="margin-top:12px" onclick="document.getElementById('flair-add-form').style.display='block'">+ Add flair</button>`;
+    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+      <button class="btn ghost sm" onclick="document.getElementById('flair-add-form').style.display='block'">+ Add flair</button>
+      <button class="btn ghost sm" style="border-color:var(--pu);color:var(--pu)" onclick="_flairShowPresets()">⚡ Load preset flairs</button>
+    </div>
+    <div id="flair-preset-panel" style="display:none;margin-top:14px;background:var(--sf2);border-radius:10px;padding:14px">
+      <div style="font-size:12px;font-weight:700;color:var(--mu);margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em">Select presets to add — greyed = already exists</div>
+      <div id="flair-preset-groups"></div>
+      <div style="display:flex;gap:8px;margin-top:14px;align-items:center">
+        <button class="btn sm green" onclick="_flairAddPresets()">+ Add selected</button>
+        <button class="btn sm ghost" onclick="document.getElementById('flair-preset-panel').style.display='none'">Close</button>
+        <span id="flair-preset-status" style="font-size:12px;color:var(--gn);flex:1"></span>
+      </div>
+    </div>`;
 
   window._flairColor='blue';
   el.querySelectorAll('.flair-swatch').forEach(s=>s.classList.toggle('active',s.dataset.color==='blue'));
@@ -12949,6 +12982,46 @@ function _renderFlairsPanel(){
 function _flairPickColor(color){
   window._flairColor=color;
   document.querySelectorAll('.flair-swatch').forEach(s=>s.classList.toggle('active',s.dataset.color===color));
+}
+
+function _flairShowPresets(){
+  const panel=document.getElementById('flair-preset-panel');
+  panel.style.display='block';
+  const existing=new Set((S.taxFlairs||[]).map(f=>f.name.toLowerCase()));
+  const groupEl=document.getElementById('flair-preset-groups');
+  groupEl.innerHTML=_FLAIR_PRESETS.map((g,gi)=>`
+    <div style="margin-bottom:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--mu);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em">${g.cat}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        ${g.items.map((name,ii)=>{
+          const exists=existing.has(name.toLowerCase());
+          return `<label style="display:inline-flex;align-items:center;gap:4px;cursor:${exists?'default':'pointer'};opacity:${exists?.4:1}">
+            <input type="checkbox" data-gi="${gi}" data-name="${name.replace(/"/g,'&quot;')}" data-color="${g.color}" ${exists?'disabled checked':''} style="margin:0">
+            <span class="flair-pill ${g.color}" style="font-size:10px;padding:1px 7px;pointer-events:none">${name}</span>
+          </label>`;
+        }).join('')}
+      </div>
+    </div>`).join('');
+  document.getElementById('flair-preset-status').textContent='';
+}
+
+async function _flairAddPresets(){
+  const checks=[...document.querySelectorAll('#flair-preset-groups input[type=checkbox]:checked:not(:disabled)')];
+  if(!checks.length){toast('Select at least one preset','fail');return;}
+  const toAdd=checks.map(cb=>({id:uid(),name:cb.dataset.name,color:cb.dataset.color}));
+  toAdd.forEach(f=>S.taxCustom.flairs.push(f));
+  S.taxFlairs=S.taxCustom.flairs;
+  try{
+    await saveCustomTaxonomy();
+    _writeCache();
+    document.getElementById('flair-preset-status').textContent=`✓ Added ${toAdd.length} flair${toAdd.length>1?'s':''}`;
+    _renderFlairsPanel();
+    _flairShowPresets();
+  }catch(e){
+    toAdd.forEach(()=>S.taxCustom.flairs.pop());
+    S.taxFlairs=S.taxCustom.flairs;
+    toast('Save failed: '+e.message,'fail');
+  }
 }
 
 async function _taxSaveFlair(){
