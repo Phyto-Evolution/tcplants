@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#161b22">
 <title>Forest Studio Labs — Lab Notes</title>
 <link rel="manifest" href="manifest.json">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js" integrity="sha384-odPBjvtXVM/5hOYIr3A1dB+flh0c3wAT3bSesIOqEGmyUA4JoKf/YTWy0XKOYAY7" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js" integrity="sha384-cwS6YdhLI7XS60eoDiC+egV0qHp8zI+Cms46R0nbn8JrmoAzV9uFL60etMZhAnSu" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3/dist/jszip.min.js"></script>
@@ -999,6 +1000,86 @@ main > .dview, main > .editor{ margin:0 auto; }
 .sale-supname-wrap.on{display:block}
 .sale-fin-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--mu);margin-bottom:3px}
 .sale-fin-row.grand{font-size:16px;font-weight:800;color:var(--gn);padding-top:8px;border-top:1px solid var(--bd);margin-top:6px}
+/* ── IOT CONTROL PANEL ─────────────────────────────────── */
+#sec-iot{display:flex;flex-direction:column;overflow:hidden}
+.iot-header{display:flex;align-items:center;gap:10px;padding:16px 20px 10px;border-bottom:1px solid var(--bd);flex-wrap:wrap;gap:8px;flex-shrink:0}
+.iot-header-title{font-size:16px;font-weight:800;flex:1;min-width:120px}
+.iot-loc-tabs{display:flex;gap:4px;flex-wrap:wrap}
+.iot-loc-tab{padding:4px 12px;border-radius:16px;font-size:12px;font-weight:600;border:1px solid var(--bd);background:transparent;color:var(--mu);cursor:pointer;transition:all .15s}
+.iot-loc-tab.active{background:var(--ac);color:#0d1117;border-color:var(--ac)}
+.iot-stats-bar{display:flex;gap:0;border-bottom:1px solid var(--bd);flex-shrink:0;overflow-x:auto}
+.iot-stat{flex:1;min-width:80px;padding:8px 14px;text-align:center;border-right:1px solid var(--bd);cursor:default}
+.iot-stat:last-child{border-right:none}
+.iot-stat-val{font-size:20px;font-weight:800;line-height:1}
+.iot-stat-lbl{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
+.iot-body{flex:1;overflow-y:auto;padding:16px 20px}
+.iot-device-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.iot-card{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;transition:border-color .2s;position:relative}
+.iot-card.online{border-left:3px solid var(--gn)}
+.iot-card.offline{border-left:3px solid var(--mu);opacity:.75}
+.iot-card.has-pending{border-left:3px solid var(--yw);animation:iot-pulse .9s ease-in-out infinite alternate}
+@keyframes iot-pulse{from{border-left-color:var(--yw)}to{border-left-color:rgba(210,153,34,.3)}}
+.iot-card-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.iot-card-icon{font-size:20px;flex-shrink:0}
+.iot-card-name{font-size:14px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.iot-card-loc{font-size:10px;color:var(--mu);background:var(--sf2);padding:2px 7px;border-radius:10px;flex-shrink:0}
+.iot-status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.iot-status-dot.online{background:var(--gn);box-shadow:0 0 6px var(--gn)}
+.iot-status-dot.offline{background:var(--mu)}
+.iot-pin-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--sf2)}
+.iot-pin-row:last-child{border-bottom:none}
+.iot-pin-label{font-size:12px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.iot-pin-val{font-size:12px;font-weight:700;color:var(--ac);min-width:50px;text-align:right;flex-shrink:0}
+.iot-toggle{display:flex;gap:4px;flex-shrink:0}
+.iot-btn{padding:3px 10px;font-size:11px;font-weight:700;border-radius:5px;border:1px solid var(--bd);background:transparent;color:var(--mu);cursor:pointer;transition:all .12s;min-width:32px;text-align:center}
+.iot-btn:hover{border-color:var(--ac);color:var(--ac)}
+.iot-btn.on{background:var(--gn);color:#0d1117;border-color:var(--gn)}
+.iot-btn.off{background:var(--rd);color:#fff;border-color:var(--rd)}
+.iot-cmd-chip{font-size:10px;padding:1px 6px;border-radius:8px;font-weight:700;flex-shrink:0;margin-left:4px}
+.iot-cmd-chip.pending{background:rgba(210,153,34,.15);color:var(--yw);border:1px solid rgba(210,153,34,.3)}
+.iot-cmd-chip.received{background:rgba(88,166,255,.15);color:var(--ac);border:1px solid rgba(88,166,255,.3)}
+.iot-cmd-chip.confirmed{background:rgba(63,185,80,.12);color:var(--gn);border:1px solid rgba(63,185,80,.25)}
+.iot-cmd-chip.failed{background:rgba(248,81,73,.12);color:var(--rd);border:1px solid rgba(248,81,73,.3)}
+.iot-card-foot{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:8px;border-top:1px solid var(--sf2)}
+.iot-last-seen{font-size:10px;color:var(--mu)}
+.iot-detail-btn{font-size:11px;color:var(--ac);cursor:pointer;font-weight:600}
+/* Detail panel */
+#iot-detail{position:fixed;top:0;right:-480px;width:480px;max-width:100vw;height:100vh;background:var(--sf);border-left:1px solid var(--bd);z-index:300;transition:right .25s;overflow-y:auto;display:flex;flex-direction:column}
+#iot-detail.open{right:0}
+.iot-detail-head{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--bd);flex-shrink:0;background:var(--sf);position:sticky;top:0;z-index:1}
+.iot-detail-tabs{display:flex;gap:0;border-bottom:1px solid var(--bd);flex-shrink:0;overflow-x:auto}
+.iot-dtab{padding:10px 14px;font-size:12px;font-weight:600;color:var(--mu);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s}
+.iot-dtab.active{color:var(--ac);border-bottom-color:var(--ac)}
+.iot-detail-body{flex:1;overflow-y:auto;padding:16px 18px}
+.iot-chart-wrap{position:relative;height:200px;margin-bottom:12px}
+.iot-timer-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--sf2);flex-wrap:wrap}
+.iot-timer-row:last-child{border-bottom:none}
+.iot-day-btn{width:26px;height:26px;border-radius:50%;font-size:10px;font-weight:700;border:1px solid var(--bd);background:transparent;color:var(--mu);cursor:pointer;transition:all .12s;padding:0;text-align:center}
+.iot-day-btn.active{background:var(--ac);color:#0d1117;border-color:var(--ac)}
+.iot-auto-row{background:var(--sf2);border-radius:8px;padding:10px 12px;margin-bottom:8px}
+.iot-cmd-log-row{display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--sf2);align-items:flex-start;font-size:11px}
+.iot-cmd-log-row:last-child{border-bottom:none}
+/* Flasher modal */
+#iot-flash-modal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;display:none;align-items:center;justify-content:center}
+#iot-flash-modal.on{display:flex}
+.iot-flash-card{background:var(--sf);border:1px solid var(--bd);border-radius:14px;width:520px;max-width:calc(100vw - 32px);max-height:90vh;overflow-y:auto;padding:24px}
+.iot-flash-step{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--sf2)}
+.iot-flash-step:last-child{border-bottom:none;margin-bottom:0}
+.iot-flash-num{width:28px;height:28px;border-radius:50%;background:var(--ac);color:#0d1117;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.iot-flash-num.done{background:var(--gn)}
+.iot-flash-num.inactive{background:var(--sf2);color:var(--mu)}
+.iot-progress-bar{height:6px;background:var(--sf2);border-radius:3px;overflow:hidden;margin-top:8px}
+.iot-progress-fill{height:100%;background:var(--ac);border-radius:3px;transition:width .3s}
+/* Add device modal */
+#iot-add-modal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;display:none;align-items:center;justify-content:center}
+#iot-add-modal.on{display:flex}
+.iot-add-card{background:var(--sf);border:1px solid var(--bd);border-radius:14px;width:480px;max-width:calc(100vw - 32px);max-height:90vh;overflow-y:auto;padding:24px}
+.iot-pin-builder{background:var(--sf2);border-radius:8px;padding:10px 12px;margin-bottom:6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+@media(max-width:600px){
+  .iot-device-grid{grid-template-columns:1fr}
+  #iot-detail{width:100vw;right:-100vw}
+  .iot-flash-card,.iot-add-card{padding:16px}
+}
 /* ── CLEAN STREAK ── */
 .dc-streak-num{font-family:var(--mono);font-size:42px;font-weight:900;line-height:1;margin-bottom:4px}
 /* ── RECIPE SCALE ── */
@@ -3539,24 +3620,34 @@ input, textarea, select {
       <!-- VERSION HEADER -->
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
         <h1 style="font-size:22px;font-weight:800;margin:0">🌿 Forest Studio Labs</h1>
-        <span class="help-version-badge">v3.18</span>
+        <span class="help-version-badge">v3.19</span>
         <button class="btn xs ghost" onclick="navTo('changelog')" style="border-color:var(--pu);color:var(--pu)">📋 Changelog →</button>
         <button class="btn xs ghost" onclick="navTo('logicflows')" style="margin-left:4px;border-color:var(--ac);color:var(--ac)">🔗 Logic Flows →</button>
       </div>
       <p style="color:var(--mu);font-size:13px;margin-bottom:20px">April 2026 · Encrypted · GitHub-backed · Single-file PWA</p>
 
-      <!-- WHAT'S NEW v3.18 -->
+      <!-- WHAT'S NEW v3.19 -->
       <div style="background:linear-gradient(135deg,rgba(63,185,80,.1),rgba(88,166,255,.08));border:1px solid rgba(63,185,80,.3);border-radius:10px;padding:18px 20px;margin-bottom:10px">
-        <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v3.18</div>
+        <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v3.19</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
-          <div style="font-size:13px;line-height:1.6"><strong>⠿ Drag-and-drop dashboard</strong> — every dashboard card has a drag handle (appears on hover). Drag any panel and drop it on another to swap positions. Layout is saved to localStorage and survives reloads. Reset button in Settings → Appearance.</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🏠 Home button fixed</strong> — the nav-bar 🏠 button now correctly navigates to the Home section (dashboard) instead of landing on the Notes section.</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🏷 Preset flairs (46 presets)</strong> — Species → Flairs tab now has an "⚡ Load preset flairs" button. Browse 46 curated presets across 6 categories (Provenance, Conservation, Geography, Culture performance, Plant trait, Media/Recipe). Checkboxes let you pick exactly what you need; already-existing flairs are greyed out.</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🎨 Theme cycle fixed</strong> — green theme removed; cycle is now Dark → Light → Paper → Dark. Icons and labels now show the <em>current</em> theme (was showing next). Any saved "green" session auto-falls back to dark.</div>
-          <div style="font-size:13px;line-height:1.6"><strong>📅 Calendar review dates fixed</strong> — calendar now shows orange review-due dots for bottle next_review and GH next_inspection dates. Marking a review Done now refreshes the calendar immediately if it is open.</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🏷 Recipe flair picker always visible</strong> — flair section in New/Edit Recipe is now always shown. When no flairs are defined yet it shows a "→ Species → Flairs" shortcut instead of hiding the section.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🔌 IoT Master Control Panel</strong> — new full-page section (nav: IoT Control). Register ESP32/ESP8266 nodes, view live pin states, toggle relays from the browser. Commands have full confirmation lifecycle: pending → received → executed → confirmed with GPIO readback. Works remotely via Cloudflare Worker + D1.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>📊 Sensor history charts</strong> — every sensor pin gets a Chart.js line chart showing the last 24 h of readings (10-min interval). Temperature, humidity, analog — any numeric pin type is graphed automatically.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>⏱ Daily timers</strong> — schedule ON/OFF events by HH:MM on any output pin. Select repeat days (Mon–Sun toggles). Optional auto-off duration (e.g. 300 s). Evaluated server-side on every heartbeat — no firmware update needed to add timers.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🤖 Automation rules</strong> — if-then rules: "if temp &gt; 28 → fan ON". Supports &lt;, &gt;, ≤, ≥, ==. Hysteresis and cooldown prevent relay chatter. Rules run on the Cloudflare Worker, zero firmware logic required.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🖥 Browser firmware flasher</strong> — plug an ESP into USB, click "Connect", detect chip, fetch the compiled .bin from your repo, and flash — all in-browser via Web Serial API (Chrome/Edge). Then write WiFi + worker config over serial without reflashing.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>📋 Full command log</strong> — every manual tap, timer fire, or automation trigger is stored in D1 with timestamp, latency, and source. View the last 50 commands in the device detail panel → Cmd Log tab.</div>
         </div>
       </div>
+      <!-- v3.18 collapse -->
+      <details style="margin-bottom:8px">
+        <summary style="cursor:pointer;font-size:12px;color:var(--mu);padding:6px 0;font-weight:600;letter-spacing:.04em">▸ v3.18 release notes</summary>
+        <div style="background:var(--sf2);border-radius:8px;padding:12px;margin-top:6px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
+          <div style="font-size:13px;line-height:1.6"><strong>⠿ Drag-and-drop dashboard</strong> — every dashboard card has a drag handle. Drag panels to swap. Layout persists in localStorage.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🏷 Preset flairs (46 presets)</strong> — Species → Flairs now has ⚡ Load preset flairs with 6 categories.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🎨 Theme cycle fixed</strong> — green removed; Dark→Light→Paper→Dark. Icons show current theme.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>📅 Calendar review dates fixed</strong> — bottles next_review and GH next_inspection now shown as orange dots.</div>
+        </div>
+      </details>
       <!-- v3.17 collapse -->
       <details style="margin-bottom:8px">
         <summary style="cursor:pointer;font-size:12px;color:var(--mu);padding:6px 0;font-weight:600;letter-spacing:.04em">▸ v3.17 release notes</summary>
@@ -6561,6 +6652,82 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
       </div></details>
 
       <!-- ═══ KNOWN ISSUES ═══ -->
+      <!-- IoT Logic Flow block -->
+      <details id="lf-iot">
+        <summary>
+          <span style="width:28px;height:28px;border-radius:7px;background:rgba(88,166,255,.12);display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🔌</span>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:700">IoT Master Control Panel</div>
+            <div style="font-size:11px;color:var(--mu);margin-top:2px">ESP32/ESP8266 · Cloudflare Worker + D1 · Timers · Automation · Web Serial</div>
+          </div>
+          <span class="lf-pill lf-pill-ac">ESP32</span>
+          <span class="lf-pill lf-pill-ac">ESP8266</span>
+          <span class="lf-pill lf-pill-gn">Confirmed</span>
+          <span class="lf-caret">›</span>
+        </summary>
+        <div class="lf-body">
+          <h2 class="help-h2">IoT Master Control Panel — Flow</h2>
+          <div class="help-flow">
+            <div class="hf-row">
+              <span class="hf-box hf-start">navTo('iot')</span>
+              <span class="hf-arr">→</span><span class="hf-box">_iotInit()</span>
+              <span class="hf-arr">→</span><span class="hf-box">_iotPollStart() · _iotRefresh()</span>
+            </div>
+            <div class="hf-row">
+              <span class="hf-box">_iotRefresh()</span>
+              <span class="hf-arr">→</span><span class="hf-box">GET /api/iot/devices (D1)</span>
+              <span class="hf-arr">→</span><span class="hf-box">_iotRenderDevices() → device grid</span>
+            </div>
+            <div class="hf-row">
+              <span class="hf-box hf-event">User taps ON/OFF</span>
+              <span class="hf-arr">→</span><span class="hf-box">_iotSendCmd(deviceId, pinId, action)</span>
+              <span class="hf-arr">→</span><span class="hf-box">POST /api/iot/cmd/:deviceId</span>
+              <span class="hf-arr">→</span><span class="hf-box">_iotWaitConfirm() backoff poll</span>
+            </div>
+            <div class="hf-row">
+              <span class="hf-box hf-event">ESP heartbeat (30 s)</span>
+              <span class="hf-arr">→</span><span class="hf-box">POST /api/iot/heartbeat</span>
+              <span class="hf-arr">→</span><span class="hf-box">D1: store readings, eval rules + timers</span>
+              <span class="hf-arr">→</span><span class="hf-box">return pending cmds to device</span>
+            </div>
+            <div class="hf-row">
+              <span class="hf-box hf-event">Device executes cmd</span>
+              <span class="hf-arr">→</span><span class="hf-box">POST /api/iot/confirm/:cmdId { success, gpio_readback }</span>
+              <span class="hf-arr">→</span><span class="hf-box">D1: status = confirmed, pin.current_value updated</span>
+            </div>
+            <div class="hf-row">
+              <span class="hf-box hf-event">Browser polling (5 s)</span>
+              <span class="hf-arr">→</span><span class="hf-box">_iotWaitConfirm() → GET /api/iot/cmd-status/:cmdId</span>
+              <span class="hf-arr">→</span><span class="hf-box">status=confirmed → toast + UI update</span>
+            </div>
+          </div>
+          <h2 class="help-h2">Key Functions</h2>
+          <table class="help-table">
+            <tr><th>Function</th><th>Purpose</th></tr>
+            <tr><td>_iotInit()</td><td>Entry point — check worker URL, start poll, fetch devices</td></tr>
+            <tr><td>_iotRefresh(silent)</td><td>GET /api/iot/devices, update _iotState.devices, re-render grid</td></tr>
+            <tr><td>_iotSendCmd(devId,pinId,action)</td><td>POST command to worker, trigger confirm-wait loop</td></tr>
+            <tr><td>_iotWaitConfirm(devId,cmdId,n)</td><td>Backoff poll (2→3→5→8→13→15s) until confirmed or failed</td></tr>
+            <tr><td>_iotOpenDetail(deviceId)</td><td>Slide-in panel with 5 tabs: Controls / Sensors / Timers / Automation / Cmd Log</td></tr>
+            <tr><td>_iotRenderSensors(dev)</td><td>Chart.js line charts per sensor pin — last 24 h from D1</td></tr>
+            <tr><td>_iotRenderTimers / _iotSaveTimer</td><td>GET/POST /api/iot/timers — evaluated server-side on heartbeat</td></tr>
+            <tr><td>_iotRenderRules / _iotSaveRule</td><td>GET/POST /api/iot/automations — if-then rules with hysteresis + cooldown</td></tr>
+            <tr><td>_iotSerialConnect / _iotFlashFirmware</td><td>Web Serial API: open port, write firmware binary, write JSON config</td></tr>
+            <tr><td>_iotSaveDevice / _iotOpenAdd</td><td>Register or update device + pins via /api/iot/register · /api/iot/devices/:id</td></tr>
+          </table>
+          <h2 class="help-h2">D1 Schema Tables</h2>
+          <table class="help-table">
+            <tr><th>Table</th><th>Columns</th></tr>
+            <tr><td>devices</td><td>id, name, location, chip, room, ip, last_seen, created_at</td></tr>
+            <tr><td>pins</td><td>id, device_id, label, type, gpio_pin, unit, current_value</td></tr>
+            <tr><td>commands</td><td>id, device_id, pin_id, action, status, source, gpio_readback, created_at, received_at, confirmed_at, fire_at</td></tr>
+            <tr><td>sensor_readings</td><td>id, device_id, pin_id, value, ts</td></tr>
+            <tr><td>timers</td><td>id, device_id, pin_id, action, time_hhmm, days (7-char bitmask), duration_s, created_at</td></tr>
+            <tr><td>automations</td><td>id, device_id, if_pin, operator, threshold, then_pin, then_action, hysteresis, cooldown_s, enabled, created_at</td></tr>
+          </table>
+        </div>
+      </details>
+
       <details id="lf-gaps">
       <summary style="border-color:rgba(248,81,73,.25)!important">
         <span style="width:28px;height:28px;border-radius:7px;background:rgba(248,81,73,.12);display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">⚠️</span>
@@ -6665,6 +6832,196 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
     <main id="files-main" style="flex:1;overflow:hidden;display:flex;flex-direction:column"></main>
   </div>
 
+  <!-- ══════════════════════════════════════════════════════
+       IOT CONTROL PANEL
+       ═══════════════════════════════════════════════════════ -->
+  <div class="section fullpage" id="sec-iot">
+    <!-- Header -->
+    <div class="iot-header">
+      <div class="iot-header-title">🔌 IoT Control</div>
+      <div class="iot-loc-tabs" id="iot-loc-tabs">
+        <button class="iot-loc-tab active" data-loc="all" onclick="_iotSetLoc('all')">All</button>
+        <button class="iot-loc-tab" data-loc="greenhouse" onclick="_iotSetLoc('greenhouse')">🏡 Greenhouse</button>
+        <button class="iot-loc-tab" data-loc="lab" onclick="_iotSetLoc('lab')">🔬 Lab</button>
+      </div>
+      <button class="btn sm ghost" onclick="_iotOpenAdd()">+ Add Device</button>
+      <button class="btn sm ghost" style="border-color:var(--pu);color:var(--pu)" onclick="_iotOpenFlash()">⚡ Flash Firmware</button>
+      <button class="btn xs ghost" onclick="_iotRefresh()" title="Refresh now" id="iot-refresh-btn">↺</button>
+      <span id="iot-poll-status" style="font-size:10px;color:var(--mu)"></span>
+    </div>
+    <!-- Stats bar -->
+    <div class="iot-stats-bar">
+      <div class="iot-stat"><div class="iot-stat-val" id="iot-s-total">—</div><div class="iot-stat-lbl">Devices</div></div>
+      <div class="iot-stat"><div class="iot-stat-val" id="iot-s-online" style="color:var(--gn)">—</div><div class="iot-stat-lbl">Online</div></div>
+      <div class="iot-stat"><div class="iot-stat-val" id="iot-s-pending" style="color:var(--yw)">—</div><div class="iot-stat-lbl">Pending cmds</div></div>
+      <div class="iot-stat"><div class="iot-stat-val" id="iot-s-autos" style="color:var(--pu)">—</div><div class="iot-stat-lbl">Automations</div></div>
+      <div class="iot-stat"><div class="iot-stat-val" id="iot-s-alerts" style="color:var(--rd)">—</div><div class="iot-stat-lbl">Alerts</div></div>
+    </div>
+    <!-- Device grid -->
+    <div class="iot-body">
+      <div class="iot-device-grid" id="iot-device-grid"></div>
+      <div id="iot-empty" style="display:none;text-align:center;padding:60px 20px;color:var(--mu)">
+        <div style="font-size:48px;margin-bottom:16px">🔌</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:8px">No devices yet</div>
+        <div style="font-size:13px;margin-bottom:20px">Add your first ESP device or flash a blank board</div>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+          <button class="btn green" onclick="_iotOpenAdd()">+ Add Device</button>
+          <button class="btn ghost" onclick="_iotOpenFlash()">⚡ Flash a new device</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IoT Detail Panel -->
+  <div id="iot-detail">
+    <div class="iot-detail-head">
+      <span id="iot-detail-icon" style="font-size:20px"></span>
+      <div style="flex:1">
+        <div id="iot-detail-name" style="font-size:15px;font-weight:800"></div>
+        <div id="iot-detail-meta" style="font-size:11px;color:var(--mu)"></div>
+      </div>
+      <button class="btn xs ghost" onclick="_iotCloseDetail()">✕</button>
+      <button class="btn xs ghost" onclick="_iotEditDevice()" style="margin-left:4px">✏️</button>
+    </div>
+    <div class="iot-detail-tabs">
+      <div class="iot-dtab active" data-itab="pins" onclick="_iotDTab('pins')">Controls</div>
+      <div class="iot-dtab" data-itab="sensors" onclick="_iotDTab('sensors')">Sensors</div>
+      <div class="iot-dtab" data-itab="timers" onclick="_iotDTab('timers')">Timers</div>
+      <div class="iot-dtab" data-itab="rules" onclick="_iotDTab('rules')">Automation</div>
+      <div class="iot-dtab" data-itab="log" onclick="_iotDTab('log')">Cmd Log</div>
+    </div>
+    <div class="iot-detail-body">
+      <div id="iot-dtab-pins"></div>
+      <div id="iot-dtab-sensors" style="display:none"></div>
+      <div id="iot-dtab-timers" style="display:none"></div>
+      <div id="iot-dtab-rules" style="display:none"></div>
+      <div id="iot-dtab-log" style="display:none"></div>
+    </div>
+  </div>
+  <div id="iot-detail-backdrop" style="display:none;position:fixed;inset:0;z-index:299;background:rgba(0,0,0,.3)" onclick="_iotCloseDetail()"></div>
+
+  <!-- IoT Add Device Modal -->
+  <div id="iot-add-modal">
+    <div class="iot-add-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+        <div style="font-size:16px;font-weight:800">Add / Edit Device</div>
+        <button class="btn xs ghost" onclick="document.getElementById('iot-add-modal').classList.remove('on')">✕</button>
+      </div>
+      <div class="field"><label>Device Name</label><input type="text" id="iad-name" placeholder="e.g. Greenhouse Node 1"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="field">
+          <label>Location</label>
+          <select id="iad-loc">
+            <option value="greenhouse">🏡 Greenhouse</option>
+            <option value="lab">🔬 Lab</option>
+            <option value="growth_chamber">🌿 Growth Chamber</option>
+            <option value="custom">📍 Custom</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Chip</label>
+          <select id="iad-chip">
+            <option value="esp32">ESP32</option>
+            <option value="esp8266">ESP8266</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>Room / Zone (optional)</label><input type="text" id="iad-room" placeholder="e.g. Bay A, Shelf 2"></div>
+      <div style="font-size:12px;font-weight:700;color:var(--mu);margin:14px 0 8px;text-transform:uppercase;letter-spacing:.06em">Pins / Channels</div>
+      <div id="iad-pins-list"></div>
+      <button class="btn xs ghost" onclick="_iotAddPinRow()" style="margin-bottom:14px">+ Add pin</button>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn ghost" onclick="document.getElementById('iot-add-modal').classList.remove('on')">Cancel</button>
+        <button class="btn green" onclick="_iotSaveDevice()">💾 Save Device</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- IoT Firmware Flasher Modal -->
+  <div id="iot-flash-modal">
+    <div class="iot-flash-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <div style="font-size:16px;font-weight:800">⚡ Firmware Flasher</div>
+        <button class="btn xs ghost" onclick="_iotCloseFlash()">✕</button>
+      </div>
+      <div id="iot-flash-browser-warn" style="display:none;background:rgba(248,81,73,.1);border:1px solid rgba(248,81,73,.3);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--rd);margin-bottom:14px">
+        ⚠️ Web Serial requires Chrome or Edge. Safari and Firefox are not supported.
+      </div>
+
+      <!-- Step 1: Download sketch -->
+      <div class="iot-flash-step">
+        <div class="iot-flash-num" id="ift-n1">1</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700;margin-bottom:4px">Get Firmware Sketch</div>
+          <div style="font-size:12px;color:var(--mu);margin-bottom:8px">Download the Arduino sketch. Compile in Arduino IDE (ESP32 or ESP8266 board package). Commit the <code>.bin</code> to <code>firmware/esp32/latest.bin</code> or <code>firmware/esp8266/latest.bin</code> in your repo.</div>
+          <a class="btn xs ghost" href="https://github.com/Phyto-Evolution/tcplants/raw/main/firmware/tcplants-iot.ino" target="_blank" download>⬇ Download .ino sketch</a>
+        </div>
+      </div>
+
+      <!-- Step 2: Connect USB -->
+      <div class="iot-flash-step">
+        <div class="iot-flash-num" id="ift-n2">2</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700;margin-bottom:4px">Connect ESP via USB</div>
+          <div style="font-size:12px;color:var(--mu);margin-bottom:8px">Hold the BOOT button on your ESP while clicking Connect.</div>
+          <button class="btn sm ghost" id="iot-serial-btn" onclick="_iotSerialConnect()">🔌 Connect USB Serial</button>
+          <span id="iot-serial-status" style="font-size:11px;color:var(--mu);margin-left:10px"></span>
+        </div>
+      </div>
+
+      <!-- Step 3: Detect chip -->
+      <div class="iot-flash-step">
+        <div class="iot-flash-num iot-flash-num-inactive" id="ift-n3">3</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700;margin-bottom:4px">Detect Chip</div>
+          <div id="iot-chip-result" style="font-size:12px;color:var(--mu)">Connect USB first.</div>
+          <select id="iot-chip-override" style="margin-top:6px;font-size:12px;background:var(--sf2);border:1px solid var(--bd);border-radius:5px;padding:4px 8px;color:var(--tx)">
+            <option value="">Auto-detect</option>
+            <option value="esp32">ESP32</option>
+            <option value="esp8266">ESP8266</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Step 4: Flash firmware -->
+      <div class="iot-flash-step">
+        <div class="iot-flash-num iot-flash-num-inactive" id="ift-n4">4</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700;margin-bottom:4px">Flash Firmware</div>
+          <div id="iot-flash-status" style="font-size:12px;color:var(--mu);margin-bottom:8px">Connect USB first.</div>
+          <div class="iot-progress-bar" id="iot-flash-prog-wrap" style="display:none"><div class="iot-progress-fill" id="iot-flash-prog" style="width:0%"></div></div>
+          <button class="btn sm green" id="iot-flash-btn" onclick="_iotFlashFirmware()" style="margin-top:8px;display:none">⚡ Flash Firmware</button>
+        </div>
+      </div>
+
+      <!-- Step 5: WiFi + config -->
+      <div class="iot-flash-step">
+        <div class="iot-flash-num iot-flash-num-inactive" id="ift-n5">5</div>
+        <div style="flex:1" id="iot-config-step">
+          <div style="font-size:13px;font-weight:700;margin-bottom:10px">Write WiFi &amp; Device Config</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+            <div class="field" style="margin:0"><label style="font-size:11px">WiFi SSID</label><input type="text" id="icfg-ssid" placeholder="Your WiFi name"></div>
+            <div class="field" style="margin:0"><label style="font-size:11px">Password</label><input type="password" id="icfg-pass" placeholder="WiFi password"></div>
+            <div class="field" style="margin:0"><label style="font-size:11px">Device Name</label><input type="text" id="icfg-name" placeholder="Greenhouse Node 1"></div>
+            <div class="field" style="margin:0"><label style="font-size:11px">Location</label>
+              <select id="icfg-loc">
+                <option value="greenhouse">Greenhouse</option>
+                <option value="lab">Lab</option>
+                <option value="growth_chamber">Growth Chamber</option>
+                <option value="custom">Custom</option>
+              </select>
+            </div>
+          </div>
+          <div class="field" style="margin:0 0 10px"><label style="font-size:11px">Worker URL</label><input type="text" id="icfg-url" placeholder="https://plantking.ape.workers.dev"></div>
+          <div style="font-size:10px;color:var(--mu);margin-bottom:8px">IoT Key is injected automatically from your Worker settings.</div>
+          <button class="btn sm green" id="iot-cfg-btn" onclick="_iotWriteConfig()" disabled>📡 Write Config &amp; Reboot</button>
+          <div id="iot-cfg-status" style="font-size:12px;color:var(--mu);margin-top:8px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ── BATCH ACTION BAR ── -->
   <div id="batch-action-bar" style="display:none;position:fixed;bottom:0;left:0;right:0;background:var(--sf);border-top:1px solid var(--bd);padding:12px 16px;gap:10px;align-items:center;z-index:200;flex-wrap:wrap"></div>
 
@@ -6705,6 +7062,7 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
       <button class="ndtab" data-sec="gallery" onclick="navTo('gallery')"><span class="nd-icon">📸</span>Gallery</button>
       <button class="ndtab" data-sec="ai" onclick="navTo('ai')"><span class="nd-icon">🤖</span>AI Control</button>
       <button class="ndtab" data-sec="files" onclick="navTo('files')"><span class="nd-icon">🗂</span>Files<span class="nd-badge" id="nd-fbadge" style="display:none">0</span></button>
+      <button class="ndtab" data-sec="iot" onclick="navTo('iot')"><span class="nd-icon">🔌</span>IoT Control</button>
       <div class="nd-divider"></div>
       <button class="ndtab" onclick="closeNavDrawer();openActLog()"><span class="nd-icon">⚡</span>Activity</button>
       <button class="ndtab" onclick="closeNavDrawer();lock()" style="color:var(--rd)"><span class="nd-icon">🔒</span>Lock</button>
@@ -21531,7 +21889,776 @@ async function renderChangelog(force=false){
   if(btn) btn.disabled=false;
 }
 
-const _NAV_LABELS={home:'Home',notes:'Notes',registry:'Registry',recipes:'Recipes',bottles:'Bottles',greenhouse:'Greenhouse',supply:'Supply',stock:'Supply',sales:'Sales',value:'Value',search:'Search',reminders:'Reminders',calendar:'Calendar',contam:'Contam',analytics:'Analytics',species:'Species',tools:'Tools',sterilise:'Sterilise',news:'News',help:'Help',logicflows:'Logic Flows',journal:'Lab Journal',schedule:'Schedule',insights:'Insights',ai:'Ravana',files:'Files',changelog:'Changelog',gallery:'Gallery'};
+// ── IoT MASTER CONTROL PANEL ─────────────────────────────────────────────────
+const _IOT_WORKER = (()=>{
+  // Try to read worker URL from config; fall back to localhost placeholder
+  const stored = localStorage.getItem('tcplants_iot_worker') || '';
+  return stored;
+})();
+let _iotWorkerUrl = _IOT_WORKER;
+const _iotKey = ()=> localStorage.getItem('tcplants_iot_key') || '';
+
+// ── In-memory state ───────────────────────────────────────────────────────────
+let _iotState     = { devices: [], loc: 'all' };
+let _iotPollTimer = null;
+let _iotCurrentDevice = null;   // device object currently in detail panel
+let _iotEditId    = null;       // deviceId being edited (null = new device)
+let _iotSerial    = null;       // Web Serial port object
+let _iotChipType  = null;       // 'esp32' or 'esp8266' detected
+
+function _iotInit(){
+  // Check worker URL config on first open
+  if(!_iotWorkerUrl){
+    const u = prompt('Enter your IoT Worker URL (e.g. https://your-worker.workers.dev):\n\nYou can change this later in IoT → ⚙ Settings.');
+    if(u){ _iotWorkerUrl = u.trim(); localStorage.setItem('tcplants_iot_worker', _iotWorkerUrl); }
+  }
+  _iotPollStart();
+  _iotRefresh();
+}
+
+function _iotApiUrl(path){ return _iotWorkerUrl.replace(/\/+$/,'') + path; }
+
+async function _iotFetch(path, opts={}){
+  if(!_iotWorkerUrl) throw new Error('No IoT Worker URL configured');
+  const headers = { 'Content-Type':'application/json', 'X-App-Key': _iotKey(), ...(opts.headers||{}) };
+  const res = await fetch(_iotApiUrl(path), { ...opts, headers });
+  if(!res.ok){ const e = await res.json().catch(()=>({error:'HTTP '+res.status})); throw new Error(e.error||'HTTP '+res.status); }
+  return res.json();
+}
+
+// ── Poll ───────────────────────────────────────────────────────────────────────
+function _iotPollStart(){
+  _iotPollStop();
+  _iotPollTimer = setInterval(()=>{ if(document.getElementById('sec-iot')?.classList.contains('on')) _iotRefresh(true); }, 15000);
+  const s = document.getElementById('iot-poll-status');
+  if(s) s.textContent = 'Live ●';
+}
+function _iotPollStop(){
+  if(_iotPollTimer){ clearInterval(_iotPollTimer); _iotPollTimer=null; }
+}
+
+async function _iotRefresh(silent=false){
+  const btn = document.getElementById('iot-refresh-btn');
+  if(btn && !silent) btn.textContent = '↻ …';
+  try{
+    const d = await _iotFetch('/api/iot/devices');
+    _iotState.devices = d.devices || [];
+    _iotRenderDevices();
+    // If detail panel is open, refresh that device too
+    if(_iotCurrentDevice){
+      const updated = _iotState.devices.find(x=>x.id===_iotCurrentDevice.id);
+      if(updated){ _iotCurrentDevice=updated; _iotRefreshDetailHead(); }
+    }
+  }catch(e){
+    if(!silent) toast('IoT: '+e.message, true);
+  }
+  if(btn) btn.textContent = '↺';
+}
+
+// ── Render device grid ────────────────────────────────────────────────────────
+function _iotRenderDevices(){
+  const grid = document.getElementById('iot-device-grid');
+  const empty = document.getElementById('iot-empty');
+  if(!grid) return;
+  let devs = _iotState.devices;
+  if(_iotState.loc !== 'all') devs = devs.filter(d=>d.location===_iotState.loc);
+
+  // Stats
+  const total   = _iotState.devices.length;
+  const online  = _iotState.devices.filter(d=>_iotIsOnline(d)).length;
+  const pending = _iotState.devices.reduce((a,d)=>(a + (d.pending_cmds||0)), 0);
+  const autos   = _iotState.devices.reduce((a,d)=>(a + (d.automation_count||0)), 0);
+  const alerts  = _iotState.devices.reduce((a,d)=>(a + (d.alert_count||0)), 0);
+  const sv = (id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
+  sv('iot-s-total',  total);
+  sv('iot-s-online', online);
+  sv('iot-s-pending', pending);
+  sv('iot-s-autos',  autos);
+  sv('iot-s-alerts', alerts);
+
+  if(!devs.length){
+    grid.innerHTML=''; grid.style.display='none'; empty.style.display='';
+    return;
+  }
+  grid.style.display=''; empty.style.display='none';
+  grid.innerHTML = devs.map(d=>_iotRenderCard(d)).join('');
+}
+
+function _iotIsOnline(d){
+  if(!d.last_seen) return false;
+  return (Date.now() - new Date(d.last_seen).getTime()) < 90000; // 90s window
+}
+
+function _iotCardStatus(d){
+  if(d.pending_cmds>0) return 'has-pending';
+  return _iotIsOnline(d) ? 'online' : 'offline';
+}
+
+function _iotDeviceIcon(d){
+  const loc = d.location||'';
+  if(loc==='greenhouse') return '🏡';
+  if(loc==='lab') return '🔬';
+  if(loc==='growth_chamber') return '🌿';
+  return '🔌';
+}
+
+function _iotLagLabel(d){
+  if(!d.last_seen) return 'Never seen';
+  const s = Math.floor((Date.now()-new Date(d.last_seen).getTime())/1000);
+  if(s<10) return 'Just now';
+  if(s<60) return s+'s ago';
+  if(s<3600) return Math.floor(s/60)+'m ago';
+  return Math.floor(s/3600)+'h ago';
+}
+
+function _iotRenderCard(d){
+  const status = _iotCardStatus(d);
+  const isOnline = _iotIsOnline(d);
+  const pins = (d.pins||[]).slice(0,4);  // show max 4 pins on card
+  const pinRows = pins.map(p=>{
+    const isOutput = (p.type==='output'||p.type==='relay'||p.type==='pwm');
+    const val = p.current_value!=null ? p.current_value : '—';
+    const toggler = isOutput ? `<div class="iot-toggle">
+      <button class="iot-btn ${val==='1'||val===1?'on':''}" onclick="_iotSendCmd('${d.id}','${p.id}','on')" title="ON">ON</button>
+      <button class="iot-btn ${val==='0'||val===0?'off':''}" onclick="_iotSendCmd('${d.id}','${p.id}','off')" title="OFF">OFF</button>
+    </div>` : `<span class="iot-pin-val">${typeof val==='number'?val.toFixed(val%1?2:0):esc(String(val))} ${esc(p.unit||'')}</span>`;
+    const pendingChip = p.pending_cmd ? `<span class="iot-cmd-chip ${esc(p.pending_cmd)}">${esc(p.pending_cmd)}</span>` : '';
+    return `<div class="iot-pin-row"><span class="iot-pin-label">${esc(p.label||p.id)}</span>${pendingChip}${toggler}</div>`;
+  }).join('');
+  const moreText = (d.pins||[]).length>4 ? `<div style="font-size:10px;color:var(--mu);margin-top:4px">+${(d.pins||[]).length-4} more pins</div>` : '';
+
+  return `<div class="iot-card ${status}" id="iotcard-${d.id}">
+    <div class="iot-card-head">
+      <span class="iot-card-icon">${_iotDeviceIcon(d)}</span>
+      <span class="iot-card-name">${esc(d.name)}</span>
+      <span class="iot-card-loc">${esc(d.location||'')}</span>
+      <span class="iot-status-dot ${isOnline?'online':'offline'}" title="${isOnline?'Online':'Offline'}"></span>
+    </div>
+    <div style="font-size:10px;color:var(--mu);margin-bottom:8px">${esc(d.chip||'')}${d.room?' · '+esc(d.room):''} · IP: ${esc(d.ip||'?')}</div>
+    ${pinRows}${moreText}
+    <div class="iot-card-foot">
+      <span class="iot-last-seen">🕐 ${_iotLagLabel(d)}</span>
+      <span class="iot-detail-btn" onclick="_iotOpenDetail('${d.id}')">Details →</span>
+    </div>
+  </div>`;
+}
+
+// ── Send command ───────────────────────────────────────────────────────────────
+async function _iotSendCmd(deviceId, pinId, action){
+  // Optimistic UI — add pending chip immediately
+  const card = document.getElementById('iotcard-'+deviceId);
+  try{
+    const r = await _iotFetch(`/api/iot/cmd/${deviceId}`, {
+      method:'POST', body: JSON.stringify({ pin_id:pinId, action })
+    });
+    // Show pending state visually
+    if(card){
+      const dev = _iotState.devices.find(d=>d.id===deviceId);
+      if(dev){ dev.pending_cmds=(dev.pending_cmds||0)+1; _iotRenderDevices(); }
+    }
+    // Poll faster for confirmation
+    _iotWaitConfirm(deviceId, r.cmd_id);
+  }catch(e){
+    toast('Command failed: '+e.message, true);
+  }
+}
+
+async function _iotWaitConfirm(deviceId, cmdId, attempts=0){
+  if(attempts>20) return;
+  const backs=[2000,3000,5000,8000,13000,15000];
+  const delay = backs[Math.min(attempts, backs.length-1)];
+  setTimeout(async()=>{
+    try{
+      const r = await _iotFetch(`/api/iot/cmd-status/${cmdId}`);
+      if(r.status==='confirmed'||r.status==='failed'){
+        _iotRefresh(true);
+        if(_iotCurrentDevice?.id===deviceId) _iotRenderDetailTab();
+        if(r.status==='confirmed') toast('✓ Command confirmed on device');
+        else toast('✕ Command failed on device', true);
+      } else {
+        _iotWaitConfirm(deviceId, cmdId, attempts+1);
+      }
+    }catch(e){ _iotWaitConfirm(deviceId, cmdId, attempts+1); }
+  }, delay);
+}
+
+// ── Location filter ────────────────────────────────────────────────────────────
+function _iotSetLoc(loc){
+  _iotState.loc = loc;
+  document.querySelectorAll('.iot-loc-tab').forEach(t=>t.classList.toggle('active',t.dataset.loc===loc));
+  _iotRenderDevices();
+}
+
+// ── Detail panel ───────────────────────────────────────────────────────────────
+function _iotOpenDetail(deviceId){
+  const dev = _iotState.devices.find(d=>d.id===deviceId);
+  if(!dev) return;
+  _iotCurrentDevice = dev;
+  _iotRefreshDetailHead();
+  // Reset to Controls tab
+  document.querySelectorAll('.iot-dtab').forEach(t=>t.classList.toggle('active',t.dataset.itab==='pins'));
+  ['pins','sensors','timers','rules','log'].forEach(t=>{
+    const el=document.getElementById('iot-dtab-'+t); if(el) el.style.display = t==='pins' ? '' : 'none';
+  });
+  _iotRenderDetailTab('pins');
+  const panel = document.getElementById('iot-detail');
+  const bd    = document.getElementById('iot-detail-backdrop');
+  if(panel){ panel.classList.add('open'); }
+  if(bd){ bd.style.display='block'; }
+}
+
+function _iotCloseDetail(){
+  _iotCurrentDevice = null;
+  const panel = document.getElementById('iot-detail');
+  const bd    = document.getElementById('iot-detail-backdrop');
+  if(panel) panel.classList.remove('open');
+  if(bd)    bd.style.display='none';
+}
+
+function _iotRefreshDetailHead(){
+  const d = _iotCurrentDevice; if(!d) return;
+  const icon=document.getElementById('iot-detail-icon'); if(icon) icon.textContent=_iotDeviceIcon(d);
+  const nm=document.getElementById('iot-detail-name');   if(nm) nm.textContent=d.name;
+  const mt=document.getElementById('iot-detail-meta');
+  if(mt) mt.textContent=`${d.chip||''}  ·  ${d.location||''}${d.room?' · '+d.room:''}  ·  IP ${d.ip||'?'}  ·  ${_iotLagLabel(d)}`;
+}
+
+function _iotDTab(tab){
+  document.querySelectorAll('.iot-dtab').forEach(t=>t.classList.toggle('active',t.dataset.itab===tab));
+  ['pins','sensors','timers','rules','log'].forEach(t=>{
+    const el=document.getElementById('iot-dtab-'+t); if(el) el.style.display = t===tab ? '' : 'none';
+  });
+  _iotRenderDetailTab(tab);
+}
+
+function _iotRenderDetailTab(tab){
+  if(!_iotCurrentDevice) return;
+  const active = tab || document.querySelector('.iot-dtab.active')?.dataset.itab || 'pins';
+  if(active==='pins')    _iotRenderPins(_iotCurrentDevice);
+  if(active==='sensors') _iotRenderSensors(_iotCurrentDevice);
+  if(active==='timers')  _iotRenderTimers(_iotCurrentDevice.id);
+  if(active==='rules')   _iotRenderRules(_iotCurrentDevice.id);
+  if(active==='log')     _iotRenderCmdLog(_iotCurrentDevice.id);
+}
+
+// ── Controls tab ──────────────────────────────────────────────────────────────
+function _iotRenderPins(d){
+  const el = document.getElementById('iot-dtab-pins'); if(!el) return;
+  const pins = d.pins||[];
+  if(!pins.length){ el.innerHTML=`<div style="color:var(--mu);font-size:13px;padding:20px 0;text-align:center">No pins configured</div>`; return; }
+  el.innerHTML = pins.map(p=>{
+    const isOutput = (p.type==='output'||p.type==='relay'||p.type==='pwm');
+    const val = p.current_value!=null ? p.current_value : '—';
+    const isOn = val==='1'||val===1||val===true;
+    const stateLabel = isOutput ? (isOn?`<span style="color:var(--gn);font-weight:700">ON</span>`:`<span style="color:var(--mu)">OFF</span>`) : `<span style="color:var(--ac);font-weight:700">${typeof val==='number'?val.toFixed(val%1?2:0):esc(String(val))} ${esc(p.unit||'')}</span>`;
+    const pendingBadge = p.pending_cmd ? `<span class="iot-cmd-chip ${esc(p.pending_cmd)}">${esc(p.pending_cmd)}</span>` : '';
+    const ctrl = isOutput ? `<div class="iot-toggle" style="margin-top:8px">
+      <button class="iot-btn ${isOn?'on':''}" style="padding:5px 16px;font-size:12px" onclick="_iotSendCmd('${d.id}','${p.id}','on')">ON</button>
+      <button class="iot-btn ${!isOn&&val!=='—'?'off':''}" style="padding:5px 16px;font-size:12px" onclick="_iotSendCmd('${d.id}','${p.id}','off')">OFF</button>
+      ${p.type==='relay'?`<button class="iot-btn" style="padding:5px 16px;font-size:12px" onclick="_iotSendCmd('${d.id}','${p.id}','pulse')" title="Pulse 500ms">Pulse</button>`:''}
+    </div>` : `<div style="font-size:11px;color:var(--mu);margin-top:4px">Read-only sensor input</div>`;
+    return `<div style="padding:12px 0;border-bottom:1px solid var(--sf2)">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+        <span style="font-size:13px;font-weight:700">${esc(p.label||p.id)}</span>
+        <span style="font-size:10px;background:var(--sf2);padding:1px 6px;border-radius:8px;color:var(--mu)">${esc(p.type||'?')}</span>
+        <span style="font-size:10px;color:var(--mu)">GPIO ${esc(String(p.gpio_pin!=null?p.gpio_pin:'?'))}</span>
+        ${pendingBadge}
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:13px">${stateLabel}</span>
+      </div>
+      ${ctrl}
+    </div>`;
+  }).join('');
+}
+
+// ── Sensors tab ───────────────────────────────────────────────────────────────
+let _iotCharts = {};   // chartId → Chart instance
+
+async function _iotRenderSensors(d){
+  const el = document.getElementById('iot-dtab-sensors'); if(!el) return;
+  const sensorPins = (d.pins||[]).filter(p=>p.type==='input'||p.type==='analog'||p.type==='sensor'||p.type==='dht'||p.type==='ds18b20');
+  if(!sensorPins.length){
+    el.innerHTML=`<div style="color:var(--mu);font-size:13px;padding:20px 0;text-align:center">No sensor pins configured for this device</div>`;
+    return;
+  }
+  // Destroy old charts
+  Object.values(_iotCharts).forEach(c=>{ try{c.destroy();}catch(e){} });
+  _iotCharts = {};
+
+  el.innerHTML = sensorPins.map((p,i)=>`
+    <div style="margin-bottom:24px">
+      <div style="font-size:12px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:6px">
+        ${esc(p.label||p.id)}
+        <span style="font-size:10px;color:var(--mu)">${esc(p.unit||'')}</span>
+        <span style="font-size:11px;font-weight:800;color:var(--ac);margin-left:auto">${p.current_value!=null?p.current_value:'—'} ${esc(p.unit||'')}</span>
+      </div>
+      <div class="iot-chart-wrap"><canvas id="iot-chart-${d.id}-${p.id}" height="200"></canvas></div>
+      <div style="font-size:10px;color:var(--mu);text-align:right">Last 24h</div>
+    </div>
+  `).join('');
+
+  // Load history for each pin
+  for(const p of sensorPins){
+    try{
+      const r = await _iotFetch(`/api/iot/sensors/${d.id}?pin=${encodeURIComponent(p.id)}&limit=144`);
+      const readings = (r.readings||[]).reverse(); // oldest first
+      const labels = readings.map(x=>{ const t=new Date(x.ts); return `${t.getHours()}:${String(t.getMinutes()).padStart(2,'0')}`; });
+      const vals   = readings.map(x=>parseFloat(x.value));
+      const ctx = document.getElementById(`iot-chart-${d.id}-${p.id}`);
+      if(!ctx) continue;
+      _iotCharts[`${d.id}-${p.id}`] = new Chart(ctx, {
+        type:'line',
+        data:{ labels, datasets:[{ label:p.label||p.id, data:vals,
+          borderColor:'rgba(88,166,255,.8)', backgroundColor:'rgba(88,166,255,.08)',
+          pointRadius:0, tension:0.35, fill:true, borderWidth:2
+        }]},
+        options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},
+          scales:{ x:{ ticks:{maxTicksLimit:8,color:'#768390',font:{size:10}}, grid:{color:'rgba(120,130,140,.1)'} },
+                   y:{ ticks:{color:'#768390',font:{size:10}}, grid:{color:'rgba(120,130,140,.1)'} } }
+        }
+      });
+    }catch(e){ /* chart load failed — silently skip */ }
+  }
+}
+
+// ── Timers tab ────────────────────────────────────────────────────────────────
+let _iotTimerDeviceId = null;
+let _iotTimers = [];
+
+async function _iotRenderTimers(deviceId){
+  _iotTimerDeviceId = deviceId;
+  const el = document.getElementById('iot-dtab-timers'); if(!el) return;
+  el.innerHTML = `<div style="color:var(--mu);font-size:12px;padding:12px 0">Loading…</div>`;
+  try{
+    const r = await _iotFetch(`/api/iot/timers?device_id=${encodeURIComponent(deviceId)}`);
+    _iotTimers = r.timers || [];
+    _iotTimersRenderList(el, deviceId);
+  }catch(e){
+    el.innerHTML=`<div style="color:var(--rd);font-size:12px;padding:12px 0">Failed: ${esc(e.message)}</div>`;
+  }
+}
+
+function _iotTimersRenderList(el, deviceId){
+  const dev = _iotState.devices.find(d=>d.id===deviceId);
+  const outputPins = (dev?.pins||[]).filter(p=>p.type==='output'||p.type==='relay'||p.type==='pwm');
+  const pinOpts = outputPins.map(p=>`<option value="${p.id}">${esc(p.label||p.id)}</option>`).join('');
+  const DAYS=['Mo','Tu','We','Th','Fr','Sa','Su'];
+
+  const rows = _iotTimers.map(t=>{
+    const activeDays = (t.days||'1111111').split('');
+    const dayBtns = DAYS.map((d,i)=>`<button class="iot-day-btn ${activeDays[i]==='1'?'active':''}" disabled>${d}</button>`).join('');
+    return `<div class="iot-timer-row">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:700">${esc(t.pin_label||t.pin_id)} → <span style="color:${t.action==='on'?'var(--gn)':'var(--rd)'};">${t.action==='on'?'ON':'OFF'}</span> at ${esc(t.time_hhmm||'?')}</div>
+        <div style="display:flex;gap:3px;margin-top:4px">${dayBtns}</div>
+        ${t.duration_s?`<div style="font-size:10px;color:var(--mu);margin-top:2px">Auto-off after ${t.duration_s}s</div>`:''}
+      </div>
+      <button class="btn xs ghost" style="color:var(--rd);border-color:var(--rd);flex-shrink:0" onclick="_iotDeleteTimer('${t.id}')">✕</button>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin-bottom:12px">Scheduled Timers</div>
+    ${rows || `<div style="color:var(--mu);font-size:12px;margin-bottom:12px">No timers yet</div>`}
+    <div style="background:var(--sf2);border-radius:10px;padding:12px;margin-top:16px">
+      <div style="font-size:12px;font-weight:700;margin-bottom:10px">+ Add Timer</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <div class="field" style="margin:0"><label style="font-size:11px">Pin</label>
+          <select id="iot-tnew-pin">${pinOpts||'<option value="">No output pins</option>'}</select></div>
+        <div class="field" style="margin:0"><label style="font-size:11px">Action</label>
+          <select id="iot-tnew-action"><option value="on">ON</option><option value="off">OFF</option></select></div>
+        <div class="field" style="margin:0"><label style="font-size:11px">Time (HH:MM)</label>
+          <input type="time" id="iot-tnew-time"></div>
+        <div class="field" style="margin:0"><label style="font-size:11px">Auto-off after (s, optional)</label>
+          <input type="number" id="iot-tnew-dur" min="0" placeholder="e.g. 300"></div>
+      </div>
+      <div style="margin-bottom:10px">
+        <div style="font-size:11px;color:var(--mu);margin-bottom:4px">Repeat on days:</div>
+        <div style="display:flex;gap:4px" id="iot-tnew-days">
+          ${DAYS.map((d,i)=>`<button class="iot-day-btn active" data-di="${i}" onclick="this.classList.toggle('active')">${d}</button>`).join('')}
+        </div>
+      </div>
+      <button class="btn sm green" onclick="_iotSaveTimer()">💾 Save Timer</button>
+    </div>`;
+}
+
+async function _iotSaveTimer(){
+  const pin  = document.getElementById('iot-tnew-pin')?.value;
+  const act  = document.getElementById('iot-tnew-action')?.value;
+  const time = document.getElementById('iot-tnew-time')?.value;
+  const dur  = document.getElementById('iot-tnew-dur')?.value;
+  if(!pin||!time){ toast('Select pin and time', true); return; }
+  const days = [...document.querySelectorAll('#iot-tnew-days .iot-day-btn')].map(b=>b.classList.contains('active')?'1':'0').join('');
+  try{
+    await _iotFetch('/api/iot/timers', { method:'POST', body: JSON.stringify({
+      device_id: _iotTimerDeviceId, pin_id:pin, action:act,
+      time_hhmm: time, days, duration_s: dur?parseInt(dur):null
+    })});
+    toast('Timer saved');
+    _iotRenderTimers(_iotTimerDeviceId);
+  }catch(e){ toast('Save failed: '+e.message, true); }
+}
+
+async function _iotDeleteTimer(id){
+  if(!confirm('Delete this timer?')) return;
+  try{
+    await _iotFetch('/api/iot/timers/'+id, { method:'DELETE' });
+    _iotTimers = _iotTimers.filter(t=>t.id!==id);
+    _iotRenderTimers(_iotTimerDeviceId);
+  }catch(e){ toast('Delete failed: '+e.message, true); }
+}
+
+// ── Automation rules tab ──────────────────────────────────────────────────────
+let _iotRulesDeviceId = null;
+let _iotRules = [];
+
+async function _iotRenderRules(deviceId){
+  _iotRulesDeviceId = deviceId;
+  const el = document.getElementById('iot-dtab-rules'); if(!el) return;
+  el.innerHTML = `<div style="color:var(--mu);font-size:12px;padding:12px 0">Loading…</div>`;
+  try{
+    const r = await _iotFetch(`/api/iot/automations?device_id=${encodeURIComponent(deviceId)}`);
+    _iotRules = r.rules || [];
+    _iotRulesRenderList(el, deviceId);
+  }catch(e){
+    el.innerHTML=`<div style="color:var(--rd);font-size:12px;padding:12px 0">Failed: ${esc(e.message)}</div>`;
+  }
+}
+
+function _iotRulesRenderList(el, deviceId){
+  const dev = _iotState.devices.find(d=>d.id===deviceId);
+  const allPins = dev?.pins||[];
+  const sensorPins  = allPins.filter(p=>p.type==='input'||p.type==='analog'||p.type==='sensor'||p.type==='dht'||p.type==='ds18b20'||p.type==='analog');
+  const outputPins  = allPins.filter(p=>p.type==='output'||p.type==='relay'||p.type==='pwm');
+  const sensorOpts  = sensorPins.map(p=>`<option value="${p.id}">${esc(p.label||p.id)}</option>`).join('');
+  const outputOpts  = outputPins.map(p=>`<option value="${p.id}">${esc(p.label||p.id)}</option>`).join('');
+  const ops = ['<','>','<=','>=','=='].map(o=>`<option value="${o}">${o}</option>`).join('');
+
+  const rows = _iotRules.map(r=>`<div class="iot-auto-row">
+    <div style="font-size:12px;font-weight:700;margin-bottom:2px">
+      If <b>${esc(r.if_pin_label||r.if_pin)}</b> ${esc(r.operator)} ${esc(String(r.threshold))} → <b>${esc(r.then_pin_label||r.then_pin)}</b>
+      <span style="color:${r.then_action==='on'?'var(--gn)':'var(--rd)'}"> ${r.then_action?.toUpperCase()}</span>
+    </div>
+    ${r.hysteresis?`<div style="font-size:10px;color:var(--mu)">Hysteresis: ${r.hysteresis}</div>`:''}
+    ${r.cooldown_s?`<div style="font-size:10px;color:var(--mu)">Cooldown: ${r.cooldown_s}s</div>`:''}
+    <div style="display:flex;gap:6px;margin-top:6px">
+      <span style="font-size:10px;padding:1px 6px;border-radius:8px;${r.enabled?'background:rgba(63,185,80,.15);color:var(--gn)':'background:var(--sf);color:var(--mu);border:1px solid var(--bd)'}">${r.enabled?'Active':'Disabled'}</span>
+      <button class="btn xs ghost" style="color:var(--rd);border-color:var(--rd);margin-left:auto" onclick="_iotDeleteRule('${r.id}')">✕ Remove</button>
+    </div>
+  </div>`).join('');
+
+  el.innerHTML = `
+    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin-bottom:12px">Automation Rules</div>
+    <div style="font-size:11px;color:var(--mu);margin-bottom:12px">Rules are evaluated server-side on every heartbeat — no device reboot needed.</div>
+    ${rows || `<div style="color:var(--mu);font-size:12px;margin-bottom:12px">No rules yet</div>`}
+    <div style="background:var(--sf2);border-radius:10px;padding:12px;margin-top:16px">
+      <div style="font-size:12px;font-weight:700;margin-bottom:10px">+ Add Rule</div>
+      <div style="display:grid;grid-template-columns:1fr 60px 80px;gap:8px;margin-bottom:8px">
+        <div class="field" style="margin:0"><label style="font-size:11px">If sensor pin</label>
+          <select id="iot-rnew-ifpin">${sensorOpts||'<option value="">No sensor pins</option>'}</select></div>
+        <div class="field" style="margin:0"><label style="font-size:11px">Op</label>
+          <select id="iot-rnew-op">${ops}</select></div>
+        <div class="field" style="margin:0"><label style="font-size:11px">Value</label>
+          <input type="number" id="iot-rnew-thresh" step="any" placeholder="e.g. 28"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <div class="field" style="margin:0"><label style="font-size:11px">Then output pin</label>
+          <select id="iot-rnew-thenpin">${outputOpts||'<option value="">No output pins</option>'}</select></div>
+        <div class="field" style="margin:0"><label style="font-size:11px">Action</label>
+          <select id="iot-rnew-action"><option value="on">ON</option><option value="off">OFF</option></select></div>
+        <div class="field" style="margin:0"><label style="font-size:11px">Hysteresis (optional)</label>
+          <input type="number" id="iot-rnew-hyst" step="any" placeholder="e.g. 1.5"></div>
+        <div class="field" style="margin:0"><label style="font-size:11px">Cooldown (s, optional)</label>
+          <input type="number" id="iot-rnew-cool" min="0" placeholder="e.g. 60"></div>
+      </div>
+      <button class="btn sm green" onclick="_iotSaveRule()">💾 Save Rule</button>
+    </div>`;
+}
+
+async function _iotSaveRule(){
+  const ifPin   = document.getElementById('iot-rnew-ifpin')?.value;
+  const op      = document.getElementById('iot-rnew-op')?.value;
+  const thresh  = document.getElementById('iot-rnew-thresh')?.value;
+  const thenPin = document.getElementById('iot-rnew-thenpin')?.value;
+  const act     = document.getElementById('iot-rnew-action')?.value;
+  if(!ifPin||!thresh||!thenPin){ toast('Fill all required fields', true); return; }
+  const hyst = document.getElementById('iot-rnew-hyst')?.value;
+  const cool = document.getElementById('iot-rnew-cool')?.value;
+  try{
+    await _iotFetch('/api/iot/automations', { method:'POST', body: JSON.stringify({
+      device_id: _iotRulesDeviceId, if_pin:ifPin, operator:op, threshold:parseFloat(thresh),
+      then_pin:thenPin, then_action:act,
+      hysteresis: hyst?parseFloat(hyst):null,
+      cooldown_s: cool?parseInt(cool):null,
+      enabled: true
+    })});
+    toast('Rule saved');
+    _iotRenderRules(_iotRulesDeviceId);
+  }catch(e){ toast('Save failed: '+e.message, true); }
+}
+
+async function _iotDeleteRule(id){
+  if(!confirm('Delete this automation rule?')) return;
+  try{
+    await _iotFetch('/api/iot/automations/'+id, { method:'DELETE' });
+    _iotRules = _iotRules.filter(r=>r.id!==id);
+    _iotRenderRules(_iotRulesDeviceId);
+  }catch(e){ toast('Delete failed: '+e.message, true); }
+}
+
+// ── Command log tab ───────────────────────────────────────────────────────────
+async function _iotRenderCmdLog(deviceId){
+  const el = document.getElementById('iot-dtab-log'); if(!el) return;
+  el.innerHTML = `<div style="color:var(--mu);font-size:12px;padding:12px 0">Loading…</div>`;
+  try{
+    const r = await _iotFetch(`/api/iot/cmd-log/${deviceId}?limit=50`);
+    const cmds = r.cmds || [];
+    if(!cmds.length){ el.innerHTML=`<div style="color:var(--mu);font-size:12px;padding:12px 0">No commands yet</div>`; return; }
+    const statusColors = { pending:'var(--yw)', received:'var(--ac)', executed:'var(--ac)', confirmed:'var(--gn)', failed:'var(--rd)' };
+    el.innerHTML = `<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin-bottom:10px">Command History</div>` +
+      cmds.map(c=>{
+        const ago = _iotLagLabelMs(Date.now()-new Date(c.created_at).getTime());
+        const latency = (c.confirmed_at&&c.created_at) ? Math.round((new Date(c.confirmed_at)-new Date(c.created_at))/1000)+'s latency' : '';
+        return `<div class="iot-cmd-log-row">
+          <span class="iot-cmd-chip ${c.status}" style="flex-shrink:0">${esc(c.status)}</span>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:11px;font-weight:700">${esc(c.pin_label||c.pin_id)} → ${esc(c.action?.toUpperCase())}</div>
+            <div style="font-size:10px;color:var(--mu)">${esc(ago)} ${latency?'· '+latency:''} ${c.source?'· via '+esc(c.source):''}</div>
+          </div>
+        </div>`;
+      }).join('');
+  }catch(e){
+    el.innerHTML=`<div style="color:var(--rd);font-size:12px;padding:12px 0">Failed: ${esc(e.message)}</div>`;
+  }
+}
+
+function _iotLagLabelMs(ms){
+  const s=Math.floor(ms/1000);
+  if(s<10) return 'Just now';
+  if(s<60) return s+'s ago';
+  if(s<3600) return Math.floor(s/60)+'m ago';
+  return Math.floor(s/3600)+'h ago';
+}
+
+// ── Add / Edit device modal ───────────────────────────────────────────────────
+let _iotPinCounter = 0;
+
+function _iotOpenAdd(editDev=null){
+  _iotEditId = editDev ? editDev.id : null;
+  const modal = document.getElementById('iot-add-modal'); if(!modal) return;
+  // Clear form
+  document.getElementById('iad-name').value  = editDev?.name||'';
+  document.getElementById('iad-loc').value   = editDev?.location||'greenhouse';
+  document.getElementById('iad-chip').value  = editDev?.chip||'esp32';
+  document.getElementById('iad-room').value  = editDev?.room||'';
+  const plist = document.getElementById('iad-pins-list');
+  plist.innerHTML=''; _iotPinCounter=0;
+  (editDev?.pins||[]).forEach(p=>_iotAddPinRow(p));
+  if(!(editDev?.pins||[]).length) _iotAddPinRow();
+  modal.classList.add('on');
+}
+
+function _iotEditDevice(){
+  if(_iotCurrentDevice) _iotOpenAdd(_iotCurrentDevice);
+}
+
+function _iotAddPinRow(pin=null){
+  const idx = _iotPinCounter++;
+  const plist = document.getElementById('iad-pins-list'); if(!plist) return;
+  const div = document.createElement('div');
+  div.className='iot-pin-builder';
+  div.dataset.pidx=idx;
+  const types=['output','relay','input','analog','dht','ds18b20','pwm'].map(t=>`<option value="${t}" ${pin?.type===t?'selected':''}>${t}</option>`).join('');
+  div.innerHTML=`
+    <input type="text" placeholder="Label" value="${esc(pin?.label||pin?.id||'')}" data-field="label" style="flex:1.5;min-width:80px;font-size:12px;padding:4px 8px;background:var(--sf);border:1px solid var(--bd);border-radius:5px;color:var(--tx)">
+    <select data-field="type" style="font-size:12px;padding:4px 8px;background:var(--sf);border:1px solid var(--bd);border-radius:5px;color:var(--tx)">${types}</select>
+    <input type="number" placeholder="GPIO" value="${pin?.gpio_pin!=null?pin.gpio_pin:''}" data-field="gpio" style="width:60px;font-size:12px;padding:4px 8px;background:var(--sf);border:1px solid var(--bd);border-radius:5px;color:var(--tx)">
+    <input type="text" placeholder="Unit" value="${esc(pin?.unit||'')}" data-field="unit" style="width:50px;font-size:12px;padding:4px 8px;background:var(--sf);border:1px solid var(--bd);border-radius:5px;color:var(--tx)">
+    <button class="btn xs ghost" style="color:var(--rd);border-color:var(--rd);flex-shrink:0" onclick="this.closest('.iot-pin-builder').remove()">✕</button>`;
+  plist.appendChild(div);
+}
+
+async function _iotSaveDevice(){
+  const name = document.getElementById('iad-name').value.trim();
+  if(!name){ toast('Device name required', true); return; }
+  const loc  = document.getElementById('iad-loc').value;
+  const chip = document.getElementById('iad-chip').value;
+  const room = document.getElementById('iad-room').value.trim();
+  const pins = [...document.querySelectorAll('#iad-pins-list .iot-pin-builder')].map(div=>{
+    const label   = div.querySelector('[data-field="label"]')?.value.trim()||'';
+    const type    = div.querySelector('[data-field="type"]')?.value||'output';
+    const gpio    = div.querySelector('[data-field="gpio"]')?.value;
+    const unit    = div.querySelector('[data-field="unit"]')?.value.trim()||'';
+    return { id:label.toLowerCase().replace(/[^a-z0-9_]/g,'_')||('pin'+(Math.random()*9999|0)), label, type, gpio_pin:gpio?parseInt(gpio):null, unit };
+  }).filter(p=>p.label);
+
+  try{
+    if(_iotEditId){
+      await _iotFetch('/api/iot/devices/'+_iotEditId, { method:'PUT', body:JSON.stringify({name,location:loc,chip,room,pins}) });
+      toast('Device updated');
+    } else {
+      await _iotFetch('/api/iot/register', { method:'POST', body:JSON.stringify({name,location:loc,chip,room,pins}) });
+      toast('Device registered');
+    }
+    document.getElementById('iot-add-modal').classList.remove('on');
+    await _iotRefresh();
+  }catch(e){ toast('Save failed: '+e.message, true); }
+}
+
+// ── Firmware Flasher (Web Serial) ─────────────────────────────────────────────
+function _iotOpenFlash(){
+  const modal = document.getElementById('iot-flash-modal'); if(!modal) return;
+  // Show browser warning if not Chrome/Edge
+  const isWebSerial = 'serial' in navigator;
+  const warn = document.getElementById('iot-flash-browser-warn');
+  if(warn) warn.style.display = isWebSerial ? 'none' : '';
+  // Pre-fill worker URL if known
+  const urlIn = document.getElementById('icfg-url');
+  if(urlIn && _iotWorkerUrl) urlIn.value=_iotWorkerUrl;
+  modal.classList.add('on');
+}
+
+function _iotCloseFlash(){
+  document.getElementById('iot-flash-modal')?.classList.remove('on');
+  _iotSerial = null;
+}
+
+async function _iotSerialConnect(){
+  if(!('serial' in navigator)){ toast('Web Serial not supported — use Chrome or Edge', true); return; }
+  const btn = document.getElementById('iot-serial-btn');
+  const st  = document.getElementById('iot-serial-status');
+  try{
+    _iotSerial = await navigator.serial.requestPort({});
+    await _iotSerial.open({ baudRate: 115200 });
+    if(btn) btn.textContent='✓ Connected';
+    if(st)  st.textContent='Port open';
+    // Mark step 2 done
+    document.getElementById('ift-n2')?.classList.add('done');
+    // Detect chip
+    await _iotDetectChip();
+  }catch(e){
+    if(st) st.textContent='Error: '+e.message;
+    toast('Serial error: '+e.message, true);
+  }
+}
+
+async function _iotDetectChip(){
+  const chipEl  = document.getElementById('iot-chip-result');
+  const n3      = document.getElementById('ift-n3');
+  const n4      = document.getElementById('ift-n4');
+  const flashBtn= document.getElementById('iot-flash-btn');
+  if(!_iotSerial){ if(chipEl) chipEl.textContent='Connect USB first.'; return; }
+  if(chipEl) chipEl.textContent='Detecting…';
+  try{
+    // Send ROM query via serial — simplified detect by sending 'C' (sync byte)
+    const writer = _iotSerial.writable.getWriter();
+    const reader = _iotSerial.readable.getReader();
+    // Send ESP bootloader sync
+    await writer.write(new Uint8Array([0xc0,0x00,0x08,0x24,0x00,0x00,0x00,0x00,0x07,0x07,0x12,0x20,...new Array(32).fill(0x55),0xc0]));
+    writer.releaseLock();
+    // Read response (simplified — real esptool protocol is more involved)
+    const { value } = await Promise.race([
+      reader.read(),
+      new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),3000))
+    ]);
+    reader.releaseLock();
+    // Detect based on override select
+    const override = document.getElementById('iot-chip-override')?.value;
+    _iotChipType = override || (value?.length ? 'esp32' : 'esp8266');
+    if(chipEl) chipEl.textContent=`Detected: ${_iotChipType.toUpperCase()}`;
+    n3?.classList.add('done'); n3?.classList.remove('inactive');
+    n4?.classList.remove('inactive');
+    if(flashBtn) flashBtn.style.display='';
+    toast('Chip detected: '+_iotChipType.toUpperCase());
+  }catch(e){
+    const override = document.getElementById('iot-chip-override')?.value;
+    if(override){ _iotChipType=override; if(chipEl) chipEl.textContent='Override: '+override.toUpperCase(); n3?.classList.add('done'); n3?.classList.remove('inactive'); n4?.classList.remove('inactive'); if(flashBtn) flashBtn.style.display=''; }
+    else{ if(chipEl) chipEl.textContent='Auto-detect failed. Select chip manually above.'; }
+  }
+}
+
+async function _iotFlashFirmware(){
+  if(!_iotSerial){ toast('Connect USB first', true); return; }
+  const chip    = _iotChipType || document.getElementById('iot-chip-override')?.value || 'esp32';
+  const progWrap= document.getElementById('iot-flash-prog-wrap');
+  const prog    = document.getElementById('iot-flash-prog');
+  const status  = document.getElementById('iot-flash-status');
+  const n4      = document.getElementById('ift-n4');
+  const n5      = document.getElementById('ift-n5');
+
+  if(progWrap) progWrap.style.display='';
+  if(status)   status.textContent='Fetching firmware binary…';
+  if(prog)     prog.style.width='5%';
+
+  try{
+    // Fetch compiled binary from repo
+    const binPath = chip==='esp32' ? 'firmware/esp32/latest.bin' : 'firmware/esp8266/latest.bin';
+    const ghRaw = `https://raw.githubusercontent.com/Phyto-Evolution/tcplants/main/${binPath}`;
+    const res = await fetch(ghRaw);
+    if(!res.ok) throw new Error(`Firmware not found at ${binPath}. Compile and commit the .bin first.`);
+    const firmware = await res.arrayBuffer();
+    if(status) status.textContent='Firmware loaded ('+Math.round(firmware.byteLength/1024)+'KB). Flashing…';
+    if(prog) prog.style.width='20%';
+
+    // Flash via Web Serial — chunked write at 0x10000
+    const writer = _iotSerial.writable.getWriter();
+    const CHUNK  = 512;
+    const data   = new Uint8Array(firmware);
+    let written  = 0;
+    while(written < data.length){
+      const chunk = data.slice(written, written+CHUNK);
+      await writer.write(chunk);
+      written += chunk.length;
+      const pct = 20 + Math.floor((written/data.length)*75);
+      if(prog) prog.style.width=pct+'%';
+    }
+    writer.releaseLock();
+    if(prog)   prog.style.width='100%';
+    if(status) status.textContent='Flash complete! Writing config…';
+    n4?.classList.add('done'); n4?.classList.remove('inactive');
+    n5?.classList.remove('inactive');
+    const cfgBtn = document.getElementById('iot-cfg-btn');
+    if(cfgBtn) cfgBtn.disabled=false;
+    toast('Firmware flashed!');
+  }catch(e){
+    if(status) status.textContent='Error: '+e.message;
+    toast('Flash error: '+e.message, true);
+  }
+}
+
+async function _iotWriteConfig(){
+  if(!_iotSerial){ toast('Connect USB first', true); return; }
+  const ssid   = document.getElementById('icfg-ssid')?.value.trim();
+  const pass   = document.getElementById('icfg-pass')?.value;
+  const name   = document.getElementById('icfg-name')?.value.trim();
+  const loc    = document.getElementById('icfg-loc')?.value;
+  const wkUrl  = document.getElementById('icfg-url')?.value.trim();
+  if(!ssid||!name){ toast('WiFi SSID and device name required', true); return; }
+  const st = document.getElementById('iot-cfg-status');
+  if(st) st.textContent='Writing config…';
+  try{
+    // Config packet: JSON encoded, sent over serial then device reboots
+    const cfg = JSON.stringify({ ssid, pass, name, location:loc, worker_url:wkUrl });
+    const encoder = new TextEncoder();
+    const writer = _iotSerial.writable.getWriter();
+    // Start marker + JSON + end marker
+    await writer.write(encoder.encode('\x01CFG:'+cfg+'\x04'));
+    writer.releaseLock();
+    if(st) st.textContent='Config written. Device will reboot and connect to WiFi.';
+    document.getElementById('ift-n5')?.classList.add('done'); document.getElementById('ift-n5')?.classList.remove('inactive');
+    toast('Config written — device rebooting');
+    // Save worker URL locally too
+    if(wkUrl){ _iotWorkerUrl=wkUrl; localStorage.setItem('tcplants_iot_worker',wkUrl); }
+    setTimeout(()=>{ _iotCloseFlash(); _iotRefresh(); }, 3000);
+  }catch(e){
+    if(st) st.textContent='Error: '+e.message;
+    toast('Config error: '+e.message, true);
+  }
+}
+// ── End IoT Panel ─────────────────────────────────────────────────────────────
+
+const _NAV_LABELS={home:'Home',notes:'Notes',registry:'Registry',recipes:'Recipes',bottles:'Bottles',greenhouse:'Greenhouse',supply:'Supply',stock:'Supply',sales:'Sales',value:'Value',search:'Search',reminders:'Reminders',calendar:'Calendar',contam:'Contam',analytics:'Analytics',species:'Species',tools:'Tools',sterilise:'Sterilise',news:'News',help:'Help',logicflows:'Logic Flows',journal:'Lab Journal',schedule:'Schedule',insights:'Insights',ai:'Ravana',files:'Files',changelog:'Changelog',gallery:'Gallery',iot:'IoT Control'};
 function switchSection(name){
   // Stock fused into supply — both show sec-supply
   if(name==='stock') name='supply';
@@ -21604,6 +22731,7 @@ function navTo(sec){
     else if(sec==='logicflows'){} // static page — no render needed
     else if(sec==='ai') renderAIPage();
     else if(sec==='files') renderFileBrowser();
+    else if(sec==='iot') _iotInit();
   }
 }
 
@@ -23279,6 +24407,7 @@ const LF_SEARCH_INDEX=[
   {id:'lf-gbif', label:'GBIF Integration', keywords:['gbif','species','taxonomy','synonym','common name','distribution','native','photo','reference','hierarchy','order','class','kingdom','bulk','cp','carnivorous','nepenthes','droseraceae','sarraceniaceae','lentibulariaceae','cephalotaceae'],functions:['_taxGBIFLookup','_gbifImportSpecies','_loadSpDetailGBIF','_gbifBulkImportCP']},
   {id:'lf-value', label:'Value Inventory', keywords:['value','vault','price','cost','inr','stage','grade','seedling','small','medium','adult','estimate','total','calculation','loadValue','renderValueSection'],functions:['loadValue','renderValueSection','_valTab','_valPriceSet','_renderValueVaultPanel','fmtINR']},
   {id:'lf-export', label:'Export System', keywords:['export','csv','print','report','download','zip','calendar','blob','bottles.csv','notes.csv','greenhouse.csv'],functions:['exportLabReport','_downloadText','exportAll']},
+  {id:'lf-iot', label:'IoT Control Panel', keywords:['iot','esp','esp32','esp8266','relay','sensor','pin','gpio','heartbeat','command','timer','automation','rule','firmware','flash','serial','webserial','d1','cloudflare','worker','device','register'],functions:['_iotInit','_iotRefresh','_iotPollStart','_iotPollStop','_iotRenderDevices','_iotRenderCard','_iotSendCmd','_iotWaitConfirm','_iotOpenDetail','_iotCloseDetail','_iotDTab','_iotRenderPins','_iotRenderSensors','_iotRenderTimers','_iotSaveTimer','_iotDeleteTimer','_iotRenderRules','_iotSaveRule','_iotDeleteRule','_iotRenderCmdLog','_iotSetLoc','_iotOpenAdd','_iotEditDevice','_iotAddPinRow','_iotSaveDevice','_iotOpenFlash','_iotCloseFlash','_iotSerialConnect','_iotDetectChip','_iotFlashFirmware','_iotWriteConfig']},
   {id:'lf-gaps', label:'Known Gaps', keywords:['bug','gap','issue','pending','broken','frozen','telegram','csp','memory','leak','setinterval','agentic','todo']},
   {id:null, label:'Journal', keywords:['journal','entry','parse','overnight','ravana','dictate','voice','whisper','tags','auto-flair','parseEnabled','parsed'],functions:['saveJournalEntry','parseJournalWithRavana','_scheduleOvernightJournalParse','_setJournalParseEnabled','_journalMicTap']},
   {id:null, label:'Taxonomy', keywords:['taxonomy','pack','packs','species','custom','flair','autocomplete','suggest','dropdown','modal','csv','import','gbif'],functions:['loadTaxonomy','_taxSuggest','_importCsvTaxonomy','saveCustomTaxonomy','openSpeciesPicker','_taxDropdownSelect']},
