@@ -962,6 +962,37 @@ main > .dview, main > .editor{ margin:0 auto; }
 .fb-preview-body embed,.fb-preview-body iframe,.fb-preview-body img{width:100%;height:100%;border:none;display:block}
 .fb-preview-body pre{padding:16px;overflow:auto;height:100%;margin:0;font-family:var(--mono);font-size:12px;color:var(--tx);background:var(--bg);white-space:pre-wrap;word-break:break-all}
 @media(max-width:700px){.fb-preview{width:100vw}}
+/* ── File Browser Editor v3.15 ── */
+.fb-preview{display:none;flex-direction:column}
+.fb-editor-bar{display:flex;align-items:center;gap:6px;padding:7px 10px;border-bottom:1px solid var(--bd);flex-shrink:0;background:var(--sf2);flex-wrap:wrap}
+.fb-editor-bar .btn{font-size:11px;padding:3px 10px}
+.fb-csv-wrap{overflow:auto;flex:1;background:var(--bg)}
+.fb-csv-table{border-collapse:collapse;font-size:12px;min-width:100%}
+.fb-csv-table td,.fb-csv-table th{border:1px solid var(--bd);padding:5px 8px;min-width:70px;max-width:260px;vertical-align:top;white-space:nowrap}
+.fb-csv-table thead td{background:var(--sf2);font-weight:700;font-size:11px;position:sticky;top:0;z-index:1;user-select:none}
+.fb-csv-table td[contenteditable=true]{cursor:text;outline:none}
+.fb-csv-table td[contenteditable=true]:focus{background:rgba(88,166,255,.07);box-shadow:inset 0 0 0 1px var(--ac)}
+.fb-csv-addrow{padding:4px 12px;font-size:11px;color:var(--ac);cursor:pointer;border:none;background:none;display:block;text-align:left}
+.fb-csv-addrow:hover{background:var(--sf2)}
+.fb-code-ed{font-family:var(--mono);font-size:12px;line-height:1.6;padding:16px;width:100%;height:100%;border:none;background:var(--bg);color:var(--tx);resize:none;tab-size:2;white-space:pre}
+.fb-code-ed:focus{outline:none}
+.fb-md-pv{padding:16px;overflow:auto;height:100%;font-size:13px;line-height:1.8;color:var(--tx)}
+.fb-md-pv h1,.fb-md-pv h2,.fb-md-pv h3{color:var(--ac);margin:1em 0 .4em}
+.fb-md-pv code{background:var(--sf2);padding:1px 5px;border-radius:4px;font-family:var(--mono);font-size:11px}
+.fb-md-pv pre{background:var(--sf2);padding:10px;border-radius:6px;overflow:auto}
+.fb-audio-pv,.fb-video-pv{display:flex;align-items:center;justify-content:center;height:100%;padding:20px;background:var(--bg)}
+.fb-audio-pv audio,.fb-video-pv video{max-width:100%;border-radius:8px}
+.fb-tree-item.drag-over{background:rgba(63,185,80,.15)!important;border-left-color:var(--gn)!important;color:var(--gn)!important}
+.fb-drop-hint{border:2px dashed var(--bd);border-radius:10px;padding:32px;text-align:center;color:var(--mu);font-size:13px;margin:12px;transition:all .15s}
+.fb-drop-hint.drag-active{border-color:var(--gn);background:rgba(63,185,80,.06);color:var(--gn)}
+/* ── Sales v3.15 ── */
+.sale-pm-btn.active,.sale-gst-btn.active{background:rgba(88,166,255,.15)!important;border-color:var(--ac)!important;color:var(--ac)!important;font-weight:700}
+.sale-stock-chip{font-size:10px;background:rgba(63,185,80,.1);border:1px solid rgba(63,185,80,.2);color:var(--gn);padding:1px 6px;border-radius:10px;margin-left:4px;white-space:nowrap;display:inline}
+.sale-stock-chip.warn{background:rgba(248,81,73,.1);border-color:rgba(248,81,73,.3);color:var(--rd)}
+.sale-supname-wrap{display:none}
+.sale-supname-wrap.on{display:block}
+.sale-fin-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--mu);margin-bottom:3px}
+.sale-fin-row.grand{font-size:16px;font-weight:800;color:var(--gn);padding-top:8px;border-top:1px solid var(--bd);margin-top:6px}
 /* ── CLEAN STREAK ── */
 .dc-streak-num{font-family:var(--mono);font-size:42px;font-weight:900;line-height:1;margin-bottom:4px}
 /* ── RECIPE SCALE ── */
@@ -2161,7 +2192,12 @@ input, textarea, select {
 .sale-line-table { width:100%; border-collapse:collapse; margin-bottom:16px; }
 .sale-line-table th { padding:7px 8px; font-size:11px; color:var(--mu); font-weight:600; text-align:left; border-bottom:1px solid var(--bd); }
 .sale-line-table td { padding:7px 8px; font-size:13px; border-bottom:1px solid var(--bd); vertical-align:middle; }
-.sale-line-table td input, .sale-line-table td select { background:var(--sf2); border:1px solid var(--bd); border-radius:5px; padding:4px 7px; font-size:12px; color:var(--tx); width:100%; }
+.sale-line-table td input, .sale-line-table td select { background:var(--sf2); border:1px solid var(--bd); border-radius:5px; padding:4px 7px; font-size:12px; color:var(--tx); }
+.sale-sec-hd{font-size:11px;font-weight:700;color:var(--ac);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px}
+.sale-field{margin-bottom:9px}
+.sale-field label{display:block;font-size:11px;color:var(--mu);margin-bottom:3px;font-weight:600}
+.sale-field input,.sale-field select,.sale-field textarea{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:7px;padding:7px 10px;font-size:13px;color:var(--tx)}
+.sale-field textarea{resize:vertical}
 .sale-order-card { background:var(--sf); border:1px solid var(--bd); border-radius:10px; padding:14px 16px; margin-bottom:10px; }
 .sale-order-card:hover { border-color:var(--ac); }
 .sale-order-head { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:6px; }
@@ -2295,7 +2331,7 @@ input, textarea, select {
   <nav>
     <button id="nav-hamburger" title="Menu" aria-label="Toggle navigation menu" onclick="toggleNavDrawer()">☰</button>
     <button class="nav-home-btn" title="Home" aria-label="Go to home" onclick="goHome()">🏠</button>
-    <div class="brand" role="banner">🌿 Forest Studio Labs <span>/ Lab</span></div>
+    <div class="brand" role="banner">🌿 Forest Studio Labs <span id="nav-crumb" style="color:var(--mu);font-weight:400">/ Lab</span></div>
     <div id="toast"></div>
     <span class="nav-spacer"></span>
     <div id="nav-clock" onclick="navTo('calendar')" title="Chennai IST · tap to open Calendar" aria-label="Current time in Chennai IST">
@@ -3470,27 +3506,32 @@ input, textarea, select {
       <!-- VERSION HEADER -->
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
         <h1 style="font-size:22px;font-weight:800;margin:0">🌿 Forest Studio Labs</h1>
-        <span class="help-version-badge">v3.14</span>
+        <span class="help-version-badge">v3.15</span>
         <button class="btn xs ghost" onclick="navTo('changelog')" style="border-color:var(--pu);color:var(--pu)">📋 Changelog →</button>
         <button class="btn xs ghost" onclick="navTo('logicflows')" style="margin-left:4px;border-color:var(--ac);color:var(--ac)">🔗 Logic Flows →</button>
       </div>
       <p style="color:var(--mu);font-size:13px;margin-bottom:20px">April 2026 · Encrypted · GitHub-backed · Single-file PWA</p>
 
-      <!-- WHAT'S NEW v3.14 -->
+      <!-- WHAT'S NEW v3.15 -->
       <div style="background:linear-gradient(135deg,rgba(63,185,80,.1),rgba(88,166,255,.08));border:1px solid rgba(63,185,80,.3);border-radius:10px;padding:18px 20px;margin-bottom:10px">
-        <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v3.14</div>
+        <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v3.15</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
-          <div style="font-size:13px;line-height:1.6"><strong>📈 Usage Analytics tab</strong> — new tab in AI Control: today/week/all-time token totals, feature breakdown bar chart, 7-day sparkline, model distribution (Groq/Gemini/Claude), cap progress bars, cost indicator for Claude. Reset counters button.</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🎚 Per-feature daily token caps</strong> — each background feature (journal, insights, stock, inline) now has an editable daily token cap (tok/day). Hard block at 100%, toast warning at 80%. 0 = unlimited.</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🔀 Chat auto-fallback</strong> — when primary model is rate-limited or down, Ravana silently retries via Gemini → Groq 8B before surfacing an error. A small <span style="background:rgba(210,153,34,.2);border:1px solid var(--yw);border-radius:6px;padding:1px 5px;font-size:11px">⚡ via Gemini</span> pill shows in the reply if a fallback was used. Chat is always unlimited.</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🌐 Web Search</strong> — Ravana can now search the internet. Toggle in AI Control → Internet Access. Uses Brave Search API (add <code>BRAVE_KEY</code> to Cloudflare env) or falls back to DuckDuckGo instant answers. Ravana calls <code>search_web</code> tool automatically when needed.</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🗜 Context-saving mode</strong> — when enabled and chat tokens today exceed 10k, extended lab data is omitted from the prompt. Saves tokens on heavy chat days while keeping Ravana responsive.</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🔔 Toast inline in nav</strong> — notification pill lives inside the nav bar (next to the Forest Studio Labs brand), slides open as a flex pill, no fixed overlays.</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🌿 Forest Studio Labs</strong> — brand renamed from "TC Plants" across nav, login screen, splash, and page title.</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🍅 Pomodoro in nav</strong> — Pomodoro FAB moved from floating bottom-left into the nav bar next to the weather chip.</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🗂 Nav drawer fixes</strong> — Calendar and Changelog sections now have drawer tabs; Stock tab correctly highlights when the Stock section is active (was silently redirecting to Supply without highlighting).</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🧾 Sales v2</strong> — richer New Sale form with separate phone/email/PO ref fields, payment mode chips (Cash/UPI/Bank Transfer), GST selector, discount (flat/%), shipping. Line items show live stock counts from bottles + GH. Supply items wired in as sellable.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>📦 Backward supply wiring</strong> — add a line item as "New item…" in an invoice and it auto-creates the entry in Supply Inventory on save. Works for any lab consumable not yet in inventory.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>📊 Sales CSV log</strong> — every saved order appends rows to <code>sales/sales-log.csv</code> (plain text, one row per line item). Visible and editable in Files → Sales Log.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>💾 PDF save</strong> — Orders tab now has a 💾 PDF button per order that auto-triggers the browser's print-to-PDF dialog. Invoice layout updated with phone, email, PO ref, payment mode, discount + GST breakdown.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🗂 File browser v2</strong> — multi-format viewer: CSV renders as editable table (add/delete rows), JSON pretty-prints, Markdown renders with side-by-side edit toggle, code files in monospace editor, audio/video native players. Edit + Save works for both encrypted attachments and plain-text files.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>📎 Drag & drop upload</strong> — drag any file from your OS onto a folder in the file browser left panel. Auto-encrypts and stores under <code>attachments/&lt;section&gt;/general/</code>. Drop hint highlights the target folder.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🧭 Live breadcrumb</strong> — the nav bar now shows the current section name (e.g. <em>/ Notes</em>, <em>/ Bottles</em>, <em>/ Calendar</em>) next to the Forest Studio Labs brand. Updates on every navigation.</div>
         </div>
       </div>
+      <!-- v3.14 collapse -->
+      <details style="margin-bottom:8px">
+        <summary style="cursor:pointer;font-size:12px;color:var(--mu);padding:6px 0;font-weight:600;letter-spacing:.04em">▸ v3.14 release notes</summary>
+        <div style="background:var(--sf2);border-radius:8px;padding:12px;margin-top:6px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
+          <div style="font-size:13px;line-height:1.6"><strong>📈 Usage Analytics tab</strong> · <strong>🎚 Per-feature token caps</strong> · <strong>🔀 Chat auto-fallback</strong> · <strong>🌐 Web Search</strong> · <strong>🗜 Context-saving mode</strong> · <strong>🔔 Toast inline in nav</strong> · <strong>🌿 Forest Studio Labs rebrand</strong> · <strong>🍅 Pomo in nav</strong> · <strong>🗂 Nav drawer fixes</strong></div>
+        </div>
+      </details>
       <!-- v3.13 collapse -->
       <details style="margin-bottom:8px">
         <summary style="cursor:pointer;font-size:12px;color:var(--mu);padding:6px 0;font-weight:600;letter-spacing:.04em">▸ v3.13 release notes</summary>
@@ -5082,7 +5123,7 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
     <main style="flex:1;overflow-y:auto;padding:28px 32px;max-width:980px;width:100%;box-sizing:border-box">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
         <h1 style="font-size:20px;font-weight:800;margin:0">🔗 Logic Flows</h1>
-        <span style="background:linear-gradient(135deg,var(--ac),var(--pu));color:#0d1117;border-radius:12px;font-size:11px;font-weight:800;padding:2px 9px;letter-spacing:.04em">v3.14</span>
+        <span style="background:linear-gradient(135deg,var(--ac),var(--pu));color:#0d1117;border-radius:12px;font-size:11px;font-weight:800;padding:2px 9px;letter-spacing:.04em">v3.15</span>
         <button onclick="_lfExpandAll()" class="btn xs ghost" style="margin-left:auto">Expand all</button>
         <button onclick="_lfCollapseAll()" class="btn xs ghost">Collapse all</button>
       </div>
@@ -6841,7 +6882,9 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
 <div id="fb-preview-panel" class="fb-preview">
   <div class="fb-preview-head">
     <span class="fb-preview-title" id="fb-pv-title">Preview</span>
-    <a id="fb-pv-dl" style="font-size:11px;color:var(--ac);cursor:pointer;margin-right:8px">⬇ Download</a>
+    <a id="fb-pv-dl" style="font-size:11px;color:var(--ac);cursor:pointer;margin-right:4px">⬇ Download</a>
+    <button id="fb-pv-edit-btn" onclick="_fbToggleEdit()" style="display:none;background:none;border:1px solid var(--bd);border-radius:6px;padding:3px 10px;font-size:11px;color:var(--ac);cursor:pointer;margin-right:4px">✏️ Edit</button>
+    <button id="fb-pv-save-btn" onclick="_fbEditSave()" style="display:none;background:var(--gn);border:none;border-radius:6px;padding:3px 10px;font-size:11px;color:#fff;cursor:pointer;font-weight:700;margin-right:4px">💾 Save</button>
     <button onclick="_fbPreviewClose()" style="background:none;border:none;color:var(--mu);cursor:pointer;font-size:16px;line-height:1">✕</button>
   </div>
   <div class="fb-preview-body" id="fb-pv-body"></div>
@@ -16666,12 +16709,19 @@ async function decBin(raw){
 const ATT_IDX='attachments/_index.enc';
 let _attIndex=null, _attIndexSha=null;
 
-function _attIconFor(mime){
+function _attIconFor(mime,name){
+  const ext=_fbExtType(name||'');
+  if(!mime&&name) return {csv:{cls:'csv',em:'📊'},json:{cls:'code',em:'📦'},md:{cls:'md',em:'📝'},code:{cls:'code',em:'💻'},image:{cls:'img',em:'🖼'},pdf:{cls:'pdf',em:'📕'},audio:{cls:'audio',em:'🎵'},video:{cls:'video',em:'🎬'}}[ext]||{cls:'other',em:'📄'};
   if(!mime) return {cls:'other',em:'📄'};
   if(mime.includes('pdf')) return {cls:'pdf',em:'📕'};
   if(mime.startsWith('image/')) return {cls:'img',em:'🖼'};
+  if(mime.startsWith('audio/')) return {cls:'audio',em:'🎵'};
+  if(mime.startsWith('video/')) return {cls:'video',em:'🎬'};
   if(mime.includes('csv')||mime.includes('spreadsheet')||mime.includes('excel')) return {cls:'csv',em:'📊'};
-  if(mime.includes('text')) return {cls:'other',em:'📝'};
+  if(mime.includes('json')) return {cls:'code',em:'📦'};
+  if(mime.includes('markdown')) return {cls:'md',em:'📝'};
+  if(mime.includes('javascript')||mime.includes('python')||mime.includes('css')||mime.includes('html')) return {cls:'code',em:'💻'};
+  if(mime.includes('text')) return {cls:'other',em:'📄'};
   return {cls:'other',em:'📄'};
 }
 function _attFmtSize(bytes){
@@ -16776,53 +16826,79 @@ async function _attPreview(id){
 // FILE BROWSER
 // ════════════════════════════════════════════════════════════
 let _fbFilter='all', _fbSource=null, _fbSearch='', _fbBlobUrls=[];
+let _fbCurrentEntry=null, _fbCurrentPath=null, _fbEditMode=false, _fbCurrentSha=null;
 
-function _fbSourceLabel(s){ return {notes:'📋 Notes',journal:'📓 Journal',recipes:'🧪 Recipes',bottles:'🫙 Bottles',exports:'📤 Exports'}[s]||s; }
+function _fbSourceLabel(s){ return {notes:'📋 Notes',journal:'📓 Journal',recipes:'🧪 Recipes',bottles:'🫙 Bottles',exports:'📤 Exports',sales:'💸 Sales'}[s]||s; }
+function _fbExtType(name){
+  const ext=(name||'').split('.').pop().toLowerCase();
+  if(['csv'].includes(ext)) return 'csv';
+  if(['json'].includes(ext)) return 'json';
+  if(['md','markdown'].includes(ext)) return 'md';
+  if(['js','ts','jsx','tsx','py','sh','css','html','xml','yaml','yml','sql','txt','log'].includes(ext)) return 'code';
+  if(['png','jpg','jpeg','webp','gif','svg','bmp'].includes(ext)) return 'image';
+  if(['pdf'].includes(ext)) return 'pdf';
+  if(['mp3','wav','ogg','m4a','flac'].includes(ext)) return 'audio';
+  if(['mp4','webm','mov'].includes(ext)) return 'video';
+  return 'text';
+}
 
 async function renderFileBrowser(){
   const main=document.getElementById('files-main'); if(!main) return;
-  main.innerHTML='<div style="padding:20px;color:var(--mu)">Loading attachments index…</div>';
+  main.innerHTML='<div style="padding:20px;color:var(--mu)">Loading…</div>';
   await _attLoadIndex();
   const idx=_attIndex||[];
   const sources=[...new Set(idx.map(a=>a.source))].sort();
   main.innerHTML=`
-    <div class="fb-layout">
+    <div class="fb-layout" id="fb-layout"
+      ondragover="event.preventDefault()"
+      ondrop="_fbDropHandler(event,null)">
       <div class="fb-tree" id="fb-tree"></div>
       <div class="fb-main">
         <div class="fb-toolbar">
           <input class="fb-search" id="fb-search-input" placeholder="Search files…" oninput="_fbSearchChange(this.value)">
           <div class="fb-filter-pills" id="fb-filter-pills">
-            <button class="fb-fpill active" onclick="_fbTypeFilter('all',this)">All types</button>
+            <button class="fb-fpill active" onclick="_fbTypeFilter('all',this)">All</button>
             <button class="fb-fpill" onclick="_fbTypeFilter('pdf',this)">📕 PDF</button>
             <button class="fb-fpill" onclick="_fbTypeFilter('img',this)">🖼 Image</button>
             <button class="fb-fpill" onclick="_fbTypeFilter('csv',this)">📊 CSV</button>
+            <button class="fb-fpill" onclick="_fbTypeFilter('audio',this)">🎵 Audio</button>
+            <button class="fb-fpill" onclick="_fbTypeFilter('code',this)">💻 Code</button>
           </div>
           <span class="fb-count" id="fb-count">0 files</span>
         </div>
         <div class="fb-list" id="fb-list"></div>
+        <div class="fb-drop-hint" id="fb-drop-hint">📎 Drop files here to attach to <strong id="fb-drop-target-lbl">All Files</strong></div>
       </div>
     </div>`;
   _fbRenderTree(sources);
   _fbRenderList();
+  // Global drag feedback
+  main.addEventListener('dragenter',()=>{ document.getElementById('fb-drop-hint')?.classList.add('drag-active'); });
+  main.addEventListener('dragleave',e=>{ if(!main.contains(e.relatedTarget)) document.getElementById('fb-drop-hint')?.classList.remove('drag-active'); });
 }
 
 function _fbRenderTree(sources){
   const tree=document.getElementById('fb-tree'); if(!tree) return;
-  let html=`<div class="fb-tree-item${_fbSource===null?' active':''}" onclick="_fbSetSource(null)">🗂 All Files</div>`;
-  html+=`<div class="fb-tree-group">By section</div>`;
+  const mkDrop=s=>`ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="_fbDropHandler(event,'${s||'general'}');this.classList.remove('drag-over')"`;
+  let html=`<div class="fb-tree-item${_fbSource===null?' active':''}" onclick="_fbSetSource(null)" ${mkDrop('')}>🗂 All Files</div>`;
+  html+=`<div class="fb-tree-group">Lab sections</div>`;
   const allSources=['notes','journal','recipes','bottles','exports'];
   allSources.forEach(s=>{
     const n=(_attIndex||[]).filter(a=>a.source===s).length;
-    html+=`<div class="fb-tree-item${_fbSource===s?' active':''}" onclick="_fbSetSource('${s}')">${_fbSourceLabel(s)} <span style="margin-left:auto;font-size:10px;color:var(--mu)">${n}</span></div>`;
+    html+=`<div class="fb-tree-item${_fbSource===s?' active':''}" onclick="_fbSetSource('${s}')" ${mkDrop(s)}>${_fbSourceLabel(s)} <span style="margin-left:auto;font-size:10px;color:var(--mu)">${n||''}</span></div>`;
   });
+  html+=`<div class="fb-tree-group" style="margin-top:8px">Records</div>`;
+  html+=`<div class="fb-tree-item${_fbSource==='sales'?' active':''}" onclick="_fbSetSource('sales')" ${mkDrop('sales')}>💸 Sales Log</div>`;
   tree.innerHTML=html;
 }
 
 function _fbSetSource(src){
   _fbSource=src;
-  document.querySelectorAll('.fb-tree-item').forEach(el=>{
-    el.classList.toggle('active', src===null?el.textContent.includes('All Files'):el.textContent.includes(_fbSourceLabel(src)));
-  });
+  document.querySelectorAll('.fb-tree-item').forEach(el=>el.classList.remove('active'));
+  const active=src===null?document.querySelector('.fb-tree-item'):document.querySelector(`.fb-tree-item[onclick*="_fbSetSource('${src}')"]`);
+  if(active) active.classList.add('active');
+  const lbl=document.getElementById('fb-drop-target-lbl');
+  if(lbl) lbl.textContent=src?_fbSourceLabel(src):'All Files';
   _fbRenderList();
 }
 
@@ -16836,21 +16912,36 @@ function _fbSearchChange(q){ _fbSearch=q; _fbRenderList(); }
 
 function _fbRenderList(){
   const list=document.getElementById('fb-list'); if(!list) return;
+  // Sales source: show CSV log
+  if(_fbSource==='sales'){
+    list.innerHTML=`<div class="fb-file-card" onclick="_fbShowSalesLog()">
+      <div class="fb-file-icon csv">📊</div>
+      <div class="fb-file-info">
+        <div class="fb-file-name">sales-log.csv</div>
+        <div class="fb-file-meta">💸 Sales — running ledger · plain text · click to view/edit</div>
+      </div>
+      <div class="fb-file-acts" onclick="event.stopPropagation()">
+        <button class="fb-file-btn" onclick="_fbShowSalesLog()">👁 View</button>
+      </div>
+    </div>`;
+    const cnt=document.getElementById('fb-count'); if(cnt) cnt.textContent='1 file';
+    return;
+  }
   let entries=_attIndex||[];
   if(_fbSource) entries=entries.filter(a=>a.source===_fbSource);
   if(_fbFilter!=='all') entries=entries.filter(a=>{
-    const {cls}=_attIconFor(a.mime);
+    const {cls}=_attIconFor(a.mime,a.name);
     return cls===_fbFilter;
   });
   if(_fbSearch) entries=entries.filter(a=>a.name.toLowerCase().includes(_fbSearch.toLowerCase())||(a.sourceTitle||'').toLowerCase().includes(_fbSearch.toLowerCase()));
   entries=[...entries].sort((a,b)=>new Date(b.date)-new Date(a.date));
   const cnt=document.getElementById('fb-count'); if(cnt) cnt.textContent=entries.length+' file'+(entries.length!==1?'s':'');
   if(!entries.length){
-    list.innerHTML=`<div class="fb-empty">📂 No files here yet.<br><span style="font-size:12px">Attach files from Notes, Journal, Recipes or Bottles editors.</span></div>`;
+    list.innerHTML=`<div class="fb-empty">📂 No files here yet.<br><span style="font-size:12px">Attach files from Notes, Journal, Recipes or Bottles, or drop files onto a folder in the left panel.</span></div>`;
     return;
   }
   list.innerHTML=entries.map(a=>{
-    const {cls,em}=_attIconFor(a.mime);
+    const {cls,em}=_attIconFor(a.mime,a.name);
     const srcLabel=a.sourceTitle?`${_fbSourceLabel(a.source)}: ${a.sourceTitle}`:_fbSourceLabel(a.source);
     return `<div class="fb-file-card" onclick="_attPreview('${a.id}')">
       <div class="fb-file-icon ${cls}">${em}</div>
@@ -16869,6 +16960,7 @@ function _fbRenderList(){
 function _fbShowPreview(entry, blobUrl){
   _fbBlobUrls.forEach(u=>URL.revokeObjectURL(u));
   _fbBlobUrls=[blobUrl];
+  _fbCurrentEntry=entry; _fbCurrentPath=null; _fbCurrentSha=null; _fbEditMode=false;
   const panel=document.getElementById('fb-preview-panel');
   const title=document.getElementById('fb-pv-title');
   const body=document.getElementById('fb-pv-body');
@@ -16877,21 +16969,212 @@ function _fbShowPreview(entry, blobUrl){
   if(title) title.textContent=entry.name;
   if(dl){ dl.href=blobUrl; dl.download=entry.name; }
   const mime=entry.mime||'';
-  if(mime.includes('pdf')){
+  const extType=_fbExtType(entry.name);
+  const editBtn=document.getElementById('fb-pv-edit-btn');
+  const saveBtn=document.getElementById('fb-pv-save-btn');
+  const editable=['csv','json','md','code','text'].includes(extType)||mime.includes('text')||mime.includes('csv')||mime.includes('json');
+  if(editBtn) editBtn.style.display=editable?'':'none';
+  if(saveBtn) saveBtn.style.display='none';
+  if(mime.includes('pdf')||extType==='pdf'){
     body.innerHTML=`<embed src="${blobUrl}" type="application/pdf" width="100%" height="100%">`;
-  } else if(mime.startsWith('image/')){
-    body.innerHTML=`<img src="${blobUrl}" style="max-width:100%;max-height:100%;object-fit:contain;margin:auto;display:block">`;
-  } else if(mime.includes('text')||mime.includes('csv')){
-    fetch(blobUrl).then(r=>r.text()).then(t=>{ body.innerHTML=`<pre>${esc(t)}</pre>`; });
+  } else if(mime.startsWith('image/')||extType==='image'){
+    body.innerHTML=`<img src="${blobUrl}" style="max-width:100%;max-height:100%;object-fit:contain;margin:auto;display:block;padding:12px">`;
+  } else if(mime.startsWith('audio/')||extType==='audio'){
+    body.innerHTML=`<div class="fb-audio-pv"><audio controls src="${blobUrl}" style="width:90%"></audio></div>`;
+  } else if(mime.startsWith('video/')||extType==='video'){
+    body.innerHTML=`<div class="fb-video-pv"><video controls src="${blobUrl}" style="max-width:100%;max-height:100%;border-radius:8px"></video></div>`;
+  } else if(editable){
+    fetch(blobUrl).then(r=>r.text()).then(t=>_fbRenderText(t, extType||'text', entry.name, body));
   } else {
-    body.innerHTML=`<div style="padding:24px;color:var(--mu);text-align:center"><div style="font-size:48px;margin-bottom:12px">${_attIconFor(mime).em}</div><div style="margin-bottom:16px">${esc(entry.name)}</div><a href="${blobUrl}" download="${esc(entry.name)}" class="btn" style="display:inline-block;padding:8px 18px">⬇ Download</a></div>`;
+    const {em}=_attIconFor(mime,entry.name);
+    body.innerHTML=`<div style="padding:40px;color:var(--mu);text-align:center"><div style="font-size:52px;margin-bottom:16px">${em}</div><div style="font-size:13px;margin-bottom:20px">${esc(entry.name)}</div><a href="${blobUrl}" download="${esc(entry.name)}" class="btn" style="display:inline-block">⬇ Download</a></div>`;
   }
   panel.classList.add('open');
 }
+
+function _fbRenderText(text, extType, filename, body){
+  if(!body) body=document.getElementById('fb-pv-body');
+  if(extType==='csv'){
+    body.innerHTML=`<div class="fb-csv-wrap" id="fb-csv-wrap">${_fbCsvToTable(text)}<button class="fb-csv-addrow" onclick="_fbCsvAddRow()">＋ Add row</button></div>`;
+  } else if(extType==='md'){
+    const rendered=typeof marked!=='undefined'?marked.parse(text):`<pre style="white-space:pre-wrap;padding:16px;font-size:13px">${esc(text)}</pre>`;
+    body.innerHTML=`<div style="display:flex;height:100%;overflow:hidden"><div class="fb-md-pv" style="flex:1;border-right:1px solid var(--bd)">${rendered}</div><textarea class="fb-code-ed" id="fb-edit-ta" style="flex:1;display:none" oninput="_fbMdSync(this.value)">${esc(text)}</textarea></div>`;
+    body.querySelector('.fb-md-pv').dataset.raw=text;
+  } else if(extType==='json'){
+    let pretty=text;
+    try{ pretty=JSON.stringify(JSON.parse(text),null,2); }catch{}
+    body.innerHTML=`<textarea class="fb-code-ed" id="fb-edit-ta" spellcheck="false">${esc(pretty)}</textarea>`;
+    document.getElementById('fb-edit-ta').readOnly=true;
+  } else {
+    body.innerHTML=`<textarea class="fb-code-ed" id="fb-edit-ta" spellcheck="false">${esc(text)}</textarea>`;
+    document.getElementById('fb-edit-ta').readOnly=true;
+  }
+}
+
+function _fbMdSync(raw){
+  const pv=document.querySelector('.fb-md-pv');
+  if(pv){ pv.dataset.raw=raw; if(typeof marked!=='undefined') pv.innerHTML=marked.parse(raw); }
+}
+
+function _fbToggleEdit(){
+  _fbEditMode=!_fbEditMode;
+  const editBtn=document.getElementById('fb-pv-edit-btn');
+  const saveBtn=document.getElementById('fb-pv-save-btn');
+  const ta=document.getElementById('fb-edit-ta');
+  const pv=document.querySelector('.fb-md-pv');
+  if(_fbEditMode){
+    if(editBtn){ editBtn.textContent='👁 Preview'; editBtn.style.borderColor='var(--yw)'; editBtn.style.color='var(--yw)'; }
+    if(saveBtn) saveBtn.style.display='';
+    if(ta){ ta.readOnly=false; ta.style.display=''; ta.focus(); }
+    if(pv) pv.style.display='none';
+  } else {
+    if(editBtn){ editBtn.textContent='✏️ Edit'; editBtn.style.borderColor=''; editBtn.style.color=''; }
+    if(saveBtn) saveBtn.style.display='none';
+    if(ta) ta.readOnly=true;
+    // For MD: re-render preview
+    if(pv&&ta){ if(typeof marked!=='undefined') pv.innerHTML=marked.parse(ta.value||pv.dataset.raw||''); pv.style.display=''; ta.style.display='none'; }
+  }
+}
+
+async function _fbEditSave(){
+  const saveBtn=document.getElementById('fb-pv-save-btn');
+  const extType=_fbCurrentEntry?_fbExtType(_fbCurrentEntry.name):_fbExtType(_fbCurrentPath||'');
+  let newText='';
+  if(extType==='csv'){
+    newText=_fbTableToCsv();
+  } else {
+    const ta=document.getElementById('fb-edit-ta');
+    newText=ta?ta.value:'';
+  }
+  if(saveBtn){ saveBtn.disabled=true; saveBtn.textContent='Saving…'; }
+  try{
+    if(_fbCurrentPath){
+      // Plain text file (e.g. sales log)
+      const res=await ghPut(_fbCurrentPath, newText, _fbCurrentSha, `lab: edit ${_fbCurrentPath.split('/').pop()}`);
+      _fbCurrentSha=res.content.sha;
+      if(_fbCurrentPath==='sales/sales-log.csv') _salesLogSha=_fbCurrentSha;
+    } else if(_fbCurrentEntry){
+      // Encrypted attachment — re-encrypt
+      const buf=new TextEncoder().encode(newText);
+      const encBuf=await encBin(buf);
+      const b64=btoa(String.fromCharCode(...new Uint8Array(encBuf)));
+      const path=_fbCurrentEntry.path;
+      const f=await ghGet(path);
+      await ghPut(path, b64, f?.sha, `lab: edit attachment ${_fbCurrentEntry.name}`);
+    }
+    toast('File saved','ok');
+    _fbToggleEdit();
+  } catch(e){ toast('Save failed: '+e.message,'fail'); }
+  finally{ if(saveBtn){ saveBtn.disabled=false; saveBtn.textContent='💾 Save'; } }
+}
+
+function _fbCsvToTable(csv){
+  const rows=csv.trim().split('\n').filter(l=>l.trim());
+  if(!rows.length) return '<table class="fb-csv-table"><thead><tr><td contenteditable=true></td></tr></thead><tbody></tbody></table>';
+  const parse=line=>{
+    const cells=[]; let cur='',inQ=false;
+    for(let i=0;i<line.length;i++){
+      const c=line[i];
+      if(c==='"'&&!inQ){ inQ=true; continue; }
+      if(c==='"'&&inQ&&line[i+1]==='"'){ cur+='"'; i++; continue; }
+      if(c==='"'&&inQ){ inQ=false; continue; }
+      if(c===','&&!inQ){ cells.push(cur); cur=''; continue; }
+      cur+=c;
+    }
+    cells.push(cur);
+    return cells;
+  };
+  const head=parse(rows[0]);
+  const thRow=head.map(h=>`<td contenteditable=false style="user-select:none">${esc(h)}</td>`).join('');
+  const bodyRows=rows.slice(1).map(r=>{
+    const cells=parse(r);
+    while(cells.length<head.length) cells.push('');
+    return `<tr>${cells.map(c=>`<td contenteditable=true>${esc(c)}</td>`).join('')}<td style="width:22px;border:none"><button onclick="this.closest('tr').remove()" style="background:none;border:none;color:var(--rd);cursor:pointer;font-size:11px">✕</button></td></tr>`;
+  }).join('');
+  return `<table class="fb-csv-table" id="fb-csv-tbl"><thead><tr>${thRow}<th style="width:22px"></th></tr></thead><tbody>${bodyRows}</tbody></table>`;
+}
+
+function _fbCsvAddRow(){
+  const tbl=document.getElementById('fb-csv-tbl'); if(!tbl) return;
+  const colCount=tbl.querySelector('thead tr')?.cells.length||1;
+  const tr=document.createElement('tr');
+  for(let i=0;i<colCount-1;i++) tr.innerHTML+=`<td contenteditable=true></td>`;
+  tr.innerHTML+=`<td style="width:22px;border:none"><button onclick="this.closest('tr').remove()" style="background:none;border:none;color:var(--rd);cursor:pointer;font-size:11px">✕</button></td>`;
+  tbl.querySelector('tbody').appendChild(tr);
+}
+
+function _fbTableToCsv(){
+  const tbl=document.getElementById('fb-csv-tbl'); if(!tbl) return '';
+  const q=s=>s.includes(',')||s.includes('"')||s.includes('\n')?`"${s.replace(/"/g,'""')}"`:s;
+  const headCells=[...tbl.querySelectorAll('thead td')].map(td=>q(td.textContent||''));
+  const rows=[[...headCells].join(',')];
+  tbl.querySelectorAll('tbody tr').forEach(tr=>{
+    const cells=[...tr.querySelectorAll('td[contenteditable]')].map(td=>q(td.textContent||''));
+    if(cells.some(c=>c)) rows.push(cells.join(','));
+  });
+  return rows.join('\n')+'\n';
+}
+
+async function _fbShowSalesLog(){
+  _fbCurrentEntry=null; _fbCurrentPath='sales/sales-log.csv'; _fbEditMode=false;
+  const panel=document.getElementById('fb-preview-panel');
+  const title=document.getElementById('fb-pv-title');
+  const body=document.getElementById('fb-pv-body');
+  const editBtn=document.getElementById('fb-pv-edit-btn');
+  const saveBtn=document.getElementById('fb-pv-save-btn');
+  if(title) title.textContent='sales-log.csv';
+  if(editBtn){ editBtn.style.display=''; editBtn.textContent='✏️ Edit'; }
+  if(saveBtn) saveBtn.style.display='none';
+  if(body) body.innerHTML=`<div style="padding:20px;color:var(--mu)">Loading sales log…</div>`;
+  panel?.classList.add('open');
+  try{
+    const f=await ghGet('sales/sales-log.csv');
+    if(!f){ body.innerHTML=`<div style="padding:20px;color:var(--mu)">No sales log yet. Save an order to create it.</div>`; return; }
+    _fbCurrentSha=f.sha; _salesLogSha=f.sha;
+    const text=decodeURIComponent(escape(atob(f.content.replace(/\s/g,''))));
+    _fbRenderText(text,'csv','sales-log.csv',body);
+  } catch(e){ body.innerHTML=`<div style="padding:20px;color:var(--rd)">Error loading: ${esc(e.message)}</div>`; }
+}
+
+async function _fbDropHandler(e, source){
+  e.preventDefault();
+  document.querySelectorAll('.fb-tree-item').forEach(el=>el.classList.remove('drag-over'));
+  document.getElementById('fb-drop-hint')?.classList.remove('drag-active');
+  const files=[...e.dataTransfer.files];
+  if(!files.length) return;
+  await _attLoadIndex();
+  let added=0;
+  for(const file of files){
+    try{
+      const buf=await file.arrayBuffer();
+      const encBuf=await encBin(buf);
+      const b64=btoa(String.fromCharCode(...new Uint8Array(encBuf)));
+      const id=uid();
+      const safeName=file.name.replace(/[^a-zA-Z0-9.\-_]/g,'_');
+      const src=source||_fbSource||'general';
+      const path=`attachments/${src}/general/${id}-${safeName}.enc`;
+      const res=await ghPut(path, b64, null, `lab: attach ${file.name}`);
+      (_attIndex||[]).push({id,name:file.name,path,source:src,sourceId:null,sourceTitle:'(dropped)',mime:file.type||'application/octet-stream',size:file.size,date:new Date().toISOString()});
+      added++;
+    } catch(err){ toast('Failed: '+file.name+' — '+err.message,'fail'); }
+  }
+  if(added){
+    await _attSaveIndex();
+    _updateFileBadge();
+    _fbRenderList();
+    toast(`📎 ${added} file${added!==1?'s':''} added`,'ok');
+  }
+}
+
 function _fbPreviewClose(){
   document.getElementById('fb-preview-panel').classList.remove('open');
   _fbBlobUrls.forEach(u=>URL.revokeObjectURL(u));
   _fbBlobUrls=[];
+  _fbCurrentEntry=null; _fbCurrentPath=null; _fbEditMode=false;
+  const editBtn=document.getElementById('fb-pv-edit-btn');
+  const saveBtn=document.getElementById('fb-pv-save-btn');
+  if(editBtn){ editBtn.textContent='✏️ Edit'; editBtn.style.display='none'; }
+  if(saveBtn) saveBtn.style.display='none';
 }
 
 function mdIndentLines(taId, dir){
@@ -19805,6 +20088,10 @@ async function _valPriceSet(key, val){
 // ════════════════════════════════════════════════════════════
 const _SALE_STATUSES=['draft','confirmed','dispatched'];
 const _SALE_STATUS_LABEL={draft:'Draft',confirmed:'Confirmed',dispatched:'Dispatched'};
+let _salesLogSha=null;
+function _csvQ(s){ const v=String(s||''); return v.includes(',')||v.includes('"')||v.includes('\n')?`"${v.replace(/"/g,'""')}"`:v; }
+function _salePmSelect(btn){ document.querySelectorAll('.sale-pm-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); const pm=document.getElementById('sale-payment-mode'); if(pm) pm.value=btn.dataset.pm; }
+function _saleGstSelect(btn){ document.querySelectorAll('.sale-gst-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); const g=document.getElementById('sale-gst'); if(g) g.value=btn.dataset.gst; _saleLineCalc(); }
 
 function _salesNextInvoiceNo(){
   const existing=(S.sales||[]).map(s=>parseInt((s.invoice_no||'').replace(/\D/g,''))||0);
@@ -19828,72 +20115,119 @@ function renderSalesPage(tab){
 }
 
 function _salesNewHtml(){
-  const prices=(S.value||{}).prices||{};
-  const VALUE_STAGES=['prepared','inoculated','growing','subcultured','rooting','hardening','weaned'];
-  const VALUE_GH_GRADES=['sapling','s','m','l','xl','xxl'];
-  const stageOpts=VALUE_STAGES.map(s=>`<option value="bottle_${s}">🫙 Bottle — ${s.charAt(0).toUpperCase()+s.slice(1)} (₹${parseFloat(prices['stage_'+s])||0}/bottle)</option>`).join('');
-  const gradeOpts=VALUE_GH_GRADES.map(g=>`<option value="gh_${g}">🌱 GH Plant — ${VALUE_GRADE_LABEL[g]||g.toUpperCase()} (₹${parseFloat(prices['gh_'+g])||0}/plant)</option>`).join('');
-
-  // Unique species from bottles + GH
-  const spSet=new Set([...(S.bottles||[]).map(b=>b.species), ...(S.greenhouse||[]).map(p=>p.species)].filter(Boolean));
-  const spOpts=[...spSet].sort().map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join('');
-
+  const today=new Date().toISOString().slice(0,10);
+  // Species: registry + bottles + greenhouse, deduplicated
+  const spSet=new Set([
+    ...(S.species||[]).map(s=>s.scientific_name||s.name),
+    ...(S.bottles||[]).map(b=>b.species),
+    ...(S.greenhouse||[]).map(p=>p.species)
+  ].filter(Boolean));
+  const spOpts=[...spSet].sort().map(s=>`<option value="${esc(s)}">`).join('');
+  const sf='width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:7px;padding:7px 10px;font-size:13px;color:var(--tx)';
   return `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px" id="sale-form-grid">
-      <div>
-        <div style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--tx)">Customer Details</div>
-        <div class="field"><label>Customer / Organisation *</label><input type="text" id="sale-cust-name" placeholder="Name or org" style="width:100%;background:var(--sf);border:1px solid var(--bd);border-radius:7px;padding:7px 10px;font-size:13px;color:var(--tx)"></div>
-        <div class="field"><label>Contact (phone / email)</label><input type="text" id="sale-cust-contact" placeholder="Phone or email" style="width:100%;background:var(--sf);border:1px solid var(--bd);border-radius:7px;padding:7px 10px;font-size:13px;color:var(--tx)"></div>
-        <div class="field"><label>Address</label><textarea id="sale-cust-addr" rows="2" placeholder="Delivery address" style="width:100%;background:var(--sf);border:1px solid var(--bd);border-radius:7px;padding:7px 10px;font-size:13px;color:var(--tx);resize:vertical"></textarea></div>
-        <div class="field"><label>Sale Date</label><input type="date" id="sale-date" value="${new Date().toISOString().slice(0,10)}" style="background:var(--sf);border:1px solid var(--bd);border-radius:7px;padding:7px 10px;font-size:13px;color:var(--tx)"></div>
-        <div class="field"><label>Status</label>
-          <select id="sale-status" style="width:100%;background:var(--sf);border:1px solid var(--bd);border-radius:7px;padding:7px 10px;font-size:13px;color:var(--tx)">
-            <option value="draft">Draft</option>
-            <option value="confirmed">Confirmed</option>
-            <option value="dispatched">Dispatched</option>
-          </select>
-        </div>
-        <div class="field"><label>Notes</label><textarea id="sale-notes" rows="2" placeholder="Any notes on this order…" style="width:100%;background:var(--sf);border:1px solid var(--bd);border-radius:7px;padding:7px 10px;font-size:13px;color:var(--tx);resize:vertical"></textarea></div>
+  <div style="display:grid;grid-template-columns:340px 1fr;gap:22px" id="sale-form-grid">
+    <!-- LEFT: customer + financials -->
+    <div>
+      <div class="sale-sec-hd">👤 Customer</div>
+      <div class="sale-field"><label>Name / Organisation *</label><input type="text" id="sale-cust-name" placeholder="Name or org" style="${sf}"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div class="sale-field"><label>Phone</label><input type="tel" id="sale-cust-phone" placeholder="+91…" style="${sf}"></div>
+        <div class="sale-field"><label>Email</label><input type="email" id="sale-cust-email" placeholder="name@…" style="${sf}"></div>
       </div>
-      <div>
-        <div style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--tx)">Line Items</div>
-        <table class="sale-line-table" id="sale-lines-table">
+      <div class="sale-field"><label>Address</label><textarea id="sale-cust-addr" rows="2" placeholder="Delivery address" style="${sf};resize:vertical"></textarea></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div class="sale-field"><label>Date</label><input type="date" id="sale-date" value="${today}" style="${sf}"></div>
+        <div class="sale-field"><label>PO / Order Ref</label><input type="text" id="sale-po-ref" placeholder="PO-…" style="${sf}"></div>
+      </div>
+      <div class="sale-field"><label>Status</label>
+        <select id="sale-status" style="${sf}">
+          <option value="draft">Draft</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="dispatched">Dispatched</option>
+        </select>
+      </div>
+      <div class="sale-field"><label>Payment Mode</label>
+        <div style="display:flex;gap:5px;flex-wrap:wrap">
+          ${['Cash','UPI','Bank Transfer','Credit','Other'].map((m,i)=>`<button type="button" class="btn xs ghost sale-pm-btn${i===0?' active':''}" data-pm="${m}" onclick="_salePmSelect(this)">${m}</button>`).join('')}
+        </div>
+        <input type="hidden" id="sale-payment-mode" value="Cash">
+      </div>
+
+      <div class="sale-sec-hd" style="margin-top:16px">💰 Financials</div>
+      <div style="display:grid;grid-template-columns:90px 1fr;gap:6px;align-items:end;margin-bottom:8px">
+        <div class="sale-field" style="margin:0"><label>Discount</label>
+          <select id="sale-disc-type" onchange="_saleLineCalc()" style="${sf}"><option value="flat">₹ Flat</option><option value="pct">% Percent</option></select>
+        </div>
+        <div class="sale-field" style="margin:0"><label>&nbsp;</label><input type="number" id="sale-disc" min="0" value="0" oninput="_saleLineCalc()" style="${sf}"></div>
+      </div>
+      <div class="sale-field"><label>Shipping ₹</label><input type="number" id="sale-shipping" min="0" value="0" oninput="_saleLineCalc()" style="${sf}"></div>
+      <div class="sale-field"><label>GST %</label>
+        <div style="display:flex;gap:5px">
+          ${[0,5,12,18].map(g=>`<button type="button" class="btn xs ghost sale-gst-btn${g===0?' active':''}" data-gst="${g}" onclick="_saleGstSelect(this)">${g}%</button>`).join('')}
+        </div>
+        <input type="hidden" id="sale-gst" value="0">
+      </div>
+      <div class="sale-field"><label>Notes / Remarks</label><textarea id="sale-notes" rows="2" placeholder="Special instructions, packing notes…" style="${sf};resize:vertical"></textarea></div>
+    </div>
+
+    <!-- RIGHT: line items + running total -->
+    <div style="display:flex;flex-direction:column">
+      <div class="sale-sec-hd">🧾 Line Items</div>
+      <div style="overflow-x:auto;flex:1">
+        <table class="sale-line-table" id="sale-lines-table" style="min-width:520px">
           <thead><tr>
-            <th>Species</th><th>Type</th><th style="width:60px">Qty</th><th style="width:80px">Unit ₹</th><th style="width:80px">Total</th><th style="width:30px"></th>
+            <th>Species / Item</th><th>Type / Category</th><th style="width:52px">Qty</th><th style="width:76px">Unit ₹</th><th style="width:80px">Subtotal</th><th style="width:24px"></th>
           </tr></thead>
           <tbody id="sale-lines-body"></tbody>
         </table>
-        <button class="btn sm ghost" style="margin-bottom:16px" onclick="_saleAddLine()">+ Add Line</button>
-        <div style="text-align:right;font-size:15px;font-weight:700;color:var(--gn)">Total: <span id="sale-grand-total">₹0</span></div>
-        <datalist id="sale-sp-list">${spOpts}</datalist>
-        <datalist id="sale-type-opts">${stageOpts}${gradeOpts}</datalist>
       </div>
+      <button class="btn sm ghost" style="margin:8px 0 16px;align-self:flex-start" onclick="_saleAddLine()">＋ Add Line</button>
+      <div id="sale-grand-total" style="background:var(--sf2);border:1px solid var(--bd);border-radius:9px;padding:12px 14px;min-width:220px"></div>
+      <datalist id="sale-sp-list">${spOpts}</datalist>
     </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn green" onclick="_saveSaleAction()">💾 Save Order</button>
-      <button class="btn ghost" onclick="_saleAddLine()">+ Line Item</button>
-    </div>
-    <div id="sale-form-status" style="font-size:12px;color:var(--mu);margin-top:8px;min-height:18px"></div>
-    <script>_saleAddLine();_saleAddLine();<\/script>`;
+  </div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:20px">
+    <button class="btn green" onclick="_saveSaleAction()">💾 Save Order</button>
+  </div>
+  <div id="sale-form-status" style="font-size:12px;color:var(--mu);margin-top:8px;min-height:18px"></div>
+  <script>_saleAddLine();_saleAddLine();_saleLineCalc();<\/script>`;
 }
 
 function _saleAddLine(){
-  const prices=(S.value||{}).prices||{};
   const tbody=document.getElementById('sale-lines-body'); if(!tbody) return;
   const idx=tbody.rows.length;
+  const supOpts=(S.supplies||[]).filter(s=>s.name).sort((a,b)=>(a.name||'').localeCompare(b.name||''))
+    .map(s=>`<option value="supply_${esc(s.id)}">${esc(s.name)}</option>`).join('');
+  const inSt='background:var(--sf2);border:1px solid var(--bd);border-radius:5px;padding:4px 6px;font-size:12px;color:var(--tx)';
   const tr=document.createElement('tr');
   tr.dataset.idx=idx;
   tr.innerHTML=`
-    <td><input type="text" list="sale-sp-list" placeholder="Species…" oninput="_saleLineCalc()" style="min-width:120px"></td>
-    <td><select onchange="_saleLineAutoPrice(this,${idx})" style="min-width:130px">
-      <option value="">— type —</option>
-      ${['prepared','inoculated','growing','subcultured','rooting','hardening','weaned'].map(s=>`<option value="bottle_${s}">🫙 ${s.charAt(0).toUpperCase()+s.slice(1)}</option>`).join('')}
-      ${['sapling','s','m','l','xl','xxl'].map(g=>`<option value="gh_${g}">🌱 GH ${VALUE_GRADE_LABEL[g]||g.toUpperCase()}</option>`).join('')}
-    </select></td>
-    <td><input type="number" min="1" value="1" oninput="_saleLineCalc()" style="width:55px"></td>
-    <td><input type="number" min="0" value="0" id="sale-unit-${idx}" oninput="_saleLineCalc()" style="width:75px"></td>
-    <td style="font-weight:600;color:var(--ac)" id="sale-subtotal-${idx}">₹0</td>
-    <td><button style="background:none;border:none;cursor:pointer;color:var(--rd);font-size:14px" onclick="this.closest('tr').remove();_saleLineCalc()">✕</button></td>`;
+    <td style="min-width:140px">
+      <input class="sl-sp" type="text" list="sale-sp-list" placeholder="Species / item…" oninput="_saleStockChip(this);_saleLineCalc()" style="${inSt};width:100%">
+      <span class="sale-stock-chip" style="display:none"></span>
+    </td>
+    <td style="min-width:150px">
+      <select class="sl-type" onchange="_saleLineAutoPrice(this,${idx})" style="${inSt};width:100%">
+        <option value="">— type —</option>
+        <optgroup label="🫙 Bottle stages">
+          ${['prepared','inoculated','growing','subcultured','rooting','hardening','weaned'].map(s=>`<option value="bottle_${s}">🫙 ${s.charAt(0).toUpperCase()+s.slice(1)}</option>`).join('')}
+        </optgroup>
+        <optgroup label="🌱 GH Plants">
+          ${['sapling','s','m','l','xl','xxl'].map(g=>`<option value="gh_${g}">🌱 ${VALUE_GRADE_LABEL[g]||g.toUpperCase()}</option>`).join('')}
+        </optgroup>
+        ${supOpts?`<optgroup label="📦 Supply items">${supOpts}</optgroup>`:''}
+        <optgroup label="Other">
+          <option value="supply_new">📦 New item (add to inventory)…</option>
+        </optgroup>
+      </select>
+      <div class="sale-supname-wrap" id="sale-sn-${idx}">
+        <input class="sl-supname" type="text" placeholder="Item name — will be saved to inventory" style="${inSt};width:100%;margin-top:4px;font-size:11px">
+      </div>
+    </td>
+    <td><input class="sl-qty" type="number" min="1" value="1" oninput="_saleLineCalc()" style="${inSt};width:50px"></td>
+    <td><input class="sl-unit" type="number" min="0" value="0" oninput="_saleLineCalc()" style="${inSt};width:72px"></td>
+    <td class="sl-sub" style="font-weight:600;color:var(--ac);text-align:right;white-space:nowrap">₹0</td>
+    <td><button style="background:none;border:none;cursor:pointer;color:var(--rd);font-size:13px;padding:2px 4px" onclick="this.closest('tr').remove();_saleLineCalc()">✕</button></td>`;
   tbody.appendChild(tr);
 }
 
@@ -19903,59 +20237,135 @@ function _saleLineAutoPrice(sel, idx){
   let price=0;
   if(v.startsWith('bottle_')) price=parseFloat(prices['stage_'+v.slice(7)])||0;
   else if(v.startsWith('gh_')) price=parseFloat(prices['gh_'+v.slice(3)])||0;
-  const unitEl=document.getElementById('sale-unit-'+idx);
+  else if(v.startsWith('supply_')&&v!=='supply_new'){
+    const sid=v.slice(7);
+    const item=(S.supplies||[]).find(s=>s.id===sid);
+    price=parseFloat(item?.cost)||parseFloat(item?.cost_unit)||0;
+  }
+  const tr=sel.closest('tr');
+  const unitEl=tr?.querySelector('.sl-unit');
   if(unitEl) unitEl.value=price;
+  const wrap=document.getElementById('sale-sn-'+idx);
+  if(wrap) wrap.classList.toggle('on', v==='supply_new');
+  _saleStockChip(tr?.querySelector('.sl-sp'));
   _saleLineCalc();
+}
+
+function _saleStockChip(spInput){
+  const tr=spInput?.closest('tr'); if(!tr) return;
+  const sp=(spInput?.value||'').trim().toLowerCase();
+  const chip=tr.querySelector('.sale-stock-chip');
+  const typeEl=tr.querySelector('.sl-type');
+  if(!chip||!typeEl) return;
+  const type=typeEl.value||'';
+  if(!sp||!type||type==='supply_new'||type.startsWith('supply_')){ chip.style.display='none'; return; }
+  let count=0, total=0;
+  if(type.startsWith('bottle_')){
+    const stage=type.slice(7);
+    const all=(S.bottles||[]).filter(b=>(b.species||'').toLowerCase()===sp);
+    count=all.filter(b=>b.status===stage).length; total=all.length;
+  } else if(type.startsWith('gh_')){
+    const grade=type.slice(3);
+    const all=(S.greenhouse||[]).filter(p=>(p.species||'').toLowerCase()===sp);
+    count=all.filter(p=>p.size_grade===grade).length; total=all.length;
+  }
+  chip.style.display='inline';
+  chip.textContent=`${count} in stage · ${total} total`;
+  chip.className='sale-stock-chip'+(count===0?' warn':'');
 }
 
 function _saleLineCalc(){
   const tbody=document.getElementById('sale-lines-body'); if(!tbody) return;
-  let grand=0;
-  Array.from(tbody.rows).forEach((tr,i)=>{
-    const cells=tr.querySelectorAll('input,select');
-    const qty=parseFloat(cells[2]?.value||1)||0;
-    const unit=parseFloat(cells[3]?.value||0)||0;
-    const sub=qty*unit;
-    grand+=sub;
-    const subEl=tr.querySelector('[id^="sale-subtotal-"]');
+  let subtotal=0;
+  Array.from(tbody.rows).forEach(tr=>{
+    const qty=parseFloat(tr.querySelector('.sl-qty')?.value)||0;
+    const unit=parseFloat(tr.querySelector('.sl-unit')?.value)||0;
+    const sub=qty*unit; subtotal+=sub;
+    const subEl=tr.querySelector('.sl-sub');
     if(subEl) subEl.textContent='₹'+sub.toLocaleString('en-IN',{maximumFractionDigits:0});
   });
-  const tot=document.getElementById('sale-grand-total');
-  if(tot) tot.textContent=fmtINR(grand);
+  const discType=document.getElementById('sale-disc-type')?.value||'flat';
+  const discVal=parseFloat(document.getElementById('sale-disc')?.value)||0;
+  const gstPct=parseFloat(document.getElementById('sale-gst')?.value)||0;
+  const shipping=parseFloat(document.getElementById('sale-shipping')?.value)||0;
+  const discAmt=discType==='pct'?(subtotal*discVal/100):Math.min(discVal,subtotal);
+  const taxable=Math.max(0,subtotal-discAmt)+shipping;
+  const gstAmt=taxable*gstPct/100;
+  const grand=taxable+gstAmt;
+  const el=document.getElementById('sale-grand-total');
+  if(!el) return;
+  let rows=`<div class="sale-fin-row"><span>Subtotal</span><span>₹${subtotal.toLocaleString('en-IN',{maximumFractionDigits:0})}</span></div>`;
+  if(discAmt>0) rows+=`<div class="sale-fin-row" style="color:var(--gn)"><span>Discount${discType==='pct'?` (${discVal}%)`:'(₹)'}</span><span>− ₹${discAmt.toLocaleString('en-IN',{maximumFractionDigits:0})}</span></div>`;
+  if(shipping>0) rows+=`<div class="sale-fin-row"><span>Shipping</span><span>₹${shipping.toLocaleString('en-IN',{maximumFractionDigits:0})}</span></div>`;
+  if(gstPct>0) rows+=`<div class="sale-fin-row"><span>GST (${gstPct}%)</span><span>₹${gstAmt.toLocaleString('en-IN',{maximumFractionDigits:0})}</span></div>`;
+  rows+=`<div class="sale-fin-row grand"><span>Grand Total</span><span>${fmtINR(grand)}</span></div>`;
+  el.innerHTML=rows;
 }
 
 async function _saveSaleAction(){
-  const name=(document.getElementById('sale-cust-name')?.value||'').trim();
-  if(!name){ toast('Customer name is required','fail'); return; }
+  const custName=(document.getElementById('sale-cust-name')?.value||'').trim();
+  if(!custName){ toast('Customer name is required','fail'); return; }
   const tbody=document.getElementById('sale-lines-body');
+  const newSupplyItems=[];
   const lines=Array.from(tbody?.rows||[]).map(tr=>{
-    const cells=tr.querySelectorAll('input,select');
-    const species=(cells[0]?.value||'').trim();
-    const type=cells[1]?.value||'';
-    const qty=parseInt(cells[2]?.value||1)||1;
-    const unit_price=parseFloat(cells[3]?.value||0)||0;
-    return {species,type,qty,unit_price,subtotal:qty*unit_price};
+    const sp=(tr.querySelector('.sl-sp')?.value||'').trim();
+    const type=tr.querySelector('.sl-type')?.value||'';
+    const supName=(tr.querySelector('.sl-supname')?.value||'').trim();
+    const qty=Math.max(1,parseInt(tr.querySelector('.sl-qty')?.value||1)||1);
+    const unit_price=parseFloat(tr.querySelector('.sl-unit')?.value||0)||0;
+    const subtotal=qty*unit_price;
+    // Backward wiring: new supply item
+    if(type==='supply_new'&&supName){
+      const nid=uid();
+      newSupplyItems.push({id:nid,name:supName,category:'Other',qty:0,unit:'unit',cost:unit_price,cost_unit:unit_price,date_prepared:new Date().toISOString().slice(0,10),notes:`Added from invoice`});
+      return {species:supName,supply_name:supName,type:'supply_new',qty,unit_price,subtotal};
+    }
+    return {species:sp||supName,type,qty,unit_price,subtotal};
   }).filter(l=>l.species||l.type);
   if(!lines.length){ toast('Add at least one line item','fail'); return; }
-  const total=lines.reduce((s,l)=>s+l.subtotal,0);
+
+  const discType=document.getElementById('sale-disc-type')?.value||'flat';
+  const discVal=parseFloat(document.getElementById('sale-disc')?.value)||0;
+  const gstPct=parseFloat(document.getElementById('sale-gst')?.value)||0;
+  const shipping=parseFloat(document.getElementById('sale-shipping')?.value)||0;
+  const subtotalAmt=lines.reduce((s,l)=>s+l.subtotal,0);
+  const discAmt=discType==='pct'?(subtotalAmt*discVal/100):Math.min(discVal,subtotalAmt);
+  const taxable=Math.max(0,subtotalAmt-discAmt)+shipping;
+  const gstAmt=taxable*gstPct/100;
+  const total=taxable+gstAmt;
+
   const sale={
     id:uid(),
     invoice_no:_salesNextInvoiceNo(),
     date:document.getElementById('sale-date')?.value||new Date().toISOString().slice(0,10),
-    customer_name:name,
-    customer_contact:(document.getElementById('sale-cust-contact')?.value||'').trim()||null,
+    customer_name:custName,
+    customer_phone:(document.getElementById('sale-cust-phone')?.value||'').trim()||null,
+    customer_email:(document.getElementById('sale-cust-email')?.value||'').trim()||null,
     customer_address:(document.getElementById('sale-cust-addr')?.value||'').trim()||null,
+    po_ref:(document.getElementById('sale-po-ref')?.value||'').trim()||null,
+    payment_mode:document.getElementById('sale-payment-mode')?.value||'Cash',
+    discount_type:discType, discount_val:discVal, discount_amt:discAmt,
+    shipping, gst_pct:gstPct, gst_amt:gstAmt,
+    subtotal:subtotalAmt, total,
     items:lines,
-    total,
     status:document.getElementById('sale-status')?.value||'draft',
     notes:(document.getElementById('sale-notes')?.value||'').trim()||null,
     created_at:new Date().toISOString(),
   };
+
   const statusEl=document.getElementById('sale-form-status');
   if(statusEl) statusEl.textContent='Saving…';
   try{
+    // Backward wiring: add new supply items
+    if(newSupplyItems.length){
+      S.supplies=[...(S.supplies||[]),...newSupplyItems];
+      S.suppliesSha=await saveSupplies(S.supplies,S.suppliesSha);
+      toast(`📦 ${newSupplyItems.length} new item${newSupplyItems.length>1?'s':''} added to inventory`,'ok',2000);
+    }
     S.sales=[sale,...(S.sales||[])];
     S.salesSha=await saveSales(S.sales,S.salesSha);
+    // Append to CSV log (fire-and-forget, don't block UI)
+    _salesLogAppend(sale).catch(e=>console.warn('CSV log:',e));
     toast(`📋 ${sale.invoice_no} saved`,'ok');
     renderSalesPage('orders');
   }catch(e){
@@ -19963,6 +20373,26 @@ async function _saveSaleAction(){
     toast('Save failed: '+e.message,'fail');
     if(statusEl) statusEl.textContent='Save failed: '+e.message;
   }
+}
+
+async function _salesLogAppend(sale){
+  const path='sales/sales-log.csv';
+  const hdr='invoice_no,date,customer_name,customer_phone,customer_email,po_ref,species,type,qty,unit_price,subtotal,discount_amt,shipping,gst_pct,gst_amt,order_total,payment_mode,status\n';
+  let existing='', sha=_salesLogSha;
+  try{
+    const f=await ghGet(path);
+    if(f){ sha=f.sha; existing=decodeURIComponent(escape(atob(f.content.replace(/\s/g,'')))); if(!existing.startsWith('invoice_no')) existing=hdr+existing; }
+    else existing=hdr;
+  }catch{ existing=hdr; }
+  const rows=sale.items.map(i=>[
+    _csvQ(sale.invoice_no),_csvQ(sale.date),_csvQ(sale.customer_name),_csvQ(sale.customer_phone||''),_csvQ(sale.customer_email||''),_csvQ(sale.po_ref||''),
+    _csvQ(i.species||i.supply_name||''),_csvQ(i.type||''),i.qty,i.unit_price,i.subtotal,
+    sale.discount_amt||0,sale.shipping||0,sale.gst_pct||0,sale.gst_amt||0,sale.total,
+    _csvQ(sale.payment_mode||''),_csvQ(sale.status||'')
+  ].join(','));
+  const updated=existing.trimEnd()+'\n'+rows.join('\n')+'\n';
+  const res=await ghPut(path, updated, sha, `sales: log ${sale.invoice_no}`);
+  _salesLogSha=res.content.sha;
 }
 
 function _salesOrdersHtml(){
@@ -20001,6 +20431,7 @@ function _salesOrdersHtml(){
       <div class="sale-items-preview">${esc(itemsPreview)}</div>
       <div class="sale-actions">
         <button class="btn sm ghost" onclick="_printInvoice('${o.id}')">🖨 Invoice</button>
+        <button class="btn sm ghost" onclick="_saveInvoicePdf('${o.id}')">💾 PDF</button>
         <button class="btn sm ghost" onclick="_openSaleStatusEdit('${o.id}')">✏️ Status</button>
         <button class="btn sm ghost" style="color:var(--rd)" onclick="_deleteSale('${o.id}')">🗑</button>
       </div>
@@ -20026,39 +20457,43 @@ async function _deleteSale(id){
   catch(e){ S.sales.push(sale); toast('Delete failed: '+e.message,'fail'); }
 }
 
-function _printInvoice(id){
-  const sale=(S.sales||[]).find(s=>s.id===id); if(!sale) return;
+function _buildInvoiceHtml(sale, autoPrint=false){
   const itemRows=sale.items.map(i=>`
     <tr>
-      <td>${esc(i.species||'—')}</td>
-      <td>${esc(i.type||'—')}</td>
+      <td>${esc(i.species||i.supply_name||'—')}</td>
+      <td>${esc(i.type==='supply_new'?'Supply item':i.type||'—')}</td>
       <td style="text-align:center">${i.qty}</td>
       <td style="text-align:right">₹${(i.unit_price||0).toLocaleString('en-IN')}</td>
       <td style="text-align:right;font-weight:600">₹${(i.subtotal||0).toLocaleString('en-IN')}</td>
     </tr>`).join('');
-
-  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Invoice ${esc(sale.invoice_no)}</title>
+  const totBlock=`
+    ${sale.discount_amt>0?`<tr><td colspan="4" style="text-align:right;color:#388e3c">Discount</td><td style="text-align:right;color:#388e3c">− ₹${(sale.discount_amt||0).toLocaleString('en-IN')}</td></tr>`:''}
+    ${sale.shipping>0?`<tr><td colspan="4" style="text-align:right">Shipping</td><td style="text-align:right">₹${(sale.shipping||0).toLocaleString('en-IN')}</td></tr>`:''}
+    ${sale.gst_pct>0?`<tr><td colspan="4" style="text-align:right">GST (${sale.gst_pct}%)</td><td style="text-align:right">₹${(sale.gst_amt||0).toLocaleString('en-IN')}</td></tr>`:''}
+    <tr style="background:#e8f5e9"><td colspan="4" style="text-align:right;font-weight:700;font-size:14px">Grand Total</td><td style="text-align:right;font-weight:800;font-size:15px;color:#1a472a">₹${(sale.total||0).toLocaleString('en-IN')}</td></tr>`;
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Invoice ${esc(sale.invoice_no)}</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}body{font-family:'Segoe UI',sans-serif;font-size:13px;color:#111;padding:40px;max-width:800px;margin:0 auto}
-    .inv-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;padding-bottom:20px;border-bottom:2px solid #111}
-    .brand{font-size:22px;font-weight:800;color:#1a472a}.brand-sub{font-size:11px;color:#555;margin-top:3px}
-    .inv-meta{text-align:right}.inv-no{font-size:18px;font-weight:700;color:#1a472a}.inv-date{font-size:12px;color:#555}
-    .bill-to{margin-bottom:28px}.section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#888;margin-bottom:6px}
-    .customer-name{font-size:15px;font-weight:700}
-    table{width:100%;border-collapse:collapse;margin-bottom:20px}
+    .inv-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;padding-bottom:18px;border-bottom:2px solid #1a472a}
+    .brand{font-size:20px;font-weight:800;color:#1a472a}.brand-sub{font-size:11px;color:#555;margin-top:3px}
+    .inv-meta{text-align:right}.inv-no{font-size:16px;font-weight:700;color:#1a472a}
+    .inv-date{font-size:12px;color:#555;margin-top:3px}
+    .bill-to{margin-bottom:24px;display:flex;gap:40px}
+    .bill-col{flex:1}.section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#888;margin-bottom:5px}
+    .customer-name{font-size:14px;font-weight:700}
+    .meta-row{font-size:12px;color:#555;margin-top:2px}
+    table{width:100%;border-collapse:collapse;margin-bottom:16px}
     thead tr{background:#1a472a;color:#fff}
     thead th{padding:9px 10px;text-align:left;font-size:12px;font-weight:600}
     tbody tr:nth-child(even){background:#f9f9f9}
-    tbody td{padding:8px 10px;border-bottom:1px solid #e5e5e5}
-    .total-row{margin-top:12px;text-align:right}
-    .total-label{font-size:12px;color:#555;margin-right:12px}
-    .total-val{font-size:22px;font-weight:800;color:#1a472a}
-    .footer{margin-top:40px;padding-top:16px;border-top:1px solid #ddd;font-size:11px;color:#888;text-align:center}
-    .status-chip{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;background:#e8f5e9;color:#1a472a;margin-left:8px}
-    .notes-box{margin-top:20px;padding:12px 14px;background:#f9f9f9;border-radius:6px;font-size:12px;color:#444}
+    tbody td{padding:7px 10px;border-bottom:1px solid #e5e5e5;font-size:12px}
+    .status-chip{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#e8f5e9;color:#1a472a;margin-left:6px}
+    .pay-chip{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;background:#e3f2fd;color:#1565c0;margin-top:4px}
+    .notes-box{margin-top:16px;padding:10px 12px;background:#f9f9f9;border-radius:6px;font-size:12px;color:#444}
+    .footer{margin-top:36px;padding-top:14px;border-top:1px solid #ddd;font-size:11px;color:#888;text-align:center}
     @media print{body{padding:20px}button{display:none}}
   </style>
-  </head><body>
+  </head><body ${autoPrint?'onload="window.print()"':''}>
   <div class="inv-head">
     <div>
       <div class="brand">🌿 Forest Studio Labs</div>
@@ -20066,37 +20501,50 @@ function _printInvoice(id){
     </div>
     <div class="inv-meta">
       <div class="inv-no">TAX INVOICE<span class="status-chip">${_SALE_STATUS_LABEL[sale.status]||sale.status}</span></div>
-      <div class="inv-date" style="font-size:15px;font-weight:700;margin-top:4px">${esc(sale.invoice_no)}</div>
+      <div style="font-size:17px;font-weight:800;color:#1a472a;margin-top:3px">${esc(sale.invoice_no)}</div>
       <div class="inv-date">Date: ${sale.date}</div>
+      ${sale.po_ref?`<div class="inv-date">PO/Ref: ${esc(sale.po_ref)}</div>`:''}
     </div>
   </div>
   <div class="bill-to">
-    <div class="section-label">Bill To</div>
-    <div class="customer-name">${esc(sale.customer_name)}</div>
-    ${sale.customer_contact?`<div style="color:#555;margin-top:3px">${esc(sale.customer_contact)}</div>`:''}
-    ${sale.customer_address?`<div style="color:#555;margin-top:3px;white-space:pre-line">${esc(sale.customer_address)}</div>`:''}
+    <div class="bill-col">
+      <div class="section-label">Bill To</div>
+      <div class="customer-name">${esc(sale.customer_name)}</div>
+      ${sale.customer_phone?`<div class="meta-row">📞 ${esc(sale.customer_phone)}</div>`:''}
+      ${sale.customer_email?`<div class="meta-row">✉️ ${esc(sale.customer_email)}</div>`:''}
+      ${sale.customer_address?`<div class="meta-row" style="white-space:pre-line">${esc(sale.customer_address)}</div>`:''}
+    </div>
+    <div class="bill-col" style="text-align:right">
+      <div class="section-label">Payment</div>
+      ${sale.payment_mode?`<div class="pay-chip">${esc(sale.payment_mode)}</div>`:''}
+    </div>
   </div>
   <table>
     <thead><tr>
-      <th>Species / Item</th><th>Type</th><th style="text-align:center">Qty</th>
-      <th style="text-align:right">Unit Price</th><th style="text-align:right">Amount</th>
+      <th>Species / Item</th><th>Type / Stage</th><th style="text-align:center">Qty</th>
+      <th style="text-align:right">Unit ₹</th><th style="text-align:right">Amount</th>
     </tr></thead>
-    <tbody>${itemRows}</tbody>
+    <tbody>${itemRows}${totBlock}</tbody>
   </table>
-  <div class="total-row">
-    <span class="total-label">Total Amount</span>
-    <span class="total-val">₹${(sale.total||0).toLocaleString('en-IN')}</span>
-  </div>
   ${sale.notes?`<div class="notes-box"><strong>Notes:</strong> ${esc(sale.notes)}</div>`:''}
   <div class="footer">
     Forest Studio Labs · Kelambakkam, Chennai · Phyto Evolution Private Limited<br>
-    This invoice was generated by Forest Studio Labs. Thank you for your order.
+    Generated by Forest Studio Labs Management System. Thank you for your order.
   </div>
-  <div style="margin-top:24px;text-align:center"><button onclick="window.print()" style="padding:8px 20px;background:#1a472a;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;font-weight:600">🖨 Print</button></div>
+  <div style="margin-top:22px;text-align:center"><button onclick="window.print()" style="padding:8px 20px;background:#1a472a;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;font-weight:600">🖨 Print / Save PDF</button></div>
   </body></html>`;
+}
 
+function _printInvoice(id){
+  const sale=(S.sales||[]).find(s=>s.id===id); if(!sale) return;
   const w=window.open('','_blank');
-  if(w){ w.document.write(html); w.document.close(); }
+  if(w){ w.document.write(_buildInvoiceHtml(sale,false)); w.document.close(); }
+}
+
+function _saveInvoicePdf(id){
+  const sale=(S.sales||[]).find(s=>s.id===id); if(!sale) return;
+  const w=window.open('','_blank');
+  if(w){ w.document.write(_buildInvoiceHtml(sale,true)); w.document.close(); }
 }
 
 // REMINDERS
@@ -20373,6 +20821,7 @@ async function renderChangelog(force=false){
   if(btn) btn.disabled=false;
 }
 
+const _NAV_LABELS={notes:'Notes',registry:'Registry',recipes:'Recipes',bottles:'Bottles',greenhouse:'Greenhouse',supply:'Supply',stock:'Supply',sales:'Sales',value:'Value',search:'Search',reminders:'Reminders',calendar:'Calendar',contam:'Contam',analytics:'Analytics',species:'Species',tools:'Tools',sterilise:'Sterilise',news:'News',help:'Help',logicflows:'Logic Flows',journal:'Lab Journal',schedule:'Schedule',insights:'Insights',ai:'Ravana',files:'Files',changelog:'Changelog',gallery:'Gallery'};
 function switchSection(name){
   // Stock fused into supply — both show sec-supply
   if(name==='stock') name='supply';
@@ -20382,6 +20831,9 @@ function switchSection(name){
   if(sec) sec.classList.add('on');
   // Sync drawer active state — also highlight stock tab when on supply (stock→supply redirect)
   document.querySelectorAll('.ndtab').forEach(t=>t.classList.toggle('active',t.dataset.sec===name||(name==='supply'&&t.dataset.sec==='stock')));
+  // Breadcrumb
+  const crumb=document.getElementById('nav-crumb');
+  if(crumb) crumb.textContent='/ '+(_NAV_LABELS[name]||name.charAt(0).toUpperCase()+name.slice(1));
   if(name==='reminders') renderReminders();
   if(name==='contam') renderContamDashboard();
   if(name==='analytics') renderAnalytics();
