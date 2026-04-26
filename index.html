@@ -393,10 +393,23 @@ main > .dview, main > .editor{ margin:0 auto; }
 .spin{border:2px solid var(--bd);border-top-color:var(--ac);border-radius:50%;width:28px;height:28px;animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 #overlay p{font-size:14px;color:var(--mu)}
-#toast{position:fixed;bottom:46px;left:16px;background:var(--glass);border:1px solid var(--glass-bd);border-radius:10px;padding:10px 15px;font-size:13px;transform:translateY(70px);transition:transform .25s;z-index:200;max-width:320px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-#toast.on{transform:translateY(0)}
-#toast.ok{border-color:var(--gn)}
-#toast.fail{border-color:var(--rd)}
+#toast{
+  position:fixed;top:52px;left:16px;
+  background:var(--glass);border:1px solid var(--glass-bd);
+  border-radius:0 0 10px 10px;
+  padding:9px 16px;font-size:13px;font-weight:500;
+  z-index:500;max-width:360px;
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  transform:translateY(-64px);opacity:0;pointer-events:none;
+  transition:transform .22s cubic-bezier(.22,1,.36,1),opacity .2s ease;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  box-shadow:0 4px 16px rgba(0,0,0,.18);
+}
+#toast.on{transform:translateY(0);opacity:1;pointer-events:auto}
+#toast.hide{transform:translateY(-64px);opacity:0;pointer-events:none}
+#toast.ok{border-color:var(--gn);border-top-color:var(--gn)}
+#toast.fail{border-color:var(--rd);border-top-color:var(--rd)}
+#toast.warn{border-color:var(--yw);border-top-color:var(--yw)}
 
 /* ── VANAKKAM GREETING ── */
 #vanakkam-greeting{
@@ -9555,10 +9568,16 @@ function unload(){document.getElementById('overlay').classList.remove('on');}
 let _tt;
 function toast(msg,type='ok',dur=3200){
   const t=document.getElementById('toast');
-  t.textContent=msg;t.className=`on ${type}`;
-  t.style.cssText='';
-  clearTimeout(_tt);_tt=setTimeout(()=>{t.className='';},dur);
+  clearTimeout(_tt);clearTimeout(_tt2);
+  t.textContent=msg;
+  t.className=type; // reset to base state (invisible)
+  requestAnimationFrame(()=>{ t.classList.add('on'); }); // next frame → transition in
+  _tt=setTimeout(()=>{
+    t.classList.remove('on'); t.classList.add('hide'); // slide back up
+    _tt2=setTimeout(()=>{ t.className=''; },240);
+  },dur);
 }
+let _tt2;
 
 function showVanakkam(){ }
 
