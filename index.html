@@ -833,13 +833,13 @@ main > .dview, main > .editor{ margin:0 auto; }
 /* custom media */
 #re-base-custom-wrap{display:none;margin-top:6px}
 
-/* ── POMODORO WIDGET ── */
-#pomo-widget{position:fixed;bottom:22px;left:22px;z-index:320;display:none;flex-direction:column;align-items:flex-start;gap:8px}
+/* ── POMODORO WIDGET (nav-embedded) ── */
+#pomo-widget{position:relative;display:none;align-items:center}
 #pomo-widget.on{display:flex}
-#pomo-fab{width:46px;height:46px;border-radius:50%;background:var(--sf);border:1px solid var(--bd);box-shadow:0 4px 16px rgba(0,0,0,.3);cursor:pointer;font-size:21px;display:flex;align-items:center;justify-content:center;transition:all .2s;line-height:1}
-#pomo-fab:hover{background:var(--sf2);transform:scale(1.09)}
-#pomo-fab.running{border-color:var(--gn);box-shadow:0 0 0 3px rgba(63,185,80,.25),0 4px 16px rgba(0,0,0,.3)}
-#pomo-panel{background:var(--sf);border:1px solid var(--bd);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.3);padding:16px 18px;width:210px;display:none;flex-direction:column;gap:10px}
+#pomo-fab{width:32px;height:32px;border-radius:50%;background:transparent;border:1px solid transparent;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all .2s;line-height:1;padding:0}
+#pomo-fab:hover{background:var(--sf2);border-color:var(--bd);transform:scale(1.09)}
+#pomo-fab.running{border-color:var(--gn);background:rgba(63,185,80,.12);box-shadow:0 0 0 2px rgba(63,185,80,.25)}
+#pomo-panel{position:absolute;top:calc(100% + 8px);right:0;z-index:320;background:var(--sf);border:1px solid var(--bd);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.3);padding:16px 18px;width:210px;display:none;flex-direction:column;gap:10px}
 #pomo-panel.open{display:flex}
 .pomo-mode{font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;text-align:center}
 .pomo-presets{display:flex;gap:5px;justify-content:center}
@@ -2291,6 +2291,31 @@ input, textarea, select {
       <div id="nc-day">Loading</div>
     </div>
     <button id="weather-chip" title="Lab &amp; Greenhouse weather" aria-label="Lab and greenhouse weather">🌡️ —</button>
+    <div id="pomo-widget">
+      <button id="pomo-fab" onclick="_pomoPanelToggle()" title="Lab Pomodoro Timer">🍅</button>
+      <div id="pomo-panel">
+        <div class="pomo-mode" id="pomo-mode-lbl" style="color:var(--mu)">READY</div>
+        <div style="display:flex;justify-content:center">
+          <svg width="96" height="96" viewBox="0 0 96 96">
+            <circle cx="48" cy="48" r="42" fill="none" stroke="var(--sf2)" stroke-width="6"/>
+            <circle id="pomo-ring-prog" cx="48" cy="48" r="42" fill="none" stroke="var(--gn)" stroke-width="6"
+              stroke-linecap="round" stroke-dasharray="263.89" stroke-dashoffset="263.89"
+              transform="rotate(-90 48 48)" style="transition:stroke-dashoffset .9s linear"/>
+            <text id="pomo-time-svg" x="48" y="55" text-anchor="middle" font-family="monospace" font-weight="900" font-size="19" fill="currentColor">25:00</text>
+          </svg>
+        </div>
+        <div class="pomo-presets">
+          <button class="pomo-preset active" onclick="_pomoSetPreset(25,5,this)">25/5</button>
+          <button class="pomo-preset" onclick="_pomoSetPreset(50,10,this)">50/10</button>
+          <button class="pomo-preset" onclick="_pomoSetPreset(90,15,this)">90/15</button>
+        </div>
+        <div class="pomo-controls">
+          <button class="pomo-ctrl-btn" onclick="_pomoReset()" title="Reset">↺</button>
+          <button class="pomo-ctrl-btn go" id="pomo-play-btn" onclick="_pomoToggle()">▶</button>
+        </div>
+        <div class="pomo-session-log" id="pomo-session-log">0 sessions today</div>
+      </div>
+    </div>
     <span id="offline-pill" aria-label="Offline mode">● Offline</span>
     <button class="nav-icon-btn" id="nav-qr-btn" title="Scan QR / Barcode" aria-label="Scan QR code or barcode" onclick="openQRScan()" style="font-size:15px">📷</button>
     <button class="nav-icon-btn" id="export-all-btn" title="Export ZIP" aria-label="Export all data as ZIP">⬇</button>
@@ -6799,31 +6824,6 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
 </div>
 
 <!-- Pomodoro Timer Widget -->
-<div id="pomo-widget">
-  <div id="pomo-panel">
-    <div class="pomo-mode" id="pomo-mode-lbl" style="color:var(--mu)">READY</div>
-    <div style="display:flex;justify-content:center">
-      <svg width="96" height="96" viewBox="0 0 96 96">
-        <circle cx="48" cy="48" r="42" fill="none" stroke="var(--sf2)" stroke-width="6"/>
-        <circle id="pomo-ring-prog" cx="48" cy="48" r="42" fill="none" stroke="var(--gn)" stroke-width="6"
-          stroke-linecap="round" stroke-dasharray="263.89" stroke-dashoffset="263.89"
-          transform="rotate(-90 48 48)" style="transition:stroke-dashoffset .9s linear"/>
-        <text id="pomo-time-svg" x="48" y="55" text-anchor="middle" font-family="monospace" font-weight="900" font-size="19" fill="currentColor">25:00</text>
-      </svg>
-    </div>
-    <div class="pomo-presets">
-      <button class="pomo-preset active" onclick="_pomoSetPreset(25,5,this)">25/5</button>
-      <button class="pomo-preset" onclick="_pomoSetPreset(50,10,this)">50/10</button>
-      <button class="pomo-preset" onclick="_pomoSetPreset(90,15,this)">90/15</button>
-    </div>
-    <div class="pomo-controls">
-      <button class="pomo-ctrl-btn" onclick="_pomoReset()" title="Reset">↺</button>
-      <button class="pomo-ctrl-btn go" id="pomo-play-btn" onclick="_pomoToggle()">▶</button>
-    </div>
-    <div class="pomo-session-log" id="pomo-session-log">0 sessions today</div>
-  </div>
-  <button id="pomo-fab" onclick="_pomoPanelToggle()" title="Lab Pomodoro Timer">🍅</button>
-</div>
 <!-- Alarm fire modal -->
 <div id="alarm-modal">
   <div id="alm-card">
@@ -11392,7 +11392,20 @@ function _openCalendarAlarms(){
 // ── POMODORO ─────────────────────────────────────────────────
 let _pomoMode='idle',_pomoWorkMin=25,_pomoBreakMin=5,_pomoElapsed=0,_pomoInterval=null;
 const _POMO_KEY='tcplants_pomo_sessions';
-function _pomoPanelToggle(){document.getElementById('pomo-panel').classList.toggle('open');}
+function _pomoPanelToggle(){
+  const p=document.getElementById('pomo-panel');
+  const wasOpen=p.classList.contains('open');
+  p.classList.toggle('open');
+  if(!wasOpen){
+    const close=(e)=>{
+      if(!document.getElementById('pomo-widget').contains(e.target)){
+        p.classList.remove('open');
+        document.removeEventListener('pointerdown',close,true);
+      }
+    };
+    setTimeout(()=>document.addEventListener('pointerdown',close,true),10);
+  }
+}
 function _pomoSetPreset(w,b,btn){
   if(_pomoInterval) return;
   _pomoWorkMin=w;_pomoBreakMin=b;_pomoElapsed=0;_pomoMode='idle';
