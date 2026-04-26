@@ -368,6 +368,9 @@ main > .dview, main > .editor{ margin:0 auto; }
 .rem-date{font-size:13px;font-weight:600;flex-shrink:0;text-align:right}
 .rem-date.overdue{color:var(--rd)}
 .rem-date.soon{color:var(--yw)}
+.rem-card{position:relative}
+.rem-done-btn{margin-left:auto;padding:5px 12px;font-size:11px;font-weight:700;background:var(--gn);color:#fff;border:none;border-radius:6px;cursor:pointer;opacity:.85;flex-shrink:0;transition:opacity .15s}
+.rem-done-btn:hover{opacity:1}
 
 /* ── CONTAMINATION DASHBOARD ── */
 .contam-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
@@ -2206,6 +2209,11 @@ input, textarea, select {
 .sale-status-pill.draft { background:rgba(139,148,158,.2); color:var(--mu); }
 .sale-status-pill.confirmed { background:rgba(88,166,255,.2); color:var(--ac); }
 .sale-status-pill.dispatched { background:rgba(63,185,80,.2); color:var(--gn); }
+.sale-status-pill.received { background:rgba(63,185,80,.35); color:var(--gn); border:1px solid var(--gn); }
+#steril-deduct-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1001;display:flex;align-items:center;justify-content:center}
+.steril-deduct-box{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:20px;max-width:440px;width:92%;max-height:72vh;overflow-y:auto}
+.steril-deduct-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--bd)}
+.steril-deduct-row:last-child{border-bottom:none}
 .sale-customer { font-size:12px; color:var(--mu); }
 .sale-total-big { font-size:14px; font-weight:700; color:var(--gn); }
 .sale-items-preview { font-size:11px; color:var(--mu); margin-top:4px; }
@@ -3506,16 +3514,27 @@ input, textarea, select {
       <!-- VERSION HEADER -->
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
         <h1 style="font-size:22px;font-weight:800;margin:0">🌿 Forest Studio Labs</h1>
-        <span class="help-version-badge">v3.15</span>
+        <span class="help-version-badge">v3.16</span>
         <button class="btn xs ghost" onclick="navTo('changelog')" style="border-color:var(--pu);color:var(--pu)">📋 Changelog →</button>
         <button class="btn xs ghost" onclick="navTo('logicflows')" style="margin-left:4px;border-color:var(--ac);color:var(--ac)">🔗 Logic Flows →</button>
       </div>
       <p style="color:var(--mu);font-size:13px;margin-bottom:20px">April 2026 · Encrypted · GitHub-backed · Single-file PWA</p>
 
-      <!-- WHAT'S NEW v3.15 -->
+      <!-- WHAT'S NEW v3.16 -->
       <div style="background:linear-gradient(135deg,rgba(63,185,80,.1),rgba(88,166,255,.08));border:1px solid rgba(63,185,80,.3);border-radius:10px;padding:18px 20px;margin-bottom:10px">
-        <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v3.15</div>
+        <div style="font-size:13px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✨ What's New — v3.16</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
+          <div style="font-size:13px;line-height:1.6"><strong>🔗 Cross-section wiring (6 wires)</strong> — actions in one section now trigger smart prompts in related sections: Contamination log → offer journal entry · Bottle save with notes → offer recipe save · Sterilise run → offer supply deduction · Sales save → auto-add species to Registry · Reminder ✅ Done → reschedule next review · Sales dispatched → ✓ Received button marks order paid.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>✅ Reminder Done button</strong> — each rem-card now has a Done button. Click it → enter days until next review → date is updated and reminder rescheduled (works for bottles, notes, and greenhouse plants).</div>
+          <div style="font-size:13px;line-height:1.6"><strong>📦 Sterilise supply deduction</strong> — after logging a run, tap "Deduct supplies?" to open a pre-filtered checklist of inventory items. Tick + enter qty used → deducts from Supply Inventory immediately.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>✓ Received status for sales</strong> — dispatched orders now show a green "✓ Received" button. Click it → confirm payment mode → order status updates to Received.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🌿 Sales → Registry auto-add</strong> — any species name typed in a sales line item that doesn't exist in the Registry is silently added as a custom entry on save.</div>
+        </div>
+      </div>
+      <!-- v3.15 collapse -->
+      <details style="margin-bottom:8px">
+        <summary style="cursor:pointer;font-size:12px;color:var(--mu);padding:6px 0;font-weight:600;letter-spacing:.04em">▸ v3.15 release notes</summary>
+        <div style="background:var(--sf2);border-radius:8px;padding:12px;margin-top:6px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
           <div style="font-size:13px;line-height:1.6"><strong>🧾 Sales v2</strong> — richer New Sale form with separate phone/email/PO ref fields, payment mode chips (Cash/UPI/Bank Transfer), GST selector, discount (flat/%), shipping. Line items show live stock counts from bottles + GH. Supply items wired in as sellable.</div>
           <div style="font-size:13px;line-height:1.6"><strong>📦 Backward supply wiring</strong> — add a line item as "New item…" in an invoice and it auto-creates the entry in Supply Inventory on save. Works for any lab consumable not yet in inventory.</div>
           <div style="font-size:13px;line-height:1.6"><strong>📊 Sales CSV log</strong> — every saved order appends rows to <code>sales/sales-log.csv</code> (plain text, one row per line item). Visible and editable in Files → Sales Log.</div>
@@ -3524,7 +3543,7 @@ input, textarea, select {
           <div style="font-size:13px;line-height:1.6"><strong>📎 Drag & drop upload</strong> — drag any file from your OS onto a folder in the file browser left panel. Auto-encrypts and stores under <code>attachments/&lt;section&gt;/general/</code>. Drop hint highlights the target folder.</div>
           <div style="font-size:13px;line-height:1.6"><strong>🧭 Live breadcrumb</strong> — the nav bar now shows the current section name (e.g. <em>/ Notes</em>, <em>/ Bottles</em>, <em>/ Calendar</em>) next to the Forest Studio Labs brand. Updates on every navigation.</div>
         </div>
-      </div>
+      </details>
       <!-- v3.14 collapse -->
       <details style="margin-bottom:8px">
         <summary style="cursor:pointer;font-size:12px;color:var(--mu);padding:6px 0;font-weight:600;letter-spacing:.04em">▸ v3.14 release notes</summary>
@@ -5123,7 +5142,7 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
     <main style="flex:1;overflow-y:auto;padding:28px 32px;max-width:980px;width:100%;box-sizing:border-box">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
         <h1 style="font-size:20px;font-weight:800;margin:0">🔗 Logic Flows</h1>
-        <span style="background:linear-gradient(135deg,var(--ac),var(--pu));color:#0d1117;border-radius:12px;font-size:11px;font-weight:800;padding:2px 9px;letter-spacing:.04em">v3.15</span>
+        <span style="background:linear-gradient(135deg,var(--ac),var(--pu));color:#0d1117;border-radius:12px;font-size:11px;font-weight:800;padding:2px 9px;letter-spacing:.04em">v3.16</span>
         <button onclick="_lfExpandAll()" class="btn xs ghost" style="margin-left:auto">Expand all</button>
         <button onclick="_lfCollapseAll()" class="btn xs ghost">Collapse all</button>
       </div>
@@ -5212,6 +5231,7 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
         <a href="#lf-value" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid rgba(255,180,0,.4);color:#e3a000;text-decoration:none;background:rgba(255,180,0,.06)">💰 Value</a>
         <a href="#lf-export" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid var(--bd);color:var(--tx);text-decoration:none;background:var(--sf)">📥 Export</a>
         <a href="#lf-alarms" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid rgba(255,200,0,.4);color:var(--yw);text-decoration:none;background:rgba(255,200,0,.06)">⏰ Alarms</a>
+        <a href="#lf-wires" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid rgba(88,166,255,.4);color:var(--ac);text-decoration:none;background:rgba(88,166,255,.06)">🔗 Wires</a>
         <a href="#lf-gaps" class="help-toc" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid rgba(248,81,73,.4);color:var(--rd);text-decoration:none;background:rgba(248,81,73,.06)">⚠️ Gaps</a>
       </div>
 
@@ -6441,6 +6461,34 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
         </div>
       </div></details>
 
+      <!-- ═══ CROSS-SECTION WIRING v3.16 ═══ -->
+      <details id="lf-wires">
+      <summary>
+        <span style="width:28px;height:28px;border-radius:7px;background:rgba(88,166,255,.12);display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🔗</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">Cross-section Wiring (v3.16)</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:2px">6 reverse-wiring connections that propagate an action in one section to related data in another</div>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center">
+          <span class="lf-pill lf-pill-ac">_wireSalesToRegistry</span>
+          <span class="lf-pill lf-pill-ac">_remDone</span>
+          <span class="lf-pill lf-pill-ac">_sterilDeductOpen</span>
+        </div>
+      </summary>
+      <div class="lf-body">
+        <table class="help-table" style="width:100%;margin-bottom:12px">
+          <tr><th>Wire</th><th>Trigger</th><th>Target section</th><th>Function</th><th>Mechanism</th></tr>
+          <tr><td><strong>1 — Sales → Registry</strong></td><td>_saveSaleAction() on save</td><td>Species Registry (taxCustom)</td><td>_wireSalesToRegistry(lines)</td><td>Checks each line item species against S.taxSpecies + S.taxCustom.species. New names pushed to taxCustom, saveCustomTaxonomy() called. Toast after 200ms delay (doesn't conflict with main save toast).</td></tr>
+          <tr><td><strong>2 — Bottle notes → Recipes</strong></td><td>saveBottleAction() new bottle, no recipe_id, notes.length &gt; 20</td><td>Recipes</td><td>_toastAction (inline)</td><td>After 3.4s delay (after main save toast fades), shows action toast. If accepted: navTo('recipes'), startNewRecipe(), pre-fills re-name and rr-notes from bottle notes.</td></tr>
+          <tr><td><strong>3 — GH harvest → Bottle</strong></td><td>takeExplantFromGH(plantId)</td><td>Bottles</td><td>takeExplantFromGH (existing)</td><td>Already implemented: logs ghTransfer, navTo('bottles'), startNewBottle('single'), pre-fills species + GH plant dropdown via _populateGHDropdown. No new code needed.</td></tr>
+          <tr><td><strong>4 — Contam note → Journal</strong></td><td>saveNoteAction() where type==='Contamination Log'</td><td>Lab Journal</td><td>_toastAction (inline)</td><td>After 3.4s delay, shows action toast. If accepted: navTo('journal'), startNewJournalEntry(), pre-fills je-title + je-body with contam details (species, stage, note ref, original body).</td></tr>
+          <tr><td><strong>5 — Reminder Done → reschedule</strong></td><td>✅ Done button on rem-card</td><td>Bottles / Notes / Greenhouse</td><td>_remDone(id, isBottle, isGH)</td><td>Prompts for days. Computes next date. Routes to saveBottles / saveNotesIndex / saveGreenhouse based on item type. Calls renderReminders + updateReminderBadge.</td></tr>
+          <tr><td><strong>6 — Sterilise → Supplies</strong></td><td>_saveSterilRun() if run.status !== 'failed'</td><td>Supply Inventory</td><td>_sterilDeductOpen(run), _sterilDeductConfirm()</td><td>After 3.4s delay, shows action toast. Opens overlay with supply list fuzzy-matched against load_contents. Checkboxes + qty inputs. Confirm decrements S.supplies[].qty and calls saveSupplies.</td></tr>
+          <tr><td><strong>7 — Sales received</strong></td><td>✓ Received button on dispatched order card</td><td>Sales (same)</td><td>_saleMarkReceived(id)</td><td>Sets status='received', received_at=ISO timestamp, prompts for payment_mode if unset. Calls saveSales(). New 'received' status in _SALE_STATUSES (4th value).</td></tr>
+        </table>
+        <div style="font-size:12px;color:var(--mu)">All async wires are fire-and-forget or use _toastAction delayed by 3.4s so they don't visually collide with the main save toast. Wire 1 fires synchronously post-save. The _toastAction helper creates a toast with an action button; clicking it clears the toast and runs the callback.</div>
+      </div></details>
+
       <!-- ═══ KNOWN ISSUES ═══ -->
       <details id="lf-gaps">
       <summary style="border-color:rgba(248,81,73,.25)!important">
@@ -6888,6 +6936,19 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
     <button onclick="_fbPreviewClose()" style="background:none;border:none;color:var(--mu);cursor:pointer;font-size:16px;line-height:1">✕</button>
   </div>
   <div class="fb-preview-body" id="fb-pv-body"></div>
+</div>
+
+<!-- Sterilise supply deduction overlay -->
+<div id="steril-deduct-overlay" style="display:none" onclick="if(event.target===this)document.getElementById('steril-deduct-overlay').style.display='none'">
+  <div class="steril-deduct-box">
+    <div style="font-weight:700;font-size:15px;margin-bottom:12px">📦 Deduct supplies used</div>
+    <div style="font-size:12px;color:var(--mu);margin-bottom:12px" id="steril-deduct-hint">Tick items and enter quantities consumed in this run.</div>
+    <div id="steril-deduct-list"></div>
+    <div style="display:flex;gap:8px;margin-top:16px">
+      <button class="btn green" onclick="_sterilDeductConfirm()" style="flex:1">✓ Deduct</button>
+      <button class="btn ghost" onclick="document.getElementById('steril-deduct-overlay').style.display='none'">Cancel</button>
+    </div>
+  </div>
 </div>
 
 <!-- Pomodoro Timer Widget -->
@@ -9620,9 +9681,29 @@ let _ov;
 function load(msg='Working…'){document.getElementById('ovmsg').textContent=msg;document.getElementById('overlay').classList.add('on');}
 function unload(){document.getElementById('overlay').classList.remove('on');}
 let _tt, _tt2;
+// ── Toast with action button ──────────────────────────────────
+let _taCleanup=null;
+function _toastAction(msg, btnLabel, cb, dur=7500){
+  const t=document.getElementById('toast');
+  clearTimeout(_tt);clearTimeout(_tt2);
+  if(_taCleanup){_taCleanup();_taCleanup=null;}
+  t.innerHTML='';
+  const s=document.createElement('span'); s.textContent=msg; t.appendChild(s);
+  const b=document.createElement('button');
+  b.textContent=btnLabel;
+  b.style.cssText='margin-left:10px;background:var(--ac);color:#fff;border:none;border-radius:4px;padding:2px 10px;cursor:pointer;font-size:12px;font-weight:700;vertical-align:middle';
+  b.onclick=()=>{clearTimeout(_tt);clearTimeout(_tt2);t.classList.remove('on');t.classList.add('hide');_tt2=setTimeout(()=>{t.className='';t.innerHTML='';},280);cb();};
+  t.appendChild(b);
+  _taCleanup=()=>{t.innerHTML='';};
+  t.className='ok';
+  requestAnimationFrame(()=>t.classList.add('on'));
+  _tt=setTimeout(()=>{t.classList.remove('on');t.classList.add('hide');_tt2=setTimeout(()=>{t.className='';t.innerHTML='';_taCleanup=null;},280);},dur);
+}
+
 function toast(msg,type='ok',dur=3200){
   const t=document.getElementById('toast');
   clearTimeout(_tt);clearTimeout(_tt2);
+  if(_taCleanup){_taCleanup();_taCleanup=null;}
   t.textContent=msg;
   t.className=type; // reset to base state (invisible)
   requestAnimationFrame(()=>{ t.classList.add('on'); }); // next frame → transition in
@@ -16312,6 +16393,17 @@ async function saveNoteAction(){
     updateReminderBadge();
     toast('Saved ✓ — committed to GitHub');
     renderNoteList(); await openNote(S.cur); closeNavDrawer();
+    // Wire 4: offer journal entry for contamination logs
+    if(type==='Contamination Log'){
+      const _cTitle=title, _cSpecies=species, _cStage=stage, _cBody=body, _cRef=S.cur;
+      setTimeout(()=>_toastAction('☣️ Contam logged — add to journal?','📓 Log',()=>{
+        navTo('journal'); startNewJournalEntry();
+        setTimeout(()=>{
+          document.getElementById('je-title').value='Contam: '+_cTitle;
+          document.getElementById('je-body').value=`## Contamination Event\n**Species:** ${_cSpecies||'Unknown'}\n**Stage:** ${_cStage||'—'}\n**Note ID:** ${_cRef}\n\n${_cBody||''}`;
+        },120);
+      }),3400);
+    }
   }catch(e){
     toast('Save failed: '+e.message,'fail');
   }finally{
@@ -19222,6 +19314,16 @@ async function saveBottleAction(){
     toast(toastMsg,'ok');
     updateReminderBadge();
     LabAnalytics.calculate();
+    // Wire 2: offer to save notes as recipe if no recipe selected
+    if(!recipe_id && notes && notes.length>20 && !S.editingBot){
+      setTimeout(()=>_toastAction('Notes saved — save as recipe?','🧪 Yes',()=>{
+        navTo('recipes'); startNewRecipe();
+        setTimeout(()=>{
+          document.getElementById('re-name').value=(sp?sp.split(' ').slice(0,2).join(' ')+' ':'')+'media recipe';
+          document.getElementById('rr-notes').value=notes;
+        },120);
+      }),3400);
+    }
   } catch(e){ toast('Save failed: '+e.message,'fail'); }
   btn.disabled=false; btn.textContent='Save';
 }
@@ -20086,8 +20188,8 @@ async function _valPriceSet(key, val){
 // ════════════════════════════════════════════════════════════
 // SALES & INVOICING
 // ════════════════════════════════════════════════════════════
-const _SALE_STATUSES=['draft','confirmed','dispatched'];
-const _SALE_STATUS_LABEL={draft:'Draft',confirmed:'Confirmed',dispatched:'Dispatched'};
+const _SALE_STATUSES=['draft','confirmed','dispatched','received'];
+const _SALE_STATUS_LABEL={draft:'Draft',confirmed:'Confirmed',dispatched:'Dispatched',received:'✓ Received'};
 let _salesLogSha=null;
 function _csvQ(s){ const v=String(s||''); return v.includes(',')||v.includes('"')||v.includes('\n')?`"${v.replace(/"/g,'""')}"`:v; }
 function _salePmSelect(btn){ document.querySelectorAll('.sale-pm-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); const pm=document.getElementById('sale-payment-mode'); if(pm) pm.value=btn.dataset.pm; }
@@ -20366,6 +20468,8 @@ async function _saveSaleAction(){
     S.salesSha=await saveSales(S.sales,S.salesSha);
     // Append to CSV log (fire-and-forget, don't block UI)
     _salesLogAppend(sale).catch(e=>console.warn('CSV log:',e));
+    // Wire 1: auto-add new species to registry
+    _wireSalesToRegistry(lines);
     toast(`📋 ${sale.invoice_no} saved`,'ok');
     renderSalesPage('orders');
   }catch(e){
@@ -20432,6 +20536,7 @@ function _salesOrdersHtml(){
       <div class="sale-actions">
         <button class="btn sm ghost" onclick="_printInvoice('${o.id}')">🖨 Invoice</button>
         <button class="btn sm ghost" onclick="_saveInvoicePdf('${o.id}')">💾 PDF</button>
+        ${o.status==='dispatched'?`<button class="btn sm green" onclick="_saleMarkReceived('${o.id}')">✓ Received</button>`:''}
         <button class="btn sm ghost" onclick="_openSaleStatusEdit('${o.id}')">✏️ Status</button>
         <button class="btn sm ghost" style="color:var(--rd)" onclick="_deleteSale('${o.id}')">🗑</button>
       </div>
@@ -20455,6 +20560,115 @@ async function _deleteSale(id){
   S.sales=(S.sales||[]).filter(s=>s.id!==id);
   try{ S.salesSha=await saveSales(S.sales,S.salesSha); toast('Order deleted'); renderSalesPage('orders'); }
   catch(e){ S.sales.push(sale); toast('Delete failed: '+e.message,'fail'); }
+}
+
+// ── Wire 7: Mark sale as received ────────────────────────────
+async function _saleMarkReceived(id){
+  const sale=(S.sales||[]).find(s=>s.id===id); if(!sale) return;
+  if(sale.status==='received') return;
+  sale.status='received';
+  sale.received_at=new Date().toISOString();
+  if(!sale.payment_mode||sale.payment_mode==='Cash'){
+    const pm=prompt(`Payment mode for ${sale.invoice_no}:\nCash / UPI / Bank Transfer / Cheque`,sale.payment_mode||'UPI');
+    if(pm) sale.payment_mode=pm.trim();
+  }
+  try{
+    S.salesSha=await saveSales(S.sales,S.salesSha);
+    toast(`✓ ${sale.invoice_no} marked as Received`,'ok');
+    renderSalesPage('orders');
+  }catch(e){ sale.status='dispatched'; toast('Update failed: '+e.message,'fail'); }
+}
+
+// ── Wire 1: Sales species → Registry ─────────────────────────
+function _wireSalesToRegistry(lines){
+  if(!S.taxCustom) return;
+  const knownLower=new Set([
+    ...(S.taxSpecies||[]).map(s=>(s.full_name||'').toLowerCase()),
+    ...(S.taxCustom.species||[]).map(s=>(s.full_name||'').toLowerCase())
+  ]);
+  const newNames=[...new Set(
+    lines.filter(l=>l.species&&!['supply_new','supply'].includes(l.type))
+         .map(l=>l.species.trim())
+  )].filter(n=>n&&!knownLower.has(n.toLowerCase()));
+  if(!newNames.length) return;
+  newNames.forEach(name=>{
+    S.taxCustom.species.push({full_name:name,common_name:'',conservation_status:'',category:'Other',source:'sales',is_custom:true,added_at:new Date().toISOString()});
+  });
+  saveCustomTaxonomy().catch(e=>console.warn('registry wire:',e));
+  setTimeout(()=>toast(`🌿 ${newNames.length} new species added to Registry`,'ok',3000),200);
+}
+
+// ── Wire 5: Reminder done → reschedule ───────────────────────
+async function _remDone(id, isBottle, isGH){
+  const daysStr=prompt('Reviewed! Schedule next review in how many days?\n(Enter 0 to clear, blank to cancel):','14');
+  if(daysStr===null||daysStr==='') return;
+  const days=parseInt(daysStr)||0;
+  const nextDate=days>0?(()=>{const d=new Date();d.setDate(d.getDate()+days);return d.toISOString().slice(0,10);})():null;
+  try{
+    if(isGH){
+      const idx=(S.greenhouse||[]).findIndex(p=>p.id===id); if(idx===-1) return;
+      S.greenhouse[idx]={...S.greenhouse[idx],next_inspection:nextDate,updated_at:new Date().toISOString()};
+      S.greenhouseSha=await saveGreenhouse(S.greenhouse,S.greenhouseSha,S.ghTransfers);
+    } else if(isBottle){
+      const idx=(S.bottles||[]).findIndex(b=>b.id===id); if(idx===-1) return;
+      S.bottles[idx]={...S.bottles[idx],next_review:nextDate};
+      S.bottlesSha=await saveBottles(S.bottles,S.bottlesSha);
+    } else {
+      const {sha,notes}=await saveNotesIndex(ns=>{
+        const idx=ns.findIndex(n=>n.id===id); if(idx!==-1) ns[idx]={...ns[idx],next_review:nextDate}; return ns;
+      });
+      S.notes=notes; S.notesSha=sha;
+    }
+    _writeCache(); updateReminderBadge(); renderReminders();
+    toast(nextDate?`✅ Next review in ${days}d — ${nextDate}`:'✅ Review cleared','ok');
+  }catch(e){toast('Save failed: '+e.message,'fail');}
+}
+
+// ── Wire 6: Sterilise → supply deduction ─────────────────────
+function _sterilDeductOpen(run){
+  const overlay=document.getElementById('steril-deduct-overlay');
+  const list=document.getElementById('steril-deduct-list');
+  if(!overlay||!list) return;
+  const supplies=(S.supplies||[]).filter(s=>s.qty>0||s.quantity>0);
+  // Fuzzy-match against load_contents
+  const lc=(run.load_contents||'').toLowerCase();
+  const ranked=supplies.map(s=>({
+    ...s,
+    match: lc&&(lc.includes((s.name||'').toLowerCase())||['ms medium','wpm','murashige','agar','sucrose','sugar','hormo','ppm','ba ','kin','naa','iba','glucose','yeast'].some(kw=>kw.length>2&&(s.name||'').toLowerCase().includes(kw)&&lc.includes(kw)))
+  })).sort((a,b)=>Number(b.match)-Number(a.match));
+  list.innerHTML=ranked.map(s=>{
+    const qty=s.qty||s.quantity||0;
+    return `<div class="steril-deduct-row">
+      <input type="checkbox" id="sdd-${s.id}" ${s.match?'checked':''} style="flex-shrink:0">
+      <label for="sdd-${s.id}" style="flex:1;font-size:13px;cursor:pointer">${esc(s.name||'?')}</label>
+      <span style="font-size:11px;color:var(--mu);flex-shrink:0">${qty} ${s.unit||''} left</span>
+      <input type="number" id="sdd-qty-${s.id}" value="${s.match?1:''}" min="0" step="any"
+        style="width:64px;padding:3px 6px;background:var(--sf2);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-size:12px;text-align:right">
+      <span style="font-size:11px;color:var(--mu);width:28px;flex-shrink:0">${s.unit||''}</span>
+    </div>`;
+  }).join('');
+  document.getElementById('steril-deduct-hint').textContent=`Run: ${run.protocol||'—'} · ${run.date||''} · load: ${run.load_contents||'—'}`;
+  overlay.style.display='flex';
+}
+async function _sterilDeductConfirm(){
+  const supplies=(S.supplies||[]).filter(s=>s.qty>0||s.quantity>0);
+  let changed=0;
+  supplies.forEach(s=>{
+    const cb=document.getElementById('sdd-'+s.id);
+    const qi=document.getElementById('sdd-qty-'+s.id);
+    if(!cb?.checked||!qi?.value) return;
+    const used=parseFloat(qi.value)||0; if(used<=0) return;
+    const idx=S.supplies.findIndex(x=>x.id===s.id); if(idx===-1) return;
+    const cur=S.supplies[idx].qty??S.supplies[idx].quantity??0;
+    S.supplies[idx]={...S.supplies[idx],qty:Math.max(0,cur-used),quantity:Math.max(0,cur-used)};
+    changed++;
+  });
+  if(!changed){toast('No items selected','fail');return;}
+  document.getElementById('steril-deduct-overlay').style.display='none';
+  try{
+    S.suppliesSha=await saveSupplies(S.supplies,S.suppliesSha);
+    toast(`📦 ${changed} supply item${changed!==1?'s':''} deducted`,'ok');
+  }catch(e){toast('Save failed: '+e.message,'fail');}
 }
 
 function _buildInvoiceHtml(sale, autoPrint=false){
@@ -20573,6 +20787,7 @@ function renderReminders(){
         <div class="rem-sub">${n.species&&!n.isGH?`<em>${esc(n.species)}</em> · `:''}${n.type?esc(n.type):''}</div>
       </div>
       <div class="rem-date ${cls}">${dlabel}<br><span style="font-size:11px;font-weight:400">${fmtDateShort(n.next_review)}</span></div>
+      <button class="rem-done-btn" onclick="event.stopPropagation();_remDone('${n.id}',${n.isBottle},${n.isGH})">✅ Done</button>
     </div>`;
   };
 
@@ -24292,6 +24507,10 @@ async function _saveSterilRun(){
     toast('Run logged ✓','ok');
     document.getElementById('steril-log-form').style.display='none';
     renderSterilRunLog();
+    // Wire 6: offer supply deduction after a run
+    if(run.status!=='failed'){
+      setTimeout(()=>_toastAction('Run saved — deduct supplies used?','📦 Deduct',()=>_sterilDeductOpen(run)),3400);
+    }
   }catch(e){toast('Save failed: '+e.message,'fail');}
   btn.disabled=false; btn.textContent='Save Run';
 }
