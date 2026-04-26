@@ -3553,6 +3553,8 @@ input, textarea, select {
           <div style="font-size:13px;line-height:1.6"><strong>🏠 Home button fixed</strong> — the nav-bar 🏠 button now correctly navigates to the Home section (dashboard) instead of landing on the Notes section.</div>
           <div style="font-size:13px;line-height:1.6"><strong>🏷 Preset flairs (46 presets)</strong> — Species → Flairs tab now has an "⚡ Load preset flairs" button. Browse 46 curated presets across 6 categories (Provenance, Conservation, Geography, Culture performance, Plant trait, Media/Recipe). Checkboxes let you pick exactly what you need; already-existing flairs are greyed out.</div>
           <div style="font-size:13px;line-height:1.6"><strong>🎨 Theme cycle fixed</strong> — green theme removed; cycle is now Dark → Light → Paper → Dark. Icons and labels now show the <em>current</em> theme (was showing next). Any saved "green" session auto-falls back to dark.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>📅 Calendar review dates fixed</strong> — calendar now shows orange review-due dots for bottle next_review and GH next_inspection dates. Marking a review Done now refreshes the calendar immediately if it is open.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🏷 Recipe flair picker always visible</strong> — flair section in New/Edit Recipe is now always shown. When no flairs are defined yet it shows a "→ Species → Flairs" shortcut instead of hiding the section.</div>
         </div>
       </div>
       <!-- v3.17 collapse -->
@@ -11231,6 +11233,20 @@ function _buildCalMap(){
       add(b.date_prepared,{
         id:b.id, title:b.code, type:_botStatusLabel(b.status), stage:b.stage||'', species:b.species||'',
         dotType:'teal', isReview:false, isBottle:true
+      });
+    }
+    if(b.next_review&&['inoculated','growing','subcultured','rooting','hardening'].includes(b.status)){
+      add(b.next_review,{
+        id:b.id, title:b.code, type:'Review due', stage:b.stage||'', species:b.species||'',
+        dotType:'orange', isReview:true, isBottle:true
+      });
+    }
+  }
+  for(const p of (S.greenhouse||[])){
+    if(p.next_inspection){
+      add(p.next_inspection,{
+        id:p.id, title:p.species||'GH Plant', type:'GH inspection', stage:'', species:p.species||'',
+        dotType:'orange', isReview:true, isGH:true
       });
     }
   }
@@ -19850,9 +19866,12 @@ function _renderRecFlairs(selectedIds){
   const cont=document.getElementById('re-flair-pills');
   const field=document.getElementById('re-flair-field');
   if(!cont) return;
-  const flairs=S.taxFlairs||[];
-  if(!flairs.length){if(field) field.style.display='none';return;}
   if(field) field.style.display='';
+  const flairs=S.taxFlairs||[];
+  if(!flairs.length){
+    cont.innerHTML=`<span style="font-size:11px;color:var(--mu)">No flairs defined yet — <span style="color:var(--ac);cursor:pointer" onclick="navTo('species');_spTab('flairs')">add in Species → Flairs ↗</span></span>`;
+    return;
+  }
   cont.innerHTML=flairs.map(f=>{
     const active=(selectedIds||[]).includes(f.id);
     return `<span class="flair-pill flair-toggle ${f.color} ${active?'active':''}" data-fid="${f.id}" onclick="this.classList.toggle('active')" style="cursor:pointer">${f.emoji?esc(f.emoji)+' ':''}${esc(f.name)}</span>`;
@@ -20987,6 +21006,7 @@ async function _remDone(id, isBottle, isGH){
       S.notes=notes; S.notesSha=sha;
     }
     _writeCache(); updateReminderBadge(); renderReminders();
+    if(document.getElementById('sec-calendar')?.classList.contains('on')) renderCalendar();
     toast(nextDate?`✅ Next review in ${days}d — ${nextDate}`:'✅ Review cleared','ok');
   }catch(e){toast('Save failed: '+e.message,'fail');}
 }
