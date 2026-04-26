@@ -3485,7 +3485,10 @@ input, textarea, select {
           <div style="font-size:13px;line-height:1.6"><strong>🔀 Chat auto-fallback</strong> — when primary model is rate-limited or down, Ravana silently retries via Gemini → Groq 8B before surfacing an error. A small <span style="background:rgba(210,153,34,.2);border:1px solid var(--yw);border-radius:6px;padding:1px 5px;font-size:11px">⚡ via Gemini</span> pill shows in the reply if a fallback was used. Chat is always unlimited.</div>
           <div style="font-size:13px;line-height:1.6"><strong>🌐 Web Search</strong> — Ravana can now search the internet. Toggle in AI Control → Internet Access. Uses Brave Search API (add <code>BRAVE_KEY</code> to Cloudflare env) or falls back to DuckDuckGo instant answers. Ravana calls <code>search_web</code> tool automatically when needed.</div>
           <div style="font-size:13px;line-height:1.6"><strong>🗜 Context-saving mode</strong> — when enabled and chat tokens today exceed 10k, extended lab data is omitted from the prompt. Saves tokens on heavy chat days while keeping Ravana responsive.</div>
-          <div style="font-size:13px;line-height:1.6"><strong>🔔 Toast repositioned</strong> — notification toast moved to bottom-left (above widget tray) to clear space on the right side of the screen.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🔔 Toast inline in nav</strong> — notification pill lives inside the nav bar (next to the Forest Studio Labs brand), slides open as a flex pill, no fixed overlays.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🌿 Forest Studio Labs</strong> — brand renamed from "TC Plants" across nav, login screen, splash, and page title.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🍅 Pomodoro in nav</strong> — Pomodoro FAB moved from floating bottom-left into the nav bar next to the weather chip.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>🗂 Nav drawer fixes</strong> — Calendar and Changelog sections now have drawer tabs; Stock tab correctly highlights when the Stock section is active (was silently redirecting to Supply without highlighting).</div>
         </div>
       </div>
       <!-- v3.13 collapse -->
@@ -5333,8 +5336,8 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
         <table class="help-table">
           <tr><th>Section type</th><th>navTo() behaviour</th><th>Examples</th></tr>
           <tr><td><strong>List sections</strong></td><td>Opens nav drawer + switches to nd-{sec} panel. Drawer stays open as sidebar.</td><td>notes, registry, recipes, bottles, greenhouse</td></tr>
-          <tr><td><strong>Full-page sections</strong></td><td>Closes drawer, hides all nd panels, triggers section render function.</td><td>reminders, contam, analytics, species, schedule, journal, supply, value, search, logicflows</td></tr>
-          <tr><td><strong>stock</strong></td><td>Redirected → <code>navTo('supply')</code> (Stock deprecated in v3.11)</td><td>—</td></tr>
+          <tr><td><strong>Full-page sections</strong></td><td>Closes drawer, hides all nd panels, triggers section render function.</td><td>reminders, calendar, contam, analytics, species, schedule, journal, supply, value, search, logicflows, changelog</td></tr>
+          <tr><td><strong>stock</strong></td><td>Redirected → <code>switchSection('supply')</code>. Active highlight fixed (v3.14): ndtab toggle also matches <code>data-sec="stock"</code> when name is 'supply'.</td><td>—</td></tr>
         </table>
         <h3 class="help-h3" style="margin-top:14px">Section render triggers (via switchSection)</h3>
         <table class="help-table">
@@ -5350,6 +5353,13 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
           <tr><td>bottles, greenhouse</td><td><code>renderBottleList()</code> + <code>showBotEmpty()</code> / <code>renderGHList()</code></td></tr>
         </table>
         <div class="help-tip">✓ Canonical cross-section pattern: <code>navTo('bottles'); openBottle(id)</code> — <code>navTo</code> opens the drawer first, then the detail function populates the main area. Calling <code>openBottle(id)</code> alone without <code>navTo</code> breaks because the section may not be active.</div>
+        <h3 class="help-h3" style="margin-top:14px">Nav drawer tabs (v3.14)</h3>
+        <table class="help-table">
+          <tr><th>Tab</th><th>data-sec</th><th>Notes</th></tr>
+          <tr><td>📅 Calendar</td><td>calendar</td><td>Added v3.14 — was missing from drawer</td></tr>
+          <tr><td>📋 Changelog</td><td>changelog</td><td>Added v3.14 — was missing from drawer</td></tr>
+          <tr><td>📦 Stock</td><td>stock</td><td>Redirects to supply; active highlight fixed v3.14</td></tr>
+        </table>
         <h3 class="help-h3" style="margin-top:14px">Special navigation</h3>
         <p style="font-size:12px;color:var(--mu)"><code>viewBatch(batchId)</code>: sets <code>S.botBatchFilter = batchId</code>, clears other filters → <code>openNavDrawer(); renderBottleList()</code> — list shows only that batch.</p>
         <p style="font-size:12px;color:var(--mu)"><code>_handleNavQRResult()</code>: scans URL params on load — <code>?bottle=id</code> → open bottle · <code>?note=id</code> → open note · <code>?gh=id</code> → open GH plant (v3.11)</p>
@@ -6512,6 +6522,7 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
       <button class="ndtab" data-sec="bottles" onclick="navTo('bottles')"><span class="nd-icon">🫙</span>Bottles</button>
       <button class="ndtab" data-sec="greenhouse" onclick="navTo('greenhouse')"><span class="nd-icon">🏡</span>Greenhouse</button>
       <button class="ndtab" data-sec="reminders" onclick="navTo('reminders')"><span class="nd-icon">⏰</span>Reminders<span class="nd-badge" id="nd-rbadge" style="display:none">0</span></button>
+      <button class="ndtab" data-sec="calendar" onclick="navTo('calendar')"><span class="nd-icon">📅</span>Calendar</button>
       <button class="ndtab" data-sec="contam" onclick="navTo('contam')"><span class="nd-icon">☣️</span>Contam</button>
       <div class="nd-divider"></div>
       <button class="ndtab" data-sec="analytics" onclick="navTo('analytics')"><span class="nd-icon">📊</span>Analytics</button>
@@ -6522,6 +6533,7 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
       <button class="ndtab" data-sec="news" onclick="navTo('news')"><span class="nd-icon">📰</span>News</button>
       <button class="ndtab" data-sec="help" onclick="navTo('help')"><span class="nd-icon">❓</span>Help</button>
       <button class="ndtab" data-sec="logicflows" onclick="navTo('logicflows')"><span class="nd-icon">🔗</span>Logic Flows</button>
+      <button class="ndtab" data-sec="changelog" onclick="navTo('changelog')"><span class="nd-icon">📋</span>Changelog</button>
       <div class="nd-divider"></div>
       <button class="ndtab" data-sec="journal" onclick="navTo('journal')"><span class="nd-icon">📔</span>Lab Journal</button>
       <button class="ndtab" data-sec="schedule" onclick="navTo('schedule')"><span class="nd-icon">📅</span>Schedule</button>
@@ -20368,8 +20380,8 @@ function switchSection(name){
   document.querySelectorAll('.section').forEach(el=>el.classList.remove('on'));
   const sec=document.getElementById(`sec-${name}`);
   if(sec) sec.classList.add('on');
-  // Sync drawer active state — highlight both stock and supply tabs when on supply
-  document.querySelectorAll('.ndtab').forEach(t=>t.classList.toggle('active',t.dataset.sec===name));
+  // Sync drawer active state — also highlight stock tab when on supply (stock→supply redirect)
+  document.querySelectorAll('.ndtab').forEach(t=>t.classList.toggle('active',t.dataset.sec===name||(name==='supply'&&t.dataset.sec==='stock')));
   if(name==='reminders') renderReminders();
   if(name==='contam') renderContamDashboard();
   if(name==='analytics') renderAnalytics();
