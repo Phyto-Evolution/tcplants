@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#161b22">
-<title>TC Plants — Lab Notes</title>
+<title>Forest Studio Labs — Lab Notes</title>
 <link rel="manifest" href="manifest.json">
 <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js" integrity="sha384-odPBjvtXVM/5hOYIr3A1dB+flh0c3wAT3bSesIOqEGmyUA4JoKf/YTWy0XKOYAY7" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js" integrity="sha384-cwS6YdhLI7XS60eoDiC+egV0qHp8zI+Cms46R0nbn8JrmoAzV9uFL60etMZhAnSu" crossorigin="anonymous"></script>
@@ -394,22 +394,21 @@ main > .dview, main > .editor{ margin:0 auto; }
 @keyframes spin{to{transform:rotate(360deg)}}
 #overlay p{font-size:14px;color:var(--mu)}
 #toast{
-  position:fixed;top:52px;left:16px;
-  background:var(--glass);border:1px solid var(--glass-bd);
-  border-radius:0 0 10px 10px;
-  padding:9px 16px;font-size:13px;font-weight:500;
-  z-index:500;max-width:360px;
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  transform:translateY(-64px);opacity:0;pointer-events:none;
-  transition:transform .22s cubic-bezier(.22,1,.36,1),opacity .2s ease;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  box-shadow:0 4px 16px rgba(0,0,0,.18);
+  display:inline-flex;align-items:center;
+  background:rgba(var(--sf-rgb,30,30,30),.92);border:1px solid var(--bd);
+  border-radius:20px;
+  padding:0;font-size:12px;font-weight:500;
+  max-width:0;overflow:hidden;white-space:nowrap;
+  opacity:0;flex-shrink:0;
+  transition:max-width .28s cubic-bezier(.22,1,.36,1),opacity .2s ease,padding .25s cubic-bezier(.22,1,.36,1);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  box-shadow:none;pointer-events:none;
 }
-#toast.on{transform:translateY(0);opacity:1;pointer-events:auto}
-#toast.hide{transform:translateY(-64px);opacity:0;pointer-events:none}
-#toast.ok{border-color:var(--gn);border-top-color:var(--gn)}
-#toast.fail{border-color:var(--rd);border-top-color:var(--rd)}
-#toast.warn{border-color:var(--yw);border-top-color:var(--yw)}
+#toast.on{max-width:340px;padding:4px 12px;opacity:1;pointer-events:auto}
+#toast.hide{max-width:0;padding:0;opacity:0;pointer-events:none}
+#toast.ok{border-color:var(--gn);color:var(--gn)}
+#toast.fail{border-color:var(--rd);color:var(--rd)}
+#toast.warn{border-color:var(--yw);color:var(--yw)}
 
 /* ── VANAKKAM GREETING ── */
 #vanakkam-greeting{
@@ -2204,7 +2203,6 @@ input, textarea, select {
 
 <div id="overlay" aria-live="polite"><div class="spin"></div><p id="ovmsg">Working…</p></div>
 <div id="aria-live" aria-live="polite" aria-atomic="true" style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden"></div>
-<div id="toast"></div>
 <div id="vanakkam-greeting" style="display:none!important">
   <div class="vk-card">
     <div class="vk-icon">🌿🙏</div>
@@ -2217,7 +2215,7 @@ input, textarea, select {
 <!-- ═══════════ WELCOME SPLASH ═══════════ -->
 <div id="welcome-splash">
   <div class="ws-leaf">🌿</div>
-  <div class="ws-title">TC Plants Lab Notes</div>
+  <div class="ws-title">Forest Studio Labs</div>
   <div class="ws-sub">End-to-end encrypted · GitHub-backed</div>
   <div class="ws-bar"><div class="ws-bar-fill"></div></div>
 </div>
@@ -2264,7 +2262,7 @@ input, textarea, select {
   <div class="lbox">
     <div class="llogo">
       <span class="ic">🌿</span>
-      <h1>TC Plants Lab Notes</h1>
+      <h1>Forest Studio Labs</h1>
       <p>Encrypted plant tissue culture lab. Sign in with your credentials to continue.</p>
     </div>
     <div class="field">
@@ -2297,7 +2295,8 @@ input, textarea, select {
   <nav>
     <button id="nav-hamburger" title="Menu" aria-label="Toggle navigation menu" onclick="toggleNavDrawer()">☰</button>
     <button class="nav-home-btn" title="Home" aria-label="Go to home" onclick="goHome()">🏠</button>
-    <div class="brand" role="banner">🌿 TC Plants <span>/ Lab</span></div>
+    <div class="brand" role="banner">🌿 Forest Studio Labs <span>/ Lab</span></div>
+    <div id="toast"></div>
     <span class="nav-spacer"></span>
     <div id="nav-clock" onclick="navTo('calendar')" title="Chennai IST · tap to open Calendar" aria-label="Current time in Chennai IST">
       <div id="nc-time">--:--:--</div>
@@ -3470,7 +3469,7 @@ input, textarea, select {
 
       <!-- VERSION HEADER -->
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
-        <h1 style="font-size:22px;font-weight:800;margin:0">🌿 TC Plants Lab Notes</h1>
+        <h1 style="font-size:22px;font-weight:800;margin:0">🌿 Forest Studio Labs</h1>
         <span class="help-version-badge">v3.14</span>
         <button class="btn xs ghost" onclick="navTo('changelog')" style="border-color:var(--pu);color:var(--pu)">📋 Changelog →</button>
         <button class="btn xs ghost" onclick="navTo('logicflows')" style="margin-left:4px;border-color:var(--ac);color:var(--ac)">🔗 Logic Flows →</button>
@@ -6503,7 +6502,7 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
   <div id="nav-backdrop" onclick="closeNavDrawer()"></div>
   <div id="nav-drawer">
     <div id="nav-drawer-head">
-      <div class="brand">🌿 TC Plants</div>
+      <div class="brand">🌿 Forest Studio Labs</div>
       <button class="nd-close" onclick="closeNavDrawer()">✕</button>
     </div>
     <div id="nav-drawer-tabs">
@@ -7173,7 +7172,7 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
     </div>
     <div class="set-about">
       <div style="font-size:22px;margin-bottom:6px">🌿</div>
-      <div style="font-weight:700;margin-bottom:2px">TC Plants Lab Notes</div>
+      <div style="font-weight:700;margin-bottom:2px">Forest Studio Labs</div>
       <div style="color:var(--mu)">v2.0 · AES-256-GCM encrypted · GitHub-backed</div>
       <div style="margin-top:8px;color:var(--mu)">Built for plant tissue culture labs.<br>Data never leaves your browser unencrypted.</div>
     </div>
@@ -9565,7 +9564,7 @@ function slugify(s){ return String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').r
 let _ov;
 function load(msg='Working…'){document.getElementById('ovmsg').textContent=msg;document.getElementById('overlay').classList.add('on');}
 function unload(){document.getElementById('overlay').classList.remove('on');}
-let _tt;
+let _tt, _tt2;
 function toast(msg,type='ok',dur=3200){
   const t=document.getElementById('toast');
   clearTimeout(_tt);clearTimeout(_tt2);
@@ -9573,11 +9572,10 @@ function toast(msg,type='ok',dur=3200){
   t.className=type; // reset to base state (invisible)
   requestAnimationFrame(()=>{ t.classList.add('on'); }); // next frame → transition in
   _tt=setTimeout(()=>{
-    t.classList.remove('on'); t.classList.add('hide'); // slide back up
-    _tt2=setTimeout(()=>{ t.className=''; },240);
+    t.classList.remove('on'); t.classList.add('hide');
+    _tt2=setTimeout(()=>{ t.className=''; },280);
   },dur);
 }
-let _tt2;
 
 function showVanakkam(){ }
 
@@ -11224,7 +11222,7 @@ async function exportCalendar(scope){
     :`${new Date(startDate+'T00:00:00').toLocaleDateString('en-IN',{month:'long',year:'numeric'})}`;
 
   const w=window.open('','_blank');
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>TC Plants Lab — ${esc(titleStr)}</title>
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Forest Studio Labs — ${esc(titleStr)}</title>
 <style>
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;max-width:820px;margin:40px auto;color:#000;padding:0 20px}
 h1{font-size:22px;margin-bottom:4px}
@@ -11248,7 +11246,7 @@ img{max-width:100%}
 @page{margin:2cm}
 </style>
 </head><body>
-<h1>TC Plants Lab</h1>
+<h1>Forest Studio Labs</h1>
 <div class="period">${esc(titleStr)}</div>
 ${sections}
 </body></html>`);
@@ -12041,7 +12039,7 @@ function exportLabReport(mode){
   const spSet=new Set([...bots.map(b=>b.species),...notes.map(n=>n.species)].filter(Boolean));
 
   const html=`<!DOCTYPE html><html><head><meta charset="utf-8">
-  <title>TC Plants Lab Report — ${dateStr}</title>
+  <title>Forest Studio Labs Report — ${dateStr}</title>
   <style>
     body{font-family:system-ui,sans-serif;max-width:900px;margin:0 auto;padding:32px;color:#1a1a2e}
     h1{font-size:22px;margin-bottom:4px}h2{font-size:16px;margin:20px 0 8px;border-bottom:1px solid #ddd;padding-bottom:4px}
@@ -12055,7 +12053,7 @@ function exportLabReport(mode){
     @media print{body{padding:16px}}
   </style></head><body>
   <h1>Forest Studio Labs — Inventory Report</h1>
-  <div class="meta">Generated: ${dateStr} · TC Plants Lab Management System</div>
+  <div class="meta">Generated: ${dateStr} · Forest Studio Labs Management System</div>
   <div class="stats">
     <div class="stat"><div class="big">${bots.length}</div><div class="lbl">Total bottles</div></div>
     <div class="stat"><div class="big" style="color:#1abc9c">${active}</div><div class="lbl">Active</div></div>
@@ -20080,7 +20078,7 @@ function _printInvoice(id){
   ${sale.notes?`<div class="notes-box"><strong>Notes:</strong> ${esc(sale.notes)}</div>`:''}
   <div class="footer">
     Forest Studio Labs · Kelambakkam, Chennai · Phyto Evolution Private Limited<br>
-    This invoice was generated by TC Plants Lab Notes. Thank you for your order.
+    This invoice was generated by Forest Studio Labs. Thank you for your order.
   </div>
   <div style="margin-top:24px;text-align:center"><button onclick="window.print()" style="padding:8px 20px;background:#1a472a;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;font-weight:600">🖨 Print</button></div>
   </body></html>`;
