@@ -22755,8 +22755,7 @@ function openSettings(){
   document.getElementById('set-qr-enhance').checked=enhance;
   document.getElementById('set-qr-harder').checked=harder;
   const curTheme=document.documentElement.dataset.theme||'dark';
-  const nxtTheme=_themeNext(curTheme);
-  document.getElementById('set-theme-btn').textContent=_themeIcon(curTheme)+' '+nxtTheme[0].toUpperCase()+nxtTheme.slice(1);
+  document.getElementById('set-theme-btn').textContent=_themeIcon(curTheme)+' '+curTheme[0].toUpperCase()+curTheme.slice(1);
   document.getElementById('settings-panel').classList.add('open');
   document.getElementById('settings-backdrop').classList.add('on');
 }
@@ -23140,24 +23139,26 @@ if(_st) document.getElementById('ltok').value=_st;
 })();
 
 // ── THEME (4-way cycle: dark → light → paper → green → dark) ─────────
-function _themeNext(t){ const c={dark:'light',light:'paper',paper:'green',green:'dark'}; return c[t]||'dark'; }
-function _themeIcon(t){ const c={dark:'☀️',light:'📄',paper:'🟢',green:'🌙'}; return c[t]||'☀️'; }
-function _themeColor(t){ const c={dark:'#161b22',light:'#f6f8fa',paper:'#f0e2c8',green:'#020d07'}; return c[t]||'#161b22'; }
+function _themeNext(t){ const c={dark:'light',light:'paper',paper:'dark'}; return c[t]||'dark'; }
+function _themeIcon(t){ const c={dark:'🌙',light:'☀️',paper:'📄'}; return c[t]||'🌙'; }
+function _themeColor(t){ const c={dark:'#161b22',light:'#f6f8fa',paper:'#f0e2c8'}; return c[t]||'#161b22'; }
 function _applyTheme(t){
+  if(!{dark:1,light:1,paper:1}[t]) t='dark'; // sanitise old 'green' etc.
   document.documentElement.dataset.theme=t;
   localStorage.setItem('tcplants_theme',t);
   const icon=_themeIcon(t);
+  const label=t[0].toUpperCase()+t.slice(1);
   const tb=document.getElementById('theme-btn');
   const lb=document.getElementById('login-theme-btn');
   const sb=document.getElementById('set-theme-btn');
   if(tb) tb.textContent=icon;
   if(lb) lb.textContent=icon;
-  const nxt=_themeNext(t);
-  if(sb) sb.textContent=icon+' '+nxt[0].toUpperCase()+nxt.slice(1);
+  if(sb) sb.textContent=icon+' '+label; // shows CURRENT theme
   document.querySelector('meta[name="theme-color"]').setAttribute('content',_themeColor(t));
 }
 (function(){
-  const saved=localStorage.getItem('tcplants_theme')||'dark';
+  let saved=localStorage.getItem('tcplants_theme')||'dark';
+  if(!{dark:1,light:1,paper:1}[saved]) saved='dark';
   const icon=_themeIcon(saved);
   const tb=document.getElementById('theme-btn');
   const lb=document.getElementById('login-theme-btn');

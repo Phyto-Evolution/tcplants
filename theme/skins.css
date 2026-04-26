@@ -78,58 +78,6 @@
 }
 
 
-/* ── GREEN GLOW — radioactive phosphor / lab radiation ─────── */
-[data-theme="green"] {
-  --bg:  #020d07;
-  --sf:  #041a0c;
-  --sf2: #062414;
-  --sf3: #0a3320;
-  --bd:  #0d5c2e;
-  --tx:  #b8ffcc;
-  --mu:  #4dbb7a;
-  --ac:  #39ff14;
-  --gn:  #00ff41;
-  --rd:  #ff1744;
-  --yw:  #ccff00;
-  --pu:  #c060ff;
-  --glass:    rgba(2,13,7,.80);
-  --glass-bd: rgba(57,255,20,.25);
-}
-
-[data-theme="green"] body {
-  background-image:
-    radial-gradient(circle, rgba(57,255,20,0.07) 1px, transparent 1px),
-    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,65,0.012) 2px, rgba(0,255,65,0.012) 4px);
-  background-size: 22px 22px, 100% 4px;
-}
-
-[data-theme="green"] #login {
-  background-image:
-    radial-gradient(ellipse 70% 60% at 30% 40%, rgba(57,255,20,.18) 0%, transparent 70%),
-    radial-gradient(ellipse 50% 50% at 75% 70%, rgba(0,255,65,.10) 0%, transparent 65%),
-    radial-gradient(ellipse 35% 35% at 55% 20%, rgba(0,200,100,.08) 0%, transparent 60%);
-  background-color: var(--bg);
-}
-
-[data-theme="green"] .section,
-[data-theme="green"] .nd-list-area {
-  background: var(--bg);
-}
-
-[data-theme="green"] .help-version-badge,
-[data-theme="green"] .sale-status-pill.received {
-  box-shadow: 0 0 8px rgba(57,255,20,.5);
-}
-
-[data-theme="green"] #vanakkam-greeting { background: rgba(2,13,7,.80); }
-[data-theme="green"] .vk-card {
-  background: rgba(4,26,12,.95);
-  border-color: rgba(57,255,20,.3);
-  box-shadow: 0 0 40px rgba(57,255,20,.15), 0 0 0 1px rgba(0,255,65,.15);
-}
-
-[data-theme="green"] #login-wave { display: none; }
-
 
 /* ════════════════════════════════════════════════════════════
  * FUTURE SKINS — add blocks below here
