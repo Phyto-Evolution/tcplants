@@ -21890,11 +21890,7 @@ async function renderChangelog(force=false){
 }
 
 // ── IoT MASTER CONTROL PANEL ─────────────────────────────────────────────────
-const _IOT_WORKER = (()=>{
-  // Try to read worker URL from config; fall back to localhost placeholder
-  const stored = localStorage.getItem('tcplants_iot_worker') || '';
-  return stored;
-})();
+const _IOT_WORKER = localStorage.getItem('tcplants_iot_worker') || 'https://plantking.ape.workers.dev';
 let _iotWorkerUrl = _IOT_WORKER;
 const _iotKey = ()=> localStorage.getItem('tcplants_iot_key') || '';
 
@@ -21907,11 +21903,6 @@ let _iotSerial    = null;       // Web Serial port object
 let _iotChipType  = null;       // 'esp32' or 'esp8266' detected
 
 function _iotInit(){
-  // Check worker URL config on first open
-  if(!_iotWorkerUrl){
-    const u = prompt('Enter your IoT Worker URL (e.g. https://your-worker.workers.dev):\n\nYou can change this later in IoT → ⚙ Settings.');
-    if(u){ _iotWorkerUrl = u.trim(); localStorage.setItem('tcplants_iot_worker', _iotWorkerUrl); }
-  }
   _iotPollStart();
   _iotRefresh();
 }
