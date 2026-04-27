@@ -7,12 +7,10 @@ binding = "IOT_DB"
 database_name = "tcplants-iot"
 database_id = "ecae7634-02b6-4f12-b283-6f4f950c2cdf"
 
-# Environment variables — set secret values in Cloudflare dashboard
+# Secrets — stored in Cloudflare dashboard, never committed here
 # Workers → plantking → Settings → Variables and Secrets
-# Required:
-#   GROQ_KEY      — Groq API key (Ravana AI + Whisper)
-#   CLAUDE_KEY    — Anthropic API key (Ravana AI)
-#   GEMINI_KEY    — Google Gemini API key (Ravana AI + vision)
-#   IOT_KEY       — shared secret for IoT devices + PWA (any strong string)
-# Optional:
-#   BRAVE_KEY     — Brave Search API key (web search; DDG used if missing)
+# [vars] below is for non-secret config only
+
+[vars]
+# Non-secret vars (safe to commit)
+# SECRET vars set in dashboard: GROQ_KEY, CLAUDE_KEY, GEMINI_KEY, IOT_KEY, BRAVE_KEY
