@@ -1079,7 +1079,38 @@ main > .dview, main > .editor{ margin:0 auto; }
   .iot-device-grid{grid-template-columns:1fr}
   #iot-detail{width:100vw;right:-100vw}
   .iot-flash-card,.iot-add-card{padding:16px}
+  #iot-help-panel{width:100vw;right:-100vw}
 }
+/* ── IoT Help Panel ── */
+#iot-help-panel{position:fixed;top:0;right:-540px;width:540px;max-width:100vw;height:100vh;background:var(--sf);border-left:1px solid var(--bd);z-index:301;transition:right .25s;display:flex;flex-direction:column}
+#iot-help-panel.open{right:0}
+#iot-help-backdrop{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.3)}
+#iot-help-backdrop.on{display:block}
+.iot-help-head{display:flex;align-items:center;gap:8px;padding:14px 16px;border-bottom:1px solid var(--bd);flex-shrink:0;position:sticky;top:0;background:var(--sf);z-index:1}
+.iot-help-head-title{font-size:14px;font-weight:800;flex:1}
+.iot-help-search{flex:1;padding:6px 11px;border-radius:8px;border:1px solid var(--bd);background:var(--sf2);color:var(--tx);font-size:12px;outline:none}
+.iot-help-search:focus{border-color:var(--ac)}
+.iot-help-body{flex:1;overflow-y:auto;padding:14px 16px}
+.iot-hcard{background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:13px 15px;margin-bottom:10px}
+.iot-hcard-title{font-size:12px;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.iot-hcard-body{font-size:12px;color:var(--mu);line-height:1.75}
+.iot-hcard-body code{background:var(--sf);padding:1px 5px;border-radius:4px;font-family:monospace;color:var(--ac);font-size:11px}
+.iot-hcard-body ul{margin:5px 0 5px 14px;padding:0}
+.iot-hcard-body li{margin-bottom:2px}
+.iot-hcard-body strong{color:var(--tx);font-weight:700}
+.iot-hstep{display:flex;gap:9px;align-items:flex-start;padding:5px 0;border-bottom:1px solid var(--sf);font-size:12px;color:var(--mu);line-height:1.6}
+.iot-hstep:last-child{border-bottom:none}
+.iot-hstep-n{width:20px;height:20px;border-radius:50%;background:var(--ac);color:#0d1117;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.iot-htag{display:inline-block;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:700;margin:2px 2px 0 0}
+.iot-htag.ac{background:rgba(88,166,255,.12);color:var(--ac);border:1px solid rgba(88,166,255,.2)}
+.iot-htag.gn{background:rgba(63,185,80,.12);color:var(--gn);border:1px solid rgba(63,185,80,.2)}
+.iot-htag.yw{background:rgba(210,153,34,.12);color:var(--yw);border:1px solid rgba(210,153,34,.2)}
+.iot-htag.rd{background:rgba(248,81,73,.12);color:var(--rd);border:1px solid rgba(248,81,73,.2)}
+.iot-htable{width:100%;border-collapse:collapse;font-size:11px;margin-top:6px}
+.iot-htable td,.iot-htable th{padding:5px 8px;border:1px solid var(--bd);text-align:left;vertical-align:top}
+.iot-htable th{background:var(--sf);font-weight:700;color:var(--tx)}
+.iot-htable td{color:var(--mu)}
+.iot-htable td:first-child{color:var(--ac);font-family:monospace;white-space:nowrap}
 /* ── CLEAN STREAK ── */
 .dc-streak-num{font-family:var(--mono);font-size:42px;font-weight:900;line-height:1;margin-bottom:4px}
 /* ── RECIPE SCALE ── */
@@ -3635,6 +3666,7 @@ input, textarea, select {
           <div style="font-size:13px;line-height:1.6"><strong>⏱ Daily timers</strong> — schedule ON/OFF events by HH:MM on any output pin. Select repeat days (Mon–Sun toggles). Optional auto-off duration (e.g. 300 s). Evaluated server-side on every heartbeat — no firmware update needed to add timers.</div>
           <div style="font-size:13px;line-height:1.6"><strong>🤖 Automation rules</strong> — if-then rules: "if temp &gt; 28 → fan ON". Supports &lt;, &gt;, ≤, ≥, ==. Hysteresis and cooldown prevent relay chatter. Rules run on the Cloudflare Worker, zero firmware logic required.</div>
           <div style="font-size:13px;line-height:1.6"><strong>🖥 Browser firmware flasher</strong> — plug an ESP into USB, click "Connect", detect chip, fetch the compiled .bin from your repo, and flash — all in-browser via Web Serial API (Chrome/Edge). Then write WiFi + worker config over serial without reflashing.</div>
+          <div style="font-size:13px;line-height:1.6"><strong>❓ IoT Help panel</strong> — tap "❓ Help" in the IoT header for searchable inline docs: hardware setup, Arduino IDE libraries, flash walkthrough, pin types, device lifecycle, automation rules, timer UTC offset, and troubleshooting table.</div>
           <div style="font-size:13px;line-height:1.6"><strong>📋 Full command log</strong> — every manual tap, timer fire, or automation trigger is stored in D1 with timestamp, latency, and source. View the last 50 commands in the device detail panel → Cmd Log tab.</div>
         </div>
       </div>
@@ -6714,6 +6746,8 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
             <tr><td>_iotRenderRules / _iotSaveRule</td><td>GET/POST /api/iot/automations — if-then rules with hysteresis + cooldown</td></tr>
             <tr><td>_iotSerialConnect / _iotFlashFirmware</td><td>Web Serial API: open port, write firmware binary, write JSON config</td></tr>
             <tr><td>_iotSaveDevice / _iotOpenAdd</td><td>Register or update device + pins via /api/iot/register · /api/iot/devices/:id</td></tr>
+            <tr><td>_iotHelpOpen / _iotHelpClose</td><td>Slide-in help panel — 8 searchable cards covering hardware, flashing, pin types, lifecycle, automation, timers, troubleshooting</td></tr>
+            <tr><td>_iotHelpSearch(q)</td><td>Filters .iot-hcard elements by data-tags + textContent — live search as user types</td></tr>
           </table>
           <h2 class="help-h2">D1 Schema Tables</h2>
           <table class="help-table">
@@ -6847,6 +6881,7 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
       <button class="btn sm ghost" onclick="_iotOpenAdd()">+ Add Device</button>
       <button class="btn sm ghost" style="border-color:var(--pu);color:var(--pu)" onclick="_iotOpenFlash()">⚡ Flash Firmware</button>
       <button class="btn xs ghost" onclick="_iotRefresh()" title="Refresh now" id="iot-refresh-btn">↺</button>
+      <button class="btn xs ghost" onclick="_iotHelpOpen()" title="Help & Docs" style="border-color:var(--ac);color:var(--ac)">❓ Help</button>
       <span id="iot-poll-status" style="font-size:10px;color:var(--mu)"></span>
     </div>
     <!-- Stats bar -->
@@ -7019,6 +7054,170 @@ Use Ravana to extract structured data once you're done writing." style="flex:1;p
           <div id="iot-cfg-status" style="font-size:12px;color:var(--mu);margin-top:8px"></div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ── IoT HELP PANEL ── -->
+  <div id="iot-help-backdrop" onclick="_iotHelpClose()"></div>
+  <div id="iot-help-panel">
+    <div class="iot-help-head">
+      <span style="font-size:16px">❓</span>
+      <span class="iot-help-head-title">IoT Help &amp; Docs</span>
+      <input class="iot-help-search" id="iot-help-search-input" placeholder="Search docs…" oninput="_iotHelpSearch(this.value)">
+      <button class="btn xs ghost" onclick="_iotHelpClose()">✕</button>
+    </div>
+    <div class="iot-help-body" id="iot-help-body">
+
+      <div class="iot-hcard" data-tags="hardware esp32 esp8266 usb cable chrome edge browser requirements">
+        <div class="iot-hcard-title">🛒 What You Need</div>
+        <div class="iot-hcard-body">
+          <ul>
+            <li><strong>Board:</strong> ESP32 (recommended) or ESP8266 — any dev board with USB</li>
+            <li><strong>Cable:</strong> USB-A to Micro-USB or USB-C (data cable, not charge-only)</li>
+            <li><strong>Browser:</strong> Chrome or Edge only — Web Serial API is not supported in Safari or Firefox</li>
+            <li><strong>Software:</strong> Arduino IDE 2.x for compiling firmware (one-time)</li>
+            <li><strong>Power:</strong> 5V via USB or external supply for relay boards</li>
+          </ul>
+          <div style="margin-top:6px"><span class="iot-htag gn">ESP32</span><span class="iot-htag ac">ESP8266</span><span class="iot-htag yw">Chrome/Edge only</span></div>
+        </div>
+      </div>
+
+      <div class="iot-hcard" data-tags="arduino ide compile libraries arduinojson dht ds18b20 install setup">
+        <div class="iot-hcard-title">🔧 Arduino IDE Setup</div>
+        <div class="iot-hcard-body">
+          <div style="margin-bottom:6px">Install these libraries via <strong>Tools → Manage Libraries</strong>:</div>
+          <table class="iot-htable">
+            <tr><th>Library</th><th>By</th><th>Needed for</th></tr>
+            <tr><td>ArduinoJson</td><td>Benoit Blanchon</td><td>All — JSON parsing</td></tr>
+            <tr><td>DHT sensor library</td><td>Adafruit</td><td>DHT11 / DHT22 sensors</td></tr>
+            <tr><td>OneWire</td><td>Paul Stoffregen</td><td>DS18B20 temp probes</td></tr>
+            <tr><td>DallasTemperature</td><td>Miles Burton</td><td>DS18B20 temp probes</td></tr>
+          </table>
+          <div style="margin-top:8px">Board packages (via <strong>Boards Manager</strong>):
+            <ul>
+              <li>ESP32: search <code>esp32</code> by Espressif Systems</li>
+              <li>ESP8266: search <code>esp8266</code> by ESP8266 Community</li>
+            </ul>
+          </div>
+          <div style="margin-top:6px">Open <code>firmware/tcplants-iot.ino</code>, select your board, compile. Export the binary via <strong>Sketch → Export Compiled Binary</strong> — commit the <code>.bin</code> to <code>firmware/esp32/latest.bin</code> or <code>firmware/esp8266/latest.bin</code> in the repo before using the browser flasher.</div>
+        </div>
+      </div>
+
+      <div class="iot-hcard" data-tags="flash firmware browser flasher web serial steps connect detect chip binary">
+        <div class="iot-hcard-title">⚡ How the Browser Flasher Works</div>
+        <div class="iot-hcard-body">
+          <div style="margin-bottom:8px">Click <strong>⚡ Flash Firmware</strong> in the header. It runs a 5-step wizard entirely in your browser using the Web Serial API — no esptool, no command line.</div>
+          <div class="iot-hstep"><span class="iot-hstep-n">1</span><span><strong>Prepare:</strong> Download the <code>.ino</code> source from GitHub. Compile in Arduino IDE and commit the <code>.bin</code> to the repo. The flasher fetches that binary at flash time — if it's not there, step 4 will fail.</span></div>
+          <div class="iot-hstep"><span class="iot-hstep-n">2</span><span><strong>Connect USB:</strong> Plug the ESP into USB. Click "Connect USB Serial" — your browser shows a port picker. Select the ESP's COM/tty port. Baud rate is set to 115200 automatically.</span></div>
+          <div class="iot-hstep"><span class="iot-hstep-n">3</span><span><strong>Detect chip:</strong> The app sends an ESP bootloader sync byte sequence and waits for a response to guess ESP32 vs ESP8266. If auto-detect fails (common), select the chip manually from the dropdown override.</span></div>
+          <div class="iot-hstep"><span class="iot-hstep-n">4</span><span><strong>Flash firmware:</strong> Fetches <code>firmware/esp32/latest.bin</code> (or esp8266) from your GitHub repo raw URL, then writes it to the device in 512-byte chunks over serial. Progress bar fills as it writes.</span></div>
+          <div class="iot-hstep"><span class="iot-hstep-n">5</span><span><strong>Write config:</strong> Sends your WiFi SSID, password, device name, location, and worker URL as a JSON packet over serial. Format: <code>\x01CFG:{json}\x04</code>. The device receives it, saves to EEPROM/Preferences, then reboots and connects to WiFi automatically.</span></div>
+          <div style="margin-top:8px;padding:8px 10px;background:rgba(210,153,34,.08);border-radius:6px;font-size:11px;color:var(--yw);border:1px solid rgba(210,153,34,.2)">⚠️ The browser flasher writes firmware in raw chunks — it is <em>not</em> the full esptool ROM protocol. It works for config writes and simple re-flashes after the device already has the bootloader. For a blank chip, use esptool or Arduino IDE for the first flash.</div>
+        </div>
+      </div>
+
+      <div class="iot-hcard" data-tags="device lifecycle boot register heartbeat command poll confirm first boot">
+        <div class="iot-hcard-title">🔄 Device Lifecycle</div>
+        <div class="iot-hcard-body">
+          <div class="iot-hstep"><span class="iot-hstep-n">1</span><span><strong>Boot:</strong> Device loads config from EEPROM (ESP8266) or Preferences (ESP32). Connects to WiFi.</span></div>
+          <div class="iot-hstep"><span class="iot-hstep-n">2</span><span><strong>Register (first boot only):</strong> If no <code>device_id</code> is stored, sends <code>POST /api/iot/register</code> with name + location. Worker creates a row in D1 and returns an ID. Device saves the ID permanently.</span></div>
+          <div class="iot-hstep"><span class="iot-hstep-n">3</span><span><strong>Load pin config:</strong> Fetches <code>GET /api/iot/devices</code>, finds its own entry, and loads the pin list (GPIO number, type, label). Sets up GPIO modes.</span></div>
+          <div class="iot-hstep"><span class="iot-hstep-n">4</span><span><strong>Heartbeat (every 30s):</strong> Reads all sensor pins, sends readings + output pin states to <code>POST /api/iot/heartbeat</code>. Worker saves readings to D1 and evaluates automation rules. Any triggered commands are returned in the response and executed immediately.</span></div>
+          <div class="iot-hstep"><span class="iot-hstep-n">5</span><span><strong>Command poll (every 5s):</strong> Calls <code>GET /api/iot/cmd/:deviceId</code>. Worker returns pending commands and marks them as "received". Device executes each (ON/OFF/pulse/toggle) and confirms back via <code>POST /api/iot/confirm/:cmdId</code> with GPIO readback value.</span></div>
+          <div style="margin-top:8px"><span class="iot-htag gn">Online</span> = last heartbeat &lt; 90s ago &nbsp;<span class="iot-htag rd">Offline</span> = no heartbeat for &gt; 90s</div>
+        </div>
+      </div>
+
+      <div class="iot-hcard" data-tags="pin types output relay input analog dht ds18b20 pwm gpio sensor">
+        <div class="iot-hcard-title">📌 Pin Types Reference</div>
+        <div class="iot-hcard-body">
+          <table class="iot-htable">
+            <tr><th>Type</th><th>Direction</th><th>What it does</th></tr>
+            <tr><td>output</td><td>OUT</td><td>Digital HIGH/LOW — LED, valve, buzzer</td></tr>
+            <tr><td>relay</td><td>OUT</td><td>Same as output — treated as ON/OFF switch. Cards show toggle buttons.</td></tr>
+            <tr><td>pwm</td><td>OUT</td><td>PWM output — fan speed, dimmer. Use action value 0–255.</td></tr>
+            <tr><td>input</td><td>IN</td><td>Digital read with INPUT_PULLUP — button, door sensor (0=triggered)</td></tr>
+            <tr><td>analog</td><td>IN</td><td>Analog read — moisture sensor, light sensor, potentiometer. ESP32: any ADC pin. ESP8266: A0 only.</td></tr>
+            <tr><td>dht</td><td>IN</td><td>DHT11 or DHT22 temperature + humidity. Requires Adafruit DHT library.</td></tr>
+            <tr><td>ds18b20</td><td>IN</td><td>DS18B20 waterproof temp probe (OneWire). Good for nutrient solution temp.</td></tr>
+          </table>
+          <div style="margin-top:8px;font-size:11px">GPIO numbers to avoid on ESP32: 6–11 (flash memory), 34–39 (input-only). Safe outputs: 2, 4, 5, 12–19, 21–23, 25–27, 32–33.</div>
+        </div>
+      </div>
+
+      <div class="iot-hcard" data-tags="command actions on off toggle pulse lifecycle pending received confirmed">
+        <div class="iot-hcard-title">📡 Command Lifecycle</div>
+        <div class="iot-hcard-body">
+          <div style="margin-bottom:6px">When you tap ON/OFF in the control panel, a command is created in D1 and tracked through 4 states:</div>
+          <table class="iot-htable">
+            <tr><th>State</th><th>Meaning</th></tr>
+            <tr><td>pending</td><td>Created in D1, waiting for device to pick up</td></tr>
+            <tr><td>received</td><td>Device fetched it on its 5s poll</td></tr>
+            <tr><td>confirmed</td><td>Device executed it and reported GPIO readback ✓</td></tr>
+            <tr><td>failed</td><td>Device reported execution failure</td></tr>
+          </table>
+          <div style="margin-top:8px">Supported actions: <code>on</code> · <code>off</code> · <code>toggle</code> · <code>pulse</code> (500ms HIGH then LOW). The PWA polls for confirmation using backoff: 2→3→5→8→13→15s, up to 20 attempts.</div>
+        </div>
+      </div>
+
+      <div class="iot-hcard" data-tags="automation rules if then threshold operator cooldown hysteresis sensor trigger">
+        <div class="iot-hcard-title">🤖 Automation Rules</div>
+        <div class="iot-hcard-body">
+          <div style="margin-bottom:6px">Rules are evaluated server-side on every heartbeat. Format: <em>If [sensor pin] [operator] [threshold] → [action pin] [action]</em></div>
+          <table class="iot-htable">
+            <tr><th>Field</th><th>Example</th></tr>
+            <tr><td>if_pin</td><td>temp sensor pin ID</td></tr>
+            <tr><td>operator</td><td><code>&gt;</code> <code>&lt;</code> <code>&gt;=</code> <code>&lt;=</code> <code>==</code></td></tr>
+            <tr><td>threshold</td><td>28.5 (°C, %, raw value)</td></tr>
+            <tr><td>then_pin</td><td>fan relay pin ID</td></tr>
+            <tr><td>then_action</td><td><code>on</code> or <code>off</code></td></tr>
+            <tr><td>cooldown_s</td><td>300 — minimum seconds between firings</td></tr>
+            <tr><td>hysteresis</td><td>Optional dead-band to prevent rapid toggling</td></tr>
+          </table>
+          <div style="margin-top:6px;font-size:11px">Example: temp &gt; 28°C → turn on fan. Cooldown 300s means it won't re-trigger for 5 minutes even if temp stays high.</div>
+        </div>
+      </div>
+
+      <div class="iot-hcard" data-tags="timers schedule time days week duration on off repeat">
+        <div class="iot-hcard-title">⏱ Timers</div>
+        <div class="iot-hcard-body">
+          <div style="margin-bottom:6px">Timers fire server-side when the device heartbeats at the matching minute. They don't fire if the device is offline at that exact moment.</div>
+          <ul>
+            <li><strong>Time:</strong> HH:MM in UTC (e.g. <code>01:30</code> = 7:00 AM IST)</li>
+            <li><strong>Days:</strong> 7-character string <code>1111100</code> = Mon–Fri only (Mon=0, Sun=6)</li>
+            <li><strong>Duration:</strong> Optional — if set, fires the opposite action after N seconds (e.g. turn on lights at 07:00, auto-off after 3600s)</li>
+            <li><strong>Action:</strong> <code>on</code> or <code>off</code></li>
+          </ul>
+          <div style="margin-top:6px;padding:7px 10px;background:rgba(88,166,255,.08);border-radius:6px;font-size:11px;color:var(--ac)">💡 IST is UTC+5:30, so subtract 5h30m from your local time to get the UTC value to enter. E.g. 6:00 AM IST = 00:30 UTC.</div>
+        </div>
+      </div>
+
+      <div class="iot-hcard" data-tags="config serial protocol ssid wifi password worker url iot key write reboot">
+        <div class="iot-hcard-title">🔧 Config Over Serial (No Reflash)</div>
+        <div class="iot-hcard-body">
+          <div style="margin-bottom:6px">After flashing firmware once, you can update WiFi credentials, device name, or worker URL without reflashing — just write a config packet over USB serial.</div>
+          <div style="margin-bottom:6px">The protocol: send <code>\x01CFG:{json}\x04</code> over serial at 115200 baud. The firmware detects the SOH byte (<code>0x01</code>), buffers until EOT (<code>0x04</code>), parses the JSON, saves to EEPROM/Preferences, and reboots.</div>
+          <div>Fields you can update: <code>ssid</code> · <code>pass</code> · <code>worker_url</code> · <code>name</code> · <code>location</code>. The device ID is cleared so it re-registers with the new name.</div>
+          <div style="margin-top:6px">Step 5 of the browser flasher does this automatically — you don't need to send the packet manually.</div>
+        </div>
+      </div>
+
+      <div class="iot-hcard" data-tags="troubleshoot offline error firmware missing binary safari firefox not working debug">
+        <div class="iot-hcard-title">🔴 Troubleshooting</div>
+        <div class="iot-hcard-body">
+          <table class="iot-htable">
+            <tr><th>Problem</th><th>Fix</th></tr>
+            <tr><td>Device shows Offline</td><td>Last heartbeat was &gt;90s ago. Check WiFi credentials and worker URL stored on device. Open Arduino serial monitor at 115200 to see boot logs.</td></tr>
+            <tr><td>Flash Firmware button missing</td><td>Chip detection failed. Use the manual chip dropdown override to select ESP32 or ESP8266, then retry.</td></tr>
+            <tr><td>Flash fails: "Firmware not found"</td><td>The compiled <code>.bin</code> hasn't been committed to the repo yet. Compile in Arduino IDE → Sketch → Export Compiled Binary → commit the file to <code>firmware/esp32/latest.bin</code>.</td></tr>
+            <tr><td>Web Serial not available</td><td>You're on Safari or Firefox. Open notes.tcplants.in in Chrome or Edge.</td></tr>
+            <tr><td>Commands stuck on "pending"</td><td>Device isn't polling. Check it's online. Also verify <code>IOT_KEY</code> matches between the Cloudflare Worker env var and what's stored on the device.</td></tr>
+            <tr><td>Device registers every reboot</td><td>Config not saving. On ESP8266 check EEPROM size. On ESP32 check Preferences namespace. Serial logs will show "[IoT] Config saved" if working.</td></tr>
+            <tr><td>Automation not triggering</td><td>Rules are evaluated on heartbeat (every 30s). Check the if_pin is a sensor that's actually sending readings. Check cooldown — rule won't re-fire within cooldown window.</td></tr>
+          </table>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -22647,6 +22846,23 @@ async function _iotWriteConfig(){
     toast('Config error: '+e.message, true);
   }
 }
+// ── IoT Help Panel ────────────────────────────────────────────────────────────
+function _iotHelpOpen(){
+  document.getElementById('iot-help-panel')?.classList.add('open');
+  document.getElementById('iot-help-backdrop')?.classList.add('on');
+  setTimeout(()=>document.getElementById('iot-help-search-input')?.focus(), 250);
+}
+function _iotHelpClose(){
+  document.getElementById('iot-help-panel')?.classList.remove('open');
+  document.getElementById('iot-help-backdrop')?.classList.remove('on');
+}
+function _iotHelpSearch(q){
+  const lq = q.toLowerCase().trim();
+  document.querySelectorAll('#iot-help-body .iot-hcard').forEach(c=>{
+    const hay = (c.dataset.tags||'') + ' ' + c.textContent.toLowerCase();
+    c.style.display = (!lq || hay.includes(lq)) ? '' : 'none';
+  });
+}
 // ── End IoT Panel ─────────────────────────────────────────────────────────────
 
 const _NAV_LABELS={home:'Home',notes:'Notes',registry:'Registry',recipes:'Recipes',bottles:'Bottles',greenhouse:'Greenhouse',supply:'Supply',stock:'Supply',sales:'Sales',value:'Value',search:'Search',reminders:'Reminders',calendar:'Calendar',contam:'Contam',analytics:'Analytics',species:'Species',tools:'Tools',sterilise:'Sterilise',news:'News',help:'Help',logicflows:'Logic Flows',journal:'Lab Journal',schedule:'Schedule',insights:'Insights',ai:'Ravana',files:'Files',changelog:'Changelog',gallery:'Gallery',iot:'IoT Control'};
@@ -24398,7 +24614,7 @@ const LF_SEARCH_INDEX=[
   {id:'lf-gbif', label:'GBIF Integration', keywords:['gbif','species','taxonomy','synonym','common name','distribution','native','photo','reference','hierarchy','order','class','kingdom','bulk','cp','carnivorous','nepenthes','droseraceae','sarraceniaceae','lentibulariaceae','cephalotaceae'],functions:['_taxGBIFLookup','_gbifImportSpecies','_loadSpDetailGBIF','_gbifBulkImportCP']},
   {id:'lf-value', label:'Value Inventory', keywords:['value','vault','price','cost','inr','stage','grade','seedling','small','medium','adult','estimate','total','calculation','loadValue','renderValueSection'],functions:['loadValue','renderValueSection','_valTab','_valPriceSet','_renderValueVaultPanel','fmtINR']},
   {id:'lf-export', label:'Export System', keywords:['export','csv','print','report','download','zip','calendar','blob','bottles.csv','notes.csv','greenhouse.csv'],functions:['exportLabReport','_downloadText','exportAll']},
-  {id:'lf-iot', label:'IoT Control Panel', keywords:['iot','esp','esp32','esp8266','relay','sensor','pin','gpio','heartbeat','command','timer','automation','rule','firmware','flash','serial','webserial','d1','cloudflare','worker','device','register'],functions:['_iotInit','_iotRefresh','_iotPollStart','_iotPollStop','_iotRenderDevices','_iotRenderCard','_iotSendCmd','_iotWaitConfirm','_iotOpenDetail','_iotCloseDetail','_iotDTab','_iotRenderPins','_iotRenderSensors','_iotRenderTimers','_iotSaveTimer','_iotDeleteTimer','_iotRenderRules','_iotSaveRule','_iotDeleteRule','_iotRenderCmdLog','_iotSetLoc','_iotOpenAdd','_iotEditDevice','_iotAddPinRow','_iotSaveDevice','_iotOpenFlash','_iotCloseFlash','_iotSerialConnect','_iotDetectChip','_iotFlashFirmware','_iotWriteConfig']},
+  {id:'lf-iot', label:'IoT Control Panel', keywords:['iot','esp','esp32','esp8266','relay','sensor','pin','gpio','heartbeat','command','timer','automation','rule','firmware','flash','serial','webserial','d1','cloudflare','worker','device','register'],functions:['_iotInit','_iotRefresh','_iotPollStart','_iotPollStop','_iotRenderDevices','_iotRenderCard','_iotSendCmd','_iotWaitConfirm','_iotOpenDetail','_iotCloseDetail','_iotDTab','_iotRenderPins','_iotRenderSensors','_iotRenderTimers','_iotSaveTimer','_iotDeleteTimer','_iotRenderRules','_iotSaveRule','_iotDeleteRule','_iotRenderCmdLog','_iotSetLoc','_iotOpenAdd','_iotEditDevice','_iotAddPinRow','_iotSaveDevice','_iotOpenFlash','_iotCloseFlash','_iotSerialConnect','_iotDetectChip','_iotFlashFirmware','_iotWriteConfig','_iotHelpOpen','_iotHelpClose','_iotHelpSearch']},
   {id:'lf-gaps', label:'Known Gaps', keywords:['bug','gap','issue','pending','broken','frozen','telegram','csp','memory','leak','setinterval','agentic','todo']},
   {id:null, label:'Journal', keywords:['journal','entry','parse','overnight','ravana','dictate','voice','whisper','tags','auto-flair','parseEnabled','parsed'],functions:['saveJournalEntry','parseJournalWithRavana','_scheduleOvernightJournalParse','_setJournalParseEnabled','_journalMicTap']},
   {id:null, label:'Taxonomy', keywords:['taxonomy','pack','packs','species','custom','flair','autocomplete','suggest','dropdown','modal','csv','import','gbif'],functions:['loadTaxonomy','_taxSuggest','_importCsvTaxonomy','saveCustomTaxonomy','openSpeciesPicker','_taxDropdownSelect']},
