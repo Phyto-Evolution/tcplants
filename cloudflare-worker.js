@@ -22,7 +22,7 @@ function cors(origin) {
   return {
     'Access-Control-Allow-Origin': allowed ? origin : ALLOWED_ORIGIN,
     'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, X-Lab-Secret',
+    'Access-Control-Allow-Headers': 'Content-Type, X-Lab-Secret, X-App-Key',
     'Access-Control-Max-Age': '86400',
   };
 }
